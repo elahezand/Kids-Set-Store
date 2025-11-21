@@ -1,0 +1,29 @@
+
+.no_answer {
+  color: var(--white);
+  background-color: red !important;
+}
+.answer {
+  color: rgb(255, 255, 255);
+  background-color: var(--sage) !important;
+}
+
+.check,
+.no_check {
+  font-size: 13px;
+  background: var(--text);
+  padding: 0.4rem 0.7rem;
+  width: -webkit-fill-available;
+  cursor: pointer;
+  border: 0;
+  border-radius: 3px;
+  color: var(--white);
+}
+.no_check {
+  background:var(--sage);
+}
+.row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

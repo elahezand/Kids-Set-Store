@@ -1,0 +1,55 @@
+.title {
+  color: var(--text);
+  font-size: 1.8rem;
+  border-bottom: 2px solid var(--sage);
+  padding: 1rem;
+}
+
+.container {
+  max-width: 1222px;
+  margin: 5rem auto;
+}
+
+.container main {
+  border-bottom: 2px solid var(--sage);
+}
+
+
+
+@media screen and (min-width:992) and (max-width:1200) {
+  .title {
+    font-size: 1.6rem;
+  }
+
+
+}
+
+
+@media screen and (min-width:769) and (max-width:991) {
+  .title {
+    font-size: 1.4rem;
+  }
+}
+
+
+
+
+@media screen and (min-width:481) and (max-width:768) {
+
+  .title {
+    font-size: 1.4rem;
+
+  }
+
+
+
+}
+
+@media screen and (max-width: 480) {
+
+  .title {
+    font-size: 1rem;
+  }
+
+
+}

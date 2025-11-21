@@ -1,0 +1,11 @@
+.image_article {
+    display: flex;
+    align-items: center;
+    gap: 0 1rem;
+}
+
+.image_article img {
+    width: 50px;
+    height: 50px;
+    object-fit: fill;
+}

@@ -1,0 +1,58 @@
+.form input,
+.form textarea {
+  outline: 0;
+  border: 0;
+  background:#fff;
+  width: 100%;
+  font-size: 16px;
+  border-radius: 5px;
+  color: var(--text);
+  resize: none;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--coral);
+}
+
+.groups {
+  display: flex;
+  gap: 15px;
+}
+
+.group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+  gap: 7px;
+}
+
+.form p {
+  font-size: 22px;
+  margin-bottom: 2rem;
+  margin-top: 1rem;
+  color: var(--sage);
+  font-weight: bold;
+}
+
+.form button {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 14px;
+  line-height: 18px;
+  border-radius: 4px;
+  background-color: var(--coral);
+  color: var(--white);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+
+.form span {
+  color: var(--sage);
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 1rem;
+}

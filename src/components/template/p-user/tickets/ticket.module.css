@@ -1,0 +1,52 @@
+.ticket {
+  width: 100%;
+  padding: 1rem;
+  background-color: #f7e8e8;
+  display: flex;
+  justify-content: space-between;
+  border-radius: 5px;
+  margin: 1rem auto;
+  height: 100px;
+  align-items: center;
+  color: var(--text);
+  border: 1px solid var(--sage);
+  border-right: 10px solid var(--sage);
+
+}
+
+.department {
+  padding: 0.5rem;
+  width: max-content;
+  border-radius: 5px;
+  background: var(--coral);
+  color: var(--white);
+}
+
+.ticket div {
+  text-align: center;
+}
+
+.no_answer {
+  background-color:#d0cdcdee;
+  color: var(--white);
+  border-radius: 5px;
+  padding: 0.5rem;
+}
+
+.answer {
+  background-color: var(--sage);
+  color: var(--white);
+  border-radius: 5px;
+  padding: 0.5rem;
+}
+
+.ticket div {
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ticket div:nth-child(2) {
+  padding-top: 0.5rem;
+}

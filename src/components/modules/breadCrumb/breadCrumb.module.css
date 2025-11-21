@@ -1,0 +1,19 @@
+.breadcrumb a {
+    color: var(--coral);
+}
+
+.breadcrumb span {
+    position: relative;
+    top: 2px;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    gap: 9px;
+    margin: 5rem auto;
+    padding: 1rem 0;
+    max-width: 1222px;
+    border-bottom: 2px solid var(--sage);
+}

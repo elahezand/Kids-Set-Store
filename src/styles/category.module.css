@@ -1,0 +1,28 @@
+.title {
+  color: var(--text);
+  flex-direction: row-reverse;
+  width: 100%;
+  justify-content: space-between;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  font-size: 1.3rem;
+}
+
+.link {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+}
+
+
+.products {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  overflow: hidden;
+  gap: 20px;
+  justify-content: space-between;
+  padding: 2rem;
+}

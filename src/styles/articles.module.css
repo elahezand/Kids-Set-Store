@@ -1,0 +1,139 @@
+.container {
+  color: var(--text);
+  max-width: 1222px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 60% 35%;
+  gap: 3rem;
+  padding-right: 10px;
+  padding-left: 10px;
+  margin-right: auto;
+  margin-bottom: 4rem;
+  margin-left: auto;
+}
+
+.post_header {
+  background-color: var(--coral);
+  padding: 2rem;
+  border-radius: 10px;
+  height: 100%;
+}
+
+.post_img img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.post_header h2 {
+  color: var(--white);
+  margin-bottom: 1rem;
+}
+
+
+.article {
+  background-color: var(--white);
+  padding: 2rem;
+  border-radius: 10px;
+}
+
+
+/* SMALLER ELEMENTS */
+.article h3 {
+  font-size: 20px;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 1rem;
+
+}
+
+.article strong {
+  font-size: 18px;
+  color: var(--coral);
+}
+
+
+.article p {
+  font-size: 18px;
+  line-height: 1.5;
+  margin-bottom: 15px;
+}
+
+.article ul,
+.article ol {
+  margin-bottom: 20px;
+}
+
+.article ul li {
+  list-style-type: none;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.article ul li:last-child {
+  margin-bottom: 0;
+}
+
+
+.author_container {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.author_img {
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.articles_info {
+  overflow: hidden;
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+  background-color: var(--white);
+  padding: 3rem;
+  margin-top: 2rem;
+  border-radius: 1rem;
+
+}
+
+.articles_info__article__title {
+  position: relative;
+  color: var(--sage);
+  font-size: 18px;
+}
+
+.articles_info__article__title::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 39px;
+  background-color: var(--sage);
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 12px;
+  left: -34px;
+  top: -5px;
+  transform: skewX(10deg);
+}
+
+.last_articles__list {
+  margin-top: 2rem;
+}
+
+.last_articles__item {
+  border-bottom: 1px solid var(--text);
+  padding: 1rem 0;
+}
+
+.last_articles__link {
+  font-size: 16px;
+  color: var(--text);
+  transition: all 400ms ease-in-out;
+}
+
+.last_articles__link:hover {
+  color: var(--sage);
+}
+
+/* Finish Sidebar Styles */

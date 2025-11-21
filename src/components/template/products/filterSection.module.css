@@ -1,0 +1,120 @@
+.title {
+    color: var(--text);
+    flex-direction: row-reverse;
+    width: 100%;
+    justify-content: space-between;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    margin-bottom: 2rem;
+    font-size: 1.3rem;
+}
+
+.link {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+}
+
+
+.products {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    overflow: hidden;
+    gap: 20px;
+    justify-content: space-between;
+    padding: 2rem;
+}
+
+.container_filters {
+    background: var(--mint);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 1222px;
+    margin: 3rem auto;
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+
+.product {
+    padding: 10px;
+    background: var(--coral);
+    color: #fff;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    cursor: default;
+    transition: transform 0.2s;
+}
+
+.product:hover {
+    transform: scale(1.05);
+}
+
+.products_top_bar__selection {
+    cursor: pointer;
+    position: relative;
+    background-color: var(--sage);
+    width: 200px;
+    padding: 0 0.5rem;
+    border-radius: 10px;
+}
+
+.products_top_bar__selection_title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1rem;
+    color: var(--text);
+    font-size: 16px;
+    background-color: #fff;
+    transition: all 400ms ease;
+    width: 100%;
+    border: 2px solid var(--coral);
+    outline: none;
+}
+
+
+
+.products_top_bar__selection_list {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    background-color: #fff;
+    width: 100%;
+    color: var(--text);
+    left: 1px;
+    z-index: 9999;
+    transition: all 400ms ease;
+    border: 1px solid #000;
+    padding: 0.5rem 0;
+}
+
+.products_top_bar__selection_list {
+    display: flex;
+    flex-direction: column;
+}
+
+.products_top_bar__selection_item {
+    color: var(--text);
+    font-size: 16px;
+    transition: all 200ms ease;
+    padding: 0.5rem;
+    list-style: none;
+
+}
+
+.products_top_bar__selection_item:hover {
+    background-color: blue !important;
+    color: #fff;
+}
+
+.products_top_bar__selection:hover .products_top_bar__selection_list {
+    visibility: visible;
+    opacity: 1;
+}
+
+

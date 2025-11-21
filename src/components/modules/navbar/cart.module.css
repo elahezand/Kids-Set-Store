@@ -1,0 +1,23 @@
+
+.navbar_icons {
+  display: flex;
+  gap: 30px;
+  font-size: 1.4rem;
+  align-items: center;
+  color: var(--sage);
+}
+
+.navbar_icons a {
+  position: relative;
+}
+
+.navbar_icons span {
+  left: -9px;
+  border-radius: 100%;
+  top: -7px;
+  font-size: 0.5rem;
+  padding: 0.3rem;
+  background: var(--coral);
+  color: var(--white);
+  position: absolute;
+}

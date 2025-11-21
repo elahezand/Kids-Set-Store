@@ -1,0 +1,22 @@
+
+.check,
+.no_check {
+    font-size: 13px;
+    background: var(--text);
+    padding: 0.4rem 0.7rem;
+    width: -webkit-fill-available;
+    cursor: pointer;
+    border: 0;
+    border-radius: 3px;
+    color: var(--white);
+}
+
+.check {
+    background-color: var(--sage);
+}
+
+.no_check {
+    background: rgb(177, 173, 173);
+}
+
+

@@ -1,0 +1,205 @@
+.container {
+    max-width: 1222px;
+    margin: 10rem auto;
+    padding: 3rem;
+}
+
+
+.footer {
+    background-color: var(--sage);
+    padding-top: 40px;
+}
+
+.footer main {
+    display: flex;
+    margin: 0 auto;
+    justify-content: space-between;
+    padding-bottom: 40px;
+    flex-direction: row-reverse;
+    color:var(--white);
+}
+
+.footer h4 {
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+}
+
+.links li {
+    list-style: none;
+    margin-top: 10px;
+    color: var(--white);
+}
+
+.links {
+    display: flex;
+    gap: 80px;
+    margin-right: 1rem;
+}
+
+.tooltip span i {
+    display: inline-block;
+    font-size: 25px;
+}
+
+.social_media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+
+.tooltip span {
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    background-color: var(--white);
+    color: #676767;
+    text-align: center;
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    -ms-border-radius: 100%;
+    -o-border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    -webkit-transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    -moz-transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    -ms-transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    -o-transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+
+.tooltip {
+    position: relative;
+
+}
+
+.tooltip_text {
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    -webkit-transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    -moz-transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    -ms-transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    -o-transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    margin-bottom: 2rem;
+    position: absolute;
+    top: 11px;
+    right: -12px;
+    padding: 0.5rem;
+    font-size: 1.rem;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--white);
+    box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.4);
+    z-index: 2;
+    pointer-events: none;
+}
+
+
+.tooltip_text::before {
+    content: "";
+    width: 15px;
+    height: 18px;
+    background-color: var(--white);
+    rotate: 45deg;
+    position: absolute;
+    bottom: -16px;
+    left: 56%;
+    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+    -moz-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    -o-transform: translateX(-50%);
+    z-index: -1;
+    background-color: inherit;
+}
+
+.tooltip:hover .tooltip_text {
+    top: -45px;
+    opacity: 1;
+    pointer-events: visible;
+    color: var(--white);
+}
+
+.tooltip:hover span {
+    color: var(--white);
+}
+
+.social_media .tooltip:first-child:hover span {
+    background-color: blue;
+}
+
+.social_media .tooltip:first-child:hover .tooltip_text {
+    background-color: blue;
+
+}
+
+
+
+.social_media .tooltip:nth-child(2):hover span {
+    background-color: rgb(120, 177, 243);
+}
+
+.social_media .tooltip:nth-child(2):hover .tooltip_text {
+    background-color: rgb(120, 177, 243);
+}
+
+
+.social_media .tooltip:nth-child(3):hover span {
+    background-color: red;
+}
+
+.social_media .tooltip:nth-child(3):hover .tooltip_text {
+    background-color: red;
+}
+
+
+.social_media .tooltip:nth-child(4):hover span {
+    background-color: rgb(194, 46, 115);
+}
+
+.social_media .tooltip:nth-child(4):hover .tooltip_text {
+    background-color: rgb(194, 46, 115);
+}
+
+
+.social_media .tooltip:nth-child(5):hover span {
+    background-color: rgb(59, 238, 36);
+}
+
+.social_media .tooltip:nth-child(5):hover .tooltip_text {
+    background-color: rgb(59, 238, 36);
+}
+
+.footer hr {
+    border-color: #676767;
+}
+
+.description {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.descriptions {
+    width: 300px;
+    padding: 10px;
+    font-size: 15px;
+}
+
+.description:nth-child(3) p {
+    font-size: 15px;
+}
+
+.descriptions_title {
+    margin-bottom: 30px;
+}

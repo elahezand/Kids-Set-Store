@@ -1,0 +1,39 @@
+
+.boxes {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+  justify-content: space-between;
+}
+
+.filtering select {
+  background: var(--white);
+  padding: 10px;
+  color: var(--black-color);
+  border: none;
+  border-bottom: 3px solid var(--coral);
+  margin-top: 4.5px;
+  width: 150px;
+  outline: 0;
+}
+
+.filtering {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+
+.filtering div {
+  display: flex;
+  gap: 15px;
+}
+
+.filtering button {
+  width: max-content;
+  padding: 0.8rem 1.4rem;
+  border: 0;
+  color: var(--white);
+  border-radius: 4px;
+  cursor: pointer;
+  background-color:var(--coral);
+}

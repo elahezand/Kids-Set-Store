@@ -1,0 +1,38 @@
+.response {
+    width: 100%;
+    background-color:#ffff;
+    padding: 0.5rem;
+    height: 90px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 3px solid var(--coral);
+    margin: 3rem 1rem;
+}
+
+.response input {
+    width: 100%;
+    background-color: inherit;
+    border: none;
+    outline: none;
+    height: 100%;
+}
+
+.btn {
+    width: max-content;
+    padding: 0.5rem 1rem;
+    border: 0;
+    color: var(--white);
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: var(--sage);
+    display: flex;
+    align-items: center;
+    justify-self: self-end;
+    gap: 4px;
+}
+
+.btn svg {
+    font-size: 18px;
+}

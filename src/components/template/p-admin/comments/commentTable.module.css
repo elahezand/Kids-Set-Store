@@ -1,0 +1,17 @@
+
+.answer {
+    color: var(--white);
+    background-color: var(--sage) !important;
+}
+
+.no_answer {
+    color: var(--white);
+    background-color: #f86565 !important;
+}
+
+
+.row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

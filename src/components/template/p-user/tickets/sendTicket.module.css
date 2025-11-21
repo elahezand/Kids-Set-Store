@@ -1,0 +1,81 @@
+.content {
+  display: grid;
+  padding: 0;
+  gap: 20px;
+  margin-bottom: 1rem;
+  grid-template-columns: auto auto;
+  margin-top: 5rem;
+}
+.content .group {
+  background-color:var(--white) !important;
+}
+.container {
+  padding: 0 30px;
+}
+.group,
+.uploader {
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+}
+.group select {
+  background:var(--white);
+  padding: 10px;
+  color: var(--text);
+  border-radius: 5px;
+  outline: 0;
+  border: 3px solid var(--coral);
+  margin-top: 4.5px;
+}
+.group input,
+.group textarea {
+  padding: 10px;
+  resize: none;
+  background-color:var(--white);
+  margin-top: 4px;
+  outline: 0;
+  color: var(--text);
+  border-radius: 5px;
+  border: 3px solid var(--coral);
+  width: 100%;
+}
+
+.group textarea {
+  margin-bottom: 1rem;
+}
+.uploader {
+  border-radius: 5px;
+  background-color: var(--sage);
+  text-align: center;
+  padding: 20px 0;
+  color: var(--white);
+}
+.uploader input {
+  padding: 0;
+  background-color: transparent;
+  position: relative;
+  left: 30px;
+  border: 0;
+  cursor: pointer;
+  margin: 0 auto;
+  width: max-content;
+}
+
+.btn {
+  width: max-content;
+  padding: 0.5rem 2rem;
+  border: 0;
+  color:var(--white);
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: var(--coral);
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-self: self-end;
+  gap: 4px;
+}
+.btn svg {
+  font-size: 18px;
+}

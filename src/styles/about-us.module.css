@@ -1,0 +1,69 @@
+.container {
+    color: var(--text);
+    max-width: 1222px;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-bottom: 4rem;
+    margin-left: auto;
+}
+
+.container span {
+    font-size: 16px;
+}
+
+.container section {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    color: var(--text);
+    line-height: 2rem;
+    gap: 110px;
+    padding: 40px 0;
+    margin: 5rem auto;
+}
+
+.container section div p {
+    font-size: 36px;
+
+    line-height: 2.4rem;
+}
+
+.container section div {
+    display: grid;
+    gap: 5px;
+    color: var(--white);
+    background: var(--sage);
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+
+.main p {
+    margin-top: 20px;
+}
+
+.main {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 90px;
+    margin-top: 150px;
+    margin-bottom: 150px;
+}
+
+.main div:nth-child(2) {
+    background: var(--coral);
+    padding: 3rem;
+    border-radius: 10px;
+    color: var(--white);
+
+}
+
+.main span {
+    font-size: 16px;
+}
+
+.title {
+    margin: 10px 0 !important;
+    font-size: 35px;
+}

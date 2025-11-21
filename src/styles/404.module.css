@@ -1,0 +1,80 @@
+.contents {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 5rem auto;
+  max-width: 700px;
+}
+
+.left_number {
+  margin-right: 2%;
+  z-index: -1;
+  font-size: 25em;
+  text-shadow: 28px 21px var(--sage);
+  color:var(--coral);
+}
+
+.right_number {
+  margin-left: 2%;
+  font-size: 25em;
+  color: var(--sage);
+  z-index: -1;
+  text-shadow: 28px 21px var(--coral);
+}
+
+.mug {
+  position: relative;
+  margin: 0;
+  width: 170px;
+  height: 150px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 10px var(--sage), 0 0 0 25px var(--sage) , 0 0 0 42px var(--coral),
+    0 0 0 65px var(--sage), 0 120px 0 -25px var(--coral), 100px 70px 0 -25px var(--coral),
+    80px 140px 0 -10px var(--coral), 0px 210px 0 -55px var(--coral),
+    20px 250px 0 -65px var(--coral);
+}
+
+
+.mug::after {
+  content: "";
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  position: absolute;
+  border: 3px solid var(--sage);
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  top: 0;
+  bottom: 0;
+  margin-top: auto;
+  margin-bottom: auto;
+  opacity: 0.2;
+  animation: rings 3s ease-out infinite;
+}
+
+@keyframes rings {
+  to {
+    width: 150px;
+    height: 150px;
+    opacity: 0;
+  }
+}
+
+.texts {
+  font-size: 1.5em;
+  margin: 40px;
+  text-align: center;
+  direction: rtl;
+  color: var(--sage);
+}
+
+.texts p {
+  margin-bottom: 10px;
+}
+.texts a {
+  border-bottom: 1px solid #414042;
+  color: var(--sage);
+  font-size: 1.2rem;
+}

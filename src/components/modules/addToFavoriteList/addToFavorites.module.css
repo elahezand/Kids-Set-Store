@@ -1,0 +1,27 @@
+.favorites a,
+.favorites {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 4px;
+}
+
+.tooltip {
+  align-items: center;
+  background-color: var(--sage);
+  color: var(--white);
+  text-align: center;
+  padding: 0 12px;
+  white-space: nowrap;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 34px;
+  position: relative;
+  margin-left: 0.5rem;
+  opacity: 0;
+}
+
+.favorites a:hover .tooltip,
+.favorites:hover .tooltip {
+  opacity: 1;
+}

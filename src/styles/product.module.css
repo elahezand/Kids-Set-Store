@@ -1,0 +1,24 @@
+.contents {
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-top: 160px;
+  padding-top: 25px;
+  color: var(--text);
+  direction: ltr;
+  font-family: shabnam;
+  padding-bottom: 5rem;
+}
+
+.contents hr {
+  border-top-color: rgb(0 0 0 / 23%);
+  margin: 20px 0px;
+}
+
+.main {
+  gap: 60px;
+  display: flex;
+}
+
+.container {
+  overflow: auto;
+}

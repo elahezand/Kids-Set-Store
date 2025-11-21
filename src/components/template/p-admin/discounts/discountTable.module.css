@@ -1,0 +1,11 @@
+
+.complete {
+    color: var(--white);
+    background-color: #dfdbdb !important;
+}
+
+.uncomplete {
+    color: var(--white);
+    background-color: var(--sage) !important;
+}
+

@@ -1,0 +1,48 @@
+.ticket {
+  width: 100%;
+  border-right: 3px solid var(--coral);
+  padding: 1rem;
+  background-color: #711d1c21;
+  display: flex;
+  justify-content: space-between;
+  border-radius: 5px;
+  margin: 1rem auto;
+  height: 110px;
+  align-items: center;
+}
+
+.department {
+  padding: 0.5rem;
+  width: max-content;
+  border-radius: 5px;
+  background: var(--white);
+}
+
+.ticket div {
+  text-align: center;
+}
+
+.no_answer {
+  background-color:#ffff;
+  color: var(--text);
+  border-radius: 5px;
+  padding: 0.5rem;
+}
+
+.answer {
+  background-color: var(--sage);
+  color: var(--main-color);
+  border-radius: 5px;
+  padding: 0.5rem;
+}
+
+.ticket div {
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ticket div:nth-child(2) {
+  padding-top: 0.5rem;
+}

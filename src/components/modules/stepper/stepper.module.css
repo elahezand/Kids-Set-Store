@@ -1,0 +1,43 @@
+.stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    position: absolute;
+    bottom: -34px;
+    right: 0;
+    left: 0;
+    background-color: var(--sage);
+    padding: 0.5rem ;
+    color: var(--white);
+}
+
+.active_step {
+    opacity: 1 !important;
+}
+
+.stepper_bg {
+    background-image: url(/images/ba9c3ec47af5f0eb6b5c62469d32e7c5.jpg);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 700px;
+    margin-top: 4rem;
+    position: relative;
+    padding: 2rem;
+}
+
+.stepper p,
+.stepper a {
+    display: inline-block;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    font-size: 22px;
+    line-height: 1.2;
+    opacity: 0.7;
+}
+
+.stepper svg {
+    font-size: 1.2rem;
+    opacity: 0.7;
+}
