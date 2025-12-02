@@ -56,8 +56,8 @@ export async function PUT(req, { params }) {
 export async function DELETE(req, { params }) {
     try {
         connectToDB()
-        const user = await authAdmin()
-        if (!user) throw new Error("This api Protected")
+        const admin = await authAdmin()
+        if (!admin) throw new Error("This api Protected")
 
         const { id } = await params
        

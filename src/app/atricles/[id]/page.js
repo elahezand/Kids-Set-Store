@@ -55,8 +55,7 @@ export default async function page({ params }) {
                             alt="HTML code on a screen"
                             width={400}
                             height={400}
-                            className={styles.post_img}
-                        />
+                            className={styles.post_img} />
                     </div>
                     <div className={styles.articles_info}>
                         <div className={styles.article_info}>

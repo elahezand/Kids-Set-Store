@@ -10,17 +10,27 @@ import { getMe } from "@/utils/serverHelper";
 
 const Navbar = async () => {
     const user = await getMe()
-
     let favorites = []
 
     if (user) {
         favorites = await FavoriteModel.find({ userID: user._id })
     }
-    const categories = await CategoryModel.find({})
-        .populate({
-            path: "subCategories",
-            populate: { path: "subCategories" }
-        })
+
+    const categories = await CategoryModel.find({}).lean()
+    const tree = []
+
+    function buildChildren(parent) {
+        const children = [...categories].filter(cat => cat.parentId?.toString() === parent._id.toString())
+            .map(cat => ({ ...cat, children: buildChildren(cat) }));
+
+        return children
+    }
+
+    categories.filter(parent => {
+        if (!parent.parentId) {
+            tree.push({ ...parent, children: buildChildren(parent._id) })
+        }
+    })
 
     return (
         <>
@@ -35,25 +45,25 @@ const Navbar = async () => {
                         <li>
                             <Link href="/"> Home</Link>
                         </li>
-                        {JSON.parse(JSON.stringify(categories)).map((category, index) => (
+                        {JSON.parse(JSON.stringify(tree)).map((category, index) => (
                             <li key={index + 1}
                                 className={`${styles.arrow_icon} 
                         ${styles.controol}`}>
                                 <Link href={`/products/category/${category.slug}?page=1`}>
-                                    {category.title}</Link>
+                                    {category.name}</Link>
                                 <ul className={styles.sub_menu}>
-                                    {category.subCategories.map((sub, index) => (
+                                    {category.children.map((sub, index) => (
                                         <li key={index + 1}>
                                             <Link href={`/products/category/${category.slug}/${sub.slug}?page=1`}
                                                 className={styles.menu_title}
-                                            >{sub.title}
+                                            >{sub.name}
                                             </Link>
-                                            {sub.subCategories.map((item, index) => (
+                                            {sub.children.map((item, index) => (
                                                 <ul key={index + 1}
                                                     className={`${styles.sub_menu}${styles.left_menu}`}>
                                                     <li>
                                                         <Link href={`/products/category/${category.slug}/${sub.slug}/${item.slug}?page=1`}>
-                                                            {item.title}</Link>
+                                                            {item.name}</Link>
                                                     </li>
                                                 </ul>
                                             ))}
@@ -140,7 +150,7 @@ const Navbar = async () => {
                                 <li>
                                     <Link href="/"> Home</Link>
                                 </li>
-                                {JSON.parse(JSON.stringify(categories)).map((category, index) => (
+                                {tree.map((category, index) => (
                                     <li key={index + 1}>
                                         <input id={styles.toggler_left}
                                             type="checkbox" />
@@ -149,18 +159,18 @@ const Navbar = async () => {
                                             <FaPlus />
                                         </label>
                                         <ul className={styles.sub_menu}>
-                                            {category.subCategories.map((sub, index) => (
+                                            {category.children.map((sub, index) => (
                                                 <li key={index + 1}>
                                                     <Link href={`/product/category/${category.slug}/${sub.slug}?page=1`}
                                                         className={styles.menu_title}
-                                                    >{sub.title}
+                                                    >{sub.name}
                                                     </Link>
-                                                    {sub.subCategories.map((item, index) => (
+                                                    {sub.children.map((item, index) => (
                                                         <ul key={index + 1}
                                                             className={`${styles.sub_menu}${styles.left_menu}`}>
                                                             <li>
                                                                 <Link href={`/product/category/${category.slug}/${sub.slug}/${item.slug}?page=1`}>
-                                                                    {item.title}</Link>
+                                                                    {item.name}</Link>
                                                             </li>
                                                         </ul>
                                                     ))}

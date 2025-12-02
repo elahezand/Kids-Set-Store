@@ -1,30 +1,23 @@
 
 const mongoose = require("mongoose");
-import SubCategoryModel from "./subCategory";
 
 const schema = new mongoose.Schema({
-    title: {
+    name: {
         type: String,
         required: true,
     },
+    parentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        default: null
+    },
+
     slug: {
         type: String,
         required: true,
         unique: true
     },
 
-    description: {
-        type: String,
-        required: true,
-    },
-
-    subCategories: [
-        {
-            type: mongoose.Types.ObjectId,
-            ref: "SubCategory",
-            required: false
-        }
-    ],
 },
     {
         timestamps: true,

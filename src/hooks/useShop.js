@@ -9,7 +9,7 @@ export default function useShop() {
         if (typeof window === "undefined")
             return;
         const savedBasket = JSON.parse(localStorage.getItem("cart")) || [];
-        if (savedBasket) setCart(savedBasket)
+        if (savedBasket) return setCart(savedBasket)
     }, [])
 
     const decreaseCount = (id) => {

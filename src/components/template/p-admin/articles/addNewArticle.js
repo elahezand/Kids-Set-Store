@@ -3,10 +3,8 @@ import styles from "./addNewArticle.module.css"
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { NewArticle } from "@/utils/useServerAction";
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
-import { useFormStatus } from "react-dom";
 import { useActionState, useEffect } from "react";
 export default function AddNewArticle() {
-    const { pending } = useFormStatus()
     const [state, formAction] = useActionState(NewArticle, {
         message: "",
         error: undefined,
@@ -92,7 +90,7 @@ export default function AddNewArticle() {
                             document.querySelector("input[name=content]").value = editor.getData();
                         }
                     }} />
-                <button disabled={pending}>{pending ? "Loading...." : "addArticle"}</button>
+                <button >add New Article</button>
             </form>
         </section>
     )

@@ -9,41 +9,31 @@ export default async function Page({ params }) {
     connectToDB()
     const { slug } = await params
 
-    let mainProducts = null
+    const selectedSlug = slug[slug.length - 1];
 
-    const categories = await CategoryModel.find({})
-    const products = await ProductModal.find({})
-        .populate({
-            path: "subSubCategory",
-            populate: { path: "parentID subParent" }
-        }).lean()
+    const categories = await CategoryModel.find({}).lean()
+    const products = await ProductModal.find({}).populate("categoryId")
 
+    const mainCategory = categories.find(cat => cat.slug === selectedSlug)
 
-    if (slug.length === 1) {
-        mainProducts = products.filter(item => {
-            const sub = item.subSubCategory
-            return sub?.parentID?.slug === slug[0]
-        })
+    function getAllChildIds(parentId) {
+        let ids = [parentId.toString()];
+        categories.forEach(cat => {
+            if (cat.parentId?.toString() === parentId.toString()) {
+                ids.push(cat._id.toString());
+                ids = [...ids, ...getAllChildIds(cat._id)];
+            }
+        });
 
-    }
-    else if (slug.length === 2) {
-        mainProducts = products.filter(item => {
-            const sub = item.subSubCategory
-            return sub?.parentID?.slug === slug[0] &&
-                sub.subParent?.slug === slug[1]
-        })
-
-    }
-    else {
-        mainProducts = products.filter(item => {
-            const sub = item.subSubCategory
-            return sub?.parentID?.slug === slug[0] &&
-                sub.subParent?.slug === slug[1] &&
-                sub?.slug === slug[2]
-
-        })
+        return ids;
     }
 
+    const allIds = getAllChildIds(mainCategory._id);
+
+
+    const mainProducts = products.filter(p =>
+        p.categoryId && allIds.includes(p.categoryId._id.toString())
+    );
 
     return (
         <div>

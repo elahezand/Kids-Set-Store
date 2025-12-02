@@ -12,21 +12,16 @@ export async function POST(req) {
         const { identifier, password } = reqBody
         const isValidPassword = validatePassword(password)
 
-        if (!isValidPassword) {
-            return Response.json({ message: "Password NOT Valid" }, { status: 422 })
-        }
-
+        if (!isValidPassword) return Response.json({ message: "Password NOT Valid" }, { status: 422 })
 
         const user = await UserModal.findOne({ $or: [{ phone: identifier }, { email: identifier }] })
-        if (!user) {
-            return Response.json({ message: "Not FOUND :)" }, { status: 404 })
-        }
+        if (!user) return Response.json({ message: "Not FOUND :)" }, { status: 404 })
+
 
         const VerifiedPassword = await verifyPassword(password, user.password)
 
-        if (!VerifiedPassword) {
-            return Response.json({ message: "Password NOT Valid :)" }, { status: 422 })
-        }
+        if (!VerifiedPassword) return Response.json({ message: "Password NOT Valid :)" }, { status: 422 })
+
 
         let accessToken = null
         let refreshToken = null

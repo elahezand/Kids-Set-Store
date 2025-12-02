@@ -3,13 +3,13 @@ import UserModal from "../../../../../model/user"
 import { verifyRefreshToken, verifyToken } from "@/utils/auth"
 import { cookies } from "next/headers"
 export async function GET() {
-    connectToDB()
     try {
-        
+        connectToDB()
+
         const cookiesStore = await cookies()
-        
+
         let token = cookiesStore.get("token")
-        
+
         if (!token) return Response.json({ message: "Not Found" }, { status: 404 })
 
         let payloadToken = await verifyToken(token.value)

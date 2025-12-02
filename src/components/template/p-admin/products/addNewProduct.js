@@ -4,10 +4,15 @@ import styles from "./addNewProduct.module.css";
 import swal from "sweetalert";
 import { NewProduct } from "@/utils/useServerAction";
 import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
 
 function AddProduct() {
-    const { pending } = useFormStatus()
+
+    const [categories, setCategories] = useState([]);
+    const [tree, setTree] = useState([]);
+
+    const [categoryId, setCategoryId] = useState("");
+    const [sub, setSub] = useState([])
+
     const [state, formAction] = useActionState(NewProduct, {
         message: "",
         error: undefined,
@@ -19,53 +24,44 @@ function AddProduct() {
             color: "",
             tags: "",
             material: "",
-            subSubCategory: "",
+            categoryId: "",
+            availableSizes: "",
             longDescription: "",
             shortDescription: "",
         }
     })
-    const [categories, setCategories] = useState([]);
-    const [subcategories, setSubCategories] = useState([]);
-    const [subsubcategories, setSubSubCategories] = useState([]);
-
-    const getCategory = async () => {
-        const res = await fetch("/api/categories");
-        if (res.status === 200) {
-            const data = await res.json();
-            setCategories(data.categories);
-        }
-    };
-
-    const getSubCategories = async (e) => {
-        const res = await fetch("/api/subcategories");
-        if (res.status === 200) {
-            const data = await res.json();
-            const filtered = data.subcategories.filter(
-                (item) => item.parentID === e.target.value
-            );
-            setSubCategories(filtered);
-        }
-    };
-
-    const getSubSubCategories = async (e) => {
-        const res = await fetch("/api/subsubcategories");
-        if (res.status === 200) {
-            const data = await res.json();
-            const filtered = data.subsubcategories.filter(
-                (item) => item.subParent === e.target.value
-            );
-            setSubSubCategories(filtered);
-        }
-    };
 
     useEffect(() => {
-        getCategory();
+        const getCategory = async () => {
+            const res = await fetch("/api/categories");
+            if (res.status === 200) {
+                const data = await res.json();
+                setCategories(data.categories);
+            }
+        }
 
+        getCategory();
     }, []);
 
+    useEffect(() => {
+        if (categories.length === 0) return;
+        function buildChildren(parent) {
+            return categories.filter(cat => cat.parentId === parent._id)
+                .map(cat => ({ ...cat, children: buildChildren(cat) }));
+        }
+
+        categories.filter(parent => {
+            if (!parent.parentId) {
+                const newTreeItem = { ...parent, children: buildChildren(parent) };
+                setTree(prev => [...prev, newTreeItem]);
+            }
+        })
+
+    }, [categories]);
+
 
     useEffect(() => {
-        
+
         if (state.message === "success") {
             swal({
                 title: "Article Added Successfully :)",
@@ -81,6 +77,16 @@ function AddProduct() {
         }
     }, [state.message])
 
+    const getSubCategories = (e) => {
+        tree.map(parent => {
+            parent.children.map(item => {
+                if (item._id === e.target.value) {
+                    setSub(item.children)
+                }
+            })
+        });
+
+    }
 
     return (
         <section className={styles.product}>
@@ -121,40 +127,29 @@ function AddProduct() {
                 <div className={styles.group}>
                     <label>Select Category:</label>
                     <select
-                        name="categoryID"
-                        onChange={(e) => getSubCategories(e)}
-                    >
-                        <option value="">Please choose one</option>
-                        {categories.map((item, i) => (
-                            <option key={i}
-                                value={item._id}>{item.title}</option>
-                        ))}
+                        onChange={(e) => getSubCategories(e)}>
+                        <option value="">
+                            Please choose one</option>
+                        {tree.map(parent =>
+                            parent.children.map(child =>
+                                <option key={child._id} value={child._id}>
+                                    {child.name}
+                                </option>
+                            ))
+                        }
                     </select>
                 </div>
-
-                {/* SUBCATEGORY */}
+                {/* SubCATEGORY */}
                 <div className={styles.group}>
-                    <label>Select SubCategory:</label>
-                    <select
-                        name="subCategoryID"
-                        onChange={(e) => getSubSubCategories(e)}
-                    >
+                    <label>Select Category:</label>
+                    <select name="categoryId"
+                        onChange={(e) => setCategoryId(e.target.value)}>
                         <option value="">Please choose one</option>
-                        {subcategories.map((item, i) => (
-                            <option key={i} value={item._id}>{item.title}</option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* SUBSUBCATEGORY */}
-                <div className={styles.group}>
-                    <label>Select SubSubCategory:</label>
-                    <select name="subSubCategory">
-                        <option value="">Please choose one</option>
-                        {subsubcategories.map((item, i) => (
-                            <option key={i} value={item._id}>
-                                {item.title}</option>
-                        ))}
+                        {sub.map(grandchild =>
+                            <option key={grandchild._id} value={grandchild._id}>
+                                {grandchild.name}
+                            </option>
+                        )}
                     </select>
                 </div>
 
@@ -178,6 +173,15 @@ function AddProduct() {
                 </div>
 
                 <div>
+                    <label>availableSizes</label>
+                    <input
+                        type="text"
+                        name="availableSizes"
+                        placeholder="M,L,S"
+                    />
+                </div>
+
+                <div>
                     <label>Image</label>
                     <input
                         type="file"
@@ -185,8 +189,7 @@ function AddProduct() {
                         accept="image/*"
                     />
                 </div>
-
-                <button disabled={pending}>{pending ? "Loading...." : "addProduct"}</button>
+                <button>add Product</button>
             </form>
         </section>
     );
