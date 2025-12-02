@@ -5,10 +5,6 @@ export async function GET() {
     try {
         connectToDB()
         const categories = await CategoryModel.find({}, "-__v")
-            .populate({
-                path: "subCategories",
-                populate: { path: "subCategories" }
-            })
         return Response.json({ categories }, { status: 200 })
 
     }
@@ -23,23 +19,24 @@ export async function POST(req) {
         const admin = await authAdmin()
         if (!admin) throw new Error("This api Protected")
 
-
         const reqBody = await req.json()
-        const { title, slug, description } = reqBody
+        const { name, slug, parentId } = reqBody
 
-        if (!title.trim()) return Response.json({ message: "Title Not Valid :(" }, { status: 422 })
+        if (!name.trim()) return Response.json({ message: "Title Not Valid :(" }, { status: 422 })
 
-        const iscategoryExisted = await CategoryModel.findOne({ title })
+        const iscategoryExisted = await CategoryModel.findOne({ name })
 
         if (!iscategoryExisted) {
             await CategoryModel.create({
-                title, slug, description
-            })
+                name,
+                parentId,
+                slug
+            });
+
 
         }
         return Response.json({ message: "Category created Successfully" }, { status: 200 })
     } catch (err) {
-
         return Response.json({ message: "UnKnown Error" }, { status: 500 })
     }
 

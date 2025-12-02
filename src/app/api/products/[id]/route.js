@@ -62,11 +62,13 @@ export async function PUT(req, { params }) {
         const img = formData.get("img")
         const name = formData.get("name")
         const price = formData.get("price")
-        const size = formData.get("size")
+        const score = formData.get("score")
         const color = formData.get("color")
-        const suitableFor = formData.get("suitableFor")
-        const material = formData.get("material")
         const tags = formData.get("tags")
+        const material = formData.get("material")
+        const subSubCategory = formData.get("subSubCategory")
+        const longDescription = formData.get("longDescription")
+        const shortDescription = formData.get("shortDescription")
 
         const buffer = Buffer.from(await img.arrayBuffer())
         const filename = Date.now() + img.name
@@ -74,14 +76,16 @@ export async function PUT(req, { params }) {
 
         await ProductModal.findOneAndUpdate({ _id: id }, {
             $set: {
-                img: `http://localhost:3000/uploads/${filename}`,
                 name,
-                size,
-                color,
-                suitableFor,
-                material,
                 price,
-                tags: JSON.parse(JSON.stringify(tags))
+                longDescription,
+                shortDescription,
+                score,
+                tags: JSON.parse(JSON.stringify(tags)),
+                material,
+                subSubCategory,
+                color,
+                img: `http://localhost:3000/uploads/${filename}`
             }
         })
         return Response.json({ message: "Product Updated" }, { status: 200 })

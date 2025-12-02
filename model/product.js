@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-import SubSubCategoryModel from "./subSubCategory";
-
+import CategoryModel from "./category";
 const schema = new mongoose.Schema({
     name: {
         type: String,
@@ -38,12 +37,17 @@ const schema = new mongoose.Schema({
         type: [String],
         required: true,
     },
-    subSubCategory: {
-        type: mongoose.Types.ObjectId,
-        ref: "SubSubCategory",
-        required: true
-    }
-    ,
+    categoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        required: true,
+    },
+
+    availableSizes: [String],
+    isAvailable: {
+        type: Boolean,
+        default: true,
+    },
 });
 schema.virtual("comments", {
     ref: "Comment",

@@ -33,7 +33,8 @@
     "request": "^2.88.2",
     "serialize": "^0.1.3",
     "sweetalert": "^2.1.2",
-    "swiper": "^12.0.2"
+    "swiper": "^12.0.2",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

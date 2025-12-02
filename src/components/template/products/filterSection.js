@@ -99,9 +99,11 @@ export default function FilterSection({ categories, mainProducts }) {
                     </span>
                     <ul className={styles.products_top_bar__selection_list}>
                         {categories.length > 0 && categories.map((item, index) => (
+                            !item.parentId &&
                             <Link href={`/products/category/${item.title}?page=1`} key={index + 1}
                                 className={styles.products_top_bar__selection_item}
-                                value={item.title}>{item.title}</Link>
+                                value={item.name}>{item.name}</Link>
+
 
                         ))}
                     </ul>

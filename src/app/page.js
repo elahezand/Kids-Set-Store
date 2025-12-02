@@ -14,7 +14,7 @@ import PromoText from "@/components/template/index/promoText/promoText";
 
 export default async function Home() {
   connectToDB()
-  const products = await ProductModal.find({}).sort({ _id: -1 }).limit(10)
+  const products = await ProductModal.find({}).sort({ _id: -1 }).limit(10)  
   const articles = await ArticleModel.find({}).sort({ _id: -1 }).limit(10)
 
   return (

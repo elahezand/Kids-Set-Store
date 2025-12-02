@@ -5,7 +5,9 @@ import { NextResponse } from "next/server"
 import { authAdmin } from "@/utils/serverHelper"
 import path from "path"
 import { writeFile } from "fs/promises"
-import { log } from "console"
+import { productSchema } from "@/validators/product";
+import { StrictMode } from "react"
+
 
 export async function GET() {
     try {
@@ -18,13 +20,26 @@ export async function GET() {
 }
 
 export async function POST(req) {
-    connectToDB()
     try {
+        connectToDB()
         const admin = await authAdmin()
         if (!admin) throw new Error("This api Protected")
 
-
         const formData = await req.formData()
+        const body = Object.fromEntries(formData.entries());
+
+        body.price = Number(body.price);
+        body.score = Number(body.score);
+
+        const parsed = productSchema.safeParse(body);
+
+        if (!parsed.success) {
+            return Response.json(
+                { errors: parsed.error.flatten().fieldErrors },
+                { status: 400 }
+            );
+        }
+
 
         const img = formData.get("img")
         const name = formData.get("name")
@@ -33,7 +48,8 @@ export async function POST(req) {
         const color = formData.get("color")
         const tags = formData.get("tags")
         const material = formData.get("material")
-        const subSubCategory = formData.get("subSubCategory")
+        const size = formData.get("size")
+        const categoryId = formData.get("subSubCategory")
         const longDescription = formData.get("longDescription")
         const shortDescription = formData.get("shortDescription")
 
@@ -53,7 +69,9 @@ export async function POST(req) {
                 score,
                 tags: JSON.parse(JSON.stringify(tags)),
                 material,
-                subSubCategory,
+                categoryId,
+                size: JSON.parse(JSON.stringify(size)),
+                isAvailable,
                 color,
                 img: `http://localhost:3000/uploads/${filename}`
             })
