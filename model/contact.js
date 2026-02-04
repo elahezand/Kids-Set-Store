@@ -8,7 +8,7 @@ const schema = new mongoose.Schema({
     },
     company: {
         type: String,
-        required: true,
+        required: false,
     },
 
     body: {
@@ -19,11 +19,24 @@ const schema = new mongoose.Schema({
         type: String,
         required: true,
     },
-     phone: {
+    phone: {
         type: String,
         required: true,
     }
-});
+}
+    , {
+        timestamps: true,
+        toJSON: {
+            transform(doc, ret) {
+                ret.id = ret._id.toString();
+                delete ret._id;
+                delete ret.__v;
+                return ret;
+            },
+        }
+    }
+
+);
 
 const contactModel = mongoose.models.Contact || mongoose.model("Contact", schema);
 

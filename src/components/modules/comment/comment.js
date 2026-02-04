@@ -1,7 +1,6 @@
 import { FaStar } from "react-icons/fa";
 import { FaRegStar } from "react-icons/fa6";
 import Image from "next/image";
-
 import styles from "./comment.module.css";
 const Comment = ({ username, score, date, body }) => {
   return (

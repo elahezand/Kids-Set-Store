@@ -1,67 +1,38 @@
 "use client"
 import React, { useCallback, useEffect, useState } from 'react'
 import styles from "./filterSection.module.css"
-import Pagination from '@/components/modules/pageination/pagination'
-import { pageinatedData } from '@/utils/helper'
-import Product from "../../modules/product/product"
-import { useSearchParams, useParams } from 'next/navigation'
 import Link from 'next/link'
-export default function FilterSection({ categories, mainProducts }) {
-    const params = useParams();
-    const searchParams = useSearchParams();
 
-    const slug = params.slug;
-    const page = searchParams.get("page");
+const materials = ["Catton", "Leather", "Wool", "Velvet", "Suede", "Linen", "Chashmere", "Polyester"]
+const colors = ["Blue", "Red", "Brown", "Gray", "Black", "Pink", "Metalic", "White", "Green", "Cream", "Camel"]
 
+export default function FilterSection({ categories, data, setProducts }) {
     const [sort, setSort] = useState("-1")
-    const [products, setProducts] = useState([])
-
-    const materials = ["Catton", "Leather", "Wool", "Velvet", "Suede", "Linen", "Chashmere", "Polyester"]
-    const colors = ["Blue", "Red", "Brown", "Gray", "Black", "Pink", "Metalic", "White", "Green", "Cream", "Camel"]
-
     const sortingHandeler = useCallback(() => {
         switch (sort) {
             case ("popularity"):
-                setProducts([...mainProducts].sort((a, b) => b.score - a.score))
+                setProducts([...data].sort((a, b) => b.score - a.score))
                 break;
 
             case "latest":
-                setProducts([...mainProducts].reverse())
+                setProducts([...data].reverse())
                 break;
 
             case "price":
-                setProducts([...mainProducts].sort((a, b) => a.price - b.price))
+                setProducts([...data].sort((a, b) => a.price - b.price))
                 break;
 
-            case "-1":
-                setProducts([...mainProducts])
-                break;;
-
-            default:
-                setProducts([...mainProducts])
         }
-    }, [sort, mainProducts])
+    }, [data, setProducts, sort])
 
     useEffect(() => {
         sortingHandeler()
     }, [sortingHandeler])
 
 
-    const colorHandeler = async (e) => {
-        setProducts([...mainProducts].filter(item => item.color === e.target.value))
-    }
-
-    const materialHandeler = async (e) => {
-        setProducts([...mainProducts].filter(item => item.material.includes(e.target.value)))
-    }
-
-    const priceHandeler = async (e) => {
-        setProducts([...mainProducts].filter(item => item.price < e.target.value))
-    }
-
-    const [filteredArray, pageCount] = pageinatedData(products, page, 10)
-
-
+    const colorHandeler = async (e) => setProducts([...data].filter(item => item.color === e.target.value))
+    const materialHandeler = async (e) => setProducts([...data].filter(item => item.material.includes(e.target.value)))
+    const priceHandeler = async (e) => setProducts([...data].filter(item => item.price < e.target.value))
 
     return (
         <>
@@ -100,11 +71,10 @@ export default function FilterSection({ categories, mainProducts }) {
                     <ul className={styles.products_top_bar__selection_list}>
                         {categories.length > 0 && categories.map((item, index) => (
                             !item.parentId &&
-                            <Link href={`/products/category/${item.title}?page=1`} key={index + 1}
-                                className={styles.products_top_bar__selection_item}
-                                value={item.name}>{item.name}</Link>
-
-
+                            <Link href={`/products?category=${item.name}`}
+                                key={index + 1}
+                                className={styles.products_top_bar__selection_item}>
+                                {item.name}</Link>
                         ))}
                     </ul>
                 </div>
@@ -138,22 +108,6 @@ export default function FilterSection({ categories, mainProducts }) {
                     </select>
                 </div>
             </div>
-            <main data-aos="fade-up" className="container">
-                <div className={styles.products}>
-                    {filteredArray.length ? filteredArray
-                        .map((item, index) => (
-                            <Product
-                                {...item}
-                                key={index + 1} />
-                        )) : null}
-                </div>
-            </main>
-            <Pagination
-                pageCount={pageCount}
-                href={`/products/category/${slug}?`}
-                currentPage={page}
-            />
-
         </>
     )
 }

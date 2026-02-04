@@ -11,7 +11,7 @@ import {
     FaTwitter,
 } from "react-icons/fa";
 
-const Article = ({ _id, author, title, createdAt, cover }) => {
+const Article = ({_id, author, title, createdAt, cover }) => {    
     return (
         <div
             data-aos="zoom-in"
@@ -31,7 +31,7 @@ const Article = ({ _id, author, title, createdAt, cover }) => {
             </div>
             <div className={styles.details}>
                 <Link
-                    href={`/atricles/${_id}`}
+                    href={`/articles/${_id}`}
                     className={styles.tag}>
                     {title}
                 </Link>

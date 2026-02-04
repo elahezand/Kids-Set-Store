@@ -1,179 +1,92 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
+import { usePost, usePut } from "@/utils/hooks/useReactQueryPanel";
 import styles from "./commentTable.module.css";
+import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import showSwal, { manageError } from "@/utils/helper";
 import swal from "sweetalert";
+import { input } from "@heroui/react";
 export default function DataTable({ comments, title }) {
-    const router = useRouter();
-    const showCommentBody = (body) => {
-        showSwal(body, undefined, "Read It :)");
-    };
+    const router = useRouter()
 
-    const acceptComment = async (commentID) => {
+    const { mutate: answerMutate } = usePost("/comments/answer", {
+        onSuccess: () => {
+            toast.success("your answer sended Successfully :)")
+            router.refresh()
+        },
+    })
+
+    const { mutate: acceptMutate } = usePut("/comments", {
+        onSuccess: () => {
+            toast.success("Successfull :)")
+            router.refresh()
+        },
+    })
+    const { mutate: editmutate } = usePut(`/comments`, {
+        onSuccess: () => {
+            toast.success("Successfull :)")
+            router.refresh()
+        },
+    })
+
+    const { mutate: banmutate } = usePost("/users/ban", {
+        onSuccess: () => {
+            toast.success("this user Banned Successfully :)")
+            router.refresh()
+
+        },
+    })
+
+    const showContent = async (content) => {
         swal({
-            title: "are you Sure To Change Status? :)",
-            icon: "warning",
-            buttons: ["No", "yes"]
-        }).then(async result => {
-            if (result) {
-                try {
-                    const res = await fetch(`/api/comments/accept`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            commentID
-                        })
-                    })
-                    if (res.status !== 200) return manageError(res.status)
-
-                    swal({
-                        title: "Status Changed Successfully :)",
-                        icon: "success",
-                        buttons: "ok"
-                    }).then(result => {
-                        if (result) {
-                            router.refresh()
-                        }
-                    })
-                } catch (err) {
-                    swal({
-                        title: "NetWork Error",
-                        icon: "warning",
-                        buttons: "ok"
-                    })
-
-                }
-            }
+            title: content,
+            buttons: "ok"
         })
-
     }
 
-    const answerComment = async (commentID) => {
+    const answerComment = async (Id) => {
         swal({
-            title: "Inter Your Answer :)",
+            title: "Please Send Your Answer",
             content: "input",
             buttons: "submit"
-        }).then(async result => {
+        }).then(result => {
             if (result) {
-                try {
-                    const res = await fetch(`/api/comments/answer`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            answer: result,
-                            commentID
-                        })
-                    })
-
-                    if (res.status !== 200) return manageError(res.status)
-
-                    swal({
-                        title: "Comment Answerred Successfully :)",
-                        icon: "success",
-                        buttons: "ok"
-                    }).then(result => {
-                        if (result) {
-                            router.refresh()
-                        }
-                    })
-
-                }
-                catch (err) {
-                    swal({
-                        title: "NetWork Error",
-                        icon: "warning",
-                        buttons: "ok"
-                    })
-                }
+                answerMutate({
+                    answer: result,
+                    commentID: Id
+                })
             }
         })
     }
 
-    const editComment = async (commentID, content) => {
-        swal({
-            title: "Change Content :)",
-            content: {
-                element: "input",
-                attributes: {
-                    value: content
-                }
-            },
-            buttons: "submit"
-        }).then(async (result) => {
-            if (result) {
-                try {
-                    const res = await fetch(`/api/comments/${commentID}`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            content: result,
-                        })
-                    })
-                    if (res.status !== 200) return manageError(res.status)
-
-                    swal({
-                        title: "Comment Updated Successfully :)",
-                        icon: "success",
-                        buttons: "ok"
-                    }).then(result => {
-                        if (result) {
-                            router.refresh()
-                        }
-                    })
-                } catch (err) {
-                    swal({
-                        title: "NetWork Error",
-                        icon: "warning",
-                        buttons: "ok"
-                    })
-                }
-            }
-        })
+    const acceptComment = (commentID) => {
+        acceptMutate({ id: `${commentID}/accept` })
     }
-    const banUser = async (userID, email) => {
+
+    const banUser = async (email, username) => {
         swal({
-            title: "are you Sure To Ban This user ? :)",
-            icon: "watning",
+            title: "Are You Sure To remove This item?",
+            icon: "warning",
             buttons: ["No", "yes"]
-        }).then(async result => {
+        }).then(result => {
             if (result) {
-                try {
-                    const res = await fetch(`/api/users/ban`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            user: userID,
-                            email
-                        })
-                    })
+                banmutate({ email, username })
+            }
+        })
+    }
 
-                    if (res.status !== 200) return manageError(res.status)
-
-                    swal({
-                        title: "User Banned Successfully :)",
-                        icon: "success",
-                        buttons: "ok"
-                    }).then(result => {
-                        if (result) {
-                            router.refresh()
-                        }
-                    })
-                } catch (err) {
-                    swal({
-                        title: "NetWork Error",
-                        icon: "warning",
-                        buttons: "ok"
-                    })
-                }
+    const editComment = async (commentId, content) => {
+        swal({
+            title: "Edit Comment",
+            text: "Current: " + content,
+            content: "input",
+            buttons: ["Cancel", "Submit"]
+        }).then(result => {
+            if (result) {
+                editmutate({
+                    id: commentId,
+                    body: result
+                })
             }
         })
     }
@@ -212,13 +125,13 @@ export default function DataTable({ comments, title }) {
                                 <td>{comment.username}</td>
                                 <td>{comment.email}</td>
                                 <td>{comment.score}</td>
-                                <td>{comment.productID.name}</td>
+                                <td>{comment.productID?.name}</td>
                                 <td>{comment.date.slice(0, 10)}</td>
                                 <td>
                                     <button
                                         type="button"
                                         className="edit_btn"
-                                        onClick={() => showCommentBody(comment.body)}
+                                        onClick={() => showContent(comment.body)}
                                     >
                                         Content
                                     </button>

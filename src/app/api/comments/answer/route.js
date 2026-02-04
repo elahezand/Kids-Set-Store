@@ -1,31 +1,39 @@
-import commentModel from "../../../../../model/comment"
-import connectToDB from "../../../../../db/db"
 import { authAdmin } from "@/utils/serverHelper"
+import connectToDB from "../../../../../configs/db"
+import commentModel from "../../../../../model/comment"
+import { NextResponse } from "next/server"
 
 export async function POST(req) {
     try {
-        connectToDB()
+        await connectToDB()
         const admin = await authAdmin()
         if (!admin) throw new Error("This api Protected")
 
-        const reqBody = await req.json()
-        const { answer, commentID } = reqBody
+        const body = await req.json()
+        const { answer, commentID } = body
 
-        const isvalidId = isValidObjectId(commentID)
-        if (!isvalidId) return Response.json({ message: "Not Valid :)" }, { satatus: 422 })
+        const updated = await commentModel.findByIdAndUpdate(commentID,
+            {
+                $push: {
+                    answer: {
+                        text: answer,
+                        admin: admin._id,
+                        createdAt: new Date()
+                    }
+                }
+            },
+            { new: true }
+        )
 
-        await commentModel.findOneAndUpdate({ _id: commentID }, {
-            $push: {
-                answer: answer
-            }
-        })
+        if (!updated) {
+            return NextResponse.json({ message: "Comment not found" }, { status: 404 })
+        }
 
-        return Response.json({ message: "Comment sended Successfully" }, { status: 200 })
+        return NextResponse.json(
+            { message: "Answer added successfully" },
+            { status: 200 }
+        )
     } catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
+        return NextResponse.json({ message: err.message }, { status: 500 })
     }
-
 }
-
-
-

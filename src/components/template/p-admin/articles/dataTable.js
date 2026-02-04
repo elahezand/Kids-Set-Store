@@ -5,7 +5,10 @@ import styles from "./articleTable.module.css"
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { manageError } from "@/utils/helper";
-function Table({ articles, title }) {
+import Link from "next/link";
+import { FaRegEdit } from "react-icons/fa";
+
+function Table({ data, title }) {
     const router = useRouter()
 
     const removeArticle = async (articleID) => {
@@ -57,11 +60,11 @@ function Table({ articles, title }) {
                         <th>shortDescription</th>
                         <th>Created AT</th>
                         <th>Status</th>
-                        <th>Delete</th>
+                        <th><FaRegEdit /></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {articles.map((article, index) => (
+                    {data.map((article, index) => (
                         <tr key={article._id}>
                             <td>{index + 1}</td>
                             <td className={styles.image_article}>
@@ -75,13 +78,25 @@ function Table({ articles, title }) {
                             <td>{article.shortDescription}</td>
                             <td>{article.createdAt.slice(0, 10)}</td>
                             <td>{article.status}</td>
-                            <td>
+                            <td style={{ display: "flex", gap: "0.5rem" }}>
                                 <button
                                     type="button"
                                     onClick={() => removeArticle(article._id)}
                                     className="delete_btn">
                                     Remove
                                 </button>
+                                {article.status === "published" ?
+                                    <Link
+                                        href={`/p-admin/articles/${article._id}`}
+                                        className='edit_btn'>
+                                        Edit
+                                    </Link> :
+                                    <Link
+                                        href={`/p-admin/articles/draft?id=${article._id}`}
+                                        className="edit_btn">
+                                        Draft
+                                    </Link>
+                                }
                             </td>
                         </tr>
                     ))}

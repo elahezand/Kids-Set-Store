@@ -1,63 +1,78 @@
-import connectToDB from "../../../../../db/db"
+import connectToDB from "../../../../../configs/db"
 import UserModal from "../../../../../model/user"
 import { authAdmin } from "@/utils/serverHelper"
-import { validateEmail, validatePhone, validateUserNane } from "../../../../../validator/user"
+import { userValidationSchema } from "../../../../../validators/user"
+import { verifyPassword } from "@/utils/auth"
 import { isValidObjectId } from "mongoose"
+import { NextResponse } from "next/server"
+
 export async function PUT(req, { params }) {
-    connectToDB()
     try {
+        await connectToDB()
+
+        const isUser = await authUser();
+        if (!isUser) throw new Error("This API is Protected");
+
         const { id } = await params
-        const isvalidId = isValidObjectId(id)
 
-        if (!isvalidId) return Response.json({ message: "Not Valid :)" }, { satatus: 422 })
+        if (!isValidObjectId(id))
+            return NextResponse.json({ message: "Not Valid ID" }, { status: 422 })
 
-        const reqBody = await req.json()
-        const { username, email, phone } = reqBody
+        const formData = await req.formData()
+        const body = Object.fromEntries(formData.entries());
+        const parsed = userValidationSchema.safeParse(body);
 
-        const isuserNameValid = validateUserNane(username)
-        const isphoneValid = validatePhone(phone)
-        const isEmailValid = validateEmail(email)
+        if (!parsed.success)
+            return NextResponse.json({ errors: parsed.error.flatten().fieldErrors }, { status: 400 });
 
-        if (!isEmailValid || !isuserNameValid || !isphoneValid) {
-            return Response.json({ message: "UserName or Email or Phone Not Valid :(" }, { status: 422 })
+        const password = formData.get("password")
+        const newPassword = formData.get("newPassword")
+        const confirmPassword = formData.get("confirmPassword")
 
-        }
+        if (newPassword && newPassword !== confirmPassword)
+            return NextResponse.json({ message: "Passwords Do Not Match" }, { status: 422 })
 
-        await UserModal.findOneAndUpdate({ _id: id }, {
+        const user = await UserModal.findById(id)
+        if (!user) return NextResponse.json({ message: "User Not Found" }, { status: 404 })
+
+        const verifiedPassword = verifyPassword(password, user.password)
+
+        if (!verifiedPassword) return NextResponse.json({ message: "Current Password Not Valid" }, { status: 422 })
+
+        let hashedPassword = user.password
+        if (newPassword) hashedPassword = await hashPassword(confirmPassword)
+
+        const avatar = await handleFileUpload(formData.get("avatar")) || "";
+
+        await UserModal.findByIdAndUpdate(id, {
             $set: {
-                username,
-                email,
-                phone
+                ...parsed.data,
+                avatar,
+                password: hashedPassword
             }
         })
-        return Response.json("user UPDATED successfully", { status: 200 })
-    }
-    catch (err) {
-        return Response.json({ message: "UnKnownError" }, { status: 500 })
-    }
 
+        return NextResponse.json({ message: "User Updated Successfully" }, { status: 200 })
+
+    } catch (err) {
+        return NextResponse.json({ message: err.message }, { status: 500 })
+    }
 }
-
 
 export async function DELETE(req, { params }) {
     try {
-        connectToDB()
+        await connectToDB()
         const admin = await authAdmin()
-        if (!admin) throw new Error("This api Protected")
+        if (!admin) throw new Error("This API Protected")
 
-        const { id } = await params
+        const { id } = params
+        if (!isValidObjectId(id))
+            return NextResponse.json({ message: "Not Valid ID" }, { status: 422 })
 
-        const isvalidId = isValidObjectId(id)
-        if (!isvalidId) return Response.json({ message: "Not Valid :)" }, { satatus: 422 })
+        await UserModal.findByIdAndDelete(id)
+        return NextResponse.json({ message: "User Removed Successfully" }, { status: 200 })
 
-        await UserModal.findOneAndDelete({ _id: id })
-
-        return Response.json({ message: "User Removed" }, { status: 200 })
+    } catch (err) {
+        return NextResponse.json({ message: err.message }, { status: 500 })
     }
-    catch (err) {
-        return Response.json({ message: "UnKnownError" }, { status: 500 })
-    }
-
 }
-
-

@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-import CategoryModel from "./category";
 const schema = new mongoose.Schema({
     name: {
         type: String,
@@ -37,10 +36,15 @@ const schema = new mongoose.Schema({
         type: [String],
         required: true,
     },
-    categoryId: {
+    categoryPath: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Category",
-        required: true,
+        required: true
+    }],
+
+    mainCategory: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category"
     },
 
     availableSizes: [String],
@@ -48,14 +52,23 @@ const schema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
-});
-schema.virtual("comments", {
-    ref: "Comment",
-    localField: "_id",
-    foreignField: "productID"
-});
+},
 
+    {
+        timestamps: true,
+        toJSON: {
+            transform(doc, ret) {
+                ret.id = ret._id.toString();
+                delete ret._id;
+                delete ret.__v;
+                return ret;
+            },
+        }
+    }
+);
 
-const ProductModal = mongoose.models.Product || mongoose.model("Product", schema)
+schema.index({ categoryPath: 1 });
 
-export default ProductModal
+const ProductModel = mongoose.models.Product || mongoose.model("Product", schema)
+
+export default ProductModel

@@ -22,17 +22,25 @@ const schema = new mongoose.Schema({
     uses: {
         type: Number,
         required: false,
-        default:0
+        default: 0
     },
 
     expTime: {
-        type:String,
+        type: String,
         required: true
     },
 
 },
     {
         timestamps: true,
+        toJSON: {
+            transform(doc, ret) {
+                ret.id = ret._id.toString();
+                delete ret._id;
+                delete ret.__v;
+                return ret;
+            },
+        }
     }
 );
 

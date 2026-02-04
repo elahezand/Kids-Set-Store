@@ -1,99 +1,98 @@
-import ProductModal from "../../../../../model/product"
-import connectToDB from "../../../../../db/db"
+import connectToDB from "../../../../../configs/db";
+import ProductModel from "../../../../../model/product";
+import handleFileUpload from "@/utils/serverFile";
+import { productSchema } from "../../../../../validators/product";
+import { NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose"
-import commentModel from "../../../../../model/comment"
-import { authAdmin } from "@/utils/serverHelper"
-import { writeFile } from "fs/promises"
-import path from "path"
+import { authAdmin } from "@/utils/serverHelper";
+/* ===================== GET ===================== */
 export async function GET(req, { params }) {
     try {
-        connectToDB()
-        const { id } = await params
-        const isvalidId = isValidObjectId(id)
+        await connectToDB();
+        const { id } = await params;
+        if (!isValidObjectId(id)) return NextResponse.json({ message: "Invalid ID" }, { status: 422 });
 
-        if (!isvalidId) return Response.json({ message: "Not Valid :)" }, { satatus: 422 })
+        const product = await ProductModel.findById(id).lean();
+        if (!product) return NextResponse.json({ message: "Product not found" }, { status: 404 });
 
-        const product = await ProductModal.findOne({ _id: id })
-            .populate("comments")
-            .lean()
-        return Response.json(product, { status: 200 })
-
-    } catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
+        return NextResponse.json(product, { status: 200 });
+    } catch {
+        return NextResponse.json({ message: "Unknown Error" }, { status: 500 });
     }
 }
 
+/* ===================== DELETE ===================== */
 export async function DELETE(req, { params }) {
     try {
-        connectToDB()
-        const admin = await authAdmin()
-        if (!admin) throw new Error("This api Protected")
+        await connectToDB();
 
-        const { id } = await params
-        const isvalidId = isValidObjectId(id)
+        const admin = await authAdmin();
+        if (!admin) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-        if (!isvalidId) return Response.json({ message: "Not Valid :)" }, { satatus: 422 })
+        const { id } = await params;
+        if (!isValidObjectId(id)) return NextResponse.json({ message: "Invalid ID" }, { status: 422 });
 
-        await ProductModal.findOneAndDelete({ _id: id })
-        return Response.json({ message: "Product Removed" }, { status: 200 })
+        await ProductModel.findByIdAndDelete(id);
 
-
-    } catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 200 })
-
+        return NextResponse.json({ message: "Product removed" }, { status: 200 });
+    } catch {
+        return NextResponse.json({ message: "Unknown Error" }, { status: 500 });
     }
-
 }
 
-
+/* ===================== PUT ===================== */
 export async function PUT(req, { params }) {
     try {
-        connectToDB()
-        const admin = await authAdmin()
-        if (!admin) throw new Error("This api Protected")
+        await connectToDB();
 
-        const { id } = await params
-        const isvalidId = isValidObjectId(id)
+        const admin = await authAdmin();
+        if (!admin) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-        if (!isvalidId) return Response.json({ message: "Not Valid :)" }, { satatus: 422 })
+        const { id } = await params;
 
-        const formData = await req.formData()
+        if (!isValidObjectId(id)) return NextResponse.json({ message: "Invalid ID" }, { status: 422 });
 
-        const img = formData.get("img")
-        const name = formData.get("name")
-        const price = formData.get("price")
-        const score = formData.get("score")
-        const color = formData.get("color")
-        const tags = formData.get("tags")
-        const material = formData.get("material")
-        const subSubCategory = formData.get("subSubCategory")
-        const longDescription = formData.get("longDescription")
-        const shortDescription = formData.get("shortDescription")
+        const currentProduct = await ProductModel.findById(id);
+        if (!currentProduct) return NextResponse.json({ message: "Product not found" }, { status: 404 });
 
-        const buffer = Buffer.from(await img.arrayBuffer())
-        const filename = Date.now() + img.name
-        await writeFile(path.join(process.cwd(), "public/uploads/" + filename), buffer)
+        const formData = await req.formData();
+        const rawData = Object.fromEntries(formData.entries());
 
-        await ProductModal.findOneAndUpdate({ _id: id }, {
+        const processedData = {
+            ...rawData,
+            price: Number(rawData.price),
+            score: rawData.score ? Number(rawData.score) : 5,
+            tags: rawData.tags ? rawData.tags.split(",").map(t => t.trim()) : [],
+            availableSizes: rawData.availableSizes ? rawData.availableSizes.split(",").map(v => v.trim()) : [],
+            categoryPath: rawData.categoryPath ? JSON.parse(rawData.categoryPath) : []
+        };
+
+        const validation = productSchema.safeParse(processedData);
+        if (!validation.success) {
+            console.log("Validation Errors:", validation.error.flatten().fieldErrors);
+            return {
+                status: 400,
+                message: "error",
+                errors: validation.error.flatten().fieldErrors
+            };
+        }
+
+
+        /* optional image upload */
+        const img = await handleFileUpload(formData.get("img")) || currentProduct.img;
+        if (!img) return NextResponse.json({ message: "Image is required" }, { status: 400 });
+
+        await ProductModel.findByIdAndUpdate(id, {
             $set: {
-                name,
-                price,
-                longDescription,
-                shortDescription,
-                score,
-                tags: JSON.parse(JSON.stringify(tags)),
-                material,
-                subSubCategory,
-                color,
-                img: `http://localhost:3000/uploads/${filename}`
-            }
-        })
-        return Response.json({ message: "Product Updated" }, { status: 200 })
+                ...validation.data,
+                img,
+            },
+        });
 
+        return NextResponse.json({ message: "Product updated" }, { status: 200 });
     } catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 200 })
+        console.log(err);
 
+        return NextResponse.json({ message: "Unknown Error" }, { status: 500 });
     }
-
 }
-

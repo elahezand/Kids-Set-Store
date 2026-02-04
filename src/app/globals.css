@@ -226,11 +226,11 @@ a {
 .login_register,
 .forgot_password {
   display: grid;
-  grid-template-columns: 45% 50%;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
   justify-content: space-between;
   align-items: center;
-  max-width: 1100px;
-  max-height: 800px;
+  max-width: 1200px;
   overflow: hidden;
   padding: 0 0 0 5rem;
   margin: 5rem auto;
@@ -347,6 +347,40 @@ a {
   border-radius: 5px;
   color: var(--white);
 }
+
+.loadmore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.loadmore button {
+  background-color: #ff8c61;
+  border: none;
+  color: #fff;
+  width: 100%;
+  font-weight: bold;
+  border-radius: 10px;
+  padding: 0.5rem;
+}
+
+.richEditor {
+  background: inherit;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--coral) !important;
+  border-radius: 12px;
+  padding: 1rem;
+
+}
+
+.richEditor div {
+  height: 100%;
+  border: none;
+  padding: 1rem;
+}
+
 
 /*---------------------------------------
   RESPONSIVE STYLES               

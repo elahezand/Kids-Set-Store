@@ -1,73 +1,57 @@
-
 import UserModal from "../../../../../model/user"
-import connectToDB from "../../../../../db/db"
-import { generateToken, hashPassword } from "@/utils/auth"
-import { validateEmail, validatePhone, validateUserNane, validatePassword } from "../../../../../validator/user"
+import connectToDB from "../../../../../configs/db"
+import { generateToken, hashPassword, generateRefreshToken } from "@/utils/auth"
+import { userValidationSchema } from "../../../../../validators/user"
+
 export async function POST(req) {
-    connectToDB()
     try {
-        const users = UserModal.find({})
-        const reqBody = await req.json()
+        await connectToDB()
+        const body = await req.json()
 
-        const { username, email, password, phone } = reqBody
-
-        const isEmailValid = validateEmail(email)
-        const isPasswordValid = validatePassword(password)
-        const isPhoneValid = validatePhone(phone)
-        const isUsernameValid = validateUserNane(username)
-
-        if (email) {
-            if (!isEmailValid) {
-                return Response.json({ message: "email Not Valid :)" }, { status: 422 })
-            }
+        const parsed = userValidationSchema.safeParse(body)
+        if (!parsed.success) {
+            return Response.json({ message: "Invalid data", errors: parsed.error.issues }, { status: 422 })
         }
-        if (!isPhoneValid) return Response.json({ message: "phone Not Valid :)" }, { status: 422 })
 
-        if (!isUsernameValid) return Response.json({ message: "username Not Valid :)" }, { status: 422 })
+        const { username, email, password, phone } = parsed.data
 
-        if (!isPasswordValid) return Response.json({ message: "Password Not Valid :)" }, { status: 422 })
+        const isUserExist = await UserModal.findOne({
+            $or: [{ phone }, { email: email || "NULL_EMAIL" }, { username }]
+        })
 
-
-
-        const isUserExist = await UserModal.findOne({ $or: [{ phone }, { email }, { username }] })
-
-        if (isUserExist) return Response.json({ message: "This username or email or Phone has already existed :)" }, { status: 409 })
-
+        if (isUserExist) {
+            return Response.json({ message: "User already exists with this info" }, { status: 409 })
+        }
 
         const hashedPassword = await hashPassword(password)
 
-        const accessToken = await generateToken({ username })
-        const refreshToken = await generateRefreshToken({ email })
+        const usersCount = await UserModal.countDocuments()
+        const role = usersCount < 3 ? "ADMIN" : "USER"
 
-
-        await UserModal.create({
+        const newUser = await UserModal.create({
             username,
-            email: email ? email : null,
-            password: hashedPassword,
+            email: email || null,
             phone,
-            role: 0 < users.length < 3 ? "ADMIN" : "USER"
+            password: hashedPassword,
+            role
         })
 
-        return Response.json({ message: "you were registerd successfully." }, {
-            status: 200,
-            headers: {
-                "Set-Cookie": [
-                    `token=${accessToken}; Path=/; HttpOnly; SameSite=Lax`,
-                    `refreshToken=${refreshToken}; Path=/; HttpOnly; SameSite=Lax`
-                ]
-            }
-        })
+        const payload = { email: newUser.email, id: newUser._id };
+        const accessToken = await generateToken(payload)
+        const refreshToken = await generateRefreshToken(payload)
 
+        const response = Response.json(
+            { message: "Registered successfully." },
+            { status: 201 }
+        );
+
+        response.headers.append("Set-Cookie", `token=${accessToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400`);
+        response.headers.append("Set-Cookie", `refreshToken=${refreshToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800`);
+
+        return response;
+
+    } catch (err) {
+        console.error("Register Error:", err)
+        return Response.json({ message: "Server Error" }, { status: 500 })
     }
-    catch (err) {
-
-        return Response.json({ message: "Unknown Error" }, { status: 500 })
-    }
-
 }
-
-
-
-
-
-

@@ -1,98 +1,103 @@
-"use client"
+"use client";
+import React, { useState, useEffect, useRef } from "react";
+import { useActionState } from "react";
 import styles from "./addNewArticle.module.css"
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import { NewArticle } from "@/utils/useServerAction";
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
-import { useActionState, useEffect } from "react";
-export default function AddNewArticle() {
-    const [state, formAction] = useActionState(NewArticle, {
-        message: "",
-        error: undefined,
+import { NewArticle } from "@/utils/actions/articleServerAction";
+import toast from "react-hot-toast";
+import RichEditor from "./richEditor";
+
+
+export default function AddNewArticle({ article }) {
+    const formRef = useRef(null);
+    const [content, setContent] = useState(article?.content || "");
+
+    const [state, formAction, isPending] = useActionState(NewArticle, {
+        status: null,
+        message: null,
         fields: {
-            cover: "",
-            title: "",
-            shortDescription: "",
-            content: "",
-            author: ""
+            title: article?.title || "",
+            author: article?.author || "",
+            shortDescription: article?.shortDescription || "",
+            content: article?.content || "",
+            cover: article?.cover || null,
         }
-
-
-    })
+    });
 
     useEffect(() => {
-        if (state.message === "success") {
-            swal({
-                title: "Article Added Successfully :)",
-                icon: "success",
-                buttons: "ok",
-            })
-        } else if (state.message === "error") {
-            swal({
-                title: "Plaese Fill out required Fields :(",
-                icon: "warning",
-                buttons: "ok",
-            })
+        if (state?.status === 201 || state.status === 200) {
+            toast.success("article added Successfully :)")
+            formRef.current?.reset();
         }
-    }, [state.message])
+    }, [state]);
+
+    const handleSubmit = async (formData) => {
+        if (article?._id) formData.set("_id", article._id);
+        formData.set("content", content);
+        await formAction(formData);
+    }
 
     return (
         <section className={styles.article}>
             <div>
                 <h1 className="title">
-                    <span> Add New Article</span>
+                    <span>{article?._id ? "Edit Article" : "Add New Article"}</span>
                 </h1>
             </div>
-            <form
-                action={async (formData) => {
-                    await formAction(formData);
-                }}>
+            <form ref={formRef}
+                action={handleSubmit}>
+                {article?._id &&
+                    <input type="hidden" name="_id"
+                        value={article._id} />}
                 <div className={styles.article_main}>
                     <div>
-                        <label>Title </label>
+                        <label>Title</label>
                         <input
-                            name='title'
-                            defaultValue={state.feilds?.title}
+                            name="title"
+                            defaultValue={state.fields?.title}
                             type="text"
+                            required
                         />
                     </div>
                     <div>
                         <label>Short Description</label>
                         <input
-                            name='shortDescription'
+                            name="shortDescription"
                             type="text"
-                            defaultValue={state.feilds?.shortDescription}
-
+                            defaultValue={state.fields?.shortDescription}
+                            required
                         />
                     </div>
                     <div>
                         <label>Author</label>
                         <input
-                            name='author'
+                            name="author"
                             type="text"
-                            defaultValue={state.feilds?.author} />
+                            defaultValue={state.fields?.author}
+                            required
+                        />
                     </div>
                     <div>
                         <label>Cover</label>
-                        <input
-                            name='cover'
-                            type="file"
-                            accept="image/*"
-                        />
+                        <input name="cover" type="file" accept="image/*" />
                     </div>
                 </div>
-                <input type="hidden" name="content"
-                    defaultValue={state.feilds?.content}
-                />
-                <CKEditor
-                    editor={ClassicEditor}
-                    onChange={(event, editor) => {
-                        if (typeof window !== "undefined") {
-                            document.querySelector("input[name=content]").value = editor.getData();
-                        }
-                    }} />
-                <button >add New Article</button>
+                <div className={styles.editorContainer}>
+                    <RichEditor
+                        value={content}
+                        onChange={setContent} />
+                    <input type="hidden" name="content"
+                        value={content} />
+                    {state?.errors?.content && (
+                        <span className="text-sm text-red-500">{state.errors.content[0]}</span>
+                    )}
+                </div>
+                <button
+                    type="submit"
+                    disabled={isPending}
+                    className={styles.submit_btn}>
+                    {isPending ? "Sending..." : article?._id ? "Update Article" : "Add New Article"}
+                </button>
             </form>
         </section>
-    )
+    );
 }
-

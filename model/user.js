@@ -28,10 +28,22 @@ const schema = mongoose.Schema({
 
     refreshToken: {
         type: String,
+    },
+    resetCode: { type: String, required: false },
+    resetCodeExpire: { type: Date, required: false },
+},
+    {
+        timestamps: true,
+        toJSON: {
+            transform(doc, ret) {
+                ret.id = ret._id.toString();
+                delete ret._id;
+                delete ret.__v;
+                return ret;
+            },
+        }
     }
-}, {
-    timestamps: true
-});
+);
 
 schema.virtual("comments", {
     ref: "Comment",
@@ -50,8 +62,6 @@ schema.virtual("tickets", {
     localField: "_id",
     foreignField: "userID"
 });
-
-
 
 const UserModal = mongoose.models.User || mongoose.model("User", schema)
 

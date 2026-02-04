@@ -51,7 +51,6 @@ const Tabs = ({ product }) => {
           </label>
         </li>
       </ul>
-
       <div className={styles.contents}>
         <section className={styles.tabs_content}>
           <Description description={product.longDescription} />
@@ -60,7 +59,9 @@ const Tabs = ({ product }) => {
           <MoreInfoes product={product} />
         </section>
         <section className={styles.tabs_content}>
-          <Comments product={JSON.parse(JSON.stringify(product))} />
+          <Comments
+            productId={product._id}
+          />
         </section>
       </div>
     </div>

@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema({
@@ -28,19 +27,22 @@ const schema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
-        default: "Draft"
+        default: "unpublish",
+        enum: ["publish", "unpublish"]
     },
-
-
 },
     {
         timestamps: true,
+        toJSON: {
+            transform(doc, ret) {
+                ret.id = ret._id.toString(); 
+                delete ret._id;
+                delete ret.__v;
+                return ret;
+            },
+        }
     }
 );
-
-
-
-
 
 const ArticleModel = mongoose.models.Article || mongoose.model("Article", schema);
 

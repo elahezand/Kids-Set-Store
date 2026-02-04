@@ -5,48 +5,33 @@ import Image from "next/image";
 import styles from "./producTable.module.css"
 import EditModal from "@/components/template/p-admin/products/modal";
 import swal from "sweetalert";
-import { manageError } from "@/utils/helper";
+import { useDelete } from "@/utils/hooks/useReactQueryPanel";
+import toast from "react-hot-toast";
 export default function DataTable({ products, title }) {
-    const router = useRouter();
 
     const [showModalEdit, setShowModalEdit] = useState(false)
-    const hideModal = () => setShowModalEdit(false)
-
     const [product, setProduct] = useState("")
+  
+    const hideModal = () => setShowModalEdit(false)
+    const router = useRouter()
 
-    const removeProduct = async (productID) => {
+    const { mutate } = useDelete(`/products`, {
+        onSuccess: (data) => {
+            toast.success("Item Removed Successfully :)")
+            router.refresh()
+        },
+    })
+
+    const removeProduct = (id) => {
         swal({
-            title: "are you Sure To Remove This Product? :)",
+            title: "Are You Sure To remove This item?",
             icon: "warning",
             buttons: ["No", "yes"]
-        }).then(async result => {
+        }).then(result => {
             if (result) {
-                try {
-                    const res = await fetch(`/api/products/${productID}`, {
-                        method: "DELETE",
-                    })
-
-                    if (res.status !== 200) return manageError(res.status)
-                    swal({
-                        title: "Product Removed Successfully :)",
-                        icon: "success",
-                        buttons: "ok"
-                    }).then(result => {
-                        if (result) {
-                            router.refresh()
-                        }
-                    })
-                }
-                catch (err) {
-                    swal({
-                        title: "NetWork Error",
-                        icon: "warning",
-                        buttons: "ok"
-                    })
-                }
+                mutate(id)
             }
-        }
-        )
+        })
     }
 
     return (

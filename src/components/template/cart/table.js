@@ -1,10 +1,12 @@
 "use client";
-import useShop from "@/hooks/useShop";
-import { useEffect, useState, useMemo, useCallback } from "react";
-import Select from "react-select";
+import useShop from "@/utils/hooks/useShop";
+import { useEffect, useState, useCallback } from "react";
+import { useForm, Controller } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import toast from 'react-hot-toast'
 import Image from "next/image";
 import totalStyles from "./totals.module.css";
-import countryList from 'react-select-country-list'
 import styles from "./table.module.css";
 import Link from "next/link";
 import { IoMdClose } from "react-icons/io";
@@ -12,29 +14,18 @@ import { useRouter } from "next/navigation";
 import { TbShoppingCartX } from "react-icons/tb";
 import { manageError } from "@/utils/helper";
 
-const Table = () => {
+
+// Zod schema for shipping address
+const shippingSchema = z.object({
+    fullName: z.string().min(2, "Full name is required"),
+    phone: z.string().min(8, "Phone number is required"),
+    address: z.string().min(5, "Address is required"),
+    city: z.string().min(2, "City is required"),
+    postalCode: z.string().min(4, "Postal code is required"),
+})
+const Table = ({ user }) => {
     const { removeFromCart, cart, addTocard, increaseCount, decreaseCount } = useShop()
     const router = useRouter()
-
-    const [changeAddress, setChangeAddress] = useState(false);
-    const [stateSelectedOption, setStateSelectedOption] = useState(null);
-
-    const [total, setTotal] = useState(null)
-    const [discount, setDiscount] = useState("")
-
-    const options = useMemo(() => countryList().getData(), [])
-
-    const calculateProducts = useCallback(() => {
-        if (cart.length) {
-            setTotal(cart.reduce((prev, current) => prev + current.price * current.count, 0))
-        }
-    }, [cart])
-
-
-    useEffect(() => {
-        calculateProducts()
-    }, [calculateProducts]);
-
 
     const refreshCart = () => {
         router.refresh()
@@ -49,8 +40,51 @@ const Table = () => {
 
         const data = await res.json()
         setTotal(prev => prev = prev - (prev * data.discount.percent / 100))
-
     }
+
+    const [total, setTotal] = useState(0)
+    const [discount, setDiscount] = useState("")
+
+    const calculateProducts = useCallback(() => {
+        if (cart.length) {
+            setTotal(cart.reduce((prev, current) => prev + current.price * current.count, 0))
+        }
+    }, [cart])
+
+    useEffect(() => {
+        calculateProducts()
+    }, [calculateProducts]);
+
+
+    const { mutate } = usePost("/orders", {
+        onSuccess: () => {
+            toast.success("Order created successfully!")
+            setCart([])
+        }
+    })
+
+    const { handleSubmit, control, formState: { errors } } = useForm({
+        resolver: zodResolver(shippingSchema),
+        defaultValues: {
+            fullName: "",
+            phone: "",
+            address: "",
+            city: "",
+            postalCode: "",
+        }
+    })
+
+    const submitOrder = (data) => {
+        if (!cart.length) return toast.error("Cart is empty")
+        const orderData = {
+            user,
+            items: cart,
+            totalPrice: total,
+            shippingAddress: data
+        }
+        mutate(orderData)
+    }
+
 
 
     return (
@@ -134,36 +168,33 @@ const Table = () => {
             </div>
             <div className={totalStyles.totals}>
                 <p className={totalStyles.totals_title}>Card Total</p>
-                <p
-                    onClick={() => setChangeAddress((prev) => !prev)}
-                    className={totalStyles.change_address}>
-                    Change Address
-                </p>
-                {changeAddress && (
-                    <div className={totalStyles.address_details}>
-                        <Select
-                            defaultValue={stateSelectedOption}
-                            onChange={setStateSelectedOption}
-                            isClearable={true}
-                            placeholder={"State"}
-                            isRtl={true}
-                            isSearchable={true}
-                            options={options}
-                        />
-                        <input type="text" placeholder="City" />
-                        <input type="number" placeholder="Postal Code " />
-                        <button onClick={() => setChangeAddress(false)}>Update</button>
-                    </div>
-                )}
-                <div className={totalStyles.total}>
-                    <p>Total</p>
-                    <p>{total} $</p>
+                <div className={totalStyles.address_details}>
+                    <form onSubmit={handleSubmit(submitOrder)} className="mb-4">
+                        <h6 className="text-white mb-2">Shipping Address</h6>
+                        {["fullName", "phone", "address", "city", "postalCode"].map((field) => (
+                            <Controller
+                                key={field}
+                                name={field}
+                                control={control}
+                                render={({ field: controllerField }) => (
+                                    <div className="mb-2">
+                                        <input
+                                            {...controllerField}
+                                            placeholder={field}
+                                            className="form-control"
+                                        />
+                                        {errors[field] && <span className="text-danger">{errors[field]?.message}</span>}
+                                    </div>
+                                )}
+                            />
+                        ))}
+                        <div className={totalStyles.total}>
+                            <p>Total</p>
+                            <p>{total} $</p>
+                        </div>
+                        <button type="submit" className={`${totalStyles.checkout_btn} mt-3 w-100`}>Proceed to Checkout</button>
+                    </form>
                 </div>
-                <Link href={"/checkout"}>
-                    <button className={totalStyles.checkout_btn}>
-                        Continue To Payment...
-                    </button>
-                </Link>
             </div>
         </>
     );

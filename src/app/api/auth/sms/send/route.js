@@ -1,47 +1,41 @@
-const request = require("request")
 import otpMOdal from "../../../../../../model/otp"
-import connectToDB from "../../../../../../db/db"
+import connectToDB from "../../../../../../configs/db"
+import axios from "axios"
 
 export async function POST(req) {
-    connectToDB()
+  try {
+    await connectToDB()
     const { phone } = await req.json()
-    const code = Math.floor(Math.random() * 99999)
+    const code = Math.floor(10000 + Math.random() * 89999) 
 
-    request.post({
-        url: 'http://ippanel.com/api/select',
-        body: {
-            "op": "pattern",
-            "user": "elizand724",
-            "pass": "917573657mM2$",
-            "fromNum": "3000505",
-            "toNum": phone,
-            "patternCode": "tzsbgnyknvvoab4",
-            "inputData": [
-                { "verification-code": code }
-            ]
-        },
-        json: true,
-    },
-        async function (error, response, body) {
-            const date = new Date()
-            const expTime = date.getTime() + 300000
+    const body = {
+      op: "pattern",
+      user: "elizand724",
+      pass: "917573657mM2$",
+      fromNum: "3000505",
+      toNum: phone,
+      patternCode: "tzsbgnyknvvoab4",
+      inputData: [{ "verification-code": code }],
+    }
 
-            if (!error && response.statusCode === 200) {
-                await otpMOdal.create(
-                    {
-                        phone,
-                        code,
-                        expTime
-                    })
+    const res = await axios.post("http://ippanel.com/api/select", body, {
+      headers: { "Content-Type": "application/json" },
+    })
 
-                Response.json({ message: "Code Sent Successfully :))" }, { status: 200 })
-            } else {
-                Response.json({ message: "Unknown Error !!" }, { status: 500 })
-            }
-        });
-
-    return Response.json({ message: "Code Sent Successfully :))" }, { status: 200 })
-
+    if (res.status === 200) {
+      const expTime = Date.now() + 5 * 60 * 1000 // 5 min
+      await otpMOdal.create({ phone, code, expTime })
+      return Response.json(
+        { message: "Code Sent Successfully :))" },
+        { status: 200 }
+      )
+    } else {
+      return Response.json(
+        { message: "Unknown Error !!" },
+        { status: 500 }
+      )
+    }
+  } catch (err) {
+    return Response.json({ message: "Server Error" }, { status: 500 })
+  }
 }
-
-

@@ -1,14 +1,16 @@
 import styles from "@/components/modules/navbar/navbar.module.css";
 import Link from "next/link";
-import CategoryModel from "../../../../model/category";
 import { IoIosArrowDown } from "react-icons/io";
 import { FaRegHeart } from "react-icons/fa";
 import FavoriteModel from "../../../../model/favorite";
 import CartCount from "./cart";
 import { FaPlus } from "react-icons/fa";
 import { getMe } from "@/utils/serverHelper";
+import { handleTree } from "@/utils/tree";
+import connectToDB from "../../../../configs/db";
 
 const Navbar = async () => {
+    await connectToDB()
     const user = await getMe()
     let favorites = []
 
@@ -16,21 +18,8 @@ const Navbar = async () => {
         favorites = await FavoriteModel.find({ userID: user._id })
     }
 
-    const categories = await CategoryModel.find({}).lean()
-    const tree = []
-
-    function buildChildren(parent) {
-        const children = [...categories].filter(cat => cat.parentId?.toString() === parent._id.toString())
-            .map(cat => ({ ...cat, children: buildChildren(cat) }));
-
-        return children
-    }
-
-    categories.filter(parent => {
-        if (!parent.parentId) {
-            tree.push({ ...parent, children: buildChildren(parent._id) })
-        }
-    })
+    const tree = await handleTree()
+console.log(tree);
 
     return (
         <>
@@ -45,16 +34,16 @@ const Navbar = async () => {
                         <li>
                             <Link href="/"> Home</Link>
                         </li>
-                        {JSON.parse(JSON.stringify(tree)).map((category, index) => (
+                        {JSON.parse(JSON.stringify(tree)).map((cat, index) => (
                             <li key={index + 1}
                                 className={`${styles.arrow_icon} 
                         ${styles.controol}`}>
-                                <Link href={`/products/category/${category.slug}?page=1`}>
-                                    {category.name}</Link>
+                                <Link href={`/products?category=${cat.name}`}>
+                                    {cat.name}</Link>
                                 <ul className={styles.sub_menu}>
-                                    {category.children.map((sub, index) => (
+                                    {cat.children.map((sub, index) => (
                                         <li key={index + 1}>
-                                            <Link href={`/products/category/${category.slug}/${sub.slug}?page=1`}
+                                            <Link href={`/products?category=${sub.name}`}
                                                 className={styles.menu_title}
                                             >{sub.name}
                                             </Link>
@@ -62,7 +51,7 @@ const Navbar = async () => {
                                                 <ul key={index + 1}
                                                     className={`${styles.sub_menu}${styles.left_menu}`}>
                                                     <li>
-                                                        <Link href={`/products/category/${category.slug}/${sub.slug}/${item.slug}?page=1`}>
+                                                        <Link href={`/products?category=${item.name}`}>
                                                             {item.name}</Link>
                                                     </li>
                                                 </ul>
