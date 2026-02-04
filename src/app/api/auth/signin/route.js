@@ -1,67 +1,66 @@
-
 import UserModal from "../../../../../model/user"
-import connectToDB from "../../../../../db/db"
-import { generateRefreshToken, generateToken, verifyPassword } from "@/utils/auth"
-import { validatePassword } from "../../../../../validator/user"
+import connectToDB from "../../../../../configs/db"
+import {
+  generateRefreshToken,
+  generateToken,
+  verifyPassword,
+} from "@/utils/auth"
+import { z } from "zod"
+
+const schema = z.object({
+  identifier: z.string(),
+  password: z.string().min(6),
+  remember: z.boolean().optional(),
+})
+
 export async function POST(req) {
-    connectToDB()
-    try {
+  try {
+    await connectToDB()
 
-        const reqBody = await req.json()
+    const body = await req.json()
+    const parsed = schema.safeParse(body)
+    if (!parsed.success)
+      return Response.json({ message: "Invalid data" }, { status: 422 })
 
-        const { identifier, password } = reqBody
-        const isValidPassword = validatePassword(password)
+    const { identifier, password, remember } = parsed.data
 
-        if (!isValidPassword) return Response.json({ message: "Password NOT Valid" }, { status: 422 })
+    const user = await UserModal.findOne({
+      $or: [{ phone: identifier }, { email: identifier }],
+    })    
+    if (!user)
+      return Response.json({ message: "User not found" }, { status: 404 })
 
-        const user = await UserModal.findOne({ $or: [{ phone: identifier }, { email: identifier }] })
-        if (!user) return Response.json({ message: "Not FOUND :)" }, { status: 404 })
+    const isValid = await verifyPassword(password, user.password)
+    
+    if (!isValid)
+      return Response.json({ message: "Invalid password" }, { status: 401 })
 
+    const email = user.email || `${user.phone}@gmail.com`
 
-        const VerifiedPassword = await verifyPassword(password, user.password)
+    const accessToken = await generateToken({ email })
+    const refreshToken = await generateRefreshToken({ email })
 
-        if (!VerifiedPassword) return Response.json({ message: "Password NOT Valid :)" }, { status: 422 })
+    await UserModal.findByIdAndUpdate(user._id, {
+      $set: { refreshToken },
+    })
 
+    const cookieOptions = `Path=/; HttpOnly; SameSite=Lax${
+      process.env.NODE_ENV === "production" ? "; Secure" : ""
+    }${remember ? "; Max-Age=2592000" : ""}` 
 
-        let accessToken = null
-        let refreshToken = null
-
-
-        const { email, phone } = user
-        if (email) {
-            accessToken = await generateToken({ email })
-            refreshToken = await generateRefreshToken({ email })
-
-        } else {
-            const email = `${phone}@gmail.com`
-            accessToken = await generateToken({ email })
-            refreshToken = await generateRefreshToken({ email })
-        }
-
-        await UserModal.findOneAndUpdate({ email }, {
-            $set: {
-                refreshToken
-            }
-        })
-
-        return Response.json({ message: "you were registerd successfully." }, {
-            status: 200,
-            headers: {
-                "Set-Cookie": [
-                    `token=${accessToken}; Path=/; HttpOnly; SameSite=Lax`,
-                    `refreshToken=${refreshToken}; Path=/; HttpOnly; SameSite=Lax`
-                ]
-            }
-        })
-    }
-    catch (err) {
-        return Response.json({ message: "Unknown Error" }, { status: 500 })
-    }
-
+    return Response.json(
+      { message: "Logged in successfully" },
+      {
+        status: 200,
+        headers: {
+          "Set-Cookie": [
+            `token=${accessToken}; ${cookieOptions}`,
+            `refreshToken=${refreshToken}; ${cookieOptions}`,
+          ],
+        },
+      }
+    )
+  } catch (err) {    
+    return Response.json({ message: "Server error" }, { status: 500 })
+  }
 }
-
-
-
-
-
-

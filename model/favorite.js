@@ -1,26 +1,32 @@
-const mongoose = require("mongoose");
-import UserModal from "./user";
-import ProductModal from "./product";
+import mongoose from "mongoose";
 
-const schema = new mongoose.Schema({
-    userID: {
-        type: mongoose.Types.ObjectId,
-        ref: "User",
-        required: true,
+const wishlistSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      unique: true
     },
-
-    productID: {
-        type: mongoose.Types.ObjectId,
+    products: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
-        required: true,
-    },
-  
-},
-    {
+      }
+    ],
+  },
+  {
     timestamps: true,
+    toJSON: {
+      transform(doc, ret) {
+        ret.id = ret._id.toString();
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      },
+    }
   }
 );
-
-const FavoriteModel = mongoose.models.Favorite || mongoose.model("Favorite", schema);
+const FavoriteModel = mongoose.models.Favorite || mongoose.model("Favorite", wishlistSchema);
 
 export default FavoriteModel;

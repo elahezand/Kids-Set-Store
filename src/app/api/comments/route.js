@@ -1,47 +1,70 @@
-import connectToDB from "../../../../db/db";
-import commentModel from "../../../../model/comment";
-import ProductModal from "../../../../model/product";
-import UserModal from "../../../../model/user";
-import { validateEmail, validateUserNane } from "../../../../validator/user";
-export async function GET() {
-    try {
-        connectToDB()
-        const comments = await commentModel.find({}, "-__v")
-            .populate("userID", "username")
-            .lean()
-        return Response.json(comments, { status: 200 })
-    } catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
-    }
 
+import connectToDB from "../../../../configs/db";
+import commentModel from "../../../../model/comment";
+import { commentValidationSchema } from "@/validators/comment";
+import { NextResponse } from "next/server";
+import { getMe } from "@/utils/serverHelper";
+import ProductModel from "../../../../model/product";
+import { paginate } from "@/utils/helper";
+export async function GET(req) {
+    try {
+        await connectToDB();
+        const { searchParams } = new URL(req.url);
+
+        const useCursor = searchParams.has("cursor");
+        const productId = searchParams.get("productId")
+
+        const result = await paginate(
+            commentModel,               // Model
+            searchParams,               // searchParams
+            productId ? { productID: productId } : {}, // filter
+            null,                       // populate
+            useCursor,
+            true                  // cursor /page
+        );
+
+        return NextResponse.json(result, { status: 200 });
+    } catch (err) {
+        return NextResponse.json({ message: err.message }, { status: 500 });
+    }
 }
+
 export async function POST(req) {
     try {
-        connectToDB()
-        const reqBody = await req.json()
+        await connectToDB();
 
-        const { username, body, email, score, productID, userID, isAccept } = reqBody
+        const user = await getMe();
+        if (!user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-        const isValidUsername = validateUserNane(username)
-        const isValidEmail = validateEmail(email)
+        const body = await req.json();
 
-        if (!isValidEmail || !isValidUsername) return Response.json({ message: "Email or Usename Not Correct" }, { status: 422 })
+        body.score = Number(body.score);
 
-        const comment = await commentModel.create({
-            username, body, email, score, productID, userID, isAccept
-        })
-        await ProductModal.findOneAndUpdate({ _id: productID }, {
-            $push: {
-                comments: comment._id
-            }
-        })
+        const parsed = commentValidationSchema.safeParse(body);
 
-        return Response.json({ message: "Comment sended Successfully" }, { status: 200 })
+        if (!parsed.success) {
+            return NextResponse.json(
+                { errors: parsed.error.flatten().fieldErrors },
+                { status: 400 }
+            );
+        }
+
+        const product = await ProductModel.findById(body.product);
+        if (!product) {
+            return NextResponse.json({ message: "Product not found" }, { status: 404 });
+        }
+
+        await commentModel.create({
+            ...parsed.data,
+            product: body.product,
+            user: user._id,
+        });
+
+        return NextResponse.json(
+            { message: "Comment sent successfully" },
+            { status: 201 }
+        );
     } catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
+        return NextResponse.json({ message: err.message }, { status: 500 });
     }
-
 }
-
-
-

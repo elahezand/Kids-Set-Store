@@ -1,162 +1,144 @@
+"use client"
 import React, { useState } from "react";
 import styles from "./register-login.module.css";
 import Link from "next/link";
 import Sms from "./Sms";
 import { useRouter } from "next/navigation";
-import { validatePassword } from "../../../../validator/user";
-import showSwal from "@/utils/helper";
+import swal from "sweetalert";
+import z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { manageError } from "@/utils/helper";
+import axios from "axios";
+import toast from "react-hot-toast";
+// Zod schema for validation
+const loginSchema = z.object({
+  email: z.string().email("Invalid email").nonempty("Email is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  remember: z.boolean().optional(),
+})
+
 const Login = ({ showRegisterForm }) => {
   const router = useRouter()
-  const [identifier, setIdentifier] = useState("")
-  const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
+
+  // React Hook Form setup
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    mode: "onChange"
+  })
+
+  // Login mutation
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await axios.post("/api/auth/signin", {
+        identifier: data.email,
+        password: data.password,
+        remember: data.remember,
+      })
+      return res.data
+    },
+    onSuccess: () => {
+      toast.success("LogIn Successfully:)"),
+        router.replace("/")
+    },
+    onError: (error) => {
+      const status = error.response?.status
+      manageError(status)
+    },
+  })
+
+  // Submit handler
+  const onSubmit = (data) => mutation.mutate(data)
 
   const [showOtp, setShowOtp] = useState(false)
   const [phone, setPhone] = useState("")
+  // OTP register
+  const mutationOtp = useMutation({
+    mutationFn: async (phoneNumber) =>
+      axios.post("/api/auth/sms/send", { phone: phoneNumber }).then(r => r.data),
+    onSuccess: () => {
+      toast.success("OTP Sent Successfully :)");
+      setShowOtp(true);
+    },
+    onError: (error) => {
+      const status = error.response?.status;
+      manageError(status);
+    },
+  });
 
-  const loginHandeler = async () => {
-    const isPasswordValid = validatePassword(password)
-    if (!password.trim() || !identifier.trim()) showSwal("plaese inter password and email", "warning", "Try Again")
-    if (!isPasswordValid) showSwal("plaese inter password Correctly", "warning", "Try Again")
-
-    try {
-      const res = await fetch("api/auth/signin", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json"
-        },
-        body: JSON.stringify({
-          identifier,
-          password,
-          rememberMe
-        })
-      })
-
-      if (res.status !== 200) return manageError(res.status)
-
-      swal({
-        title: "you are loggined successfully",
-        icon: "success",
-        buttons: "ok"
-      }).then(result => {
-        if (result) {
-          router.replace("/")
-          router.refresh()
-        }
-      })
-
-    }
-    catch (err) {
-      swal({
-        title: "SomeThing Went Wrong",
-        icon: "warning",
-        buttons: "Try Again :("
-      })
-    }
-  }
-
-  const otpHandeler = () => {
+  const handleOtp = async () => {
     swal({
-      title: "please send your number",
+      title: "Please enter your phone number",
       content: "input",
-
-    }).then(result => {
+      button: {
+        text: "Send OTP",
+      },
+    }).then((result) => {
       if (result) {
-        setPhone(result)
-        try {
-          fetch("api/auth/sms/send", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              phone: result,
-            })
-          }).then(res => {
-
-            if (res.status !== 200) return manageError(res.status)
-
-            swal({
-              title: "Code Send successfully",
-              icon: "success",
-              buttons: "ok"
-            }).then(result => {
-              if (result) {
-                setShowOtp(true)
-              }
-            })
-          })
-        } catch (err) {
-          swal({
-            title: "NetWork Error",
-            text: err.message,
-            icon: "warning",
-            buttons: "ok"
-          })
-
-        }
-
+        setPhone(result);
+        mutationOtp.mutate(result);
       }
-    })
+    });
+  };
 
-
-  }
+  if (showOtp) return <Sms phone={phone} setShowOtp={setShowOtp} />;
 
   return (
     <>
-      {!showOtp ?
-        <>
-          <div className={styles.form}>
-            <input
-              className={styles.input}
-              type="text"
-              placeholder="Email |PhoneNumber"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-            />
-            <input
-              className={styles.input}
-              type="password"
-              placeholder=" Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <small style={{ margin: "0.5rem", color: "var(--main-color)" }}>
-              Include Up,Lower Case, Number and @</small>
+      <form
+        onSubmit={handleSubmit(onSubmit)}>
+        <div className={styles.form}>
+          <input
+            className={styles.input}
+            type="text"
+            placeholder="Email |PhoneNumber"
+            {...register("email")}
+          />
+          {errors.email && <span className={styles.error_text}>{errors.email.message}</span>}
+          <input
+            className={styles.input}
+            type="password"
+            placeholder=" Password"
+            {...register("password")}
+          />
+          {errors.password && <span className={styles.error_text}>{errors.password.message}</span>}
+          <small style={{ margin: "0.5rem", color: "var(--main-color)" }}>
+            Include Up,Lower Case, Number and @</small>
 
-            <div className={styles.checkbox}>
-              <input type="checkbox" name="" id=""
-                onChange={(e) => setRememberMe(e.target.checked)}
-              />
-              <p>Remember Me</p>
-            </div>
-            <button
-              onClick={loginHandeler}
-              className={styles.btn}>Sign In</button>
-            <Link href={"/forgotPass"}
-              className={styles.forgot_pass}>
-              Forgot Password ? :(
-            </Link>
-            <button
-              onClick={otpHandeler}
-              className={styles.btn}>Login With One-Time Password </button>
-            <p
-              onClick={showRegisterForm}
-              className={styles.back_to_login}> Dont Have Account ? Please <br />
-              <strong>Sign Up</strong></p>
+          <div className={styles.checkbox}>
+            <input
+              type="checkbox"
+              {...register("remember")}
+            />
+            <p>Remember Me</p>
           </div>
-          <Link href={"/"} className={styles.redirect_to_home}>
-            Cancel
+          <button
+            type="submit"
+            className={styles.btn}>Sign In</button>
+          <Link href={"/forgotPass"}
+            className={styles.forgot_pass}>
+            Forgot Password ? :(
           </Link>
+          <button type="button" className={styles.btn} onClick={handleOtp}
+            style={{ marginTop: "1rem" }}>
+            Login With One-Time Password
+          </button>
+          <p
+            onClick={showRegisterForm}
+            className={styles.back_to_login}> Dont Have Account ? Please <br />
+            <strong>Sign Up</strong></p>
+        </div>
+        <Link href={"/"}
+          className={styles.redirect_to_home}>
+          Cancel
+        </Link>
 
-        </>
-        : <Sms
-          phone={phone}
-          setShowOtp={setShowOtp}
-        />
-
-      }
+      </form>
     </>
   );
 };

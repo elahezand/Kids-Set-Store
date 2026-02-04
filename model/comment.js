@@ -1,24 +1,16 @@
 const mongoose = require("mongoose");
-import ProductModal from "./product";
-import UserModal from "./user";
-
+import ProductModel from "./product";
 const schema = new mongoose.Schema({
-    userID: {
+    user: {
         type: mongoose.Types.ObjectId,
         ref: "User",
-        required: false,
+        required: true,
     },
-
     username: {
         type: String,
         required: true,
     },
 
-
-    body: {
-        type: String,
-        required: true,
-    },
     email: {
         type: String,
         required: true,
@@ -26,32 +18,52 @@ const schema = new mongoose.Schema({
     score: {
         type: Number,
         required: true,
+        min: 1,
+        max: 5,
     },
     isAccept: {
         type: Boolean,
         default: false,
         required: true
     },
-    date: {
-        type: Date,
-        default: () => Date.now(),
-        immutable: false,
+
+    body: {
+        type: String,
+        required: true,
     },
-    isAccept: {
-        type: Boolean,
-        default: false,
-        required: true
-    },
+
     productID: {
         type: mongoose.Types.ObjectId,
         ref: "Product",
         required: true,
     },
-    answer: {
-        type: String,
-        required: false,
+    answer: [
+        {
+            text: String,
+            admin: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "USER"
+            },
+            createdAt: {
+                type: Date,
+                default: Date.now
+            }
+        }
+    ]
+},
+    {
+        timestamps: true,
+        toJSON: {
+            transform(doc, ret) {
+                ret.id = ret._id.toString();
+                delete ret._id;
+                delete ret.__v;
+                return ret;
+            },
+        }
     }
-});
+
+);
 
 const commentModel = mongoose.models.Comment || mongoose.model("Comment", schema);
 

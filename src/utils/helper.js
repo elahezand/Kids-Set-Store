@@ -1,50 +1,65 @@
-import swal from "sweetalert";
-const showSwal = (title, icon, button) => {
-    return swal({
-        title: title,
-        icon: icon,
-        buttons: button
-    })
-}
+import toast from "react-hot-toast";
 
-export const pageinatedData = (array, page, pageSize) => {
+export const showToast = (message, type = "default") => {
+    if (type === "success") toast.success(message);
+    else if (type === "destructive") toast.error(message);
+    else toast(message);
+};
+export const manageError = (error) => {
+    let message = null
+    if (error === 400) message = "Please fill out required fields correctly.";
+    else if (error === 401 || error === 403) message = "Unauthorized request.";
+    else if (error === 404) message = "Not found.";
+    else if (error === 409) message = "This account already exists.";
+    else if (error === 410) message = "Code expired.";
+    else if (error === 422) message = "Your information is not valid.";
+    else if (error === 500) message = "Server error.";
+    else message = `Unexpected error (${error || "unknown"})`;
 
-    const lastChild = page * pageSize
-    const firstChild = lastChild - pageSize
+    toast.error(message);
+};
+export async function paginate(Model, searchParams, filter = {}, populate = null, useCursor = false, route = false) {
+    let limit, page, cursor;
 
-    const pageCount = Math.ceil(array.length / pageSize)
+    if (route) {
+        limit = Number(searchParams.get("limit")) || 10;
+        page = Number(searchParams.get("page")) || 1;
+        cursor = searchParams.get("cursor");
+    } else {
+        limit = Number(searchParams.limit) || 10;
+        page = Number(searchParams.page) || 1;
+        cursor = searchParams.cursor;
+    }
 
-    const filteredArray = array.slice(firstChild, lastChild)
+    if (useCursor) {
+        const query = cursor ? { ...filter, _id: { $gt: cursor } } : { ...filter };
+        const data = await
+            Model.find(query)
+                .sort({ _id: 1 })
+                .limit(limit + 1)
+                .populate(populate)
+                .lean();
 
-    return [filteredArray, pageCount]
-}
+        const hasNextPage = data.length > limit;
+        if (hasNextPage) data.pop();
 
+        const nextCursor = hasNextPage ? data[data.length - 1]._id.toString() : null;
 
-export const manageError = (status) => {
+        return { data, nextCursor, limit };
+    } else {
+        const skip = (page - 1) * limit;
+        const totalCount = await Model.countDocuments(filter);
 
-    if (status !== 200) {
-        let message = null
-        if (status === 400) message = "Please Fill OUT required Field";
-        else if (status === 401) message = "Unauthorized Request";
-        else if (status === 409) message = "This account already existed";
-        else if (status === 404) message = "Not Found";
-        else if (status === 410) message = " Code Expired";
-        else if (status === 422) message = "your Info Not valid";
-        else if (status === 500) message = "server Error";
-        else message = `unexpected Error (${res.status})`
+        const data = await Model.find(filter)
+            .sort({ _id: -1 })
+            .skip(skip)
+            .limit(limit)
+            .populate(populate)
+            .lean();
 
-        swal({
-            title: "Error",
-            text: message,
-            icon: "warning",
-            buttons: "ok"
-        })
-        return
+        const pageCount = Math.ceil(totalCount / limit);
+        return { data, totalCount, pageCount, page, limit };
     }
 }
 
-
-
-
-
-export default showSwal
+export default showToast

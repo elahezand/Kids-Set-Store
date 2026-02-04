@@ -4,7 +4,7 @@ import styles from "./product.module.css";
 import { FaRegStar, FaStar } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import AddToFavoriteList from "../addToFavoriteList/addToFavoriteList";
-import useShop from "@/hooks/useShop";
+import useShop from "@/utils/hooks/useShop";
 import Image from "next/image";
 
 const Card = ({ price, name, _id, score, img }) => {

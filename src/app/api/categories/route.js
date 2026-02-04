@@ -1,9 +1,9 @@
-import connectToDB from "../../../../db/db"
+import connectToDB from "../../../../configs/db"
 import { authAdmin } from "@/utils/serverHelper"
 import CategoryModel from "../../../../model/category"
 export async function GET() {
     try {
-        connectToDB()
+        await connectToDB()
         const categories = await CategoryModel.find({}, "-__v")
         return Response.json({ categories }, { status: 200 })
 
@@ -15,7 +15,7 @@ export async function GET() {
 
 export async function POST(req) {
     try {
-        connectToDB()
+        await connectToDB()
         const admin = await authAdmin()
         if (!admin) throw new Error("This api Protected")
 

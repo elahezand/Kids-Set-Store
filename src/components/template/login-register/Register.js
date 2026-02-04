@@ -1,205 +1,167 @@
-"use client"
+"use client";
 import { useState } from "react";
 import styles from "./register-login.module.css";
 import { useRouter } from "next/navigation";
 import Sms from "./Sms";
+import swal from "sweetalert";
 import Link from "next/link";
-import { validateEmail, validatePhone, validateUserNane, validatePassword } from "../../../../validator/user";
-import showSwal, { manageError } from "@/utils/helper";
+import axios from "axios";
+import { userValidationSchema } from "../../../../validators/user";
+import { useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { manageError } from "@/utils/helper";
+import toast from "react-hot-toast";
+
 const Register = ({ showloginForm }) => {
-  const router = useRouter()
-  const [showOtp, setShowOtp] = useState(false)
+  const router = useRouter();
+  const [showOtp, setShowOtp] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [showPasswordField, setShowPasswordField] = useState(false);
 
-  const [isShowPassword, setIsShowPassword] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    resolver: zodResolver(userValidationSchema),
+    mode: "onChange"
+  });
 
-  const [username, setUsername] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [phone, setPhone] = useState("")
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await axios.post("/api/auth/signup", data);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("SignUp Successfully :)");
+      router.replace("/");
+    },
+    onError: (error) => manageError(error.response?.status),
+  });
 
+  const mutationOtp = useMutation({
+    mutationFn: async (phoneNumber) => {
+      const res = await axios.post("/api/auth/sms/send", { phone: phoneNumber });
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("OTP Sent Successfully :)");
+      setShowOtp(true);
+    },
+    onError: (error) => manageError(error.response?.status),
+  });
 
-  const signUpHandeler = async () => {
-
-    const isEmailValid = validateEmail(email)
-    const isPasswordValid = validatePassword(password)
-    const isPhoneValid = validatePhone(phone)
-    const isUsernameValid = validateUserNane(username)
-
-
-    if (!isEmailValid) return showSwal("plaese inter Email Correctly", "warning", "Try Again")
-    if (!isPhoneValid) return showSwal("plaese inter Phone Correctly", "warning", "Try Again")
-    if (!isUsernameValid) return showSwal("plaese inter username Correctly", "warning", "Try Again")
-    if (!isPasswordValid) return showSwal("plaese inter password Correctly", "warning", "Try Again")
-
-
-    try {
-      const res = await fetch("api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          username,
-          email,
-          password,
-          phone
-        })
-      })
-
-      if (res.status !== 200) return manageError(res.status)
-
-      swal({
-        title: "you are registred successfully :)",
-        icon: "success",
-        buttons: "ok"
-      }).then(result => {
-        if (result) {
-          router.push("/")
-        }
-      })
-    } catch (err) {
-      swal({
-        title: "SomeThing Went Wrong",
-        icon: "warning",
-        buttons: "Try Again :("
-      })
-    }
-  }
-
-  const otpHandeler = async () => {
-    const isPhoneValid = validatePhone(phone)
-
-    if (!isPhoneValid) return showSwal("Please Inter Your Phone Number Correctly!!!", "warning", "ok")
-
-    try {
-      const res = await fetch("api/auth/sms/check-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ phone })
-      })
-
-
-      if (res.status === 200) {
-        const res = await fetch("api/auth/sms/send", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            phone
-          })
-        })
-
-        if (res.status !== 200) return manageError(res.status)
-        swal({
-          title: "Code Send successfully",
-          icon: "success",
-          buttons: "ok"
-        }).then(result => {
-          if (result) {
-            setShowOtp(true)
-          }
-        })
-      } else {
-        swal({
-          title: "Your account already existed plaese logIn",
-          icon: "warning",
-          buttons: "ok"
-        }).then(result => {
-          if (result) {
-            showloginForm(true)
-          }
-        })
+  const handleOtp = () => {
+    swal({
+      title: "Please enter your phone number",
+      content: "input",
+    }).then((result) => {
+      if (result) {
+        setPhone(result);
+        mutationOtp.mutate(result);
       }
-    } catch (err) {
-      swal({
-        title: "SomeThing Went Wrong",
-        icon: "warning",
-        buttons: "Try Again :("
-      })
-    }
-  }
+    });
+  };
 
+  if (showOtp) {
+    return <Sms phone={phone} setShowOtp={setShowOtp} />;
+  }
 
   return (
-    <>
-      {!showOtp ?
-        <>
-          <div className={styles.form}>
-            <input className={styles.input}
-              type="text"
-              placeholder="UseraName"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <input
-              className={styles.input}
-              type="text"
-              placeholder="Email (optinal)"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              className={styles.input}
-              type="Phone"
-              value={phone}
-              placeholder=" Phone *"
-              onChange={(e) => setPhone(e.target.value)}
-            />
-            {isShowPassword &&
-              <>
-                <input
-                  className={styles.input}
-                  type="password"
-                  value={password}
-                  placeholder="Password"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <small style={{ margin: "0.5rem", color: "var(--main-color)" }}>
-                  Include Up,Lower Case, Number and @</small>
-              </>
-            }
+    <form
+      onSubmit={handleSubmit(
+        (data) => {
+          console.log("Form Data Submitted:", data);
+          mutation.mutate(data);
+        },
+        (errors) => {
+          console.log("Validation Errors:", errors);
+          toast.error("Please fix the errors in the form");
+        }
+      )}>
+      <div className={styles.form}>
 
-            <button
-              style={{ marginTop: ".7rem" }}
-              className={styles.btn}
-              onClick={() => {
-                if (isShowPassword) {
-                  signUpHandeler()
-                } else {
-                  setIsShowPassword(true)
-                }
-              }}>
-              Register with password
-            </button>
-            <p style={{ marginTop: "1rem" }}
-              className={styles.btn}
-              onClick={() => {
-                otpHandeler()
-              }
-              }
-            >
-              Register with phoneNumber
-            </p>
-            <p
-              onClick={showloginForm}
-              className={styles.back_to_login}> If Have Account ? Please <br />
-              <strong>Log In</strong></p>
-          </div>
-          <Link
-            href={"/"}
-            className={styles.redirect_to_home}>Cancel</Link>
-        </> :
-        <Sms
-          phone={phone}
-          email={email}
-          setShowOtp={setShowOtp}
+        {/* Username */}
+        <input
+          className={styles.input}
+          placeholder="Username"
+          {...register("username")}
         />
-      }
+        {errors.username && <span className={styles.error_text}>
+          {errors.username.message}</span>}
 
-    </>
+        {/* Email */}
+        <input
+          className={styles.input}
+          placeholder="Email (optional)"
+          {...register("email")}
+        />
+        {errors.email && <span className={styles.error_text}>{errors.email.message}</span>}
+
+        <input
+          className={styles.input}
+          placeholder="Phone"
+          {...register("phone")}
+        />
+        {errors.phone && <span className={styles.error_text}>{errors.phone.message}</span>}
+
+        {/* Password Section */}
+        {showPasswordField && (
+          <>
+            <input
+              className={styles.input}
+              type="password"
+              placeholder="Password"
+              {...register("password")}
+            />
+            {errors.password && <span className={styles.error_text}>{errors.password.message}</span>}
+            <small style={{ margin: "0.5rem", color: "var(--main-color)" }}>
+              Include Upper, Lower Case, Number and @
+            </small>
+          </>
+        )}
+
+        {/* Toggle Buttons */}
+        {!showPasswordField ? (
+          <button
+            type="button"
+            className={styles.btn}
+            style={{ marginTop: ".7rem" }}
+            onClick={() => setShowPasswordField(true)}
+          >
+            Register with Password
+          </button>
+        ) : (
+          <button
+            type="submit"
+            className={styles.btn}
+            style={{ marginTop: ".7rem" }}
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? "Registering..." : "Register"}
+          </button>
+        )}
+
+        <button
+          type="button"
+          className={styles.btn}
+          style={{ marginTop: "1rem" }}
+          onClick={handleOtp}
+          disabled={mutationOtp.isPending}
+        >
+          {mutationOtp.isPending ? "Sending..." : "Register with Phone (OTP)"}
+        </button>
+
+        <p onClick={showloginForm} className={styles.back_to_login} style={{ cursor: "pointer" }}>
+          Already have an account? <br />
+          <strong>Log In</strong>
+        </p>
+      </div>
+      <Link href={"/"} className={styles.redirect_to_home}>
+        Cancel
+      </Link>
+    </form>
   );
 };
 

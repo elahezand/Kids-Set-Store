@@ -107,3 +107,8 @@
     margin: 0.5rem 0;
 
 }
+
+.error_text{
+    color:#000;
+    margin-top: 1rem;
+}

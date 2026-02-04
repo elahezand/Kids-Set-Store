@@ -6,6 +6,8 @@ import { Autoplay } from "swiper/modules";
 import Article from "./article";
 
 const Articles = ({ articles }) => {
+    console.log(articles);
+    
     return (
         <div className="container">
             <p className={styles.title}>Our Articles</p>

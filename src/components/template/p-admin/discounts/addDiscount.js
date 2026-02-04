@@ -1,58 +1,44 @@
 "use client"
-import React, { useState } from 'react'
+import React from 'react'
 import { useRouter } from 'next/navigation';
+import { usePost } from '@/utils/hooks/useReactQueryPanel';
+import { discountSchema } from '../../../../../validators/discount';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import toast from 'react-hot-toast';
 import styles from "./addDiscount.module.css"
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import { manageError } from '@/utils/helper';
 
 export default function AddDiscount({ products }) {
     const router = useRouter()
 
-    const [code, setCode] = useState("")
-    const [percent, setPercent] = useState("")
-    const [maxUses, setMaxUses] = useState("")
-    const [expTime, seteExpTime] = useState("")
-    const [productID, setProductID] = useState("")
-
-    const addDiscount = async () => {
-        try {
-            const res = await fetch("/api/discount", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    code,
-                    maxUses,
-                    expTime,
-                    productID,
-                    percent,
-                }
-                )
-            })
-
-            if (res.status !== 200) return manageError(res.status)
-
-            swal({
-                title: "Code Created Successfully:)",
-                icon: "success",
-                buttons: "ok"
-            }).then(result => {
-                if (result) {
-                    router.refresh()
-                    setCode("")
-                    setPercent("")
-                    setMaxUses("")
-                }
-            })
-        } catch (err) {
-            swal({
-                title: "NetWork Error",
-                icon: "warning",
-                buttons: "ok"
-            })
+    const {
+        register,
+        handleSubmit,
+        control,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(discountSchema),
+        defaultValues: {
+            code: "",
+            percent: 0,
+            maxUses: 0,
+            productID: products[0]?._id || "",
+            expTime: new Date()
         }
+    })
+
+    const { mutate, isLoading } = usePost("/discounts", {
+        onSuccess: () => {
+            toast.success("Discount added successfully :)")
+            router.refresh()
+        },
+
+    })
+
+    const onSubmit = (data) => {
+        mutate(data)
     }
 
     return (
@@ -62,56 +48,66 @@ export default function AddDiscount({ products }) {
                     <span> Add New Code</span>
                 </h1>
             </div>
-            <div className={styles.discount_main}>
+            <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
                 <div>
                     <label>Code</label>
-                    <input
-                        value={code}
-                        onChange={(e) =>
-                            setCode(e.target.value)}
-                        type="text" />
+                    <input {...register("code")} type="text" />
+                    {errors.code && <p className={styles.error}>{errors.code.message}</p>}
                 </div>
+
                 <div>
                     <label>Percent</label>
                     <input
-                        value={percent}
-                        onChange={(e) =>
-                            setPercent(e.target.value)}
-                        type="text" />
+                        {...register("percent", { valueAsNumber: true })}
+                        type="number"
+                    />
+                    {errors.percent && <p className={styles.error}>{errors.percent.message}</p>}
                 </div>
+
                 <div>
-                    <label>maxUsage </label>
+                    <label>Max Usage</label>
                     <input
-                        value={maxUses}
-                        onChange={(e) =>
-                            setMaxUses(e.target.value)}
-                        type="text" />
+                        {...register("maxUses", { valueAsNumber: true })}
+                        type="number"
+                    />
+                    {errors.maxUses && <p className={styles.error}>{errors.maxUses.message}</p>}
                 </div>
+
                 <div>
                     <label>Product</label>
-                    <select
-                        onClick={(e) =>
-                            setProductID(e.target.value)}
-                        name="" id="">
-                        {products.map((item, index) => (
-                            <option
-                                key={index}
-                                value={item._id}>
+                    <select {...register("productID")}>
+                        <option value="">Select a product</option>
+                        {products.map((item) => (
+                            <option key={item._id} value={item._id}>
                                 {item.name}
                             </option>
                         ))}
                     </select>
+                    {errors.productID && <p className={styles.error}>{errors.productID.message}</p>}
                 </div>
-            </div>
-            <DatePicker
-                className='Date-picker'
-                selected={expTime}
-                onChange={(expTime) =>
-                    seteExpTime(expTime)}
-                value='Expire Time' />
-            <button
-                onClick={addDiscount}
-            >Create</button>
+
+                <div>
+                    <label>Expire Time</label>
+                    <Controller
+                        control={control}
+                        name="expTime"
+                        render={({ field }) => (
+                            <DatePicker
+                                className={styles.datePicker}
+                                onChange={(date) => field.onChange(date)}
+                                selected={field.value}
+                                placeholderText="Select Expire Date"
+                                minDate={new Date()}
+                            />
+                        )}
+                    />
+                    {errors.expTime && <p className={styles.error}>{errors.expTime.message}</p>}
+                </div>
+
+                <button type="submit" disabled={isLoading} className={styles.submitBtn}>
+                    {isLoading ? "Sending..." : "Create"}
+                </button>
+            </form>
         </section>
     )
 }

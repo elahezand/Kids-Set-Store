@@ -9,7 +9,6 @@ import { useState } from "react";
 
 const Gallery = ({ images }) => {
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
-
     return (
         <section style={{ width: "36%", height: "100%" }}>
             <Swiper

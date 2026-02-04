@@ -1,9 +1,9 @@
-import connectToDB from "../../db/db";
+import connectToDB from "../../configs/db";
 import { cookies } from "next/headers";
 import UserModal from "../../model/user";
 import { verifyToken, verifyRefreshToken } from "./auth";
 const authUser = async () => {
-    connectToDB()
+    await connectToDB()
     let user = null
 
     const cookiesStore = await cookies()
@@ -21,7 +21,7 @@ const authUser = async () => {
 }
 
 const authAdmin = async () => {
-    connectToDB()
+    await connectToDB()
     let user = null
 
     const cookiesStore = await cookies()
@@ -40,6 +40,7 @@ const authAdmin = async () => {
 }
 
 const getMe = async () => {
+    await connectToDB()
     const cookiesStore = await cookies()
     const token = cookiesStore.get("refreshToken")
     if (!token) return null

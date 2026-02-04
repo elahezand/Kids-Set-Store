@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react'
-import useShop from '@/hooks/useShop'
+import useShop from '@/utils/hooks/useShop'
 
 export default function AddToBasket({ product }) {
     const { addTocard, increaseCount, decreaseCount } = useShop()

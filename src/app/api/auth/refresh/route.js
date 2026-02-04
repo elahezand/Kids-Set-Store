@@ -1,11 +1,11 @@
-import connectToDB from '../../../../../db/db'
+import connectToDB from '../../../../../configs/db'
 import UserModal from '../../../../../model/user'
 import { verifyRefreshToken, generateToken } from '@/utils/auth'
 import { cookies } from 'next/headers'
 
 export async function POST(req) {
     try {
-        connectToDB()
+       await connectToDB()
         const cookiSrore = await cookies()
 
         const refreshtoken = cookiSrore.get("refreshToken").value

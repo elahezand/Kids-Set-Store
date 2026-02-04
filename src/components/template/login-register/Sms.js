@@ -1,44 +1,52 @@
 "use client"
-import styles from "@/components/template/login-register/sms.module.css";
-import { useState } from "react";
-import swal from "sweetalert";
-import { useRouter } from "next/navigation";
-import { manageError } from "@/utils/helper";
+
+import styles from "@/components/template/login-register/sms.module.css"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { manageError } from "@/utils/helper"
+import toast from "react-hot-toast"
+import axios from "axios"
+import { useMutation } from "@tanstack/react-query"
+import { z } from "zod"
+
+const schema = z.object({
+  phone: z
+    .string()
+    .length(11)
+    .regex(/^09\d{9}$/),
+  code: z.string().min(4),
+})
+
 const Sms = ({ phone, setShowOtp }) => {
   const [code, setCode] = useState("")
   const router = useRouter()
 
-  const verifyHandeler = async () => {
-    try {
-      const res = await fetch("/api/auth/sms/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          phone,
-          code
-        })
-      })
-      if (res.status !== 200) return manageError(res.status)
-      swal({
-        title: "you are registred successfully :)",
-        icon: "success",
-        buttons: "ok"
-      }).then(result => {
-        if (result) {
-          router.push("/")
-        }
-      })
-    } catch (err) {
-      swal({
-        title: "SomeThing Went Wrong",
-        icon: "warning",
-        buttons: "Try Again :("
-      })
-    }
+  const mutation = useMutation({
+    mutationFn: async ({ phone, code }) => {
+      const parsed = schema.safeParse({ phone, code })
+      if (!parsed.success)
+        throw new Error("Invalid data")
 
+      const res = await axios.post("/api/auth/sms/verify", {
+        phone,
+        code,
+      })
+      return res.data
+    },
+    onSuccess: () => {
+      toast.success("Login Successfully 🙂")
+      router.replace("/")
+    },
+    onError: (error) => {
+      const status = error.response?.status
+      manageError(status)
+    },
+  })
+
+  const verifyHandler = () => {
+    mutation.mutate({ phone, code })
   }
+
   return (
     <div>
       <div className={styles.form}>
@@ -47,21 +55,36 @@ const Sms = ({ phone, setShowOtp }) => {
           Please Enter Verification Code
         </span>
         <span className={styles.number}>{phone}</span>
-        <input className={styles.input} type="text"
+
+        <input
+          className={styles.input}
+          type="text"
           value={code}
-          onChange={(e) => setCode(e.target.value)} />
-        <button style={{ marginTop: "1rem" }}
-          onClick={verifyHandeler}
-          className={styles.btn}>
+          onChange={(e) => setCode(e.target.value)}
+        />
+
+        <button
+          style={{ marginTop: "1rem" }}
+          onClick={verifyHandler}
+          className={styles.btn}
+          disabled={mutation.isPending}
+        >
           Verify Code
         </button>
-        <p className={styles.send_again_code}>Send Code again</p>
+
+        <p className={styles.send_again_code}>
+          Send Code again
+        </p>
       </div>
+
       <p
         onClick={() => setShowOtp(false)}
-        className={styles.redirect_to_home}>Cancel</p>
+        className={styles.redirect_to_home}
+      >
+        Cancel
+      </p>
     </div>
-  );
-};
+  )
+}
 
-export default Sms;
+export default Sms

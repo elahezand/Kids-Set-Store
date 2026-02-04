@@ -1,77 +1,74 @@
-import connectToDB from "../../../../../db/db"
-import commentModel from "../../../../../model/comment"
-import { authAdmin } from "@/utils/serverHelper"
-import { isValidObjectId } from "mongoose"
-
+import connectToDB from "../../../../../configs/db";
+import { authAdmin } from "@/utils/serverHelper";
+import commentModel from "../../../../../model/comment";
+import { paginate } from "@/utils/helper";
+import { isValidObjectId } from "mongoose";
+import { NextResponse } from "next/server";
 
 export async function GET(req, { params }) {
     try {
-        connectToDB()
-        const { id } = await params
+        await connectToDB();
+        const { id } = await params;
 
-        const isvalidId = isValidObjectId(id)
-        if (!isvalidId) return Response.json({ message: "Not Valid :)" }, { satatus: 422 })
+        if (!isValidObjectId(id))
+            return NextResponse.json({ message: "Not valid ID" }, { status: 422 });
 
-        const comment = await commentModel.findOne({ _id: id })
-        return Response.json({ comment }, { status: 200 })
+        const { searchParams } = new URL(req.url);
+        const useCursor = searchParams.has("cursor");
+
+        const result = await paginate(
+            commentModel,   // Model
+            searchParams,   // searchParams
+            { userID: id },             // filter
+            null,           // populate
+            useCursor,
+            true     // cursor | pagination
+        );
+
+        return NextResponse.json(result, { status: 200 });
+    } catch (err) {
+        return NextResponse.json({ message: err.message }, { status: 500 });
     }
-    catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
-    }
-
 }
-
 
 export async function PUT(req, { params }) {
     try {
-        connectToDB()
-        const admin = await authAdmin()
-        if (!admin) throw new Error("This api Protected")
+        await connectToDB();
+        const admin = await authAdmin();
+        if (!admin) throw new Error("This API is protected");
 
-        const { id } = await params
+        const { id } = await params;
+        if (!isValidObjectId(id))
+            return NextResponse.json({ message: "Not valid ID" }, { status: 422 });
 
-        const isvalidId = isValidObjectId(id)
-        if (!isvalidId) return Response.json({ message: "Not Valid :)" }, { satatus: 422 })
+        const { body } = await req.json();
 
+        await commentModel.findOneAndUpdate(
+            { _id: id },
+            { $set: { body: body } },
+            { new: true }
+        );
 
-        const reqBody = await req.json()
-        const { content } = reqBody
-
-        await commentModel.findOneAndUpdate({ _id: id },
-
-            {
-                $set: { body: content }
-            }
-        )
-
-        return Response.json({ message: "Comment was Updated Successfully" }, { status: 200 })
+        return NextResponse.json({ message: "Comment updated successfully" }, { status: 200 });
+    } catch (err) {
+        return NextResponse.json({ message: err.message }, { status: 500 });
     }
-    catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
-    }
-
 }
-
 
 export async function DELETE(req, { params }) {
     try {
-        connectToDB()
-        const admin = await authAdmin()
-        if (!admin) throw new Error("This api Protected")
+        await connectToDB();
+        const admin = await authAdmin();
+        if (!admin) throw new Error("This API is protected");
 
-        const { id } = await params
-       
-        const isvalidId = isValidObjectId(id)
-        if (!isvalidId) return Response.json({ message: "Not Valid :)" }, { satatus: 422 })
+        const { id } = await params;
 
-        await commentModel.findOneAndDelete({ _id: id })
+        if (!isValidObjectId(id))
+            return NextResponse.json({ message: "Not valid ID" }, { status: 422 });
 
-        return Response.json({ message: "Comment Removed Successfully" }, { status: 200 })
+        await commentModel.findOneAndDelete({ _id: id });
+        return NextResponse.json({ message: "Comment removed successfully" }, { status: 200 });
+    } catch (err) {
+        return NextResponse.json({ message: err.message }, { status: 500 });
     }
-    catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
-    }
-
 }
-
-

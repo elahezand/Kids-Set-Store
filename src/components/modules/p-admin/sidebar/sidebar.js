@@ -4,8 +4,8 @@ import { ImReply } from "react-icons/im";
 import { FaComments, FaHeart, FaShoppingBag, FaUsers } from "react-icons/fa";
 import { MdOutlineAttachMoney } from "react-icons/md";
 import { MdSms, MdLogout } from "react-icons/md";
-import { usePathname } from "next/navigation";
 import { TbListDetails } from "react-icons/tb";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import swal from "sweetalert";
 import { useRouter } from "next/navigation";
@@ -38,7 +38,7 @@ const Sidebar = () => {
                 {path.includes("/p-user") ? (
                     <>
                         <Link href={"/p-user"}
-                         className={styles.sidebar_link_active}>
+                            className={styles.sidebar_link_active}>
                             <ImReply />
                             Dashboard
                         </Link>
@@ -66,7 +66,7 @@ const Sidebar = () => {
                 ) : (
                     <>
                         <Link href={"/p-admin"}
-                         className={styles.sidebar_link_active}>
+                            className={styles.sidebar_link_active}>
                             <ImReply />
                             Dashboard
                         </Link>
@@ -79,11 +79,15 @@ const Sidebar = () => {
                             <FaUsers />
                             Users
                         </Link>
+                        <Link href={"/p-admin/detail-account"}>
+                            <MdOutlineAttachMoney />
+                            Detail-Account
+                        </Link>
                         <Link href={"/p-admin/comments?page=1"}>
                             <FaComments />
                             Comments
                         </Link>
-                          <Link href={"/p-admin/articles?page=1"}>
+                        <Link href={"/p-admin/articles?page=1"}>
                             <FaUsers />
                             Articles
                         </Link>
