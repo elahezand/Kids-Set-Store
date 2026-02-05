@@ -5,13 +5,13 @@ import { FaChevronRight } from "react-icons/fa";
 const Latest = ({ products }) => {
     return (
         <div className="container">
-            <section className={styles.title}>
-                <Link className={styles.link} href={"products?value=latest&page=1"}>
+            <section className="section-heading">
+                <Link className="section-heading_link" href={"/products"}>
                     <FaChevronRight />{" "}
                     See More
                 </Link>
                 <div>
-                    <span>Latest products</span>
+                    <span>Our products</span>
                 </div>
             </section>
             <div className={styles.products}

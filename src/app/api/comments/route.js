@@ -1,7 +1,7 @@
 
 import connectToDB from "../../../../configs/db";
 import commentModel from "../../../../model/comment";
-import { commentValidationSchema } from "@/validators/comment";
+import { commentValidationSchema } from "../../../../validators/comment";
 import { NextResponse } from "next/server";
 import { getMe } from "@/utils/serverHelper";
 import ProductModel from "../../../../model/product";

@@ -4,9 +4,9 @@ import styles from "./tabs.module.css";
 import { useState } from "react";
 import Description from "../description/description";
 import MoreInfoes from "../moreInfos/moreInfos";
-import Comments from "../comments/comments";
 const Tabs = ({ product }) => {
   const [tab, setTab] = useState("description");
+ 
   return (
     <div data-aos="fade-left"
       className={styles.tabs}>
@@ -47,7 +47,7 @@ const Tabs = ({ product }) => {
         <li title="Shipping">
           <label htmlFor="comments"
             role="button">
-            Comments ({product.comments.filter(comment => comment.isAccept).length})
+            Comments ({product.comments?.filter(comment => comment.isAccept).length})
           </label>
         </li>
       </ul>
@@ -57,11 +57,6 @@ const Tabs = ({ product }) => {
         </section>
         <section className={styles.tabs_content}>
           <MoreInfoes product={product} />
-        </section>
-        <section className={styles.tabs_content}>
-          <Comments
-            productId={product._id}
-          />
         </section>
       </div>
     </div>

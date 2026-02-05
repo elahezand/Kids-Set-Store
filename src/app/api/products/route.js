@@ -3,32 +3,53 @@ import ProductModal from "../../../../model/product"
 import CategoryModel from "../../../../model/category"
 import { paginate } from "@/utils/helper"
 import { NextResponse } from "next/server"
-import { authAdmin } from "@/utils/serverHelper"
-import handleFileUpload from "@/utils/serverFile"
-import { productSchema } from "../../../../validators/product"
 
 export async function GET(req) {
     try {
-        await connectToDB();
-        const { searchParams } = new URL(req.url);
+        await connectToDB()
+        const { searchParams } = new URL(req.url)
 
-        const useCursor = searchParams.has("cursor");
-        const categoryName = searchParams.get("category");
-        const value = searchParams.get("value");
+        const categoryName = searchParams.get("category")
+        const value = searchParams.get("value")
+        const color = searchParams.get("color")
+        const material = searchParams.get("material")
+        const maxPrice = searchParams.get("max")
+        const sortType = searchParams.get("sort")
 
-        let filter = {};
+        const useCursor =
+            searchParams.has("cursor") &&
+            (!sortType || sortType === "latest")
 
+        let filter = {}
 
         if (categoryName) {
-            const category = await CategoryModel.findOne({ slug: categoryName });
-            if (category) {
-                filter.categoryPath = category._id;
-            }
+            const category = await CategoryModel.findOne({ slug: categoryName })
+            if (category) filter.categoryPath = category._id
         }
 
-        if (value === "bestSelling") {
-            filter.score = { $gte: 4 }
-        };
+        if (color && color !== "-1") filter.color = color
+
+        if (material && material !== "-1") {
+            filter.material = { $regex: material, $options: "i" }
+        }
+
+        if (maxPrice) filter.price = { $lte: Number(maxPrice) }
+
+        if (value === "bestSelling") filter.score = { $gte: 4 }
+
+        let sortOption = { _id: -1 }
+
+        if (sortType === "price") {
+            sortOption = { price: 1, _id: -1 }
+        }
+
+        if (sortType === "popularity") {
+            sortOption = { score: -1, _id: -1 }
+        }
+
+        if (sortType === "latest") {
+            sortOption = { _id: -1 }
+        }
 
         const result = await paginate(
             ProductModal,
@@ -36,11 +57,15 @@ export async function GET(req) {
             filter,
             null,
             useCursor,
-            true
-        );
-        return NextResponse.json(result, { status: 200 });
+            true,
+            sortOption
+        )
+
+        return NextResponse.json(result, { status: 200 })
+
     } catch (err) {
-        return NextResponse.json({ message: "Unknown Error" }, { status: 500 });
+        console.error("Error in GET products:", err)
+        return NextResponse.json({ message: "Unknown Error" }, { status: 500 })
     }
 }
 
