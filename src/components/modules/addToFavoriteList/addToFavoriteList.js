@@ -4,7 +4,7 @@ import swal from "sweetalert";
 import { useRouter } from "next/navigation";
 import styles from "./addToFavorites.module.css"
 
-export default function AddToFavoriteList({ productid }) {
+export default function AddToFavoriteList({ productId }) {
     const router = useRouter()
     const authUser = async () => {
         const res = await fetch("/api/auth/me")
@@ -24,7 +24,7 @@ export default function AddToFavoriteList({ productid }) {
                 },
                 body: JSON.stringify({
                     userID: user.user._id,
-                    productID: productid
+                    productID: productId
                 })
 
             })

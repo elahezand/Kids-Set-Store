@@ -1,17 +1,23 @@
 "use client"
-import styles from "@/components/template/index/articles/articles.module.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
+import Link from "next/link";
+import { FaChevronRight } from "react-icons/fa";
 import { Autoplay } from "swiper/modules";
 import Article from "./article";
 
 const Articles = ({ articles }) => {
-    console.log(articles);
-    
     return (
         <div className="container">
-            <p className={styles.title}>Our Articles</p>
-            <main>
+            <section className="section-heading">
+                <Link className="section-heading_link" href={"/products"}>
+                    <FaChevronRight />{" "}
+                    See More
+                </Link>
+                <div>
+                    <span>Our Articles</span>
+                </div>
+            </section>            <main>
                 <Swiper
                     slidesPerView={1}
                     spaceBetween={10}

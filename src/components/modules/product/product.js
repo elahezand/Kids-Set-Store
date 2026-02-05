@@ -23,7 +23,7 @@ const Card = ({ price, name, _id, score, img }) => {
           alt=""
         />
         <div className={styles.icons}>
-          <Link href="/">
+          <Link href={`/products/${_id}`}>
             <CiSearch />
             <p className={styles.tooltip}>LoOK</p>
           </Link>
@@ -38,7 +38,7 @@ const Card = ({ price, name, _id, score, img }) => {
           Add To Card</button>
       </div>
       <div className={styles.details}>
-        <Link href={`/product/${_id}`}>
+        <Link href={`/products/${_id}`}>
           {name}
         </Link>
         {score &&

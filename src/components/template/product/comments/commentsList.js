@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from 'react'
 import Comment from '@/components/modules/comment/comment';
 import axios from "axios";
@@ -31,7 +32,7 @@ export default function CommentsList({ data: initialData, nextCursor, limit }) {
     return (
         <>
             <div>
-                {comments.filter(comment => comment.isAccept)
+                {comments?.filter(comment => comment.isAccept)
                     .map((comment, index) => (
                         <Comment key={index + 1} {...comment} />
                     ))}

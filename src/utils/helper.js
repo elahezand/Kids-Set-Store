@@ -18,32 +18,36 @@ export const manageError = (error) => {
 
     toast.error(message);
 };
-export async function paginate(Model, searchParams, filter = {}, populate = null, useCursor = false, route = false) {
+export async function paginate(Model, searchParams, filter = {}, populate = null, useCursor = false, route = false, sortOption = { _id: -1 }) {
     let limit, page, cursor;
 
     if (route) {
-        limit = Number(searchParams.get("limit")) || 10;
-        page = Number(searchParams.get("page")) || 1;
-        cursor = searchParams.get("cursor");
+        limit = Number(searchParams?.get("limit")) || 10;
+        page = Number(searchParams?.get("page")) || 1;
+        cursor = searchParams?.get("cursor");
     } else {
-        limit = Number(searchParams.limit) || 10;
-        page = Number(searchParams.page) || 1;
-        cursor = searchParams.cursor;
+        limit = Number(searchParams?.limit) || 10;
+        page = Number(searchParams?.page) || 1;
+        cursor = searchParams?.cursor;
     }
 
     if (useCursor) {
-        const query = cursor ? { ...filter, _id: { $gt: cursor } } : { ...filter };
-        const data = await
-            Model.find(query)
-                .sort({ _id: 1 })
-                .limit(limit + 1)
-                .populate(populate)
-                .lean();
+        const query = cursor
+            ? { ...filter, _id: { $lt: cursor } }
+            : { ...filter };
+
+        const data = await Model.find(query)
+            .sort(sortOption)
+            .limit(limit + 1)
+            .populate(populate)
+            .lean();
 
         const hasNextPage = data.length > limit;
         if (hasNextPage) data.pop();
 
-        const nextCursor = hasNextPage ? data[data.length - 1]._id.toString() : null;
+        const nextCursor = hasNextPage
+            ? data[data.length - 1]._id.toString()
+            : null;
 
         return { data, nextCursor, limit };
     } else {
@@ -51,7 +55,7 @@ export async function paginate(Model, searchParams, filter = {}, populate = null
         const totalCount = await Model.countDocuments(filter);
 
         const data = await Model.find(filter)
-            .sort({ _id: -1 })
+            .sort(sortOption)
             .skip(skip)
             .limit(limit)
             .populate(populate)

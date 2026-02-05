@@ -15,7 +15,7 @@ const Details = ({ product }) => {
             </h2>
 
             <div className={styles.rating}>
-                <p>Comments ({product.comments.length})</p>
+                <p>Comments ({product.comments?.length})</p>
                 {new Array(product.score).fill(0).map((item, index) => (
                     <FaStar key={index} />
                 ))}
@@ -36,7 +36,7 @@ const Details = ({ product }) => {
                 product={product} />
             <section className={styles.wishlist}>
                 <AddToFavoriteList
-                    productid={JSON.parse(JSON.stringify(product._id))}
+                    productId={JSON.parse(JSON.stringify(product.id))}
                 />
                 <div>
                     <TbSwitch3 />

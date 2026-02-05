@@ -3,126 +3,116 @@ import { IoMdStar } from "react-icons/io";
 import styles from "./commentForm.module.css";
 import { commentValidationSchema } from "../../../../../validators/comment";
 import { useEffect, useState } from "react";
-const CommentForm = ({ productID, user }) => {
-  const [score, setScore] = useState(0)
-  const [rememberMe, setRememberMe] = useState(false)
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { usePost } from "@/utils/hooks/useReactQueryPublic";
+import toast from "react-hot-toast";
 
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("userData"))
-    if (user) {
-      setName(user.name)
-      setEmail(user.email)
-    }
-  }, [])
+const CommentForm = ({ productID }) => {
+  const [score, setScore] = useState(0);
+  const [rememberMe, setRememberMe] = useState(false);
 
-  // React Hook Form setup
   const {
     register,
     handleSubmit,
+    reset,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(commentValidationSchema),
-  })
-  useEffect(() => {
-    console.log(errors);
-  }, [errors]);
+    defaultValues: {
+      score: 0,
+      productID: productID
+    }
+  });
 
+  useEffect(() => {
+    const savedUser = JSON.parse(localStorage.getItem("userData"));
+    if (savedUser) {
+      setValue("username", savedUser.name);
+      setValue("email", savedUser.email);
+    }
+  }, [setValue]);
+
+  useEffect(() => {
+    setValue("score", score);
+  }, [score, setValue]);
 
   const { mutate, isLoading } = usePost('/comments', {
     onSuccess: () => {
-      toast.success("Your Comment Sent Successfully :)")
-      if (rememberMe) {
-        const user = { name, email }
-        localStorage.setItem("userData", JSON.stringify(user))
-      }
-      reset()
+      toast.success("Your Comment Sent Successfully :)");
+      reset();
+      setScore(0);
     }
   });
 
   const onSubmit = (data) => {
-    const commentData = {
-      username,
-      body,
-      email,
-      score,
-      productID: productID,
-      userID: user
+    const finalData = { ...data, productID, score };
+
+    if (rememberMe) {
+      localStorage.setItem("userData", JSON.stringify({
+        name: data.username,
+        email: data.email
+      }));
     }
-    mutate(commentData);
+
+    mutate(finalData);
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className={styles.form}>
+    <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <p className={styles.title}>Write Your Comment : </p>
-      <p>
-        Your Email Addrees Will Not Be Published.
-        Required Files Are Marked :)
-        <span style={{ color: "red" }}> * </span>
-      </p>
+
       <div className={styles.rate}>
         <p> Your Rating :</p>
         <div>
-          {new Array(5).fill(0).map((item, index) => (
+          {new Array(5).fill(0).map((_, index) => (
             <IoMdStar
-              style={{
-                "color": `${index + 1 <= score ? "var(--sage)" : "gray"}`
-              }}
+              style={{ color: `${index + 1 <= score ? "orange" : "gray"}`, cursor: "pointer" }}
               key={index}
-              onClick={() => setScore(index + 1)} />
+              onClick={() => setScore(index + 1)}
+            />
           ))}
         </div>
+        {errors.score && <span style={{ color: "red", fontSize: "12px" }}>{errors.score.message}</span>}
       </div>
+
       <div className={styles.group}>
-        <label htmlFor="">
-          Your Comment
-          <span style={{ color: "red" }}> * </span>
-        </label>
+        <label>Your Comment <span style={{ color: "red" }}> * </span></label>
         <textarea
-          value={body}
           {...register("body")}
           id="comment"
-          name="comment"
           cols="45"
           rows="8"
-          required=""
-          placeholder=""
+          placeholder="Enter your comment here..."
         ></textarea>
+        {errors.body && <span style={{ color: "red", fontSize: "12px" }}>{errors.body.message}</span>}
       </div>
+
       <div className={styles.groups}>
         <div className={styles.group}>
-          <label htmlFor="">
-            Name
-            <span style={{ color: "red" }}> * </span>
-          </label>
-          <input type="text"
-            {...register("username")} />
+          <label>Name <span style={{ color: "red" }}> * </span></label>
+          <input type="text" {...register("username")} />
+          {errors.username && <span style={{ color: "red", fontSize: "12px" }}>{errors.username.message}</span>}
         </div>
         <div className={styles.group}>
-          <label htmlFor="">
-            Email
-            <span style={{ color: "red" }}> * </span>
-          </label>
-          <input type="email"
-            value={email}
-            {...register("email")} />
+          <label>Email <span style={{ color: "red" }}> * </span></label>
+          <input type="email" {...register("email")} />
+          {errors.email && <span style={{ color: "red", fontSize: "12px" }}>{errors.email.message}</span>}
         </div>
       </div>
+
       <div className={styles.checkbox}>
         <input
-          onChange={(e) =>
-            setRememberMe(e.target.checked)}
-          type="checkbox" name="" id="" />
-        <p>
-          Save my Name, Email, And Website In This Browser For The Next Time I Comment :)
-        </p>
+          onChange={(e) => setRememberMe(e.target.checked)}
+          type="checkbox"
+        />
+        <p>Save my Name and Email in this browser for the next time.</p>
       </div>
-      <button
-        type='submit'
-        disabled={isLoading}
-        className={styles.btn}>
-        {isLoading ? "Loading..." : "  Submit Review"}</button>
+
+      <button type='submit' disabled={isLoading} className={styles.btn}>
+        {isLoading ? "Sending..." : "Submit Review"}
+      </button>
     </form>
   );
 };
