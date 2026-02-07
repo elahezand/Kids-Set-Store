@@ -5,13 +5,13 @@ import Map from "@/components/template/contactUs/form/map";
 import Image from "next/image";
 
 export const metadata = {
-    title: "Contact Us - Blue Tea",
+    title: "Contact Us - SET KIDS",
     description: "Get in touch with Set KIDS. Reach out for questions, feedback, or support. We'd love to hear from you!",
     keywords: ["Set Kids", "Contact", "Support", "Feedback", "Customer Service"],
-    authors: [{ name: "Blue Tea Team" }],
+    authors: [{ name: "SET KIDS Team" }],
     openGraph: {
-        title: "Contact Us - Blue Tea",
-        description: "Get in touch with Blue Tea. Reach out for questions, feedback, or support.",
+        title: "Contact Us - SET KIDS",
+        description: "Get in touch with SET KIDS. Reach out for questions, feedback, or support.",
         url: "https://yourwebsite.com/contact",
         siteName: "Set kids",
         images: [
