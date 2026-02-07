@@ -1,6 +1,7 @@
 "use client"
-import React from 'react'
+import React,{useState} from 'react'
 import Product from "@/components/modules/product/product";
+import { useGet } from '@/utils/hooks/useReactQueryPublic';
 import styles from "@/styles/wishList.module.css";
 import Link from "next/link";
 import { FaRegHeart } from "react-icons/fa";
@@ -26,6 +27,7 @@ export default function WishListItems({ data: initialData, limit, nextCursor }) 
         setCursor(res.data.nextCursor);
         setLoading(false);
     };
+    
 
     return (
         <>
@@ -33,8 +35,7 @@ export default function WishListItems({ data: initialData, limit, nextCursor }) 
                 {favorites.map((wish, index) =>
                         <Product
                             key={index}
-                            userID={wish.userID}
-                            {...wish.productID} />)}
+                            {...wish} />)}
                 {cursor && (
                     <div className="mt-5 col-12">
                         <button onClick={loadMore} className="classic w-100"
@@ -51,7 +52,7 @@ export default function WishListItems({ data: initialData, limit, nextCursor }) 
                     <span>You Do NOT Have Any Products In Your Favorites List Yet :(</span>
                     <span>You Will Find Lots Of Interstingg Products On The Home Page</span>
                     <div>
-                        <Link href="/category">Back TO Shop</Link>
+                        <Link href="/products">Back TO Shop</Link>
                     </div>
                 </div>
             )}

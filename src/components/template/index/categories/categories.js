@@ -28,7 +28,7 @@ export default function Categories() {
                         <h3>Girls & Boys</h3>
                     </div>
                     <div className={styles.category_box__img}>
-                        <Link href={`/products/category/Kids?page=1`}>
+                        <Link href={`/products?category=Kids`}>
                             <Image
                                 width={200}
                                 height={200}
@@ -46,7 +46,7 @@ export default function Categories() {
                         <h3>Girls & Boys</h3>
                     </div>
                     <div className={styles.category_box__img}>
-                        <Link href={`/products/category/Toddelers?page=1`}>
+                        <Link href={`/products?category=Toddelers`}>
                             <Image
                                 width={200}
                                 height={200}
@@ -63,7 +63,7 @@ export default function Categories() {
                         <h3>Girls & Boys</h3>
                     </div>
                     <div className={styles.category_box__img}>
-                        <Link href={`/products/category/Shoes?page=1`}>
+                        <Link href={`/products?category=Shoes`}>
                             <Image
                                 width={200}
                                 height={200}
@@ -80,7 +80,7 @@ export default function Categories() {
                         <h3>Girls & Boys</h3>
                     </div>
                     <div className={styles.category_box__img}>
-                        <Link href={`/products/category/Baby?page=1`}>
+                        <Link href={`/products?category=Baby`}>
                             <Image
                                 width={200}
                                 height={200}

@@ -29,7 +29,7 @@ const Card = ({ price, name, _id, score, img }) => {
           </Link>
           <AddToFavoriteList
             className={styles.favorite}
-            productid={_id}
+            productId={_id}
           >  Add To Favriote
           </AddToFavoriteList>
         </div>

@@ -12,15 +12,17 @@ import connectToDB from "../../../../configs/db";
 const Navbar = async () => {
     await connectToDB()
     const user = await getMe()
-    let favorites = []
+    let favoriteCount = 0;
 
     if (user) {
-        favorites = await FavoriteModel.find({ userID: user._id })
+        const favorite = await FavoriteModel
+            .findOne({ user: user._id })
+            .select("products")
+            .lean();
+
+        favoriteCount = favorite?.products?.length || 0;
     }
-
     const tree = await handleTree()
-console.log(tree);
-
     return (
         <>
             <nav className={styles.navbar}>
@@ -93,7 +95,7 @@ console.log(tree);
                         <CartCount />
                         <Link href="/wishList">
                             <FaRegHeart />
-                            <span>{favorites.length ? favorites.length : "0"}</span>
+                            <span>{favoriteCount ? favoriteCount : "0"}</span>
                         </Link>
                     </div>
                     <div className={styles.toggler_container}>
@@ -110,7 +112,7 @@ console.log(tree);
                                     <CartCount />
                                     <Link href="/wishList">
                                         <FaRegHeart />
-                                        <span>{favorites.length ? favorites.length : "0"}</span>
+                                        <span>{favoriteCount ? favoriteCount : "0"}</span>
                                     </Link>
                                 </div>
                             </div>

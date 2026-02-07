@@ -1,19 +1,21 @@
 
 import Breadcrumb from "@/components/modules/breadCrumb/breadCrumb";
 import { getMe } from "@/utils/serverHelper";
+import { paginate } from "@/utils/helper";
 import WishListItems from "@/components/template/wishList/wishListItems";
-import FavoriteModel from "../../../model/favorite";
+import ProductModel from "../../../../model/product";
+import FavoriteModel from "../../../../model/favorite";
 
 export const metadata = {
-    title: "Favorites List - Blue Tea",
+    title: "Favorites List - SET KIDS",
     description: "View your favorite products on Blue Tea. Keep track of all items you love and save them for later.",
-    keywords: ["Blue Tea", "Favorites", "Wishlist", "Saved Products", "Shopping"],
-    authors: [{ name: "Blue Tea Team" }],
+    keywords: ["SET KIDS", "Favorites", "Wishlist", "Saved Products", "Shopping"],
+    authors: [{ name: "SET KIDS Team" }],
     openGraph: {
-        title: "Favorites List - Blue Tea",
-        description: "View your favorite products on Blue Tea. Keep track of all items you love and save them for later.",
+        title: "Favorites List - SET KIDS",
+        description: "View your favorite products on SET KIDS. Keep track of all items you love and save them for later.",
         url: "https://yourwebsite.com/favorites",
-        siteName: "Blue Tea",
+        siteName: "SET KIDS",
         images: [
             {
                 url: "https://yourwebsite.com/images/favorites-og.jpg",
@@ -27,19 +29,26 @@ export const metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "Favorites List - Blue Tea",
-        description: "View your favorite products on Blue Tea. Keep track of all items you love and save them for later.",
+        title: "Favorites List - SET KIDS",
+        description: "View your favorite products on SET KIDS. Keep track of all items you love and save them for later.",
         images: ["https://yourwebsite.com/images/favorites-og.jpg"],
     },
 };
 
 const page = async ({ searchParams }) => {
-
     const user = await getMe()
-    if (!user) return redirect("/login-register")
+    if (!user) redirect("/login-register")
 
-    const searchparams = await searchParams
-    const paginatedData = await paginate(FavoriteModel, searchparams, { user: user.id }, "products", true, false)
+    const searchparams = searchParams
+
+    const wishlist = await FavoriteModel.findOne({ user: user.id })
+    if (!wishlist) return null
+
+    const paginatedData = await paginate(
+        ProductModel,
+        searchparams,
+        { _id: { $in: wishlist.products } }
+    )
 
     return (
         <>

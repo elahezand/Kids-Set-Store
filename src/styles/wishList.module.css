@@ -1,4 +1,7 @@
 .container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    justify-content: center;
     color: var(--text);
     max-width: 1222px;
     width: 100%;
