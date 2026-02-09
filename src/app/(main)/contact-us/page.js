@@ -36,7 +36,8 @@ const page = async () => {
 
     return (
         <>
-            <Breadcrumb route={"Contact-Us"}
+            <Breadcrumb
+                route={"Contact-Us"}
                 title={"ContactUs"} />
             <div className={styles.container}>
                 <div className={styles.contents}>

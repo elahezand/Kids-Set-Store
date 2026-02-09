@@ -1,132 +1,70 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import swal from "sweetalert";
 import EditModal from "@/components/modules/modals/editModal";
-import { manageError } from "@/utils/helper";
+import { useDelete, usePut, usePost } from "@/utils/hooks/useReactQueryPanel";
+import toast from "react-hot-toast";
+import { log } from "three";
+
 export default function DataTable({ users, title }) {
-    const router = useRouter()
-    const [user, setUser] = useState("")
+    const [showModalEdit, setShowModalEdit] = useState(false);
+    const [user, setUser] = useState(null);
+    const router = useRouter();
+    const hideModal = () => setShowModalEdit(false);
 
-    const [showModalEdit, setShowModalEdit] = useState(false)
-    const hideModal = () => setShowModalEdit(false)
+    const { mutate: deleteUserMutate } = useDelete(`/users`, {
+        onSuccess: () => {
+            toast.success("User Removed Successfully :)");
+            router.refresh();
+        },
+    });
 
+    const { mutate: changeRoleMutate } = usePut(`/users/role`, {
+        onSuccess: () => {
+            toast.success("Role Changed Successfully :)");
+            router.refresh();
+        },
+    });
 
-    const changeRole = async (userID) => {
-        try {
-            const res = await fetch("/api/users/role", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    userID,
-                })
-            })
+    const { mutate: banUserMutate } = usePost(`/users/ban`, {
+        onSuccess: () => {
+            toast.success("User Banned Successfully :)");
+            router.refresh();
+        },
+    });
 
-            if (res.status !== 200) return manageError(res.status)
-            swal({
-                title: "Role Was Changed Successfully :)",
-                icon: "success",
-                buttons: "ok"
-            }).then(result => {
-                if (result) {
-                    router.refresh()
-                }
-            })
-        } catch (err) {
-            swal({
-                title: "NetWork Error",
-                icon: "warning",
-                buttons: "ok"
-            })
-        }
-
-    }
-
-    const removeUser = async (userID) => {
+    const removeHandler = (id) => {
         swal({
-            title: "are you Sure To Remove This user? :)",
+            title: "Are you sure to remove this user?",
             icon: "warning",
-            buttons: ["No", "yes"]
-        }).then(async result => {
-            if (result) {
-                try {
-                    const res = await fetch(`/api/users/${userID}`, {
-                        method: "DELETE",
-                    })
-                    if (res.status !== 200) return manageError(res.status)
-                    swal({
-                        title: "User Removed Successfully :)",
-                        icon: "success",
-                        buttons: "ok"
-                    }).then(result => {
-                        if (result) {
-                            router.refresh()
-                        }
-                    })
+            buttons: ["No", "Yes"]
+        }).then(result => {
+            if (result) deleteUserMutate(id);
+        });
+    };
 
-                }
-                catch (err) {
-                    swal({
-                        title: "NetWork Error",
-                        icon: "warning",
-                        buttons: "ok"
-                    })
-                }
-            }
-        })
-
-    }
-
-    const banUser = async (userID, phone, email) => {
+    const changeRoleHandler = (id) => {
+        if (!id) return toast.error("User ID not found!");
+      changeRoleMutate({ 
+        id: id, 
+        payload: {}
+    });
+    };
+    const banHandler = (userID, email) => {
         swal({
-            title: "are you Sure To Ban This user ? :)",
-            icon: "watning",
-            buttons: ["No", "yes"]
-        }).then(async result => {
-            if (result) {
-                try {
-                    const res = await fetch(`/api/users/ban`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            user: userID,
-                            phone,
-                            email
-                        })
-                    })
-                    if (res.status !== 200) return manageError(res.status)
-                    swal({
-                        title: "User Banned Successfully :)",
-                        icon: "success",
-                        buttons: "ok"
-                    }).then(result => {
-                        if (result) {
-                            router.refresh()
-                        }
-                    })
-
-                } catch (err) {
-                    swal({
-                        title: "NetWork Error",
-                        icon: "warning",
-                        buttons: "ok"
-                    })
-                }
-            }
-        })
-
-    }
+            title: "Are you sure to ban this user?",
+            icon: "warning",
+            buttons: ["No", "Yes"]
+        }).then(result => {
+            if (result) banUserMutate({ user: userID, email });
+        });
+    };
 
     return (
         <>
             <div>
-                <h1 className="title">
-                    <span>{title}</span>
-                </h1>
+                <h1 className="title"><span>{title}</span></h1>
             </div>
             <div className="table_container">
                 <table className="table">
@@ -137,7 +75,7 @@ export default function DataTable({ users, title }) {
                             <th>Email</th>
                             <th>Role</th>
                             <th>Edit</th>
-                            <th>Access Level</th>
+                            <th>Change Role</th>
                             <th>Remove</th>
                             <th>Ban</th>
                         </tr>
@@ -147,51 +85,41 @@ export default function DataTable({ users, title }) {
                             <tr key={user._id}>
                                 <td>{index + 1}</td>
                                 <td>{user.username}</td>
-                                <td>{user.email ? user.email : "No Email Found"}</td>
-                                <td>{user.role === "USER" ? "USER" : "ADMIN"}</td>
+                                <td>{user.email || "No Email Found"}</td>
+                                <td>{user.role === "ADMIN" ? "Admin" : "User"}</td>
                                 <td>
-                                    <button type="button"
-                                        onClick={() => {
-                                            setUser(user)
-                                            setShowModalEdit(true)
-                                        }}
-                                        className="edit_btn">
-                                        Edit
-                                    </button>
+                                    <button className="edit_btn" onClick={() => {
+                                        setUser(user);
+                                        setShowModalEdit(true);
+                                    }}>Edit</button>
                                 </td>
                                 <td>
-                                    <button type="button"
-                                        onClick={() => changeRole(user._id)}
-                                        className="edit_btn">
+                                    <button className="edit_btn" onClick={() => changeRoleHandler(user._id)}>
                                         Change Role
                                     </button>
                                 </td>
                                 <td>
-                                    <button type="button"
-                                        onClick={() => removeUser(user._id)}
-                                        className="delete_btn">
+                                    <button className="delete_btn" onClick={() => removeHandler(user._id)}>
                                         Remove
                                     </button>
                                 </td>
                                 <td>
-                                    <button type="button"
-                                        onClick={() =>
-                                            banUser(user._id, user.phone, user.email)}
-                                        className="delete_btn">
+                                    <button className="delete_btn" onClick={() => banHandler(user._id, user.phone, user.email)}>
                                         Ban
                                     </button>
                                 </td>
                             </tr>
-
                         ))}
                     </tbody>
                 </table>
-                {showModalEdit &&
+
+                {showModalEdit && (
                     <EditModal
                         showEditModal={setShowModalEdit}
                         hideModal={hideModal}
-                        data={user} />
-                }
+                        data={user}
+                    />
+                )}
             </div>
         </>
     );

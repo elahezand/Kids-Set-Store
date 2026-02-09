@@ -3,51 +3,28 @@ import React from "react";
 import styles from "./table.module.css";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import toast from "react-hot-toast";
+import { usePost } from "@/utils/hooks/useReactQueryPanel";
 import swal from "sweetalert";
-import { manageError } from "@/utils/helper";
 export default function DataTable({ tickets, title }) {
     const router = useRouter()
 
-    const banUser = async (userID, email) => {
+    const { mutate: banUserMutate } = usePost(`/users/ban`, {
+        onSuccess: () => {
+            toast.success("User Banned Successfully :)");
+            router.refresh();
+        },
+    });
+    const banHandler = (userID, phone, email) => {
         swal({
-            title: "are you Sure To Ban This user ? :)",
-            icon: "watning",
-            buttons: ["No", "yes"]
-        }).then(async result => {
-            if (result) {
-                try {
-                    const res = await fetch(`/api/users/ban`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            user: userID,
-                            email
-                        })
-                    })
-                    if (res.status !== 200) return manageError(res.status)
-                    swal({
-                        title: "User Banned Successfully :)",
-                        icon: "success",
-                        buttons: "ok"
-                    }).then(result => {
-                        if (result) {
-                            router.refresh()
-                        }
-                    })
-                }
-                catch (err) {
-                    swal({
-                        title: "NetWork Error",
-                        icon: "warning",
-                        buttons: "ok"
-                    })
-                }
-            }
-        })
+            title: "Are you sure to ban this user?",
+            icon: "warning",
+            buttons: ["No", "Yes"]
+        }).then(result => {
+            if (result) banUserMutate({ user: userID, phone, email });
+        });
+    };
 
-    }
 
     return (
         <>
@@ -89,7 +66,7 @@ export default function DataTable({ tickets, title }) {
                                 </td>
                                 <td>
                                     <button type="button"
-                                        onClick={() => banUser(item.userID)}
+                                        onClick={() => banHandler(item.userID)}
                                         className="delete_btn">
                                         Ban
                                     </button>

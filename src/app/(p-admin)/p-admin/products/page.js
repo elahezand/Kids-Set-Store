@@ -1,5 +1,4 @@
 import connectToDB from '../../../../../configs/db'
-import Layout from '@/layouts/adminPanelLayout'
 import ProductModal from '../../../../../model/product'
 import AddProduct from '@/components/template/p-admin/products/addNewProduct'
 import DataTable from '@/components/template/p-admin/products/table'
@@ -10,7 +9,6 @@ const Products = async ({ searchParams }) => {
   const paginatedData = await paginate(ProductModal, searchParams, {})
 
   return (
-    <Layout>
       <main>
         <AddProduct />
         {paginatedData.data.length === 0 ? (
@@ -28,7 +26,6 @@ const Products = async ({ searchParams }) => {
           limit={paginatedData.limit} />
 
       </main>
-    </Layout>
   )
 }
 

@@ -1,4 +1,4 @@
-import UserModal from "../../../../model/user";
+import UserModel from "../../../../model/user";
 import connectToDB from "../../../../db/db";
 import { hashPassword } from "@/utils/auth";
 export async function POST(req) {
@@ -7,11 +7,11 @@ export async function POST(req) {
         const body = await req.json()
         const { password, phone } = body
 
-        const user = await UserModal.findOne({ phone })
+        const user = await UserModel.findOne({ phone })
         if (!user) return Response.json({ message: "Not FOUND" }, { status: 404 })
 
         const hashedNewPassword = await hashPassword(password)
-        await UserModal.findOneAndUpdate({ _id: user._id },
+        await UserModel.findOneAndUpdate({ _id: user._id },
             {
                 $set: {
                     password: hashedNewPassword

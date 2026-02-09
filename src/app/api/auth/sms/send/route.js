@@ -1,4 +1,4 @@
-import otpMOdal from "../../../../../../model/otp"
+import otpMOdel from "../../../../../../model/otp"
 import connectToDB from "../../../../../../configs/db"
 import axios from "axios"
 
@@ -24,7 +24,7 @@ export async function POST(req) {
 
     if (res.status === 200) {
       const expTime = Date.now() + 5 * 60 * 1000 // 5 min
-      await otpMOdal.create({ phone, code, expTime })
+      await otpMOdel.create({ phone, code, expTime })
       return Response.json(
         { message: "Code Sent Successfully :))" },
         { status: 200 }

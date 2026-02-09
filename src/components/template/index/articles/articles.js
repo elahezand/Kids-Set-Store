@@ -10,7 +10,7 @@ const Articles = ({ articles }) => {
     return (
         <div className="container">
             <section className="section-heading">
-                <Link className="section-heading_link" href={"/products"}>
+                <Link className="section-heading_link" href={"/articles"}>
                     <FaChevronRight />{" "}
                     See More
                 </Link>

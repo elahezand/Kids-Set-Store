@@ -1,5 +1,6 @@
 import React from 'react'
 import styles from "./promoText.module.css"
+import Link from 'next/link'
 export default function PromoText() {
     return (
         <div className={styles.container}>
@@ -13,6 +14,7 @@ export default function PromoText() {
             <div className={styles.promo_title}>
                 <span> Buy Kids Clothes,in a Proffesional Style.</span>
                 <p>Dress your little ones beatifully today with Set Kids</p>
+                <Link className={styles.contact} href={"/contact-us"}>Contact Us</Link>
             </div>
         </div>
     )

@@ -1,5 +1,5 @@
 import connectToDB from '../../../../../configs/db'
-import UserModal from '../../../../../model/user'
+import UserModel from '../../../../../model/user'
 import { verifyRefreshToken, generateToken } from '@/utils/auth'
 import { cookies } from 'next/headers'
 
@@ -12,7 +12,7 @@ export async function POST(req) {
 
         if (!refreshtoken) return Response.json({ message: "User unauthorized" }, { status: 401 })
 
-        const user = await UserModal.findOne({ refreshToken: refreshtoken })
+        const user = await UserModel.findOne({ refreshToken: refreshtoken })
 
         if (!user) return Response.json({ message: "User unauthorized" }, { status: 401 })
 

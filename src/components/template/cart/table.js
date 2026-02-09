@@ -12,6 +12,7 @@ import Link from "next/link";
 import { IoMdClose } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import { TbShoppingCartX } from "react-icons/tb";
+import { usePost } from "@/utils/hooks/useReactQueryPublic";
 import { manageError } from "@/utils/helper";
 
 
@@ -169,21 +170,25 @@ const Table = ({ user }) => {
             <div className={totalStyles.totals}>
                 <p className={totalStyles.totals_title}>Card Total</p>
                 <div className={totalStyles.address_details}>
-                    <form onSubmit={handleSubmit(submitOrder)} className="mb-4">
-                        <h6 className="text-white mb-2">Shipping Address</h6>
+                    <form onSubmit={handleSubmit(submitOrder)}>
+                        <h6>Shipping Address</h6>
                         {["fullName", "phone", "address", "city", "postalCode"].map((field) => (
                             <Controller
                                 key={field}
                                 name={field}
                                 control={control}
                                 render={({ field: controllerField }) => (
-                                    <div className="mb-2">
+                                    <div className={totalStyles.input_group}>
                                         <input
                                             {...controllerField}
-                                            placeholder={field}
-                                            className="form-control"
+                                            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                                            className={errors[field] ? totalStyles.input_error : ""}
                                         />
-                                        {errors[field] && <span className="text-danger">{errors[field]?.message}</span>}
+                                        {errors[field] && (
+                                            <span className={totalStyles.error_message}>
+                                                {errors[field]?.message}
+                                            </span>
+                                        )}
                                     </div>
                                 )}
                             />
@@ -192,7 +197,7 @@ const Table = ({ user }) => {
                             <p>Total</p>
                             <p>{total} $</p>
                         </div>
-                        <button type="submit" className={`${totalStyles.checkout_btn} mt-3 w-100`}>Proceed to Checkout</button>
+                        <button type="submit" className={totalStyles.checkout_btn}>Proceed to Checkout</button>
                     </form>
                 </div>
             </div>

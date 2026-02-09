@@ -1,225 +1,213 @@
 .tabel_container {
-    width: 100%;
+  width: 100%;
+  margin-bottom: 2rem;
 }
 
 .table {
-    width: 100%;
-    background-color: var(--white);
-    border-spacing: 0;
-    color: var(--text);
-    border: 2px solid var(--sage);
-}
-
-.table th {
-    border: none;
-    color: var(--white);
-    text-align: center;
-    background-color: var(--sage);
-}
-
-.table tr {
-    vertical-align: middle;
+  width: 100%;
+  background-color: var(--white);
+  border-spacing: 0;
+  color: var(--text);
+  border: 2px solid var(--sage);
+  border-collapse: collapse; /* اضافه شده برای تمیزی خطوط */
 }
 
 .table thead th {
-    padding-bottom: 1rem;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  color: var(--white);
+  text-align: center;
+  background-color: var(--sage);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
-.table td,
-.table th {
-    padding: 5px 20px;
-    text-align: center;
+.table td {
+  padding: 15px 20px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
 }
-
-.table tbody tr td:last-child {
-    padding: 8px 10px !important;
-}
-
 
 .product {
-    display: flex;
-    align-items: center;
-    width: 250px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 250px;
+  text-align: left;
 }
 
 .product img {
-    width: 80px;
-    height: 100px;
-    object-fit: contain;
-    margin-right: 0.5rem;
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 5px;
 }
 
 .product a {
-    word-wrap: break-word;
-    line-height: 1.4;
-    display: inline-block;
-    font-size: 14px;
+  word-wrap: break-word;
+  line-height: 1.4;
+  font-size: 14px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
 }
 
 .price {
-    color: #777 !important;
-    font-size: 14px;
+  color: #777 !important;
+  font-size: 14px;
+  font-weight: 600;
 }
 
-.delete_icon {
-    cursor: pointer;
-    font-size: 1.2rem;
+/* بخش شمارنده محصول */
+.counter {
+  min-width: 180px;
 }
-
-.update_btn:hover {
-    background: var(--coral);
-}
-
-.tabel_container section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.update_btn {
-    color: #333;
-    background-color: #cfcaca;
-    margin-top: 2rem;
-    padding: 12px 20px;
-    font-size: 13px;
-    line-height: 18px;
-    position: relative;
-    display: inline-flex;
-    border: 0;
-    align-items: center;
-    justify-content: center;
-    outline: none;
-    vertical-align: middle;
-    text-align: center;
-    text-decoration: none;
-    text-transform: uppercase;
-    text-shadow: none;
-    font-weight: 600;
-    cursor: pointer;
-    transition: color 0.25s ease, background-color 0.25s ease,
-        border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
-}
-
-.discount {
-    display: flex;
-    align-items: baseline;
-    align-items: center;
-    justify-content: space-between;
-    width: 300px;
-    height: 40px;
-    border: 1px solid var(--coral);
-}
-
-.discount input {
-    padding: 0.4rem 1rem;
-    border-radius: 5px;
-    background-color: inherit;
-    color: var(--text);
-    border: none;
-    outline: none;
-}
-
-.discount button {
-    padding: 10px;
-    height: 100%;
-    cursor: pointer;
-    border: 0;
-    outline: 0;
-    transition: 0.1s all ease-in;
-    font-size: 14px;
-    border-radius: 0.001px;
-    color: var(--white);
-    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.15);
-    background-color: var(--coral);
-    border: none;
-
-}
-
-
-.cart_empty {
-    margin-bottom: 54px;
-    text-align: center;
-    line-height: 1.2;
-    color: var(--text);
-}
-
-.cart_empty svg {
-    font-size: 15.2em;
-    color: var(--white);
-}
-
-.cart_empty p {
-    font-size: 48px;
-    margin-bottom: 1.5rem;
-}
-
-.cart_empty span {
-    display: block;
-    margin-bottom: 2rem;
-    color: gray;
-}
-
-.cart_empty a:hover {
-    background: var(--coral) !important;
-}
-
-.cart_empty span:nth-child(4) {
-    margin-bottom: 2.8rem !important;
-}
-
-.cart_empty a {
-    padding: 14px 28px;
-    transition: 0.1s all ease-in;
-    font-size: 14px;
-    line-height: 20px;
-    margin-top: 4rem;
-    border-radius: 0.001px;
-    color: var(--white-color);
-    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.15);
-    background-color: var(--coral);
-}
-
-
 
 .cart {
-    display: flex;
-    gap: 10px;
-    justify-content: right;
-    align-items: center;
-    text-align: center;
-    margin-bottom: 20px;
-    flex-direction: row-reverse;
-}
-
-.cart div span:nth-child(2) {
-    border-left: 3px solid var(--coral);
-}
-
-.cart div span:nth-child(1) {
-    border-right: 3px solid var(--coral);
-}
-
-.cart span {
-    width: 30%;
-    cursor: pointer;
-    padding: 10px 0px;
+  display: flex;
+  flex-direction: column; /* تغییر به ستونی برای ظاهر بهتر در جدول */
+  align-items: center;
+  gap: 8px;
 }
 
 .cart div {
-    width: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border: 3px solid var(--coral);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100px;
+  border: 2px solid var(--coral);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cart span {
+  flex: 1;
+  padding: 5px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  transition: 0.2s;
+  user-select: none;
+}
+
+.cart span:hover {
+  background-color: var(--coral);
+  color: white;
 }
 
 .cart button {
-    background-color: var(--sage);
-    padding: 0.5rem 1.2rem;
-    cursor: pointer;
-    border: 0;
-    transition: all 0.2s;
-    border-radius: 5px;
-    color: var(--white);
+  background-color: var(--sage);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.cart button:hover {
+  background-color: var(--coral);
+}
+
+.delete_icon {
+  cursor: pointer;
+  font-size: 1.4rem;
+  color: #e74c3c;
+  transition: 0.2s;
+}
+
+.delete_icon:hover {
+  transform: scale(1.2);
+}
+
+/* بخش دکمه آپدیت و کد تخفیف */
+.tabel_container section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.update_btn {
+  color: #333;
+  background-color: #e0e0e0;
+  padding: 12px 25px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.update_btn:hover {
+  background-color: var(--coral);
+  color: white;
+}
+
+.discount {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--coral);
+  border-radius: 4px;
+  overflow: hidden;
+  height: 45px;
+}
+
+.discount input {
+  padding: 0 1rem;
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 180px;
+}
+
+.discount button {
+  height: 100%;
+  padding: 0 20px;
+  background-color: var(--coral);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* استایل سبد خرید خالی */
+.cart_empty {
+  padding: 4rem 1rem;
+  text-align: center;
+}
+
+.cart_empty svg {
+  font-size: 8rem;
+  color: #ddd;
+  margin-bottom: 1rem;
+}
+
+.cart_empty p {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.cart_empty span {
+  display: block;
+  color: #888;
+  margin-bottom: 2rem;
+}
+
+.cart_empty a {
+  display: inline-block;
+  padding: 12px 30px;
+  background-color: var(--coral);
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.cart_empty a:hover {
+  opacity: 0.9;
 }

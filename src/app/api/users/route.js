@@ -1,4 +1,4 @@
-import UserModal from "../../../../model/user";
+import UserModel from "../../../../model/user";
 import connectToDB from "../../../../db/db";
 import { authAdmin } from "@/utils/serverHelper";
 import { paginate } from "@/utils/helper";
@@ -13,7 +13,7 @@ export async function GET(req) {
         const useCursor = searchParams.has("cursor");
 
         const result = await paginate(
-            UserModal,   // Model
+            UserModel,   // Model
             searchParams,   // searchParams
             {},             // filter
             "comments",           // populate
@@ -44,7 +44,7 @@ export async function POST(req) {
             );
         }
 
-        const isUserExist = await UserModal.findOne({ email: body.email });
+        const isUserExist = await UserModel.findOne({ email: body.email });
         if (isUserExist) {
             return NextResponse.json(
                 { message: "User already exists" },
@@ -52,7 +52,7 @@ export async function POST(req) {
             );
         }
 
-        const newUser = await UserModal.create(parsed.data);
+        const newUser = await UserModel.create(parsed.data);
         return NextResponse.json({ message: "User Created Successfully", newUser }, { status: 200 });
     } catch (err) {
         return NextResponse.json({ message: err.message }, { status: 500 });

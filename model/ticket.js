@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-import UserModal from "./user";
+import UserModel from "./user";
 import DepartmentModel from "./department";
 import SubDepartmentModel from "./subDepartment";
 

@@ -1,6 +1,6 @@
 import connectToDB from "../../configs/db";
 import { cookies } from "next/headers";
-import UserModal from "../../model/user";
+import UserModel from "../../model/user";
 import { verifyToken, verifyRefreshToken } from "./auth";
 const authUser = async () => {
     await connectToDB()
@@ -14,7 +14,7 @@ const authUser = async () => {
     const payloadToken = await verifyToken(token.value)
     if (!payloadToken) return { status: "expired" }
 
-    user = await UserModal.findOne({ email: payloadToken.email })
+    user = await UserModel.findOne({ email: payloadToken.email })
     if (!user) return null
 
     return user
@@ -31,7 +31,7 @@ const authAdmin = async () => {
     const payloadToken = await verifyToken(token.value)
     if (!payloadToken) return { status: "expired" }
 
-    user = await UserModal.findOne({ email: payloadToken.email })
+    user = await UserModel.findOne({ email: payloadToken.email })
 
     if (!user) return null
     if (user.role !== "ADMIN") return user
@@ -49,7 +49,7 @@ const getMe = async () => {
 
     if (!payloadToken) return null
 
-    const user = await UserModal.findOne({ email: payloadToken.email })
+    const user = await UserModel.findOne({ email: payloadToken.email })
     return user
 
 }

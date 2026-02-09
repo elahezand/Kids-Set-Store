@@ -1,5 +1,4 @@
 import React from "react";
-import Layout from "@/layouts/adminPanelLayout";
 import connectToDB from "../../../../../configs/db";
 import commentModel from "../../../../../model/comment";
 import Table from "@/components/template/p-admin/comments/table"
@@ -11,7 +10,6 @@ const page = async ({ searchParams }) => {
   const paginatedData = await paginate(commentModel, searchParams, {}, "productID")
 
   return (
-    <Layout>
       <main>
         {paginatedData.data.length === 0 ? (
           <p className="empty">No Comment Yet :( </p>
@@ -28,7 +26,6 @@ const page = async ({ searchParams }) => {
           limit={paginatedData.limit}
         />
       </main>
-    </Layout>
   );
 };
 

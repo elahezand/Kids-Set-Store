@@ -1,4 +1,4 @@
-import UserModal from "../../../../../model/user"
+import UserModel from "../../../../../model/user"
 import connectToDB from "../../../../../configs/db"
 import { generateToken, hashPassword, generateRefreshToken } from "@/utils/auth"
 import { userValidationSchema } from "../../../../../validators/user"
@@ -15,7 +15,7 @@ export async function POST(req) {
 
         const { username, email, password, phone } = parsed.data
 
-        const isUserExist = await UserModal.findOne({
+        const isUserExist = await UserModel.findOne({
             $or: [{ phone }, { email: email || "NULL_EMAIL" }, { username }]
         })
 
@@ -25,10 +25,10 @@ export async function POST(req) {
 
         const hashedPassword = await hashPassword(password)
 
-        const usersCount = await UserModal.countDocuments()
+        const usersCount = await UserModel.countDocuments()
         const role = usersCount < 3 ? "ADMIN" : "USER"
 
-        const newUser = await UserModal.create({
+        const newUser = await UserModel.create({
             username,
             email: email || null,
             phone,
