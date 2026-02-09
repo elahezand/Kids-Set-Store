@@ -1,4 +1,4 @@
-import UserModal from "../../../../../model/user"
+import UserModel from "../../../../../model/user"
 import connectToDB from "../../../../../configs/db"
 import {
   generateRefreshToken,
@@ -24,7 +24,7 @@ export async function POST(req) {
 
     const { identifier, password, remember } = parsed.data
 
-    const user = await UserModal.findOne({
+    const user = await UserModel.findOne({
       $or: [{ phone: identifier }, { email: identifier }],
     })    
     if (!user)
@@ -40,7 +40,7 @@ export async function POST(req) {
     const accessToken = await generateToken({ email })
     const refreshToken = await generateRefreshToken({ email })
 
-    await UserModal.findByIdAndUpdate(user._id, {
+    await UserModel.findByIdAndUpdate(user._id, {
       $set: { refreshToken },
     })
 

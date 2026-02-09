@@ -1,5 +1,5 @@
 import connectToDB from "../../../../../db/db"
-import UserModal from "../../../../../model/user"
+import UserModel from "../../../../../model/user"
 import { verifyRefreshToken, verifyToken } from "@/utils/auth"
 import { cookies } from "next/headers"
 export async function GET() {
@@ -22,7 +22,7 @@ export async function GET() {
             payloadToken = await verifyRefreshToken(token.value);
 
         }
-        const user = await UserModal.findOne({ email: payloadToken.email }, "-password -refreshToken -__v")
+        const user = await UserModel.findOne({ email: payloadToken.email }, "-password -refreshToken -__v")
 
         if (!user) return Response.json({ message: "Not Found" }, { status: 404 })
 

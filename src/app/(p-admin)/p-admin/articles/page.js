@@ -3,7 +3,6 @@ import connectToDB from '../../../../../configs/db';
 import ArticleModel from '../../../../../model/article';
 import Table from '@/components/template/p-admin/articles/dataTable';
 import Pagination from '@/components/modules/pageination/pagination';
-import Layout from '@/layouts/adminPanelLayout';
 import { paginate } from '@/utils/helper';
 export default async function page({ searchParams }) {
     await connectToDB()
@@ -11,7 +10,6 @@ export default async function page({ searchParams }) {
     const paginatedData = await paginate(ArticleModel, param)
 
     return (
-        <Layout>
             <div>
                 <AddNewArticle />
                 <Table
@@ -24,7 +22,6 @@ export default async function page({ searchParams }) {
                     limit={paginatedData.limit}
                 />
             </div>
-        </Layout>
     )
 }
 

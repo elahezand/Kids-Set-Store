@@ -25,6 +25,10 @@ const schema = mongoose.Schema({
         type: String,
         required: true,
     },
+    avatar: {
+        type: String,
+        required: false,
+    },
 
     refreshToken: {
         type: String,
@@ -63,6 +67,6 @@ schema.virtual("tickets", {
     foreignField: "userID"
 });
 
-const UserModal = mongoose.models.User || mongoose.model("User", schema)
+const UserModel = mongoose.models.User || mongoose.model("User", schema)
 
-export default UserModal
+export default UserModel

@@ -67,8 +67,8 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-const orderModal = mongoose.models.Order ||
+const orderModel = mongoose.models.Order ||
   mongoose.model("Order", orderSchema);
 
 
-export default orderModal
+export default orderModel

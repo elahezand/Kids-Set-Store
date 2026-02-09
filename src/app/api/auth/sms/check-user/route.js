@@ -1,6 +1,6 @@
 
 import connectToDB from "../../../../../../configs/db"
-import UserModal from "../../../../../../model/user"
+import UserModel from "../../../../../../model/user"
 export async function POST(req) {
     try {
         await connectToDB()
@@ -11,7 +11,7 @@ export async function POST(req) {
         if (!phoneValidate) return Response.json({ message: "NoT valid" }, { status: 422 })
 
 
-        const isUserExist = await UserModal.findOne({ phone })
+        const isUserExist = await UserModel.findOne({ phone })
 
         if (isUserExist) return Response.json({ message: "this account already existed !" }, { status: 409 })
         return Response.json({ message: "You can Register" }, { status: 200 })

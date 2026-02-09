@@ -48,7 +48,9 @@ export default async function page({ params }) {
 
     return (
         <>
-            <Breadcrumb route={"articles"} title={"Articles"} />
+            <Breadcrumb
+                title={article.title}
+                route={"articles"} />
             <div className={styles.container}>
                 <div className={styles.box}>
                     <article className={styles.article}>

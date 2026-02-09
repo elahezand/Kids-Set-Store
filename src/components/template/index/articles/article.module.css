@@ -5,6 +5,7 @@
   border-radius: 20px;
   transition: transform 0.7s ease, opacity 0.7s ease;
   cursor: pointer;
+  width: 400px;
 }
 
 .card::after {
@@ -45,6 +46,8 @@
 
 .details div img {
   width: 20px;
+  height: 20px;
+  border-radius: 100%;
 }
 
 .details {

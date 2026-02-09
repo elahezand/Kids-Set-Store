@@ -1,7 +1,7 @@
 import connectToDB from "../../../../../../configs/db"
-import otpModal from "../../../../../../model/otp"
+import otpMOdel from "../../../../../../model/otp"
 import { generateToken, generateRefreshToken } from "@/utils/auth"
-import UserModal from "../../../../../../model/user"
+import UserModel from "../../../../../../model/user"
 import { z } from "zod"
 
 const schema = z.object({
@@ -25,17 +25,17 @@ export async function POST(req) {
     const { phone, code } = parsed.data
     const now = Date.now()
 
-    const otp = await otpModal.findOne({ phone, code })
+    const otp = await otpMOdel.findOne({ phone, code })
     if (!otp)
       return Response.json({ message: "Code is not correct" }, { status: 422 })
 
     if (otp.expTime < now)
       return Response.json({ message: "Code is expired" }, { status: 410 })
 
-    let user = await UserModal.findOne({ phone })
+    let user = await UserModel.findOne({ phone })
     if (!user) {
-      const count = await UserModal.countDocuments()
-      user = await UserModal.create({
+      const count = await UserModel.countDocuments()
+      user = await UserModel.create({
         phone,
         role: count < 3 ? "ADMIN" : "USER",
       })
@@ -48,7 +48,7 @@ export async function POST(req) {
     const refreshToken = await generateRefreshToken({ email })
 
     // Save refresh token in DB
-    await UserModal.findByIdAndUpdate(user._id, { refreshToken })
+    await UserModel.findByIdAndUpdate(user._id, { refreshToken })
 
     // Set cookies
     const cookieOptions = `Path=/; HttpOnly; SameSite=Lax`

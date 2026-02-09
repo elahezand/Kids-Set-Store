@@ -49,47 +49,36 @@ const data = [
 ];
 
 
-export default function Chart({ type,Data }) {
+export default function Chart({ type, Data }) {
+    const chartData = Data || data; 
+
     return (
-        <>
-            {type === "LineChart" ?
-
-                <div>
-                    <LineChart width={500} height={300} data={data} margin={{ top: 8, right: 20, bottom: 5, left: 0 }}>
+        <div style={{ width: '100%', height: '300px' }}> 
+            <ResponsiveContainer width="100%" height="100%">
+                {type === "LineChart" ? (
+                    <LineChart data={chartData} margin={{ top: 8, right: 20, bottom: 5, left: 0 }}>
                         <CartesianGrid stroke="var(--coral)" strokeDasharray="5 5" />
-                        <Line type="monotone" dataKey="uv" stroke="var(--sage)" strokeWidth={2} />
                         <XAxis dataKey="name" />
-                        <YAxis width="auto" label={{ value: 'UV', position: 'insideLeft', angle: -90 }} />
-                        <Legend align="right" />
+                        <YAxis />
                         <Tooltip />
+                        <Legend align="right" />
+                        <Line type="monotone" dataKey="uv" stroke="var(--sage)" strokeWidth={2} dot={{ r: 4 }} />
                     </LineChart>
-                </div> :
-
-                <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                        width={500}
-                        height={200}
-                        data={data}
-                        margin={{
-                            top: 8,
-                            right: 20,
-                            left:0,
-                            bottom: 30,
-                        }}
-                    >
+                ) : (
+                    <BarChart data={chartData} margin={{ top: 8, right: 20, left: 0, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip />
                         <Legend />
-                        <Bar dataKey="pv" fill="var(--sage)" activeBar={<Rectangle fill="var(--sage)" stroke="blue" />} />
-                        <Bar dataKey="uv" fill="var(--coral)" activeBar={<Rectangle fill="var(--coral)" stroke="purple" />} />
+                        <Bar dataKey="pv" fill="var(--sage)" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="uv" fill="var(--coral)" radius={[4, 4, 0, 0]} />
                     </BarChart>
-                </ResponsiveContainer>}
-        </>
-    )
-};
-
+                )}
+            </ResponsiveContainer>
+        </div>
+    );
+}
 
 
 

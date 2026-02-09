@@ -56,7 +56,6 @@ export default async function page({ searchParams }) {
                     <span>{categoryName ? categoryName.replace("-", " ") : "Products"}</span>
                 </div>
             </section>
-
             <ProductsList
                 categories={JSON.parse(JSON.stringify(tree))}
                 nextCursor={paginatedData.nextCursor}

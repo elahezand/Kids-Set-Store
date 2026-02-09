@@ -1,7 +1,8 @@
 import Table from "@/components/template/cart/table";
 import styles from "@/styles/cart.module.css";
 import { getMe } from "@/utils/serverHelper";
-
+import Breadcrumb from "@/components/modules/breadCrumb/breadCrumb";
+// Generate metadata for SEO and social sharing
 export const metadata = {
   title: "Shopping Cart - YourSiteName",
   description: "View and manage the items in your shopping cart. Proceed to checkout or continue shopping.",
@@ -34,10 +35,13 @@ export default async function page() {
   const user = await getMe()
 
   return (
-    <main
-      className={styles.cart}
-      data-aos="fade-up">
-      <Table user={user._id} />
-    </main>
+    <>
+      <Breadcrumb title={"Basket CART"} route={"Cart"} />
+      <div
+        className={styles.cart}
+        data-aos="fade-up">
+        <Table user={JSON.parse(JSON.stringify(user._id))} />
+      </div>
+    </>
   )
 }

@@ -25,6 +25,18 @@
 
 }
 
+.contact {
+    padding: 0.5rem 1rem;
+    color: #fff;
+    background-color: var(--coral);
+    font-weight: bold;
+    border: 1px solid var(--white);
+    margin-top: 1rem;
+    display: block;
+    max-width: 200px;
+    text-align: center;
+}
+
 
 
 @media screen and (min-width:992) and (max-width:1200) {

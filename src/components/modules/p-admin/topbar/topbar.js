@@ -9,7 +9,8 @@ const Topbar = ({ user }) => {
                     <Image
                         height={200}
                         width={200}
-                        src="/images/user-profile-flat-illustration-avatar-person-icon-gender-neutral-silhouette-profile-picture-free-vector.jpg" alt="" />
+                        alt=""
+                        src={user.avatar}/>
                     <div>
                         <p>{user.username}</p>
                         <span>ADMIN</span>

@@ -1,6 +1,5 @@
 import connectToDB from "../../../../../configs/db";
 import DiscountModel from "../../../../../model/discount";
-import Layout from "@/layouts/adminPanelLayout";
 import Table from "@/components/template/p-admin/discounts/table";
 import AddDiscount from "@/components/template/p-admin/discounts/addDiscount";
 import Pagination from "@/components/modules/pageination/pagination";
@@ -12,7 +11,6 @@ const Discounts = async ({ searchParams }) => {
     const products = await ProductModel.find({}).lean()
 
     return (
-        <Layout>
             <main>
                 <AddDiscount
                     products={JSON.parse(JSON.stringify(products))} />
@@ -31,7 +29,6 @@ const Discounts = async ({ searchParams }) => {
                     limit={paginatedData.limit}
                 />
             </main>
-        </Layout>
     );
 };
 

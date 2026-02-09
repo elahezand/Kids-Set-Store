@@ -1,6 +1,8 @@
 import styles from "@/styles/about-us.module.css";
 import Breadcrumb from "@/components/modules/breadCrumb/breadCrumb";
 
+// Generate metadata for SEO and social sharing
+
 export async function generateMetadata() {
     return {
         title: "About Us - Your Company Name",
@@ -33,7 +35,9 @@ export async function generateMetadata() {
 const page = async () => {
     return (
         <>
-            <Breadcrumb title={"About US."} />
+            <Breadcrumb
+                route={"about"}
+                title={"About US."} />
             <div className={styles.container}>
                 <div>
                     <span>About Us</span>

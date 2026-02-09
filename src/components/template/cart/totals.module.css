@@ -3,13 +3,15 @@
   color: var(--text);
   padding: 2rem;
   border: 3px solid var(--sage);
+  background-color: var(--white);
 }
 
 .totals_title {
-  margin-bottom: 5px;
+  margin-bottom: 15px;
   text-transform: uppercase;
   font-size: 22px;
   padding-inline-start: 6px;
+  font-weight: bold;
 }
 
 .subtotal {
@@ -20,104 +22,138 @@
   border-bottom: 1px solid var(--sage);
 }
 
-.address span {
-  color: gray;
-  width: 150px;
-  text-align: left !important;
-}
-
 .address {
   margin-top: 1rem;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+.address span {
+  color: gray;
+  font-size: 14px;
 }
 
 .change_address {
   text-align: left;
   margin-top: 1rem;
   cursor: pointer;
+  color: var(--coral);
 }
 
 .total {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row; 
+  justify-content: space-between;
+  align-items: center;
   margin-top: 1rem;
   padding-top: 0.8rem;
   border-top: 1px solid var(--coral);
-  justify-content: space-between;
 }
 
 .total p:nth-child(2) {
-  color:var(--primary-color);
+  color: var(--primary-color);
   font-size: 22px;
-}
-
-.checkout_btn:hover {
-  background:var(--coral) !important;
+  font-weight: bold;
 }
 
 .checkout_btn {
-  padding: 10px 28px;
+  padding: 12px 28px;
   cursor: pointer;
   border: 0;
   outline: 0;
-  transition: 0.1s all ease-in;
   font-size: 14px;
-  line-height: 20px;
   width: 100%;
-  margin-top: 1rem;
-  border-radius: 5px !important;
-  border-radius: 0.001px;
+  margin-top: 1.5rem;
+  border-radius: 5px;
   color: var(--white);
-  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.15);
   background-color: var(--coral);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease-in;
+  text-transform: uppercase;
+  font-weight: bold;
 }
 
-.address_details input {
-  outline: 0;
-  border: 0;
-  background: var(--whiter);
-  width: 100%;
-  font-size: 16px;
-  border-radius: 5px;
-  color: var(--text);
-  padding: 1rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+.checkout_btn:hover {
+  background: var(--sage) !important; 
+  transform: translateY(-2px);
+  color: #fff;
 }
 
 .address_details {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
   padding-top: 10px;
 }
+.address_details input {
+  outline: 0;
+  background: var(--whiter, #f9f9f9);
+  width: 100%;
+  font-size: 16px;
+  border-radius: 5px;
+  color: var(--text);
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s;
+}
 
-.address_details button:hover {
-  background: var(--white-color);
+.address_details h6{
+  color: var(--sage);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.address_details input:focus {
+  border-color: var(--coral);
 }
 
 .address_details button {
-  color: #333;
-  background-color: #f7f7f7;
-  padding: 12px 20px;
-  font-size: 13px;
-  line-height: 18px;
-  background-color: #f3f3f3;
   color: #3e3e3e;
-  position: relative;
-  width: 30%;
+  background-color: #f3f3f3;
+  padding: 10px 20px;
+  font-size: 13px;
+  width: auto;
   display: inline-flex;
   border: 0;
   align-items: center;
   justify-content: center;
-  outline: none;
-  vertical-align: middle;
-  text-align: center;
-  text-decoration: none;
-  text-transform: uppercase;
-  text-shadow: none;
   font-weight: 600;
   cursor: pointer;
-  transition: color 0.25s ease, background-color 0.25s ease,
-    border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+  border-radius: 4px;
+  transition: all 0.25s ease;
+}
+
+.address_details button:hover {
+  background: #e2e2e2;
+}
+
+.error_message {
+  color: #e74c3c;
+  text-align: left;
+  padding-left: 5px;
+  animation: fadeIn 0.3s ease;
+}
+
+.input_error {
+  border: 1px solid #e74c3c !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.address_details form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.address_details form > span {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: 600;
+    color: var(--text);
 }

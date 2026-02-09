@@ -32,6 +32,6 @@ const schema = mongoose.Schema({
     }
 );
 
-const otpMOdal = mongoose.models.Otp || mongoose.model("Otp", schema)
+const otpMOdel = mongoose.models.Otp || mongoose.model("Otp", schema)
 
-export default otpMOdal
+export default otpMOdel

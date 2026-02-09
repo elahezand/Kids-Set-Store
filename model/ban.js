@@ -1,4 +1,4 @@
-import UserModal from "./user";
+import UserModel from "./user";
 const mongoose = require("mongoose")
 const schema = mongoose.Schema({
     user: {
@@ -30,6 +30,6 @@ const schema = mongoose.Schema({
 );
 
 
-const BanModal = mongoose.models.Ban || mongoose.model("Ban", schema)
+const BanModel = mongoose.models.Ban || mongoose.model("Ban", schema)
 
-export default BanModal
+export default BanModel

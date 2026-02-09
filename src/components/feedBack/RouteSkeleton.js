@@ -1,8 +1,10 @@
+import styles from "./RouteSkeleton.module.css";
+
 export default function RouteSkeleton() {
     return (
-        <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
-            <div className="spinner-border text-success" role="status">
-                <span className="visually-hidden">Loading...</span>
+        <div className={styles.container}>
+            <div className={styles.spinner} role="status">
+                <span className={styles.srOnly}>Loading...</span>
             </div>
         </div>
     );
