@@ -1,13 +1,12 @@
 import otpMOdel from "../../../../../../model/otp"
 import connectToDB from "../../../../../../configs/db"
-import axios from "axios"
+import crypto from 'crypto';
 
 export async function POST(req) {
   try {
     await connectToDB()
     const { phone } = await req.json()
-    const code = Math.floor(10000 + Math.random() * 89999) 
-
+    const code = crypto.randomInt(10000, 99999);
     const body = {
       op: "pattern",
       user: "elizand724",
