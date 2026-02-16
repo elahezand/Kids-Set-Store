@@ -8,7 +8,7 @@ import RefreshAccessToken from '@/utils/refreshToken';
 export default async function Layout({ children }) {
     const admin = await authAdmin()
     if (!admin) {
-        redirect("/")
+        redirect("/login-register")
     }
 
     const content = (
@@ -33,8 +33,6 @@ export default async function Layout({ children }) {
         );
     }
     return content;
-
-
 }
 
 

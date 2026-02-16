@@ -1,56 +1,59 @@
 import styles from "@/styles/p-user/favorites.module.css";
 import Product from "@/components/template/p-user/favorites/product"
-import Layout from "@/layouts/userPanelLayout";
+import FavoriteModel from "../../../../../model/favorite";
 import Pagination from "@/components/modules/pageination/pagination";
-import { pageinatedData } from "@/utils/helper";
-import connectToDB from "../../../../db/db";
+import { paginate } from "@/utils/helper";
+import connectToDB from "../../../../../configs/db";
+import ProductModel from "../../../../../model/product";
 import { authUser } from "@/utils/serverHelper";
-import FavoriteModel from "../../../../model/favorite";
-const page = async ({searchParams}) => {
-  connectToDB();
-  const user = await authUser();
-  const wishlist = await FavoriteModel.find({ userID: user._id })
-    .populate(
-      "productID"
-    );
+const page = async ({ searchParams }) => {
+  await connectToDB()
+  const user = await authUser()
+  if (!user) redirect("/login-register")
 
+  const searchparams = searchParams
+  const wishlist = await FavoriteModel.findOne({ user: user.id })
+  if (!wishlist) return null
 
-  const param = await searchParams
-  const { page } = param
-  const [filteredArray, pageCount] = pageinatedData(wishlist, page, 5)
-
+  const paginatedData = await paginate(
+    ProductModel,
+    searchparams,
+    { _id: { $in: wishlist.products } }
+  )
+  
   return (
-    <Layout>
-        <div>
-          <h1 className="title">
-            <span>Favorites</span>
-          </h1>
-        </div>
-        <main className={styles.container}
-          data-aos="fade-up">
-          <section>
-            {filteredArray.length > 0 &&
-              JSON.parse(JSON.stringify(filteredArray)).map((wish, index) =>
-                <Product
-                  key={index}
-                  id={wish._id}
-                  name={wish.productID.name}
-                  score={wish.productID.score}
-                  price={wish.productID.price}
-                  img={wish.productID.img}
+    <>
+      <div>
+        <h1 className="title">
+          <span>Favorites</span>
+        </h1>
+      </div>
+      <main className={styles.container}
+        data-aos="fade-up">
+        <section>
+          {paginatedData.data.length > 0 &&
+            JSON.parse(JSON.stringify(paginatedData.data)).map((wish, index) =>
+              <Product
+                key={index}
+                id={wish._id}
+                name={wish.name}
+                score={wish.score}
+                price={wish.price}
+                img={wish.img}
 
-                />)}
-          </section>
-          <Pagination
-            pageCount={pageCount}
-            href="favorites"
-            currentPage={page}
-          />
-        </main>
-        {wishlist.length === 0 && (
-          <p className={styles.empty}>NO Item Yet</p>
-        )}
-    </Layout>
+              />)}
+        </section>
+        <Pagination
+          href={`favorites?`}
+          currentPage={paginatedData.page}
+          pageCount={paginatedData.pageCount}
+          limit={paginatedData.limit}
+        />
+      </main>
+      {paginatedData.data.length === 0 && (
+        <p className={styles.empty}>NO Item Yet</p>
+      )}
+    </>
   );
 };
 

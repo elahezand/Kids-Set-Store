@@ -1,8 +1,7 @@
 import { authUser } from "@/utils/serverHelper";
-import FavoriteModel from "../../../model/favorite";
-import Layout from "@/layouts/userPanelLayout";
-import TicketModel from "../../../model/ticket";
-import commentModel from "../../../model/comment";
+import FavoriteModel from "../../../../model/favorite";
+import TicketModel from "../../../../model/ticket";
+import commentModel from "../../../../model/comment";
 import Tickets from "@/components/template/p-user/index/tickets";
 import Orders from "@/components/template/p-user/index/orders";
 import styles from "@/styles/p-user/index.module.css";
@@ -31,7 +30,6 @@ const page = async () => {
 
 
   return (
-    <Layout>
       <main>
         <section className={styles.boxes}>
           <Box title="Tickets" value={AllTickets.length} />
@@ -44,7 +42,6 @@ const page = async () => {
           <Orders />
         </section>
       </main>
-    </Layout>
   );
 };
 

@@ -1,5 +1,5 @@
 import DepartmentModel from "../../../../model/department"
-import connectToDB from "../../../../db/db"
+import connectToDB from "../../../../configs/db"
 import { authAdmin } from "@/utils/serverHelper"
 export async function GET() {
     try {

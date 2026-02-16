@@ -28,11 +28,8 @@ export async function GET() {
 
         return Response.json(user, { status: 200 })
     }
-
     catch (err) {
-
         return Response.json({ message: "UnKnownError" }, { status: 500 })
     }
-
 }
 

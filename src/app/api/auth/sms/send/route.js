@@ -1,5 +1,6 @@
 import otpMOdel from "../../../../../../model/otp"
 import connectToDB from "../../../../../../configs/db"
+import axios from "axios";
 import crypto from 'crypto';
 
 export async function POST(req) {
