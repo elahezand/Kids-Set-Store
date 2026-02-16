@@ -1,174 +1,144 @@
 "use client";
-import React, { useEffect } from "react";
-import styles from "./detail-profile.module.css";
-import swal from "sweetalert";
-import { IoCloudUploadOutline } from "react-icons/io5";
-import { MdOutlineDelete } from "react-icons/md";
-import { useState } from "react";
-import Image from "next/image";
-import showSwal, { manageError } from "@/utils/helper";
-import { validateEmail, validatePhone, validateUserNane } from "../../../../../validator/user";
+import React from "react";
+import styles from "../../../template/p-admin/detail-account/detail.account.module.css";
+import { usePut } from "@/utils/hooks/useReactQueryPanel";
+import toast from "react-hot-toast";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { userValidationSchema } from "@/components/modules/modals/editModal";
 import { useRouter } from "next/navigation";
-function DetailProfile() {
-    const router = useRouter()
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [phone, setPhone] = useState("");
-    const [id, setId] = useState("");
+function DetailProfile(userData) {
+    const router = useRouter();
+    const fileInputRef = React.useRef(null);
 
+    const { mutate: userMutate, isPending } = usePut(`/users/`, {
+        onSuccess: () => {
+            toast.success("User updated successfully :)");
+            router.refresh();
+        },
+    });
 
-    useEffect(() => {
-        const getUser = async () => {
-            const res = await fetch("/api/auth/me");
-            const data = await res.json();
-            setName(data.user.username);
-            setEmail(data.user.email);
-            setPhone(data.user.phone);
-            setId(data.user._id)
-        };
-        getUser();
-    }, []);
+    const {
+        register: formRegister,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(userValidationSchema),
+        defaultValues: {
+            username: userData.username,
+            email: userData.email,
+            phone: userData.phone,
+            password: "",
+            newPassword: "",
+            confirmPassword: "",
+        },
+    });
 
-    const updateUser = async () => {
-        const isNameValid = validateUserNane(name)
-        const isEmailValid = validateEmail(email)
-        const isPhoneValid = validatePhone(phone)
-
-        if (!isNameValid) {
-            return showSwal("please inter your name correctly", "warning", "try again")
-        }
-        if (!isEmailValid) {
-            return showSwal("please inter your email correctly", "warning", "try again")
-        }
-        if (!isPhoneValid) {
-            return showSwal("please inter your phone correctly", "warning", "try again")
-        }
-
-
-        swal({
-            title: "Are You Sure To Save Changes?",
-            icon: "warning",
-            buttons: ["No", "yes"]
-        }).then(async result => {
-            if (result) {
-                try {
-                    const res = await fetch(`/api/users/${id}`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            name,
-                            email,
-                            phone
-                        })
-
-                    })
-
-                    if (res.status !== 200) return manageError(res.status)
-                    swal({
-                        title: "your detail was updated successfully :)",
-                        icon: "success",
-                        buttons: "ok"
-                    }).then(result => {
-                        if (result) {
-                            router.refresh()
-                        }
-                    })
-                } catch (err) {
-                    swal({
-                        title: "NetWork Error",
-                        icon: "warning",
-                        buttons: "ok"
-                    })
-                }
+    const onSubmit = (values) => {
+        const data = new FormData();
+        Object.entries(values).forEach(([key, val]) => {
+            if (val !== null && val !== "") {
+                data.append(key, val);
             }
+        });
 
+        if (fileInputRef.current?.files?.[0]) {
+            data.append("avatar", fileInputRef.current.files[0]);
+        }
 
-        })
-    }
+        userMutate({ id: userData.id, payload: data });
+    };
+
 
     return (
-        <main>
-            <div>
-                <h1 className="title">
-                    <span>Detail-profile</span>
-                </h1>
-            </div>
-            <div className={styles.details}>
-                <h1 className={styles.title}>
-                    <span>Detail Account</span>
-                </h1>
-                <div className={styles.details_main}>
-                    <section>
-                        <div>
-                            <label>UserName</label>
-                            <input
-                                value={name}
-                                onChange={(event) => setName(event.target.value)}
-                                placeholder=" Please Inter Your UserName"
-                                type="text"
-                            />
-                        </div>
-                        <div>
-                            <label>Email</label>
-                            <input
-                                value={email}
-                                onChange={(event) => setEmail(event.target.value)}
-                                placeholder=" Please Inter Your Email"
-
-                                type="text"
-                            />
-                        </div>
-                        <div>
-                            <label> Phone</label>
-                            <input
-                                value={phone}
-                                onChange={(event) => setPhone(event.target.value)}
-                                placeholder=" Please Inter Your Phone"
-                                type="number"
-                            />
-                        </div>
-                    </section>
-                    <section>
-                        <div className={styles.uploader}>
-                            <Image
-                                width={200}
-                                height={200}
-                                alt=""
-                                src="/images/user-profile-flat-illustration-avatar-person-icon-gender-neutral-silhouette-profile-picture-free-vector.jpg" />
-                            <div>
-                                <div>
-                                    <button>
-                                        <IoCloudUploadOutline />
-                                        Change
-                                    </button>
-                                    <input type="file" name="" id="" />
-                                </div>
-                                <button>
-                                    <MdOutlineDelete />
-                                    Remove
-                                </button>
-                            </div>
-                        </div>
-                        <div>
-                            <label> Password</label>
-                            <div className={styles.password_group}>
-                                <input type="password" />
-                                <button>Change</button>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-                <button
-                    type="submit"
-                    onClick={updateUser}
-                    className={styles.submit_btn}
-                >
-                    Send
-                </button>
-            </div>
-        </main>
+         <section className={styles.detail}>
+           <form onSubmit={handleSubmit(onSubmit)} noValidate>
+             <div className={styles.detail_main}>
+               {/* Username */}
+               <div>
+                 <label>Username</label>
+                 <input
+                   type="text"
+                   {...formRegister("username")}
+                   required
+                   className={errors.username ? styles.input_error : ""}
+                 />
+                 {errors.username && (
+                   <span className={styles.error_text}>{errors.username.message}</span>
+                 )}
+               </div>
+     
+               {/* Email */}
+               <div>
+                 <label>Email</label>
+                 <input
+                   type="email"
+                   {...formRegister("email")}
+                   required
+                   className={errors.email ? styles.input_error : ""}
+                 />
+                 {errors.email && (
+                   <span className={styles.error_text}>{errors.email.message}</span>
+                 )}
+               </div>
+     
+               {/* Phone */}
+               <div>
+                 <label>Phone</label>
+                 <input
+                   type="text"
+                   {...formRegister("phone")}
+                   required
+                   className={errors.phone ? styles.input_error : ""}
+                 />
+                 {errors.phone && (
+                   <span className={styles.error_text}>{errors.phone.message}</span>
+                 )}
+               </div>
+     
+               {/* Avatar */}
+               <div>
+                 <label>Profile Picture</label>
+                 <input
+                   type="file"
+                   accept="image/*"
+                   ref={fileInputRef}
+                   className={styles.file_input}
+                 />
+               </div>
+     
+               {/* Password */}
+               <div>
+                 <label>Current Password</label>
+                 <input
+                   type="password"
+                   {...formRegister("password")}
+                   className={errors.password ? styles.input_error : ""}
+                 />
+               </div>
+               <div>
+                 <label>New Password</label>
+                 <input
+                   type="password"
+                   {...formRegister("newPassword")}
+                   className={errors.newPassword ? styles.input_error : ""}
+                 />
+               </div>
+               <div>
+                 <label>Confirm New Password</label>
+                 <input
+                   type="password"
+                   {...formRegister("confirmPassword")}
+                   className={errors.confirmPassword ? styles.input_error : ""}
+                 />
+               </div>
+     
+               <button type="submit" disabled={isPending} className={styles.submit_btn}>
+                 {isPending ? "Updating..." : "Update Details"}
+               </button>
+             </div>
+           </form>
+         </section>
     );
 }
 
