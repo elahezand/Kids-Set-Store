@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-import DepartmentModel from "./department";
-
 const schema = new mongoose.Schema({
     department: {
         type: mongoose.Types.ObjectId,

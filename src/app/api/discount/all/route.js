@@ -1,31 +1,10 @@
-import connectToDB from "../../../../configs/db";
+import connectToDB from "../../../../../configs/db";
 import discountModel from "../../../../model/discount";
-import { discountValidationSchema } from "../../../../validators/discount";
 import { NextResponse } from "next/server";
+import { discountValidationSchema } from "../../../../validators/discount";
 import { authAdmin } from "@/utils/serverHelper";
-import { paginate } from "@/utils/helper";
+import ProductModel from "../../../../../model/product";
 
-export async function GET() {
-    try {
-        await connectToDB()
-        const { searchParams } = new URL(req.url)
-        const useCursor = searchParams.has("cursor");
-
-        const result = await paginate(
-            discountModel,
-            searchParams,
-            {},
-            null,
-            useCursor,
-            true,
-        )
-
-        return NextResponse.json({ result }, { satatus: 200 })
-    }
-    catch (err) {
-        return NextResponse.json({ message: "UnKnown Error" }, { satatus: 500 })
-    }
-}
 export async function POST(req) {
     try {
         await connectToDB()
@@ -42,16 +21,21 @@ export async function POST(req) {
             );
         }
 
-        const newOff = await offModel.create({
+        const newOff = await discountModel.create({
             ...parsed.data,
             creator: admin._id
         });
 
+        const products = await ProductModel.find({ name: "discount" });
 
+        for (let product of products) {
+            product.discount = newOff.percent;
+            product.price = product.price * (1 - newOff.percent / 100);
+            await product.save();
+        }
         return NextResponse.json({ massage: "Discount Created Successfully :)", newOff }, { satatus: 200 })
     }
     catch (err) {
         return NextResponse.json({ message: "UnKnown Error" }, { satatus: 500 })
     }
 }
-

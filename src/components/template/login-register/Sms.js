@@ -1,5 +1,4 @@
 "use client"
-
 import styles from "@/components/template/login-register/sms.module.css"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -21,7 +20,7 @@ const Sms = ({ phone, setShowOtp }) => {
   const [code, setCode] = useState("")
   const router = useRouter()
 
-  const mutation = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async ({ phone, code }) => {
       const parsed = schema.safeParse({ phone, code })
       if (!parsed.success)
@@ -34,17 +33,16 @@ const Sms = ({ phone, setShowOtp }) => {
       return res.data
     },
     onSuccess: () => {
-      toast.success("Login Successfully 🙂")
+      toast.success("Login Successfully:)")
       router.replace("/")
     },
     onError: (error) => {
-      const status = error.response?.status
-      manageError(status)
+      manageError(error.response?.status)
     },
   })
 
   const verifyHandler = () => {
-    mutation.mutate({ phone, code })
+    mutate({ phone, code })
   }
 
   return (
@@ -62,13 +60,11 @@ const Sms = ({ phone, setShowOtp }) => {
           value={code}
           onChange={(e) => setCode(e.target.value)}
         />
-
         <button
           style={{ marginTop: "1rem" }}
           onClick={verifyHandler}
           className={styles.btn}
-          disabled={mutation.isPending}
-        >
+          disabled={isPending}>
           Verify Code
         </button>
 
@@ -79,8 +75,7 @@ const Sms = ({ phone, setShowOtp }) => {
 
       <p
         onClick={() => setShowOtp(false)}
-        className={styles.redirect_to_home}
-      >
+        className={styles.redirect_to_home}>
         Cancel
       </p>
     </div>

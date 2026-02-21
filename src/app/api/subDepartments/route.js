@@ -1,40 +1,68 @@
-import DepartmentModel from "../../../../model/department"
-import SubDepartmentModel from "../../../../model/subDepartment"
-import connectToDB from "../../../../db/db"
-import { authAdmin } from "@/utils/serverHelper"
-export async function GET() {
-    try {
-        connectToDB()
-        const subDepartments = await SubDepartmentModel.find()
-        return Response.json({ subDepartments }, { status: 200 })
-    }
-    catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
-    }
+import connectToDB from "../../../../configs/db";
+import SubDepartmentModel from "../../../../model/subDepartment";
+import DepartmentModel from "../../../../model/department";
+import { authAdmin } from "@/utils/serverHelper";
+import { NextResponse } from "next/server";
 
+export async function GET() {
+  try {
+    await connectToDB();
+
+    const subDepartments = await SubDepartmentModel.find()
+      .populate("department", "title")
+      .lean();
+
+    return NextResponse.json({ subDepartments }, { status: 200 });
+  } catch (err) {
+    console.log(err);
+    return NextResponse.json({ message: "Unknown Error" }, { status: 500 });
+  }
 }
 
 export async function POST(req) {
-    try {
-        connectToDB()
-        const admin = await authAdmin()
+  try {
+    await connectToDB();
 
-        if (!admin) throw new Error("This api Protected")
+    const admin = await authAdmin();
+    if (!admin)
+      return NextResponse.json(
+        { message: "This API is protected" },
+        { status: 403 }
+      );
 
+    const body = await req.json();
+    const { title, department } = body;
 
-        const reqBody = await req.json()
-        const { title, department } = reqBody
+    if (!title?.trim())
+      return NextResponse.json(
+        { message: "Title Not Valid :(" },
+        { status: 422 }
+      );
 
-        if (!title.trim()) return Response.json({ message: "Title Not Valid :(" }, { status: 422 })
+    if (!department)
+      return NextResponse.json(
+        { message: "Department is required" },
+        { status: 422 }
+      );
 
-        await SubDepartmentModel.create({
-            title, department
-        })
+    const depExists = await DepartmentModel.findById(department);
+    if (!depExists)
+      return NextResponse.json(
+        { message: "Department not found" },
+        { status: 404 }
+      );
 
-        return Response.json({ message: "SubDepartment created Successfully" }, { status: 200 })
-    }
-    catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
-    }
+    const newSub = await SubDepartmentModel.create({
+      title,
+      department,
+    });
 
+    return NextResponse.json(
+      { message: "SubDepartment created Successfully", subDepartment: newSub },
+      { status: 201 }
+    );
+  } catch (err) {
+    console.log(err);
+    return NextResponse.json({ message: "Unknown Error" }, { status: 500 });
+  }
 }

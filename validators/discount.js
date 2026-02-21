@@ -1,38 +1,41 @@
 import { z } from "zod";
 
-export const discountSchema = z.object({
-  productID: z
-    .string()
-    .regex(/^[0-9a-fA-F]{24}$/, "Invalid Product ID format"), // Validates MongoDB ObjectId
+const objectId = z
+  .string()
+  .regex(/^[0-9a-fA-F]{24}$/, "Invalid ObjectId format");
+
+const discountValidationSchema = z.object({
+  product: objectId,
 
   code: z
     .string()
-    .min(3, "Discount code must be at least 3 characters")
-    .max(20, "Discount code cannot exceed 20 characters")
     .trim()
-    .toUpperCase(), // Usually, discount codes are uppercase
+    .min(3, "Discount code must be at least 3 characters")
+    .max(50, "Discount code is too long")
+    .transform(val => val.toUpperCase()),
 
-  percent: z
-    .number({ invalid_type_error: "Percentage must be a number" })
-    .min(1, "Minimum discount is 1%")
-    .max(100, "Maximum discount is 100%"),
+  percent: z.coerce
+    .number({ invalid_type_error: "Percent must be a number" })
+    .min(0, "Percent cannot be negative")
+    .max(100, "Percent cannot exceed 100"),
 
-  maxUses: z
+  max: z.coerce
     .number()
-    .int("Max uses must be an integer")
-    .min(1, "At least 1 use is required"),
+    .int("Max usage must be an integer")
+    .min(1, "Max usage must be at least 1"),
 
-  uses: z
-    .number()
-    .int()
-    .min(0)
-    .default(0)
-    .optional(),
+  creator: objectId,
 
-  expTime: z
-    .string()
-    .or(z.date())
-    .refine((val) => new Date(val) > new Date(), {
-      message: "Expiration time cannot be in the past",
-    }),
-});
+  uses: z.coerce.number().int().min(0).default(0).optional(),
+  usedBy: z.array(objectId).default([]).optional(),
+}).strict(); 
+
+const updateOffSchema = discountCreateSchema
+  .omit({ uses: true, usedBy: true, creator: true }) 
+  .partial()
+  .strict();
+
+export  {
+  discountValidationSchema,
+  updateOffSchema,
+};

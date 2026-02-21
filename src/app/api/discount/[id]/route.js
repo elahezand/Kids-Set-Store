@@ -1,60 +1,53 @@
 import { authAdmin } from "@/utils/serverHelper"
 import connectToDB from "../../../../../db/db"
-import DiscountModel from "../../../../../model/discount"
-import { isValidObjectId } from "mongoose"
-
+import discountModel from "../../../../../model/discount";
+import { updateOffSchema } from "../../../../validators/discount";
+import { NextResponse } from "next/server";
 
 export async function PUT(req, { params }) {
     try {
-        connectToDB()
+        await connectToDB()
         const { id } = await params
 
-        const isDiscountExist = await DiscountModel.findOne({ code: id })
+        const admin = await authAdmin()
+        if (!admin) throw new Error("This api Protected")
 
-        if (!isDiscountExist) return Response.json({ message: "Not Found" }, { status: 404 })
+        const body = await req.json();
+        const parsed = updateOffSchema.safeParse(body);
 
-
-        if (isDiscountExist.expTime < new Date()) {
-            return Response.json({ message: "Code Expired" }, { status: 410 })
+        if (!parsed.success) {
+            return NextResponse.json(
+                { errors: parsed.error.flatten().fieldErrors },
+                { status: 400 }
+            );
         }
-
-        if (isDiscountExist.maxUses <= isDiscountExist.uses) {
-            return Response.json({ message: "“Access denied. The usage limit for this code has been exhausted.” " }, { status: 410 })
-        }
-
-
-        const discount = await DiscountModel.findOneAndUpdate({ code: id }, {
-            $inc: {
-                uses: 1
-            },
-        },
+        const updatedOff = await discountModel.findByIdAndUpdate(
+            id,
+            parsed.data,
             { new: true }
-        )
-
-        return Response.json({ discount }, { status: 200 })
+        );
+        if (!updatedOff) return NextResponse.json({ message: "NOT founی" }, { status: 404 })
+        return NextResponse.json({ updatedOff }, { status: 200 })
     }
     catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
+        return NextResponse.json({ message: "UnKnown Error" }, { status: 500 })
     }
 
 }
-
 export async function DELETE(req, { params }) {
     try {
-        connectToDB()
+        await connectToDB()
         const admin = await authAdmin()
         if (!admin) throw new Error("This api Protected")
 
         const { id } = await params
 
-        await DiscountModel.findOneAndDelete({ _id: id })
-
-        return Response.json({ message: "discount Removed Successfully" }, { status: 200 })
+        await discountModel.findOneAndDelete({ _id: id })
+        return NextResponse.json({ message: "discount Removed Successfully" }, { status: 200 })
     }
     catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
+        return NextResponse.json({ message: "UnKnown Error" }, { status: 500 })
     }
-
 }
 
 

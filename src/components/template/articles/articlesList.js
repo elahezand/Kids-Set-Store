@@ -1,54 +1,60 @@
 "use client"
-import React, { useState } from 'react'
+import React from 'react'
 import qs from "qs"
 import axios from 'axios'
 import Article from '../index/articles/article'
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import styles from "@/components/template/index/latest/latest.module.css"
 
+export const metadata = {
+  title: "Our Articles | My Website",
+  description: "Read our latest articles, news, and insights on various topics.",
+  openGraph: {
+    title: "Our Articles | My Website",
+    description: "Read our latest articles, news, and insights on various topics.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Our Articles | My Website",
+    description: "Read our latest articles, news, and insights on various topics.",
+  },
+}
 export default function ArticlesList({ data: initialData, limit, nextCursor }) {
-    const [articles, setArticles] = useState(initialData);
-    const [cursor, setCursor] = useState(nextCursor)
-    const [loading, setLoading] = useState(false);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteQuery({
+    queryKey: ["articles"],
+    queryFn: async ({ pageParam = null }) => {
+      const queryString = qs.stringify({ cursor: pageParam, limit }, { encode: false });
+      const { data } = await axios.get(`/api/articles?${queryString}`);
+      return data;
+    },
+    getNextPageParam: (lastPage) => lastPage.nextCursor || undefined,
+    initialData: {
+      pages: [{ data: initialData, nextCursor }],
+      pageParams: [null],
+    }
+  });
 
-    let queryString = qs.stringify({ cursor, limit },
-        { encode: false, });
+  return (
+    <>
+      <div data-aos="fade-up" style={{ display: "flex", gap: "1rem" }}>
+        {data?.pages?.flatMap((page) =>
+          page.data.map((item) => <Article {...item} key={item._id} />)
+        ) || <div className={styles.no_products}>Not Found</div>}
+      </div>
 
-    const queryKey = [`/api/articles-${queryString}`]
-    const { refetch } = useQuery({
-        queryKey,
-        queryFn: async () => {
-            const { data } = await axios.get(`/api/articles?${queryString}`);
-            return data;
-        },
-    });
-
-    const loadMore = async () => {
-        setLoading(true);
-        const res = await refetch();
-
-        setArticles(prev => [...prev, ...res.data.data]);
-        setCursor(res.data.nextCursor)
-        setLoading(false);
-    };
-
-    return (
-        <>
-
-            <div data-aos="fade-up" style={{display:"flex", gap:"1rem"}}>
-                {articles?.length > 0 ? articles.map((item, index) => (
-                    <Article {...item} key={index} />
-                )) : (
-                    <div className={styles.no_products}> Not Found </div>
-                )}
-            </div>
-            {cursor && (
-                <div className={styles.loadmore_container}>
-                    <button onClick={loadMore} disabled={loading} className={styles.loadMoreBtn}>
-                        {loading ? "Loading..." : "Load more"}
-                    </button>
-                </div>
-            )}
-        </>
-    )
+      {hasNextPage && (
+        <div className="loadMoreBtn">
+          <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+            {isFetchingNextPage ? "Loading..." : "Load more"}
+          </button>
+        </div>
+      )}
+    </>
+  )
 }

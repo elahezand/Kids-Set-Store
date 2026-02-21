@@ -1,21 +1,21 @@
 import Link from "next/link";
 import styles from "./ticket.module.css";
 
-const Ticket = ({ subject, createdAt, answerBy, _id, department }) => {
+const Ticket = ({ title, createdAt, _id, department, isAnswer }) => {
   return (
-    <Link href={`/p-user/tickets/answer/${_id}`}
+    <Link href={`/p-user/tickets/${_id}`}
       className={styles.ticket}>
       <div>
-        <p>{subject}</p>
+        <p>{title}</p>
         <p className={styles.department}>
           {department.title} </p>
       </div>
       <div>
-        <p>{createdAt.slice(0, 10)}</p>
+        <p>{new Date(createdAt).toISOString().slice(0, 10)}</p>
         <p
-          className={answerBy === "ADMIN" ?
+          className={isAnswer ?
             styles.answer : styles.no_answer}>
-          {answerBy === "ADMIN" ? "Answered" : "Not Answered"}</p>
+          {isAnswer ? "Answered" : "Not Answered"}</p>
       </div>
     </Link>
   );

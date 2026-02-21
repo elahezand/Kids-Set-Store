@@ -88,6 +88,7 @@ export async function POST(req) {
         };
 
         const validation = productSchema.safeParse(processedData);
+        
         if (!validation.success) {
             console.log("Validation Errors:", validation.error.flatten().fieldErrors);
             return {

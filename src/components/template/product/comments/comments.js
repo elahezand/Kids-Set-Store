@@ -6,26 +6,29 @@ import CommentsList from "./commentsList";
 
 const Comments = async ({ productId, searchParams }) => {
   const sParams = await searchParams;
-  
   const paginatedData = await paginate(
     commentModel,
     sParams,
-    {productID:productId},
+    { productID: productId, isAccept: true },
     null,
     true,
     false
   );
+
+  const paginatedDatSerialize = JSON.parse(JSON.stringify(paginatedData.data))
   return (
     <div>
-      <p>Comments ({paginatedData.data.filter(comment => comment.isAccept).length})
+      <p>Comments ({paginatedData.data.length})
         :</p>
       <hr />
       <main className={styles.comments}>
         <div className={styles.user_comments}>
           <CommentsList
+            productId={productId}
             nextCursor={paginatedData.nextCursor}
             limit={paginatedData.limit}
-            data={JSON.parse(JSON.stringify(paginatedData.data))} />
+            data={paginatedDatSerialize}
+          />
         </div>
         <div className={styles.form_bg}>
           <CommentForm

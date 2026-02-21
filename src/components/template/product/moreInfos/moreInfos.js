@@ -1,6 +1,6 @@
 import React from "react";
 
-const MoreInfoes = ({ product }) => {
+const MoreInfoes = ({ color, material, availableSizes }) => {
   return (
     <div>
       <p> More Informatiom :</p>
@@ -8,19 +8,15 @@ const MoreInfoes = ({ product }) => {
       <main>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <p>Color</p>
-          <p>{product.color}</p>
+          <p>{color}</p>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <p>SuitableFor</p>
-          <p>{product.suitableFor}</p>
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <p>Size</p>
-          <p>{product.size}</p>
+          <p>availableSizes</p>
+          {availableSizes?.map((size, index) => <p key={index}>{size}</p>)}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <p>Material</p>
-          <p>{product.material}</p>
+          <p>{material}</p>
         </div>
       </main>
     </div>

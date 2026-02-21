@@ -15,10 +15,8 @@ const Gallery = ({ images }) => {
                 spaceBetween={10}
                 thumbs={{ swiper: thumbsSwiper }}
                 modules={[FreeMode, Thumbs]}
-                className="mySwiper2 gallery-slider"
-            >
+                className="mySwiper2 gallery-slider">
                 {Array.isArray(images) ? images.map((img, index) => (
-                    <>
                         <SwiperSlide key={index}>
                             <Image
                                 alt=""
@@ -26,9 +24,8 @@ const Gallery = ({ images }) => {
                                 width={600}
                                 src={img} />
                         </SwiperSlide>
-                    </>
                 )) :
-                    <SwiperSlide>
+                    <SwiperSlide key="single">
                         <Image
                             alt=""
                             height={600}
@@ -46,8 +43,8 @@ const Gallery = ({ images }) => {
                 modules={[FreeMode, Navigation, Thumbs]}
                 className="gallery-slider-2"
             >
-                {Array.isArray(images) ? images.map((img) => (
-                    <SwiperSlide key={img.id || index}>
+                {Array.isArray(images) ? images.map((img, index) => (
+                    <SwiperSlide key={index}>
                         <Image
                             alt=""
                             height={600}
@@ -55,7 +52,7 @@ const Gallery = ({ images }) => {
                             src={img} />
                     </SwiperSlide>
                 )) :
-                    <SwiperSlide key={img.id || index}>
+                    <SwiperSlide key="single">
                         <Image
                             alt=""
                             height={600}

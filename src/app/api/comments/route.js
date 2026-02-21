@@ -17,7 +17,7 @@ export async function GET(req) {
         const result = await paginate(
             commentModel,               // Model
             searchParams,               // searchParams
-            productId ? { productID: productId } : {}, // filter
+            productId ? {  isAccept: true } : {}, // filter
             null,                       // populate
             useCursor,
             true                  // cursor /page
