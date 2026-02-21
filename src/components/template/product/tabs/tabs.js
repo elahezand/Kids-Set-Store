@@ -4,9 +4,9 @@ import styles from "./tabs.module.css";
 import { useState } from "react";
 import Description from "../description/description";
 import MoreInfoes from "../moreInfos/moreInfos";
-const Tabs = ({ product }) => {
+const Tabs = ({ longDescription, availableSizes, color, material }) => {
   const [tab, setTab] = useState("description");
- 
+
   return (
     <div data-aos="fade-left"
       className={styles.tabs}>
@@ -44,19 +44,17 @@ const Tabs = ({ product }) => {
             More Infos{" "}
           </label>
         </li>
-        <li title="Shipping">
-          <label htmlFor="comments"
-            role="button">
-            Comments ({product.comments?.filter(comment => comment.isAccept).length})
-          </label>
-        </li>
       </ul>
       <div className={styles.contents}>
         <section className={styles.tabs_content}>
-          <Description description={product.longDescription} />
+          <Description
+            description={longDescription} />
         </section>
         <section className={styles.tabs_content}>
-          <MoreInfoes product={product} />
+          <MoreInfoes
+            material={material}
+            availableSizes={availableSizes}
+            color={color} />
         </section>
       </div>
     </div>

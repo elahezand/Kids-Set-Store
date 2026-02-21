@@ -28,7 +28,7 @@ const Register = ({ showloginForm }) => {
     mode: "onChange"
   });
 
-  const mutation = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async (data) => {
       const res = await axios.post("/api/auth/signup", data);
       return res.data;
@@ -40,7 +40,11 @@ const Register = ({ showloginForm }) => {
     onError: (error) => manageError(error.response?.status),
   });
 
-  const mutationOtp = useMutation({
+  const onSubmit = (data) => {
+    mutate(data);
+  };
+
+  const { mutate: mutationOtp, isPending: optPending } = useMutation({
     mutationFn: async (phoneNumber) => {
       const res = await axios.post("/api/auth/sms/send", { phone: phoneNumber });
       return res.data;
@@ -59,7 +63,7 @@ const Register = ({ showloginForm }) => {
     }).then((result) => {
       if (result) {
         setPhone(result);
-        mutationOtp.mutate(result);
+        mutationOtp(result);
       }
     });
   };
@@ -70,19 +74,8 @@ const Register = ({ showloginForm }) => {
 
   return (
     <form
-      onSubmit={handleSubmit(
-        (data) => {
-          console.log("Form Data Submitted:", data);
-          mutation.mutate(data);
-        },
-        (errors) => {
-          console.log("Validation Errors:", errors);
-          toast.error("Please fix the errors in the form");
-        }
-      )}>
+      onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.form}>
-
-        {/* Username */}
         <input
           className={styles.input}
           placeholder="Username"
@@ -91,7 +84,6 @@ const Register = ({ showloginForm }) => {
         {errors.username && <span className={styles.error_text}>
           {errors.username.message}</span>}
 
-        {/* Email */}
         <input
           className={styles.input}
           placeholder="Email (optional)"
@@ -105,8 +97,6 @@ const Register = ({ showloginForm }) => {
           {...register("phone")}
         />
         {errors.phone && <span className={styles.error_text}>{errors.phone.message}</span>}
-
-        {/* Password Section */}
         {showPasswordField && (
           <>
             <input
@@ -122,7 +112,6 @@ const Register = ({ showloginForm }) => {
           </>
         )}
 
-        {/* Toggle Buttons */}
         {!showPasswordField ? (
           <button
             type="button"
@@ -137,9 +126,9 @@ const Register = ({ showloginForm }) => {
             type="submit"
             className={styles.btn}
             style={{ marginTop: ".7rem" }}
-            disabled={mutation.isPending}
+            disabled={isPending}
           >
-            {mutation.isPending ? "Registering..." : "Register"}
+            {isPending ? "Registering..." : "Register"}
           </button>
         )}
 
@@ -148,9 +137,9 @@ const Register = ({ showloginForm }) => {
           className={styles.btn}
           style={{ marginTop: "1rem" }}
           onClick={handleOtp}
-          disabled={mutationOtp.isPending}
+          disabled={optPending}
         >
-          {mutationOtp.isPending ? "Sending..." : "Register with Phone (OTP)"}
+          {optPending ? "Sending..." : "Register with Phone"}
         </button>
 
         <p onClick={showloginForm} className={styles.back_to_login} style={{ cursor: "pointer" }}>

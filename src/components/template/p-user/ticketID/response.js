@@ -1,52 +1,48 @@
 "use client";
 import React, { useState } from "react";
 import styles from "./response.module.css";
+import { usePost } from "@/utils/hooks/useReactQueryPanel";
 import { useRouter } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
-import { manageError } from "@/utils/helper";
+import toast from "react-hot-toast";
 
-export default function Response({ ticketID }) {
+export default function Response({ ticketID}) {
+ 
   const router = useRouter();
   const [content, setContent] = useState("");
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async () => {
-      const res = await fetch(`/api/tickets/${ticketID}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content }),
-      });
-
-      if (!res.ok) throw res.status;
-      return res.json();
-    },
+  const { mutate, isLoading } = usePost(`/tickets/${ticketID}/answer`, {
     onSuccess: () => {
-      swal({
-        title: "Ticket Sent Successfully :)",
-        icon: "success",
-        buttons: "ok",
-      }).then(() => {
-        router.refresh();
-        setContent("");
-      });
-    },
-    onError: (status) => {
-      manageError(status);
-    },
+      toast.success("Your Ticket Response Sent Successfully :)");
+      setContent("");
+      router.refresh();
+    }
   });
+
+  const handleSubmit = () => {
+    if (!content.trim()) {
+      toast.error("Please enter a message!");
+      return;
+    }
+    mutate({
+    content,
+    });
+  };
 
   return (
     <div className={styles.response}>
-      <input
+      <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
+        placeholder="Write your reply here..."
+        rows={4}
+        className={styles.textarea}
       />
       <button
         className={styles.btn}
-        onClick={() => mutate()}
-        disabled={isPending}
+        onClick={handleSubmit}
+        disabled={isLoading}
       >
-        {isPending ? "Sending..." : "Response"}
+        {isLoading ? "Sending..." : "Submit"}
       </button>
     </div>
   );

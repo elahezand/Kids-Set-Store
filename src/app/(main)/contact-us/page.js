@@ -35,7 +35,7 @@ export const metadata = {
 const page = async () => {
 
     return (
-        <>
+        <div className="container">
             <Breadcrumb
                 route={"Contact-Us"}
                 title={"ContactUs"} />
@@ -56,7 +56,7 @@ const page = async () => {
                     <Map />
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

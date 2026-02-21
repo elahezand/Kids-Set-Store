@@ -3,18 +3,19 @@ import Pagination from "@/components/modules/pageination/pagination";
 import TicketModel from "../../../../../model/ticket";
 import { paginate } from "@/utils/helper";
 import SendTicket from "@/components/template/p-user/tickets/sendTicket";
-import Tickets from "@/components/template/p-user/tickets/tickets";
+import Ticket from "@/components/template/p-user/index/ticket";
+import connectToDB from "../../../../../configs/db";
 
 const page = async ({ searchParams }) => {
+    await connectToDB()
     const user = await authUser()
-    const searchparams = searchParams
-
+    
     const paginatedData = await paginate(
         TicketModel,
-        searchparams,
-        { "message.senderID": user._id },
+        searchParams,
+        { user: user.id, parent: null },
         "department"
-    )
+    );
 
     return (
         <>
@@ -24,10 +25,21 @@ const page = async ({ searchParams }) => {
                 </h1>
             </div>
             <main className="container">
-                {paginatedData.data.length > 0 ? <Tickets
-                    tickets={JSON.parse(JSON.stringify(paginatedData.data))} /> :
-                    <p className={styles.empty}>NO Ticket Yet !</p>
-                }
+                {paginatedData.data.length > 0 &&
+                    <>
+                        <h1 className="title">
+                            <span>All Tickets</span>
+                        </h1>
+                        <div>
+                            {paginatedData.data.map((ticket) => (
+                                <Ticket
+                                    role={user.role}
+                                    key={ticket._id}
+                                    {...ticket} />
+                            ))}
+                        </div>
+                    </>}
+
                 {paginatedData.data.length === 0 &&
                     <p className="empty">
                         No Ticket Yet :(
@@ -38,7 +50,9 @@ const page = async ({ searchParams }) => {
                     pageCount={paginatedData.pageCount}
                     limit={paginatedData.limit}
                 />
-                <SendTicket />
+                <SendTicket
+                    user={user.id}
+                />
             </main>
         </>
     );

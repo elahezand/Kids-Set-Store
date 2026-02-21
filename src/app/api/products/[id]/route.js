@@ -5,7 +5,7 @@ import { productSchema } from "../../../../../validators/product";
 import { NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose"
 import { authAdmin } from "@/utils/serverHelper";
-/* ===================== GET ===================== */
+/*  GET  */
 export async function GET(req, { params }) {
     try {
         await connectToDB();
@@ -15,13 +15,21 @@ export async function GET(req, { params }) {
         const product = await ProductModel.findById(id).lean();
         if (!product) return NextResponse.json({ message: "Product not found" }, { status: 404 });
 
-        return NextResponse.json(product, { status: 200 });
+        const productComments = await commentModel.countDocuments({ productID: product._id, isAccept: true })
+
+        const totalScore = productComments.reduce((acc, curr) => acc + (curr.score || 0), 0);
+        const avgScore = productComments.length > 0 ? Math.round(totalScore / productComments.length) : 5;
+
+        return NextResponse.json({
+            ...product,
+            courseAverageScore: avgScore,
+        }, { status: 200 });
     } catch {
         return NextResponse.json({ message: "Unknown Error" }, { status: 500 });
     }
 }
 
-/* ===================== DELETE ===================== */
+/*  DELETE  */
 export async function DELETE(req, { params }) {
     try {
         await connectToDB();
@@ -40,7 +48,7 @@ export async function DELETE(req, { params }) {
     }
 }
 
-/* ===================== PUT ===================== */
+/*  PUT  */
 export async function PUT(req, { params }) {
     try {
         await connectToDB();
@@ -77,8 +85,6 @@ export async function PUT(req, { params }) {
             };
         }
 
-
-        /* optional image upload */
         const img = await handleFileUpload(formData.get("img")) || currentProduct.img;
         if (!img) return NextResponse.json({ message: "Image is required" }, { status: 400 });
 
@@ -91,8 +97,6 @@ export async function PUT(req, { params }) {
 
         return NextResponse.json({ message: "Product updated" }, { status: 200 });
     } catch (err) {
-        console.log(err);
-
         return NextResponse.json({ message: "Unknown Error" }, { status: 500 });
     }
 }

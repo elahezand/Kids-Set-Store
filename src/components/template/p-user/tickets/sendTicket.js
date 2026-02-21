@@ -1,163 +1,145 @@
-"use client"
-import React, { useEffect, useState } from 'react'
+"use client";
+import React, { useEffect, useState } from "react";
 import { IoIosSend } from "react-icons/io";
-import styles from "./sendTicket.module.css"
-import showSwal, { manageError } from '@/utils/helper';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { usePost } from "@/utils/hooks/useReactQueryPanel";
+import toast from "react-hot-toast";
+import styles from "./sendTicket.module.css";
+import { ticketValidationSchema } from "../../../../../validators/ticket";
 
-export default function SendTicket() {
-    const [title, setTitle] = useState("")
-    const [departmentID, setDepartmentID] = useState("")
-    const [subDepartmentID, setSubDepartmentID] = useState("")
-    const [priority, setPriority] = useState("")
-    const [content, setContent] = useState("")
+export default function SendTicket({ user }) {
+    const [departments, setDepartments] = useState([]);
+    const [subDepartments, setSubDepartments] = useState([]);
 
-    const [departments, setDepartments] = useState([])
-    const [subDepartments, setsubDepartments] = useState([])
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        reset,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(ticketValidationSchema),
+        defaultValues: {
+            title: "",
+            department: "",
+            subDepartment: "",
+            priority: "1",
+            content: "",
+        },
+    });
 
+    const watchDepartment = watch("department");
 
-    const getDepartment = async () => {
-        const res = await fetch("/api/departments")
-        if (res.status === 200) {
-            const result = await res.json()
-            setDepartments(result.departments)
-        }
-    }
-
-    const getSubDepartments = async (id) => {
-        const res = await fetch("/api/subDepartments")
-        if (res.status === 200) {
-            const result = await res.json()
-            const relatedSub = result.subDepartments.filter(item => item.department === id)
-            setsubDepartments(relatedSub)
-        }
-    }
-
+    // fetch departments
     useEffect(() => {
-        getDepartment()
-    }, [])
+        const getDepartments = async () => {
+            const res = await fetch("/api/departments");
+            if (res.ok) {
+                const result = await res.json();
+                setDepartments(result.departments);
+            }
+        };
+        getDepartments();
+    }, []);
 
+    // fetch subDepartments when department changes
+    useEffect(() => {
+        const getSubDepartments = async () => {
+            if (!watchDepartment) return;
+            const res = await fetch("/api/subDepartments");
+            if (res.ok) {
+                const result = await res.json();
 
-    const sendTicket = async () => {
-        if (departmentID === "-1") {
-            return showSwal("Please choose one Department !", "warning", "Try again")
-        }
+                const relatedSub = result.subDepartments.filter(
+                    (item) => item.department._id === watchDepartment
+                );
 
-        if (subDepartmentID === "-1") {
-            return showSwal("Please choose one Department !", "warning", "Try again")
-        }
+                setSubDepartments(relatedSub);
+                setValue("subDepartment", ""); // reset subDepartment on department change
+            }
+        };
+        getSubDepartments();
+    }, [watchDepartment, setValue]);
 
-        try {
-            const res = await fetch("/api/tickets", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    subject: title,
-                    department: departmentID,
-                    subDepartment: subDepartmentID,
-                    priority,
-                    message: content,
-                    status: "open"
-                })
-            })
+    const { mutate, isLoading } = usePost("/tickets", {
+        onSuccess: () => {
+            toast.success("Ticket sent successfully :)");
+            reset();
+        },
+        onError: () => {
+            toast.error("Failed to send ticket :(");
+        },
+    });
 
-            if (res.status !== 200) return manageError(res.status)
-            swal({
-                title: "Ticket sent Successfully:)",
-                icon: "success",
-                buttons: "ok"
-            })
-
-        } catch (err) {
-            swal({
-                title: "NetWork Error",
-                icon: "warning",
-                buttons: "ok"
-            })
-        }
-
-    }
+    const onSubmit = (data) => {
+        mutate({
+            title: data.title,
+            department: data.department,
+            subDepartment: data.subDepartment,
+            priority: data.priority,
+            content: data.content,
+            isAnswer:0,
+            answer:0
+        });
+    };
 
     return (
-        <>
-            <div>
-                <h1 className="title">
-                    <span>Send Ticket</span>
-                </h1>
+        <form onSubmit={handleSubmit(onSubmit)}
+            className={styles.form}>
+            <h1 className="title">Send Ticket</h1>
+            <div className={styles.group}>
+                <label>Department:</label>
+                <select {...register("department")}>
+                    <option value="">Select Department</option>
+                    {departments.map((d) => (
+                        <option key={d._id} value={d._id}>
+                            {d.title}
+                        </option>
+                    ))}
+                </select>
+                {errors.department && <p className={styles.error}>{errors.department.message}</p>}
             </div>
-            <div className={styles.content}>
-                <div className={styles.group}>
-                    <label> Please select Depatment:</label>
-                    <select onChange={(e) => {
-                        setDepartmentID(e.target.value)
-                        getSubDepartments(e.target.value)
-                    }}>
-                        <option value="-1">Please choose One Department :)</option>
-                        {departments.length ?
-                            departments.map((item, index) => (
-                                <option
-                                    key={index + 1}
-                                    value={item._id}>{item.title}</option>
-                            )) : null}
 
-                    </select>
-                </div>
-                <div className={styles.group}>
-                    <label>Select The Ticket Type :</label>
-                    <select
-                        onChange={(e) =>
-                            setSubDepartmentID(e.target.value)}>
-                        <option value="-1">Please choose One Item :)</option>
-                        {subDepartments.length ?
-                            subDepartments.map((item, index) => (
-                                <option
-                                    key={index + 1}
-                                    value={item._id}>
-                                    {item.title}</option>
-                            )) : null}
-                    </select>
-                </div>
-                <div className={styles.group}>
-                    <label>Title:</label>
-                    <input
-                        onChange={(e) =>
-                            setTitle(e.target.value)}
-                        placeholder="..." type="text" />
-                </div>
-                <div className={styles.group}>
-                    <label> Please Select The Priority Level Of The Ticket:</label>
-                    <select
-                        onChange={(e) =>
-                            setPriority(e.target.value)}>
-                        <option value="-1">Please choose One Item :)</option>
-                        <option value="1">Low</option>
-                        <option value="2">Medium</option>
-                        <option value="3">High</option>
-                    </select>
-                </div>
+            <div className={styles.group}>
+                <label>SubDepartment:</label>
+                <select {...register("subDepartment")}>
+                    <option value="">Select SubDepartment</option>
+                    {subDepartments.map((s) => (
+                        <option key={s._id} value={s._id}>
+                            {s.title}
+                        </option>
+                    ))}
+                </select>
+                {errors.subDepartment && <p className={styles.error}>{errors.subDepartment.message}</p>}
             </div>
+
+            <div className={styles.group}>
+                <label>Title:</label>
+                <input type="text" {...register("title")} />
+                {errors.title && <p className={styles.error}>{errors.title.message}</p>}
+            </div>
+
+            <div className={styles.group}>
+                <label>Priority:</label>
+                <select {...register("priority")}>
+                    <option value="1">Low</option>
+                    <option value="2">Medium</option>
+                    <option value="3">High</option>
+                </select>
+                {errors.priority && <p className={styles.error}>{errors.priority.message}</p>}
+            </div>
+
             <div className={styles.group}>
                 <label>Content:</label>
-                <textarea
-                    onChange={(e) =>
-                        setContent(e.target.value)}
-                    rows={10}></textarea>
-            </div>
-            <div className={styles.uploader}>
-                <span> Maximum Size : 6MB</span>
-                <span> Allowed Format: jpg, png.jpeg, rar, zip</span>
-                <input type="file" />
+                <textarea {...register("content")} rows={6}></textarea>
+                {errors.content && <p className={styles.error}>{errors.content.message}</p>}
             </div>
 
-            <button
-
-                className={styles.btn}
-                onClick={sendTicket}
-            >
-                <IoIosSend />
-                Send
+            <button type="submit" className={styles.btn} disabled={isLoading}>
+                {isLoading ? "Sending..." : <><IoIosSend /> Send</>}
             </button>
-        </>
-    )
+        </form>
+    );
 }

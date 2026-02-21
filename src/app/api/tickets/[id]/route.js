@@ -1,82 +1,51 @@
-import TicketModel from "../../../../../model/ticket";
-import connectToDB from "../../../../../db/db";
-import { authAdmin, authUser } from "@/utils/serverHelper";
+import connectToDB from "../../../../../configs/db";
+import ticketModel from "../../../../../model/ticket";
+import { authAdmin } from "@/utils/serverHelper";
 import { isValidObjectId } from "mongoose";
-
+import { NextResponse } from "next/server";
 
 export async function GET(req, { params }) {
-    try {
-        connectToDB()
-        const { id } = await params
+  try {
+    await connectToDB();
+    const { id } = await params;
 
-        const isvalidId = isValidObjectId(id)
-        if (!isvalidId) return Response.json({ message: "Not Valid :)" }, { satatus: 422 })
+    if (!isValidObjectId(id))
+      return NextResponse.json({ message: "Not Valid :)" }, { status: 422 });
 
-        const Ticket = await TicketModel.findOne({ _id: id }, "-__v")
-            .populate("userID", "username")
-            .lean()
-        return Response.json(Ticket, { status: 200 })
+    const ticket = await ticketModel.findById(id)
+      .populate("user", "name email")
+      .populate("departmentID", "title")
+      .populate("course", "title")
+      .lean();
 
-    } catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
-    }
+    if (!ticket) return NextResponse.json({ message: "Not Found :)" }, { status: 404 });
 
-}
+    const children = await ticketModel.find({ parent: ticket._id })
+      .populate("user", "name email")
+      .lean();
 
-export async function PATCH(req, { params }) {
+    ticket.children = children;
 
-    try {
-        connectToDB()
-        const user = await authUser()
-        const { id } = await params
-
-        const isvalidId = isValidObjectId(id)
-
-        if (!isvalidId) return Response.json({ message: "Not Valid :)" }, { satatus: 422 })
-
-        const body = await req.json()
-        const { content } = body
-
-        await TicketModel.findOneAndUpdate({ _id: id }, {
-            $push: {
-                message: { senderID: user._id, content: content }
-            },
-            $set: {
-                answerBy: user.role
-            }
-        })
-        return Response.json({ message: "ticket sent" }, { status: 200 })
-    }
-    catch (err) {
-        console.log(err);
-
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
-    }
-
+    return NextResponse.json(ticket, { status: 200 });
+  } catch (err) {
+    return NextResponse.json({ message: "Unknown Error" }, { status: 500 });
+  }
 }
 
 export async function DELETE(req, { params }) {
+  try {
+    await connectToDB();
+    const admin = await authAdmin();
+    if (!admin) throw new Error("This API is protected");
 
-    try {
-        connectToDB()
-        const admin = await authAdmin()
-        if (!admin) throw new Error("This api Protected")
+    const { id } = await params;
+    if (!isValidObjectId(id))
+      return NextResponse.json({ message: "Not Valid :)" }, { status: 422 });
 
-        const { id } = await params
-        const isvalidId = isValidObjectId(id)
-        if (!isvalidId) return Response.json({ message: "Not Valid :)" }, { satatus: 422 })
+    await ticketModel.findOneAndDelete({ _id: id });
 
-        await TicketModel.findOneAndDelete({ _id: id })
-
-        return Response.json({ message: "ticket Removed" }, { status: 200 })
-    }
-    catch (err) {
-
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
-    }
-
+    return NextResponse.json({ message: "Ticket removed" }, { status: 200 });
+  } catch (err) {
+    return NextResponse.json({ message: "Unknown Error" }, { status: 500 });
+  }
 }
-
-
-
-

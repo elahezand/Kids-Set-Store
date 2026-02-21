@@ -35,13 +35,13 @@ export default async function page() {
   const user = await getMe()
 
   return (
-    <>
+    <div className="container">
       <Breadcrumb title={"Basket CART"} route={"Cart"} />
       <div
         className={styles.cart}
         data-aos="fade-up">
         <Table user={JSON.parse(JSON.stringify(user._id))} />
       </div>
-    </>
+    </div>
   )
 }

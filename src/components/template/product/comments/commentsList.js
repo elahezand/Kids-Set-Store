@@ -1,48 +1,47 @@
 "use client"
-import React, { useState } from 'react'
+import React from 'react'
 import Comment from '@/components/modules/comment/comment';
 import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from '@tanstack/react-query';
 import qs from "qs";
-export default function CommentsList({ data: initialData, nextCursor, limit }) {
-    const [comments, setComments] = useState(initialData);
-    const [cursor, setCursor] = useState(nextCursor)
-    const [loading, setLoading] = useState(false);
+export default function CommentsList({ data: initialData, nextCursor, limit, productId }) {
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
+    } = useInfiniteQuery({
+        queryKey: ["comments", productId],
+        queryFn: async ({ pageParam = null }) => {
+            const queryString = qs.stringify(
+                { cursor: pageParam, limit, productId },
+                { encode: false }
+            );
 
-    let queryString = qs.stringify({ cursor, limit },
-        { encode: false, });
-
-    const queryKey = [`/api/comments-${queryString}`]
-    const { refetch } = useQuery({
-        queryKey,
-        queryFn: async () => {
             const { data } = await axios.get(`/api/comments?${queryString}`);
             return data;
         },
+        getNextPageParam: (lastPage) => lastPage.nextCursor || undefined,
+
+        initialData: {
+            pages: [{ data: initialData, nextCursor }],
+            pageParams: [null],
+        },
+        staleTime: 1000 * 60 * 60,
     });
 
-    const loadMore = async () => {
-        setLoading(true);
-        const res = await refetch();
-
-        setComments(prev => [...prev, ...res.data.data]);
-        setCursor(res.data.nextCursor)
-        setLoading(false);
-    };
     return (
         <>
             <div>
-                {comments?.filter(comment => comment.isAccept)
-                    .map((comment, index) => (
-                        <Comment key={index + 1} {...comment} />
-                    ))}
+                {data?.pages?.flatMap((page) =>
+                    page.data.map((comment) => (
+                        <Comment key={comment._id} {...comment} />
+                    )))}
             </div>
-            {cursor && (
-                <div className="mt-5 col-12">
-                    <button onClick={loadMore}
-                        className="classic w-100"
-                        disabled={loading}>
-                        {loading ? "Loading..." : "Load more"}
+            {hasNextPage && (
+                <div className="loadMoreBtn">
+                    <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+                        {isFetchingNextPage ? "Loading..." : "Load more"}
                     </button>
                 </div>
             )}

@@ -22,7 +22,6 @@ const loginSchema = z.object({
 const Login = ({ showRegisterForm }) => {
   const router = useRouter()
 
-  // React Hook Form setup
   const {
     register,
     handleSubmit,

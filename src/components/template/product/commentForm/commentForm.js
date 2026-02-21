@@ -48,7 +48,6 @@ const CommentForm = ({ productID }) => {
 
   const onSubmit = (data) => {
     const finalData = { ...data, productID, score };
-
     if (rememberMe) {
       localStorage.setItem("userData", JSON.stringify({
         name: data.username,

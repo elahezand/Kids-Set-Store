@@ -7,20 +7,17 @@ import { FaRegStar } from "react-icons/fa6";
 import Link from "next/link";
 import AddToBasket from "@/components/modules/addToBasket/addToBasket";
 import AddToFavoriteList from "@/components/modules/addToFavoriteList/addToFavoriteList";
-const Details = ({ product }) => {
+const Details = ({ product, productComments }) => {
     return (
         <main style={{ width: "63%" }}>
             <h2>
                 {product.name}
             </h2>
-
             <div className={styles.rating}>
-                <p>Comments ({product.comments?.length})</p>
-                {new Array(product.score).fill(0).map((item, index) => (
-                    <FaStar key={index} />
-                ))}
-                {new Array(5 - product.score).fill(0).map((item, index) => (
-                    <FaRegStar key={index} />
+                <p>Comments ({productComments})</p>
+                {[...Array(5)].map((_, index) => (
+                    index < product.score ? <FaStar key={index} /> :
+                        <FaRegStar key={index} />
                 ))}
             </div>
             <p className={styles.price}>{product.price} $</p>
@@ -33,11 +30,14 @@ const Details = ({ product }) => {
                 <p> Available</p>
             </div>
             <AddToBasket
-                product={product} />
+                name={product.name}
+                price={product.price}
+                img={product.img}
+                id={product._id}
+            />
             <section className={styles.wishlist}>
                 <AddToFavoriteList
-                    productId={JSON.parse(JSON.stringify(product.id))}
-                />
+                    productId={product._id} />
                 <div>
                     <TbSwitch3 />
                     <Link href="/">Compare</Link>

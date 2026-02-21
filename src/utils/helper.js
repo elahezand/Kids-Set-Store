@@ -22,11 +22,11 @@ export async function paginate(Model, searchParams, filter = {}, populate = null
     let limit, page, cursor;
 
     if (route) {
-        limit = Number(searchParams?.get("limit")) || 10;
+        limit = Number(searchParams?.get("limit")) || 15;
         page = Number(searchParams?.get("page")) || 1;
         cursor = searchParams?.get("cursor");
     } else {
-        limit = Number(searchParams?.limit) || 10;
+        limit = Number(searchParams?.limit) || 15;
         page = Number(searchParams?.page) || 1;
         cursor = searchParams?.cursor;
     }

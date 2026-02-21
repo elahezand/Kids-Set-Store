@@ -6,7 +6,6 @@ const materials = ["Catton", "Leather", "Wool", "Velvet", "Suede", "Linen", "Cha
 const colors = ["Blue", "Red", "Brown", "Gray", "Black", "Pink", "Metalic", "White", "Green", "Cream", "Camel"]
 
 export default function FilterSection({ categories, onFilterChange, currentParams }) {
-
     const handleSelectChange = (e) => {
         const { name, value } = e.target;
         onFilterChange({ [name]: value === "-1" ? "" : value });

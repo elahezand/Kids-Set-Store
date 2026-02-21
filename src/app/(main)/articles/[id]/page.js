@@ -32,11 +32,8 @@ export async function generateMetadata({ params }) {
 export default async function page({ params }) {
     await connectToDB();
     const { id } = await params;
-
-    // Fetch the main article
     const article = await ArticleModel.findById(id)
 
-    // Fetch other articles
     const otherArticles = await ArticleModel.find({ _id: { $ne: id } })
         .sort({ createdAt: -1 })
         .limit(4)
@@ -47,7 +44,7 @@ export default async function page({ params }) {
     const DOMPurify = createDOMPurify(window)
 
     return (
-        <>
+        <div className="container">
             <Breadcrumb
                 title={article.title}
                 route={"articles"} />
@@ -103,6 +100,6 @@ export default async function page({ params }) {
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
