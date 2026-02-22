@@ -24,7 +24,6 @@ const Products = async ({ searchParams }) => {
           currentPage={paginatedData.page}
           pageCount={paginatedData.pageCount}
           limit={paginatedData.limit} />
-
       </main>
   )
 }

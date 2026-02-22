@@ -8,6 +8,8 @@ import Link from "next/link";
 import AddToBasket from "@/components/modules/addToBasket/addToBasket";
 import AddToFavoriteList from "@/components/modules/addToFavoriteList/addToFavoriteList";
 const Details = ({ product, productComments }) => {
+    console.log(product);
+    
     return (
         <main style={{ width: "63%" }}>
             <h2>

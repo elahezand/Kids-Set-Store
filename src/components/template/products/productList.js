@@ -6,13 +6,11 @@ import axios from 'axios'
 import Product from '@/components/modules/product/product'
 import styles from "@/components/template/index/latest/latest.module.css"
 import FilterSection from './filterSection'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import Pagination from '@/components/modules/pageination/pagination'
 
 export default function ProductsList({
-    data: initialData,
     categoryName,
-    limit,
-    nextCursor,
     categories,
     value
 }) {
@@ -20,6 +18,7 @@ export default function ProductsList({
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
+    const currentPage = Number(searchParams.get("page")) || 1;
 
     const currentFilters = useMemo(() => ({
         category: searchParams.get("category") || categoryName || "",
@@ -28,52 +27,42 @@ export default function ProductsList({
         color: searchParams.get("color") || "",
         material: searchParams.get("material") || "",
         sort: searchParams.get("sort") || "",
+        page: currentPage,
+        limit: searchParams.get("limit") || 15,
         value,
-    }), [searchParams, categoryName, value]);
+    }), [searchParams, categoryName, value, currentPage]);
 
-    const hasFilters = Object.values(currentFilters).some(v => v && v !== "");
-    const queryString = searchParams.toString()
 
-    const {
-        data,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage
-    } = useInfiniteQuery({
-        queryKey: ["products", queryString],
-     
-        queryFn: async ({ pageParam = null }) => {
+    const { data } = useQuery({
+        queryKey: ["products", currentFilters],
+        queryFn: async () => {
             const cleanParams = Object.fromEntries(
-                Object.entries({ ...currentFilters, cursor: pageParam, limit })
+                Object.entries(currentFilters)
                     .filter(([_, v]) => v !== "" && v !== null && v !== undefined && v !== "-1")
             );
-            const res = await axios.get(`/api/products?${qs.stringify(cleanParams, { encode: false })}`);
+            const res = await axios.get(`/api/products`, { params: cleanParams });
             return res.data;
         },
-
-        initialPageParam: null,
-        getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-
-        ...(!hasFilters && {
-            initialData: {
-                pages: [{ data: initialData, nextCursor }],
-                pageParams: [null],
-            }
-        }),
-
         staleTime: 1000 * 60 * 5,
     });
 
     const handleFilterChange = (newFilterParams) => {
+        const updatedFilters = { ...currentFilters, ...newFilterParams, page: 1 };
         const cleanParams = Object.fromEntries(
-            Object.entries({ ...currentFilters, ...newFilterParams })
+            Object.entries(updatedFilters)
                 .filter(([_, v]) => v !== "" && v !== null && v !== undefined && v !== "-1")
         );
 
         const queryString = qs.stringify(cleanParams, { encode: false });
-        router.push(`${pathname}?${queryString}`);
+        router.push(`${pathname}?${queryString}`, { scroll: true });
     };
 
+    const getPaginationHref = () => {
+        const params = Object.fromEntries(searchParams.entries());
+        delete params.page;
+        const baseQuery = qs.stringify(params, { encode: false });
+        return `${pathname}?${baseQuery}`;
+    };    
 
     return (
         <>
@@ -84,20 +73,16 @@ export default function ProductsList({
             />
 
             <div data-aos="fade-up" className={styles.products}>
-                {data?.pages?.flatMap((page) =>
-                    page.data.map((item) => (
-                        <Product {...item} key={item._id} />
-                    )
-                    ))}
-
+                {(data?.data || data?.pages?.[0]?.data)?.map((item) => (
+                    <Product {...item} key={item._id} />
+                ))}
             </div>
-            {hasNextPage && (
-                <div className="loadMoreBtn">
-                    <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
-                        {isFetchingNextPage ? "Loading..." : "Load more"}
-                    </button>
-                </div>
-            )}
+
+            <Pagination
+                href={getPaginationHref()}
+                currentPage={currentPage}
+                pageCount={data?.pageCount}
+            />
         </>
     )
 }

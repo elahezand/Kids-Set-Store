@@ -1,6 +1,5 @@
 import Table from "@/components/template/cart/table";
 import styles from "@/styles/cart.module.css";
-import { getMe } from "@/utils/serverHelper";
 import Breadcrumb from "@/components/modules/breadCrumb/breadCrumb";
 // Generate metadata for SEO and social sharing
 export const metadata = {
@@ -32,7 +31,6 @@ export const metadata = {
 };
 
 export default async function page() {
-  const user = await getMe()
 
   return (
     <div className="container">
@@ -40,7 +38,7 @@ export default async function page() {
       <div
         className={styles.cart}
         data-aos="fade-up">
-        <Table user={JSON.parse(JSON.stringify(user._id))} />
+        <Table />
       </div>
     </div>
   )

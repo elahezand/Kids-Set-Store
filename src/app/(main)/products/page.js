@@ -3,13 +3,12 @@ import { handleTree } from '@/utils/tree'
 import CategoryModel from '../../../../model/category'
 import ProductsList from '@/components/template/products/productList'
 import connectToDB from '../../../../configs/db'
-import ProductModal from '../../../../model/product'
-import { paginate } from '@/utils/helper'
 
 export async function generateMetadata({ searchParams }) {
+    await connectToDB();
+
     const params = await searchParams;
     const categoryName = params.category || "Products";
-    await connectToDB();
 
     const category = await CategoryModel.findOne({ slug: categoryName });
 
@@ -37,18 +36,7 @@ export default async function page({ searchParams }) {
             filter.categoryPath = category._id;
         }
     }
-    if (value === "bestSelling") {
-        filter.score = { $gte: 4 };
-    }
 
-    const paginatedData = await paginate(
-        ProductModal,
-        params,
-        filter,
-        null,
-        true,
-        false
-    );
     return (
         <div className="container">
             <section className="title">
@@ -58,11 +46,8 @@ export default async function page({ searchParams }) {
             </section>
             <ProductsList
                 categories={JSON.parse(JSON.stringify(tree))}
-                nextCursor={paginatedData.nextCursor}
-                limit={paginatedData.limit}
                 categoryName={categoryName}
                 value={value}
-                data={JSON.parse(JSON.stringify(paginatedData.data))}
             />
         </div>
     )

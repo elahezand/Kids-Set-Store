@@ -44,6 +44,8 @@ const Register = ({ showloginForm }) => {
     mutate(data);
   };
 
+
+  
   const { mutate: mutationOtp, isPending: optPending } = useMutation({
     mutationFn: async (phoneNumber) => {
       const res = await axios.post("/api/auth/sms/send", { phone: phoneNumber });

@@ -1,11 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { usePost, usePut } from "@/utils/hooks/useReactQueryPanel";
 import styles from "./commentTable.module.css";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import swal from "sweetalert";
-import { input } from "@heroui/react";
 export default function DataTable({ comments, title }) {
     const router = useRouter()
 
@@ -22,6 +21,7 @@ export default function DataTable({ comments, title }) {
             router.refresh()
         },
     })
+    
     const { mutate: editmutate } = usePut(`/comments`, {
         onSuccess: () => {
             toast.success("Successfull :)")

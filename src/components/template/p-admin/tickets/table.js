@@ -41,7 +41,6 @@ export default function DataTable({ tickets, title }) {
                             <th>Subject</th>
                             <th>Department</th>
                             <th>Priority</th>
-                            <th>Status</th>
                             <th>Content</th>
                             <th>Ban</th>
                         </tr>
@@ -50,13 +49,12 @@ export default function DataTable({ tickets, title }) {
                         {tickets.map((item, index) => (
                             <tr key={index + 1} >
                                 <td
-                                    className={item.answerBy === `USER` ?
+                                    className={item.isAnswer  ?
                                         `${styles.no_answer}` : `${styles.answer}`}
                                 >{index + 1}</td>
-                                <td>{item.subject}</td>
+                                <td>{item.title}</td>
                                 <td>{item.department.title}</td>
                                 <td>{item.priority}</td>
-                                <td>{item.status}</td>
                                 <td>
                                     <Link href={`tickets/${item._id}`}
                                         type="button"

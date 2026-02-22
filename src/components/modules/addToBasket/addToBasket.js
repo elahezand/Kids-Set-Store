@@ -14,12 +14,12 @@ export default function AddToBasket({ name, price, img, id }) {
             <div>
                 <span onClick={() => {
                     setCount(prev => prev - 1)
-                    decreaseCount(product.id)
+                    decreaseCount(id)
                 }}> -</span>
                 {count}
                 <span onClick={() => {
                     setCount(prev => prev + 1)
-                    increaseCount(product.id)
+                    increaseCount(id)
                 }}> +</span>
             </div>
         </div>

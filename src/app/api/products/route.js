@@ -14,11 +14,9 @@ export async function GET(req) {
         const color = searchParams.get("color")
         const material = searchParams.get("material")
         const maxPrice = searchParams.get("max")
-        const sortType = searchParams.get("sort")
 
-        const useCursor =
-            searchParams.has("cursor") &&
-            (!sortType || sortType === "latest")
+        const sortType = searchParams.get("sort");
+        const useCursor =  searchParams.get("cursor");;
 
         let filter = {}
 
@@ -88,7 +86,6 @@ export async function POST(req) {
         };
 
         const validation = productSchema.safeParse(processedData);
-        
         if (!validation.success) {
             console.log("Validation Errors:", validation.error.flatten().fieldErrors);
             return {

@@ -1,46 +1,48 @@
 "use client"
-import React,{useState} from 'react'
+import React from 'react'
 import Product from "@/components/modules/product/product";
-import { useGet } from '@/utils/hooks/useReactQueryPublic';
 import styles from "@/styles/wishList.module.css";
 import Link from "next/link";
+import { publicApi } from '@/utils/api';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { FaRegHeart } from "react-icons/fa";
 export default function WishListItems({ data: initialData, limit, nextCursor }) {
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
+    } = useInfiniteQuery({
+        queryKey: ["favorites"],
+        queryFn: async ({ pageParam = null }) => {
+            const queryString = qs.stringify({ cursor: pageParam, limit }, { encode: false });
+            const { data } = await publicApi.get(`/api/favorites?${queryString}`);
+            return data;
+        },
+        getNextPageParam: (lastPage) => lastPage.nextCursor || undefined,
+        initialData: {
+            pages: [{ data: initialData, nextCursor }],
+            pageParams: [null],
+        }
+    });
 
-    const [favorites, setFavorites] = useState(initialData);
-    const [cursor, setCursor] = useState(nextCursor);
-    const [loading, setLoading] = useState(false);
-
-    const { refetch } = useGet(
-        "/favorites",
-        { cursor, limit },
-        { enabled: false }
-    );
-
-    const loadMore = async () => {
-        if (!cursor || loading) return;
-
-        setLoading(true);
-        const res = await refetch();
-
-        setFavorites(prev => [...prev, ...res.data.data]);
-        setCursor(res.data.nextCursor);
-        setLoading(false);
-    };
-    
+    const favorites = data?.pages?.flatMap(page => page.data) || [];
 
     return (
         <>
             <main className={styles.container} data-aos="fade-up">
                 {favorites.map((wish, index) =>
-                        <Product
-                            key={index}
-                            {...wish} />)}
-                {cursor && (
+                    <Product
+                        key={index}
+                        {...wish} />)}
+                {hasNextPage && (
                     <div className="mt-5 col-12">
-                        <button onClick={loadMore} className="classic w-100"
-                            disabled={loading}>
-                            {loading ? "Loading..." : "Load more"}
+                        <button
+                            onClick={() => fetchNextPage()}
+                            className="classic w-100"
+                            disabled={isFetchingNextPage}
+                        >
+                            {isFetchingNextPage ? "Loading..." : "Load more"}
                         </button>
                     </div>
                 )}

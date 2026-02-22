@@ -3,10 +3,11 @@ import connectToDB from "../../../../../configs/db";
 import TicketModel from "../../../../../model/ticket";
 import Table from "@/components/template/p-admin/tickets/table"
 import Pagination from "@/components/modules/pageination/pagination";
+import DepartmentModel from "../../../../../model/department";
 import { paginate } from "@/utils/helper";
 const page = async ({ searchParams }) => {
     await connectToDB()
-    const paginatedData = await paginate(TicketModel, searchParams, {}, "department")
+    const paginatedData = await paginate(TicketModel, searchParams, {parent:null}, "department")
 
     return (
         <main>
