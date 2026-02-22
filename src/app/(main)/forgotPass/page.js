@@ -29,13 +29,12 @@ const ForgotPassword = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [resendTimer, setResendTimer] = useState(0);
 
-    const { register: registerPhone, handleSubmit: handleSubmitPhone, formState: { errors: phoneErrors } } = useForm({
-        resolver: zodResolver(phoneSchema),
-    });
-
-    const { register: registerReset, handleSubmit: handleSubmitReset, formState: { errors: resetErrors } } = useForm({
-        resolver: zodResolver(resetPasswordSchema),
-    });
+    const { register: registerPhone,
+        handleSubmit: handleSubmitPhone,
+        formState: { errors: phoneErrors } } =
+        useForm({
+            resolver: zodResolver(phoneSchema),
+        });
 
     const sendCodeMutation = useMutation({
         mutationFn: async (phone) => await axios.post("/api/auth/sms/send", { phone }),
@@ -51,6 +50,14 @@ const ForgotPassword = () => {
         setPhoneNumber(data.phone);
         sendCodeMutation.mutate(data.phone);
     };
+
+    const { register: registerReset,
+        handleSubmit: handleSubmitReset,
+        formState: { errors: resetErrors } } =
+        useForm({
+            resolver: zodResolver(resetPasswordSchema),
+        });
+
 
     const resetPasswordMutation = useMutation({
         mutationFn: async ({ phone, resetCode, newPassword }) =>
@@ -77,6 +84,7 @@ const ForgotPassword = () => {
         }
         return () => clearInterval(interval);
     }, [resendTimer]);
+
 
     return (
         <div className="forgot_password">

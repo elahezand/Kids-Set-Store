@@ -14,7 +14,7 @@ async function Page() {
     const tickets = await TicketModel.find({})
         .sort({ _id: -1 })
         .limit(8)
-        .populate("userID")
+        .populate("user")
         .lean();
     const users = await UserModel.find({}).lean();
     const products = await ProductModal.find({}).lean();

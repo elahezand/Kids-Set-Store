@@ -4,42 +4,28 @@ import swal from "sweetalert";
 import styles from "./articleTable.module.css"
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { manageError } from "@/utils/helper";
 import Link from "next/link";
 import { FaRegEdit } from "react-icons/fa";
+import { useDelete } from "@/utils/hooks/useReactQueryPanel";
 
 function Table({ data, title }) {
-    const router = useRouter()
+      const router = useRouter()
 
-    const removeArticle = async (articleID) => {
+    const { mutate } = useDelete(`/articles`, {
+        onSuccess: (data) => {
+            router.refresh()
+            toast.success("Article Updated Successfully :)");
+        },
+    })
+
+    const removeArticle = (id) => {
         swal({
-            title: "are you Sure To Remove This Article? :)",
+            title: "Are You Sure To remove This item?",
             icon: "warning",
             buttons: ["No", "yes"]
-        }).then(async result => {
+        }).then(result => {
             if (result) {
-                try {
-                    const res = await fetch(`/api/article/${articleID}`, {
-                        method: "DELETE",
-                    })
-                    if (res.status !== 200) return manageError(res.status)
-
-                    swal({
-                        title: "Article Removed Successfully :)",
-                        icon: "success",
-                        buttons: "ok"
-                    }).then(result => {
-                        if (result) {
-                            router.refresh()
-                        }
-                    })
-                } catch (err) {
-                    swal({
-                        title: "NetWork Error",
-                        icon: "warning",
-                        buttons: "ok"
-                    })
-                }
+                mutate(id)
             }
         })
     }

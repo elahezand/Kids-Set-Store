@@ -22,13 +22,13 @@ const shippingSchema = z.object({
   postalCode: z.string().min(4, "Postal code is required"),
 });
 
-const Table = ({ user }) => {
-  const { removeFromCart, cart, increaseCount, decreaseCount, clearCart } = useShop();
+const Table = () => {
+  const { removeFromCart, cart, increaseCount, decreaseCount } = useShop();
   const router = useRouter();
 
   const [discount, setDiscount] = useState("");
-  const [discountData, setDiscountData] = useState(null); 
-  const [loadingDiscount, setLoadingDiscount] = useState(false); 
+  const [discountData, setDiscountData] = useState(null);
+  const [loadingDiscount, setLoadingDiscount] = useState(false);
 
   const total = useMemo(() => {
     return cart.reduce((sum, item) => sum + item.price * item.count, 0);
@@ -51,7 +51,6 @@ const Table = ({ user }) => {
       setDiscountData({ productId: data.productId, percent: data.percent });
       toast.success("Discount applied!");
     },
-    onError: () => toast.error("Invalid discount code"),
     onSettled: () => setLoadingDiscount(false),
   });
 
@@ -64,7 +63,7 @@ const Table = ({ user }) => {
   const { mutate: createOrder } = usePost("/orders", {
     onSuccess: () => {
       toast.success("Order created successfully!");
-      clearCart();
+      localStorage.removeItem("cart");
       router.refresh();
     },
   });
@@ -84,9 +83,8 @@ const Table = ({ user }) => {
     if (!cart.length) return toast.error("Cart is empty");
 
     const orderData = {
-      user,
       items: cart,
-      totalPrice: discountedTotal, 
+      totalPrice: discountedTotal,
       shippingAddress: data,
     };
 
@@ -156,7 +154,7 @@ const Table = ({ user }) => {
                 <button
                   onClick={discountHandler}
                   className={styles.set_off_btn}
-                  disabled={loadingDiscount} 
+                  disabled={loadingDiscount}
                 >
                   {loadingDiscount ? "Applying..." : "Submit"}
                 </button>

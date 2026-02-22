@@ -31,7 +31,6 @@ const Login = ({ showRegisterForm }) => {
     mode: "onChange"
   })
 
-  // Login mutation
   const mutation = useMutation({
     mutationFn: async (data) => {
       const res = await axios.post("/api/auth/signin", {
@@ -51,12 +50,13 @@ const Login = ({ showRegisterForm }) => {
     },
   })
 
-  // Submit handler
   const onSubmit = (data) => mutation.mutate(data)
+
+
 
   const [showOtp, setShowOtp] = useState(false)
   const [phone, setPhone] = useState("")
-  // OTP register
+  
   const mutationOtp = useMutation({
     mutationFn: async (phoneNumber) =>
       axios.post("/api/auth/sms/send", { phone: phoneNumber }).then(r => r.data),
