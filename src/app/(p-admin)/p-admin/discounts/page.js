@@ -11,7 +11,7 @@ const Discounts = async ({ searchParams }) => {
     const products = await ProductModel.find({}).lean()
 
     return (
-            <main>
+            <main className="container">
                 <AddDiscount
                     products={JSON.parse(JSON.stringify(products))} />
                 {paginatedData.data.length === 0 ? (

@@ -4,15 +4,15 @@ import AdminProfileClient from '@/components/template/p-admin/detail-account/adm
 export default async function page() {
     const Info = await getMe()
     return (
-            <main>
-                <h4 className="title">
-                    <span>Detail Account </span>
-                </h4>
-                <div>
-                    <AdminProfileClient
-                        adminData={JSON.parse(JSON.stringify(Info))} />
-                </div>
-            </main>
+        <main className='container'>
+            <h1 className="title">
+                <span>Detail Account </span>
+            </h1>
+            <div>
+                <AdminProfileClient
+                    adminData={JSON.parse(JSON.stringify(Info))} />
+            </div>
+        </main>
     )
 }
 

@@ -9,7 +9,7 @@ const page = async ({ searchParams }) => {
     const paginatedData = await paginate(UserModel, searchParams)
 
     return (
-        <main>
+        <main className="container">
             {paginatedData.data.length === 0 ? (
                 <p className={styles.empty}>No User Yet :(</p>
             ) : (

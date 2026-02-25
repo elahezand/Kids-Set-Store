@@ -29,6 +29,7 @@ publicApi.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
 const privateApi = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
     withCredentials: true,
@@ -68,7 +69,6 @@ privateApi.interceptors.response.use(
         return Promise.reject(error);
     }
 );
-
 
 export {
     privateApi,

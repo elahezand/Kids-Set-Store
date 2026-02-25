@@ -10,22 +10,22 @@ const page = async ({ searchParams }) => {
   const paginatedData = await paginate(commentModel, searchParams, {}, "productID")
 
   return (
-      <main>
-        {paginatedData.data.length === 0 ? (
-          <p className="empty">No Comment Yet :( </p>
-        ) : (
-          <Table
-            comments={JSON.parse(JSON.stringify(paginatedData.data))}
-            title="Comment List"
-          />
-        )}
-        <Pagination
-          href={`comments?`}
-          currentPage={paginatedData.page}
-          pageCount={paginatedData.pageCount}
-          limit={paginatedData.limit}
+    <main className="container">
+      {paginatedData.data.length === 0 ? (
+        <p className="empty">No Comment Yet :( </p>
+      ) : (
+        <Table
+          comments={JSON.parse(JSON.stringify(paginatedData.data))}
+          title="Comment List"
         />
-      </main>
+      )}
+      <Pagination
+        href={`comments?`}
+        currentPage={paginatedData.page}
+        pageCount={paginatedData.pageCount}
+        limit={paginatedData.limit}
+      />
+    </main>
   );
 };
 

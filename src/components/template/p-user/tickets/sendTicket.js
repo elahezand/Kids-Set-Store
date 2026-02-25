@@ -57,7 +57,7 @@ export default function SendTicket({ user }) {
                 );
 
                 setSubDepartments(relatedSub);
-                setValue("subDepartment", ""); // reset subDepartment on department change
+                setValue("subDepartment", "");
             }
         };
         getSubDepartments();
@@ -80,15 +80,19 @@ export default function SendTicket({ user }) {
             subDepartment: data.subDepartment,
             priority: data.priority,
             content: data.content,
-            isAnswer:0,
-            answer:0
+            isAnswer: 0,
+            answer: 0
         });
     };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}
             className={styles.form}>
-            <h1 className="title">Send Ticket</h1>
+            <div>
+                <h1 className="title">
+                    <span>send Tickets</span>
+                </h1>
+            </div>
             <div className={styles.group}>
                 <label>Department:</label>
                 <select {...register("department")}>

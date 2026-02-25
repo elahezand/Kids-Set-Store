@@ -1,47 +1,34 @@
 "use client"
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useDelete } from "@/utils/hooks/useReactQueryPanel";
 import styles from "./product.module.css";
 import { FaRegStar, FaStar } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
+import toast from "react-hot-toast";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { manageError } from "@/utils/helper";
 
 const Card = ({ price, name, score, id, img }) => {
     const router = useRouter()
-    const removeFromWishList = async () => {
-        swal({
-            title: "Are You Sure To Remove This Item ?",
-            icon: "success",
-            buttons: ["No", "yes"]
-        }).then(async result => {
-            if (result) {
-                try {
-                    const res = await fetch(`/api/favorites/${id}`, {
-                        method: "DELETE"
-                    })
-                    if (res.status !== 200) return manageError(res.status)
-                    swal({
-                        title: "Item Remove Successfully :)",
-                        icon: "success",
-                        buttons: "ok"
-                    }).then(result => {
-                        if (result) {
-                            router.refresh()
-                        }
-                    })
+    const { mutate,isLoading } = useDelete(`/favorites`, {
+        onSuccess: (data) => {
+            toast.success("Item Removed Successfully :)")
+            router.refresh()
+        },
+    })
 
-                }
-                catch (err) {
-                    swal({
-                        title: "NetWork Error",
-                        icon: "warning",
-                        buttons: "ok"
-                    })
-                }
+    const handleRemove = () => {
+        swal({
+            title: "Are You Sure To remove This item?",
+            icon: "warning",
+            buttons: ["No", "yes"]
+        }).then(result => {
+            if (result) {
+                mutate(id)
             }
         })
     }
+
 
     return (
         <div className={styles.card}>
@@ -76,10 +63,9 @@ const Card = ({ price, name, score, id, img }) => {
                 </div>
                 <span>{price} $</span>
             </div>
-            <button
-                onClick={removeFromWishList}
-                className={styles.remove}>
-                Remove Item</button>
+            <button onClick={handleRemove} className={styles.remove} disabled={isLoading}>
+                {isLoading ? "Removing..." : "Remove Item"}
+            </button>
         </div>
     );
 };

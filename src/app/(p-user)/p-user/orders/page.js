@@ -16,30 +16,28 @@ export default async function page({ searchParams }) {
     "productID"
   )
   return (
-    <>
+    <main className="container">
       <div>
         <h1 className="title">
           <span>Orders</span>
         </h1>
       </div>
-      <main>
-        {paginatedData.data.length > 0 &&
-          <DataTable
-            comments={JSON.parse(JSON.stringify(paginatedData.data))}
-            title="Orders "
-          />
-        }
-        {paginatedData.data.length === 0 &&
-          <p className="empty">
-            No Orders Yet :(
-          </p>}
-        <Pagination
-          href={`orders?`}
-          currentPage={paginatedData.page}
-          pageCount={paginatedData.pageCount}
-          limit={paginatedData.limit}
+      {paginatedData.data.length > 0 &&
+        <DataTable
+          comments={JSON.parse(JSON.stringify(paginatedData.data))}
+          title="Orders "
         />
-      </main>
-    </>
+      }
+      {paginatedData.data.length === 0 &&
+        <p className="empty">
+          No Orders Yet :(
+        </p>}
+      <Pagination
+        href={`orders?`}
+        currentPage={paginatedData.page}
+        pageCount={paginatedData.pageCount}
+        limit={paginatedData.limit}
+      />
+    </main>
   )
 }

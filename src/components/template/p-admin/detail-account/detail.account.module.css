@@ -44,7 +44,7 @@
 .detail button {
     width: 100%;
     border: 0;
-    height: 50px;
+    height: 40px;
     border-radius: 4px;
     background-color: var(--sage);
     color: var(--white);

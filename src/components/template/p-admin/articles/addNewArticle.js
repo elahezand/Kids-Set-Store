@@ -38,11 +38,6 @@ export default function AddNewArticle({ article }) {
 
     return (
         <section className={styles.article}>
-            <div>
-                <h1 className="title">
-                    <span>{article?._id ? "Edit Article" : "Add New Article"}</span>
-                </h1>
-            </div>
             <form ref={formRef}
                 action={handleSubmit}>
                 {article?._id &&
