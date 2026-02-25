@@ -4,14 +4,14 @@ const page = async () => {
   const Info = await getMe()
 
   return (
-    <>
+    <main className="container">
       <div>
         <h1 className="title">
           <span>Detail-account</span>
         </h1>
       </div>
       <DetailProfile userData={JSON.parse(JSON.stringify(Info))} />
-    </>
+    </main>
   );
 };
 

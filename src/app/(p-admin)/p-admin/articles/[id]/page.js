@@ -9,9 +9,14 @@ export default async function page({ params }) {
     const safeArticles = JSON.parse(JSON.stringify(article))
 
     return (
-        <div>
+        <main className="container">
+            <div>
+                <h1 className="title">
+                    <span>{article?._id ? "Edit Article" : "Add New Article"}</span>
+                </h1>
+            </div>
             <AddNewArticle
                 article={safeArticles} />
-        </div>
+        </main>
     );
 }

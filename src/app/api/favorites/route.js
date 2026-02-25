@@ -71,24 +71,3 @@ export async function POST(req) {
     }
 }
 
-export async function DELETE(req) {
-    try {
-        await connectToDB();
-        const user = await getMe();
-        if (!user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-        const { searchParams } = new URL(req.url);
-        const productID = searchParams.get("productID");
-
-        if (!isValidObjectId(productID)) return NextResponse.json({ message: "Invalid Product ID" }, { status: 422 });
-
-        await FavoriteModel.findOneAndUpdate(
-            { user: user._id },
-            { $pull: { products: productID } }
-        );
-
-        return NextResponse.json({ message: "Product removed from wishlist" }, { status: 200 });
-    } catch (err) {
-        return NextResponse.json({ message:err.message }, { status: 500 });
-    }
-}

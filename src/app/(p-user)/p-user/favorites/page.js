@@ -20,40 +20,40 @@ const page = async ({ searchParams }) => {
     searchparams,
     { _id: { $in: wishlist.products } }
   )
-  
+
   return (
-    <>
+    <main className={styles.container}>
       <div>
         <h1 className="title">
           <span>Favorites</span>
         </h1>
       </div>
-      <main className={styles.container}
-        data-aos="fade-up">
-        <section>
-          {paginatedData.data.length > 0 &&
-            JSON.parse(JSON.stringify(paginatedData.data)).map((wish, index) =>
-              <Product
-                key={index}
-                id={wish._id}
-                name={wish.name}
-                score={wish.score}
-                price={wish.price}
-                img={wish.img}
+      <section>
+        {paginatedData.data.length > 0 &&
+          JSON.parse(JSON.stringify(paginatedData.data)).map((wish, index) =>
+            <Product
+              key={index}
+              id={wish._id}
+              name={wish.name}
+              score={wish.score}
+              price={wish.price}
+              img={wish.img}
 
-              />)}
-        </section>
-        <Pagination
-          href={`favorites?`}
-          currentPage={paginatedData.page}
-          pageCount={paginatedData.pageCount}
-          limit={paginatedData.limit}
-        />
-      </main>
-      {paginatedData.data.length === 0 && (
-        <p className={styles.empty}>NO Item Yet</p>
-      )}
-    </>
+            />)}
+      </section>
+      <Pagination
+        href={`favorites?`}
+        currentPage={paginatedData.page}
+        pageCount={paginatedData.pageCount}
+        limit={paginatedData.limit}
+      />
+      {
+        paginatedData.data.length === 0 && (
+          <p className={styles.empty}>NO Item Yet</p>
+        )
+      }
+    </main>
+
   );
 };
 

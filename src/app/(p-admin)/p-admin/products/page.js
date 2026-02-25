@@ -9,7 +9,7 @@ const Products = async ({ searchParams }) => {
   const paginatedData = await paginate(ProductModal, searchParams, {})
 
   return (
-      <main>
+      <main className='container'>
         <AddProduct />
         {paginatedData.data.length === 0 ? (
           <p className="empty">  No Discount Yet :(</p>

@@ -1,7 +1,7 @@
 .content {
   display: grid;
   padding: 0;
-  gap: 20px;
+  gap: 30px;
   margin-bottom: 1rem;
   grid-template-columns: auto auto;
   margin-top: 5rem;
@@ -15,8 +15,9 @@
 .group,
 .uploader {
   display: flex;
-  gap: 5px;
+  gap: 3px;
   flex-direction: column;
+  margin: 1.4rem;
 }
 .group select {
   background:var(--white);
@@ -32,7 +33,7 @@
   padding: 10px;
   resize: none;
   background-color:var(--white);
-  margin-top: 4px;
+  margin: 5px 0;
   outline: 0;
   color: var(--text);
   border-radius: 5px;

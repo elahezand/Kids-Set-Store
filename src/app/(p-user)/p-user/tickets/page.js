@@ -18,18 +18,13 @@ const page = async ({ searchParams }) => {
     );
 
     return (
-        <>
+            <main className="container">
             <div>
                 <h1 className="title">
-                    <span>Tickets</span>
+                    <span className="title">Tickets</span>
                 </h1>
             </div>
-            <main className="container">
                 {paginatedData.data.length > 0 &&
-                    <>
-                        <h1 className="title">
-                            <span>All Tickets</span>
-                        </h1>
                         <div>
                             {paginatedData.data.map((ticket) => (
                                 <Ticket
@@ -37,8 +32,7 @@ const page = async ({ searchParams }) => {
                                     key={ticket._id}
                                     {...ticket} />
                             ))}
-                        </div>
-                    </>}
+                        </div>}
 
                 {paginatedData.data.length === 0 &&
                     <p className="empty">
@@ -54,7 +48,6 @@ const page = async ({ searchParams }) => {
                     user={user.id}
                 />
             </main>
-        </>
     );
 };
 

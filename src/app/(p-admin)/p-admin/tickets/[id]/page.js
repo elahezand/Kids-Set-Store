@@ -21,9 +21,9 @@ export default async function page({ params }) {
 
     return (
         <main className="container">
-            <h2 className="title">
+            <h1 className="title">
                 <span>Ticket</span>
-            </h2>
+            </h1>
             <Answer ticket={JSON.parse(JSON.stringify(ticket))} />
             <Response
                 ticketID={JSON.parse(JSON.stringify(id))}

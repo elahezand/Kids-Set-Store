@@ -10,16 +10,16 @@ export default async function page({ params }) {
   await connectToDB();
 
   const { id } = params;
- const ticket = await ticketModel.findById(id)
-      .populate("user", "name email")
-      .populate("department", "title")
-      .lean();
+  const ticket = await ticketModel.findById(id)
+    .populate("user", "name email")
+    .populate("department", "title")
+    .lean();
 
-    const children = await ticketModel.find({ parent: ticket._id })
-      .populate("user", "name email role")
-      .lean();
+  const children = await ticketModel.find({ parent: ticket._id })
+    .populate("user", "name email role")
+    .lean();
 
-    ticket.children = children;
+  ticket.children = children;
 
   return (
     <main className="container">
@@ -29,11 +29,8 @@ export default async function page({ params }) {
           <Link href="/p-user/tickets">Send New Ticket</Link>
         </h1>
       </div>
-
       <Answer ticket={JSON.parse(JSON.stringify(ticket))} />
-      <Response
-        ticketID={JSON.parse(JSON.stringify(id))}
-      />
+      <Response ticketID={JSON.parse(JSON.stringify(id))} />
     </main>
   );
 }

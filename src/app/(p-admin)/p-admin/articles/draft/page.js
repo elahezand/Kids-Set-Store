@@ -8,10 +8,15 @@ export default async function page({ searchParams }) {
     const safeArticles = JSON.parse(JSON.stringify(article))
 
     return (
+        <main className="container">
             <div>
-                <AddNewArticle
-                  article={safeArticles}
-                 />
+                <h1 className="title">
+                    <span>{article?._id ? "Edit Article" : "Add New Article"}</span>
+                </h1>
             </div>
+            <AddNewArticle
+                article={safeArticles}
+            />
+        </main>
     )
 }

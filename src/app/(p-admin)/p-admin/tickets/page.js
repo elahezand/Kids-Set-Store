@@ -10,7 +10,7 @@ const page = async ({ searchParams }) => {
     const paginatedData = await paginate(TicketModel, searchParams, {parent:null}, "department")
 
     return (
-        <main>
+        <main className="container">
             {paginatedData.data.length === 0 ? (
                 <p className={styles.empty}>No Ticket Yet :(</p>
             ) : (

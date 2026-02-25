@@ -10,18 +10,23 @@ export default async function page({ searchParams }) {
     const paginatedData = await paginate(ArticleModel, param)
 
     return (
+        <main className="container">
             <div>
-                <AddNewArticle />
-                <Table
-                    title={"Article List"}
-                    data={JSON.parse(JSON.stringify(paginatedData.data))} />
-                <Pagination
-                    href={`articles?`}
-                    currentPage={paginatedData.page}
-                    pageCount={paginatedData.pageCount}
-                    limit={paginatedData.limit}
-                />
+                <h1 className="title">
+                    <span>Add New Article</span>
+                </h1>
             </div>
+            <AddNewArticle />
+            <Table
+                title={"Article List"}
+                data={JSON.parse(JSON.stringify(paginatedData.data))} />
+            <Pagination
+                href={`articles?`}
+                currentPage={paginatedData.page}
+                pageCount={paginatedData.pageCount}
+                limit={paginatedData.limit}
+            />
+        </main>
     )
 }
 
