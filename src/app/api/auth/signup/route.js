@@ -7,7 +7,6 @@ export async function POST(req) {
     try {
         await connectToDB()
         const body = await req.json()
-
         const parsed = userValidationSchema.safeParse(body)
         if (!parsed.success) {
             return Response.json({ message: "Invalid data", errors: parsed.error.issues }, { status: 422 })

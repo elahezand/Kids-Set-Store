@@ -1,7 +1,7 @@
 import { authAdmin } from "@/utils/serverHelper"
-import connectToDB from "../../../../../db/db"
+import connectToDB from "../../../../../configs/db"
 import discountModel from "../../../../../model/discount";
-import { updateOffSchema } from "../../../../validators/discount";
+import { updateOffSchema } from "../../../../../validators/discount";
 import { NextResponse } from "next/server";
 
 export async function PUT(req, { params }) {

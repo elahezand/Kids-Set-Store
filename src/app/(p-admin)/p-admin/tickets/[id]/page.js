@@ -1,34 +1,38 @@
-import React from 'react'
-import connectToDB from '../../../../../../configs/db'
-import Answer from '@/components/template/p-admin/tickets/answer'
-import Response from '@/components/template/p-user/ticketID/response'
-import ticketModel from '../../../../../../model/ticket'
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { LuArrowLeft } from "react-icons/lu";
+import connectToDB from "../../../../../../configs/db";
+import TicketModel from "../../../../../../model/ticket";
+import PageHeader from "@/components/modules/panel/pageHeader";
+import TicketThread from "@/components/modules/panel/ticketThread";
+import TicketReplyForm from "@/components/modules/panel/ticketReplyForm";
 
-export default async function page({ params }) {
-    connectToDB()
+export default async function AdminTicketPage({ params }) {
+    await connectToDB();
+    const { id } = await params;
 
-    const { id } = params;
-    const ticket = await ticketModel.findById(id)
-        .populate("user", "name email")
+    const ticket = await TicketModel.findById(id)
+        .populate("user", "username email role")
         .populate("department", "title")
         .lean();
+    if (!ticket) notFound();
 
-    const children = await ticketModel.find({ parent: ticket._id })
-        .populate("user", "name email role")
+    ticket.children = await TicketModel.find({ parent: ticket._id })
+        .populate("user", "username email role")
         .lean();
 
-    ticket.children = children;
-
     return (
-        <main className="container">
-            <h1 className="title">
-                <span>Ticket</span>
-            </h1>
-            <Answer ticket={JSON.parse(JSON.stringify(ticket))} />
-            <Response
-                ticketID={JSON.parse(JSON.stringify(id))}
+        <>
+            <PageHeader
+                title="Ticket details"
+                actions={
+                    <Link href="/p-admin/tickets" className="btn btn-secondary">
+                        <LuArrowLeft className="size-4" /> All tickets
+                    </Link>
+                }
             />
-        </main>
-    )
+            <TicketThread ticket={JSON.parse(JSON.stringify(ticket))} />
+            <TicketReplyForm ticketID={id} />
+        </>
+    );
 }
-

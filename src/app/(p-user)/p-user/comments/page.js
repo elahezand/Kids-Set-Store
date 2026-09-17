@@ -1,40 +1,22 @@
-import React from 'react'
-import commentModel from '../../../../../model/comment'
-import Pagination from '@/components/modules/pageination/pagination'
-import { paginate } from '@/utils/helper'
-import DataTable from '@/components/template/p-user/comments/DataTable'
-import { authUser } from '@/utils/serverHelper'
-export default async function page({ searchParams }) {
-    const user = await authUser()
-    const paginatedData = await paginate(
-        commentModel,
-        searchParams,
-        { userID: user._id },
-        "productID")
+import connectToDB from "../../../../../configs/db";
+import CommentModel from "../../../../../model/comment";
+import { authUser } from "@/utils/serverHelper";
+import { paginate } from "@/utils/helper";
+import PageHeader from "@/components/modules/panel/pageHeader";
+import Pagination from "@/components/modules/ui/pagination";
+import CommentsTable from "@/components/template/p-user/comments/commentsTable";
+
+export default async function CommentsPage({ searchParams }) {
+    await connectToDB();
+    const params = await searchParams;
+    const user = await authUser();
+    const paginatedData = await paginate(CommentModel, params, { user: user?._id }, "productID");
 
     return (
-        <main className='container'>
-            <div>
-                <h1 className="title">
-                    <span>Comments</span>
-                </h1>
-            </div>
-            {paginatedData.data.length > 0 &&
-                <DataTable
-                    comments={JSON.parse(JSON.stringify(paginatedData.data))}
-                    title="Comments "
-                />
-            }
-            {paginatedData.data.length === 0 &&
-                <p className="empty">
-                    No Comments Yet :(
-                </p>}
-            <Pagination
-                href={`comments?`}
-                currentPage={paginatedData.page}
-                pageCount={paginatedData.pageCount}
-                limit={paginatedData.limit}
-            />
-        </main>
-    )
+        <>
+            <PageHeader title="Comments" description="Reviews you've written on products." />
+            <CommentsTable comments={JSON.parse(JSON.stringify(paginatedData.data))} />
+            <Pagination pageCount={paginatedData.pageCount} limit={paginatedData.limit} />
+        </>
+    );
 }

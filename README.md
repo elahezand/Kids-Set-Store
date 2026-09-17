@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SET KIDS — Next.js store
 
-## Getting Started
+Next.js 15 (App Router) · React 19 · Tailwind CSS v4 · MongoDB (mongoose) · TanStack Query
 
-First, run the development server:
+## Getting started
 
 ```bash
+npm install   # package.json changed — regenerate the lock file
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project structure
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```
+src/
+├─ app/
+│  ├─ globals.css            ← the ONLY stylesheet (tokens + component classes)
+│  ├─ (main)/                ← storefront routes
+│  ├─ (p-admin)/p-admin/     ← admin panel routes
+│  ├─ (p-user)/p-user/       ← user panel routes
+│  └─ api/                   ← route handlers
+├─ components/
+│  ├─ modules/               ← reusable building blocks
+│  │  ├─ ui/                 ← generic: modal, pagination, emptyState, pageLoader,
+│  │  │                         errorFallback, scrollToTop, stars, themeToggle, …
+│  │  ├─ panel/              ← shared by both panels: panelShell, sidebar, topbar,
+│  │  │                         navLinks, pageHeader, statCard, profileForm,
+│  │  │                         ticketThread, ticketReplyForm
+│  │  └─ main/               ← storefront pieces: navbar, footer, product card, …
+│  └─ template/              ← page-specific sections (one folder per route)
+│     ├─ main/…
+│     ├─ p-admin/{index,products,users,comments,articles,tickets,discounts}
+│     └─ p-user/{index,orders,tickets,comments,favorites}
+└─ utils/                    ← hooks, server helpers, api clients, providers
+model/  validators/  configs/  ← mongoose models, zod schemas, db connection
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Rule:** if a component is used by more than one page it belongs in `modules/`,
+otherwise it lives next to its page in `template/`.
 
-## Learn More
+## Styling
 
-To learn more about Next.js, take a look at the following resources:
+- Tailwind utilities in JSX. No `*.module.css` files.
+- Brand colors / fonts / shadows are defined once in `@theme` inside `globals.css`
+  (`sage` = primary, `coral` = accent, `ink` = dark surfaces).
+- Repeated UI patterns are component classes in `globals.css`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Class | Use |
+| --- | --- |
+| `btn` + `btn-primary` / `btn-accent` / `btn-secondary` / `btn-ghost` / `btn-danger` / `btn-soft-primary` / `btn-soft-danger` | buttons (`btn-sm`, `btn-lg`, `btn-icon` for sizes) |
+| `label`, `input` (+ `input-error`), `field-error`, `field-hint` | forms (`input` works on input / select / textarea / file) |
+| `card`, `card-header`, `card-title`, `card-body` | surfaces |
+| `table-wrap` + `data-table` | responsive tables |
+| `badge` + `badge-success` / `-danger` / `-warning` / `-accent` / `-neutral` | status pills |
+| `page-container` | centered storefront container |
+| `spinner`, `skeleton`, `checkbox` | feedback & custom checkbox |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Dark mode uses the `dark` class on `<html>` (`dark:` variant).

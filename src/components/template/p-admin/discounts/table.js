@@ -1,88 +1,87 @@
 "use client";
-import React from "react";
-import styles from "@/components/template/p-admin/discounts/discountTable.module.css";
-import swal from "sweetalert";
 import { useRouter } from "next/navigation";
+import swal from "sweetalert";
 import toast from "react-hot-toast";
+import { LuBadgePercent, LuTrash2 } from "react-icons/lu";
 import { useDelete } from "@/utils/hooks/useReactQueryPanel";
+import EmptyState from "@/components/modules/ui/emptyState";
 
-function Table({ discounts, title }) {
-  const router = useRouter();
+export default function DiscountsTable({ discounts = [], total }) {
+    const router = useRouter();
 
-  const { mutate: removeDiscountMutate } = useDelete("/discount", {
-    onSuccess: () => {
-      toast.success("Code Removed Successfully :)");
-      router.refresh();
-    },
-  });
-
-  const removeDiscount = (discountID) => {
-    swal({
-      title: "Are you sure to remove this discount? :)",
-      icon: "warning",
-      buttons: ["No", "Yes"],
-    }).then((result) => {
-      if (result) {
-        removeDiscountMutate({ id: discountID });
-      }
+    const { mutate: removeDiscount } = useDelete("/discount", {
+        onSuccess: () => {
+            toast.success("Code removed successfully");
+            router.refresh();
+        },
     });
-  };
 
-  return (
-    <>
-      <div>
-        <h1 className="title">
-          <span>{title}</span>
-        </h1>
-      </div>
+    const confirmRemove = (id) =>
+        swal({ title: "Remove this discount?", icon: "warning", buttons: ["Cancel", "Remove"], dangerMode: true })
+            .then((ok) => ok && removeDiscount(id));
 
-      <div className="table_container">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Code</th>
-              <th>Percent</th>
-              <th>MaxUses</th>
-              <th>Uses</th>
-              <th>Expire Time</th>
-              <th>Remove</th>
-            </tr>
-          </thead>
+    return (
+        <section className="card overflow-hidden">
+            <div className="card-header">
+                <h2 className="card-title">Discount codes</h2>
+                {typeof total === "number" && <span className="badge badge-neutral">{total} codes</span>}
+            </div>
 
-          <tbody>
-            {discounts.map((discount, index) => (
-              <tr key={discount._id}>
-                <td
-                  className={
-                    discount.uses >= discount.maxUses
-                      ? styles.complete
-                      : styles.uncomplete
-                  }
-                >
-                  {index + 1}
-                </td>
-                <td>{discount.code}</td>
-                <td>{discount.percent}</td>
-                <td>{discount.maxUses}</td>
-                <td>{discount.uses}</td>
-                <td>{discount.expTime.slice(0, 10)}</td>
-                <td>
-                  <button
-                    type="button"
-                    onClick={() => removeDiscount(discount._id)}
-                    className="delete_btn"
-                  >
-                    Remove
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
+            {discounts.length === 0 ? (
+                <EmptyState title="No discount codes yet" icon={LuBadgePercent} />
+            ) : (
+                <div className="table-wrap">
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Percent</th>
+                                <th>Usage</th>
+                                <th>Created</th>
+                                <th>Status</th>
+                                <th className="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {discounts.map((discount) => {
+                                const usedUp = discount.uses >= discount.max;
+                                const usage = discount.max ? Math.min(100, Math.round((discount.uses / discount.max) * 100)) : 0;
+                                return (
+                                    <tr key={discount._id}>
+                                        <td>
+                                            <code className="rounded-md bg-gray-100 px-2 py-1 font-mono text-xs font-semibold text-gray-900 dark:bg-white/5 dark:text-gray-100">
+                                                {discount.code}
+                                            </code>
+                                        </td>
+                                        <td className="font-medium tabular-nums">{discount.percent}%</td>
+                                        <td>
+                                            <div className="flex items-center gap-2">
+                                                <div className="h-1.5 w-20 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
+                                                    <div className={`h-full rounded-full ${usedUp ? "bg-gray-600" : "bg-sage-500"}`} style={{ width: `${usage}%` }} />
+                                                </div>
+                                                <span className="text-xs tabular-nums">{discount.uses || 0}/{discount.max}</span>
+                                            </div>
+                                        </td>
+                                        <td className="tabular-nums">{discount.createdAt?.slice(0, 10)}</td>
+                                        <td>
+                                            <span className={`badge ${usedUp ? "badge-neutral" : "badge-success"}`}>
+                                                {usedUp ? "Used up" : "Active"}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div className="flex justify-end">
+                                                <button type="button" onClick={() => confirmRemove(discount._id)} className="btn btn-soft-danger btn-sm">
+                                                    <LuTrash2 className="size-3.5" /> Remove
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+        </section>
+    );
 }
-
-export default Table;

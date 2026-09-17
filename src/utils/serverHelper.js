@@ -34,7 +34,7 @@ const authAdmin = async () => {
     user = await UserModel.findOne({ email: payloadToken.email })
 
     if (!user) return null
-    if (user.role !== "ADMIN") return user
+    if (user.role !== "ADMIN") return null
 
     return user
 }

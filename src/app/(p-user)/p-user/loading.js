@@ -1,11 +1,5 @@
-import React from 'react'
+import PageLoader from "@/components/modules/ui/pageLoader";
 
-export default function laoding() {
-    return (
-           
-        <div className='container-loader'>
-             <span className="loader"></span>
-        </div>
-
-    )
+export default function Loading() {
+    return <PageLoader fullScreen={false} />;
 }

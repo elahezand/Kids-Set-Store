@@ -1,38 +1,20 @@
-import React from 'react'
-import styles from "@/styles/p-admin.module.css";
-import { authAdmin } from '@/utils/serverHelper'
-import Topbar from '@/components/modules/p-admin/topbar/topbar'
-import Sidebar from '@/components/modules/p-admin/sidebar/sidebar'
-import { redirect } from 'next/dist/server/api-utils';
-import RefreshAccessToken from '@/utils/refreshToken';
-export default async function Layout({ children }) {
-    const admin = await authAdmin()
-    if (!admin) {
-        redirect("/login-register")
-    }
+import { redirect } from "next/navigation";
+import { authAdmin } from "@/utils/serverHelper";
+import PanelShell from "@/components/modules/panel/panelShell";
+import RefreshAccessToken from "@/components/modules/ui/refreshAccessToken";
 
-    const content = (
-        <div className={styles.layout}>
-            <section className={styles.section}>
-                <Sidebar />
-                <div className={styles.contents}>
-                    <Topbar
-                        user={JSON.parse(JSON.stringify(admin))} />
-                    {children}
-                </div>
-            </section>
-        </div>
+export default async function AdminLayout({ children }) {
+    const admin = await authAdmin();
+    if (!admin) redirect("/login-register");
+
+    const isExpired = admin.status === "expired";
+    const user = isExpired ? null : JSON.parse(JSON.stringify(admin));
+
+    return (
+        <RefreshAccessToken shouldRefresh={isExpired}>
+            <PanelShell variant="admin" user={user}>
+                {children}
+            </PanelShell>
+        </RefreshAccessToken>
     );
-
-    if (admin.status === "expired") {
-        return (
-            <RefreshAccessToken
-                shouldRefresh={true}>
-                {content}
-            </RefreshAccessToken>
-        );
-    }
-    return content;
 }
-
-

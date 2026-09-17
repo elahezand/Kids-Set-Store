@@ -1,18 +1,14 @@
-import React from 'react'
-import { getMe } from '@/utils/serverHelper';
-import AdminProfileClient from '@/components/template/p-admin/detail-account/adminProfileClient';
-export default async function page() {
-    const Info = await getMe()
-    return (
-        <main className='container'>
-            <h1 className="title">
-                <span>Detail Account </span>
-            </h1>
-            <div>
-                <AdminProfileClient
-                    adminData={JSON.parse(JSON.stringify(Info))} />
-            </div>
-        </main>
-    )
-}
+import { getMe } from "@/utils/serverHelper";
+import PageHeader from "@/components/modules/panel/pageHeader";
+import ProfileForm from "@/components/modules/panel/profileForm";
 
+export default async function AdminAccountPage() {
+    const info = await getMe();
+
+    return (
+        <>
+            <PageHeader title="Account details" description="Update your admin profile and password." />
+            <ProfileForm userData={JSON.parse(JSON.stringify(info))} />
+        </>
+    );
+}

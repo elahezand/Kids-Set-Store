@@ -1,14 +1,15 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { IoIosSend } from "react-icons/io";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { LuSend } from "react-icons/lu";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePost } from "@/utils/hooks/useReactQueryPanel";
 import toast from "react-hot-toast";
-import styles from "./sendTicket.module.css";
 import { ticketValidationSchema } from "../../../../../validators/ticket";
 
-export default function SendTicket({ user }) {
+export default function SendTicket() {
+    const router = useRouter();
     const [departments, setDepartments] = useState([]);
     const [subDepartments, setSubDepartments] = useState([]);
 
@@ -63,10 +64,11 @@ export default function SendTicket({ user }) {
         getSubDepartments();
     }, [watchDepartment, setValue]);
 
-    const { mutate, isLoading } = usePost("/tickets", {
+    const { mutate, isPending } = usePost("/tickets", {
         onSuccess: () => {
             toast.success("Ticket sent successfully :)");
             reset();
+            router.refresh();
         },
         onError: () => {
             toast.error("Failed to send ticket :(");
@@ -85,65 +87,71 @@ export default function SendTicket({ user }) {
         });
     };
 
+    const error = (name) => errors[name] && <span className="field-error">{errors[name].message}</span>;
+
     return (
-        <form onSubmit={handleSubmit(onSubmit)}
-            className={styles.form}>
-            <div>
-                <h1 className="title">
-                    <span>send Tickets</span>
-                </h1>
+        <section className="card">
+            <div className="card-header">
+                <div>
+                    <h2 className="card-title">Open a new ticket</h2>
+                    <p className="mt-0.5 text-xs text-gray-700 dark:text-gray-500">Our support team usually replies within 24 hours.</p>
+                </div>
             </div>
-            <div className={styles.group}>
-                <label>Department:</label>
-                <select {...register("department")}>
-                    <option value="">Select Department</option>
-                    {departments.map((d) => (
-                        <option key={d._id} value={d._id}>
-                            {d.title}
-                        </option>
-                    ))}
-                </select>
-                {errors.department && <p className={styles.error}>{errors.department.message}</p>}
-            </div>
+            <form onSubmit={handleSubmit(onSubmit)} className="card-body grid gap-5 sm:grid-cols-2">
+                <div>
+                    <label htmlFor="ticket-department" className="label">Department</label>
+                    <select id="ticket-department" {...register("department")} className={`input ${errors.department ? "input-error" : ""}`}>
+                        <option value="">Select department</option>
+                        {departments.map((d) => (
+                            <option key={d._id} value={d._id}>{d.title}</option>
+                        ))}
+                    </select>
+                    {error("department")}
+                </div>
 
-            <div className={styles.group}>
-                <label>SubDepartment:</label>
-                <select {...register("subDepartment")}>
-                    <option value="">Select SubDepartment</option>
-                    {subDepartments.map((s) => (
-                        <option key={s._id} value={s._id}>
-                            {s.title}
-                        </option>
-                    ))}
-                </select>
-                {errors.subDepartment && <p className={styles.error}>{errors.subDepartment.message}</p>}
-            </div>
+                <div>
+                    <label htmlFor="ticket-sub" className="label">Sub-department</label>
+                    <select id="ticket-sub" {...register("subDepartment")} disabled={!subDepartments.length}
+                        className={`input ${errors.subDepartment ? "input-error" : ""}`}>
+                        <option value="">Select sub-department</option>
+                        {subDepartments.map((s) => (
+                            <option key={s._id} value={s._id}>{s.title}</option>
+                        ))}
+                    </select>
+                    {error("subDepartment")}
+                </div>
 
-            <div className={styles.group}>
-                <label>Title:</label>
-                <input type="text" {...register("title")} />
-                {errors.title && <p className={styles.error}>{errors.title.message}</p>}
-            </div>
+                <div>
+                    <label htmlFor="ticket-title" className="label">Subject</label>
+                    <input id="ticket-title" type="text" {...register("title")} placeholder="Briefly describe the issue"
+                        className={`input ${errors.title ? "input-error" : ""}`} />
+                    {error("title")}
+                </div>
 
-            <div className={styles.group}>
-                <label>Priority:</label>
-                <select {...register("priority")}>
-                    <option value="1">Low</option>
-                    <option value="2">Medium</option>
-                    <option value="3">High</option>
-                </select>
-                {errors.priority && <p className={styles.error}>{errors.priority.message}</p>}
-            </div>
+                <div>
+                    <label htmlFor="ticket-priority" className="label">Priority</label>
+                    <select id="ticket-priority" {...register("priority")} className="input">
+                        <option value="1">Low</option>
+                        <option value="2">Medium</option>
+                        <option value="3">High</option>
+                    </select>
+                    {error("priority")}
+                </div>
 
-            <div className={styles.group}>
-                <label>Content:</label>
-                <textarea {...register("content")} rows={6}></textarea>
-                {errors.content && <p className={styles.error}>{errors.content.message}</p>}
-            </div>
+                <div className="sm:col-span-2">
+                    <label htmlFor="ticket-content" className="label">Message</label>
+                    <textarea id="ticket-content" {...register("content")} rows={6} placeholder="Tell us more…"
+                        className={`input ${errors.content ? "input-error" : ""}`} />
+                    {error("content")}
+                </div>
 
-            <button type="submit" className={styles.btn} disabled={isLoading}>
-                {isLoading ? "Sending..." : <><IoIosSend /> Send</>}
-            </button>
-        </form>
+                <div className="flex justify-end sm:col-span-2">
+                    <button type="submit" className="btn btn-primary" disabled={isPending}>
+                        <LuSend className="size-4" />
+                        {isPending ? "Sending…" : "Send ticket"}
+                    </button>
+                </div>
+            </form>
+        </section>
     );
 }

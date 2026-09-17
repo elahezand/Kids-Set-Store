@@ -1,7 +1,7 @@
 import connectToDB from "../../../../../configs/db";
-import discountModel from "../../../../model/discount";
+import discountModel from "../../../../../model/discount";
 import { NextResponse } from "next/server";
-import { discountValidationSchema } from "../../../../validators/discount";
+import { discountValidationSchema } from "../../../../../validators/discount";
 import { authAdmin } from "@/utils/serverHelper";
 import ProductModel from "../../../../../model/product";
 

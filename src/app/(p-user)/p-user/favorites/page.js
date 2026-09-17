@@ -1,60 +1,47 @@
-import styles from "@/styles/p-user/favorites.module.css";
-import Product from "@/components/template/p-user/favorites/product"
-import FavoriteModel from "../../../../../model/favorite";
-import Pagination from "@/components/modules/pageination/pagination";
-import { paginate } from "@/utils/helper";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { LuHeart } from "react-icons/lu";
 import connectToDB from "../../../../../configs/db";
+import FavoriteModel from "../../../../../model/favorite";
 import ProductModel from "../../../../../model/product";
 import { authUser } from "@/utils/serverHelper";
-const page = async ({ searchParams }) => {
-  await connectToDB()
-  const user = await authUser()
-  if (!user) redirect("/login-register")
+import { paginate } from "@/utils/helper";
+import PageHeader from "@/components/modules/panel/pageHeader";
+import Pagination from "@/components/modules/ui/pagination";
+import EmptyState from "@/components/modules/ui/emptyState";
+import FavoriteCard from "@/components/template/p-user/favorites/favoriteCard";
 
-  const searchparams = searchParams
-  const wishlist = await FavoriteModel.findOne({ user: user.id })
-  if (!wishlist) return null
+export default async function FavoritesPage({ searchParams }) {
+    await connectToDB();
+    const params = await searchParams;
+    const user = await authUser();
+    if (!user) redirect("/login-register");
 
-  const paginatedData = await paginate(
-    ProductModel,
-    searchparams,
-    { _id: { $in: wishlist.products } }
-  )
+    const wishlist = await FavoriteModel.findOne({ user: user._id }).select("products").lean();
+    const paginatedData = wishlist?.products?.length
+        ? await paginate(ProductModel, params, { _id: { $in: wishlist.products } })
+        : { data: [], pageCount: 0, limit: 10 };
+    const products = JSON.parse(JSON.stringify(paginatedData.data));
 
-  return (
-    <main className={styles.container}>
-      <div>
-        <h1 className="title">
-          <span>Favorites</span>
-        </h1>
-      </div>
-      <section>
-        {paginatedData.data.length > 0 &&
-          JSON.parse(JSON.stringify(paginatedData.data)).map((wish, index) =>
-            <Product
-              key={index}
-              id={wish._id}
-              name={wish.name}
-              score={wish.score}
-              price={wish.price}
-              img={wish.img}
-
-            />)}
-      </section>
-      <Pagination
-        href={`favorites?`}
-        currentPage={paginatedData.page}
-        pageCount={paginatedData.pageCount}
-        limit={paginatedData.limit}
-      />
-      {
-        paginatedData.data.length === 0 && (
-          <p className={styles.empty}>NO Item Yet</p>
-        )
-      }
-    </main>
-
-  );
-};
-
-export default page;
+    return (
+        <>
+            <PageHeader title="Favorites" description="Products you've saved for later." />
+            {products.length ? (
+                <>
+                    <section className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 xl:grid-cols-4">
+                        {products.map((product) => (
+                            <FavoriteCard key={product._id} id={product._id} name={product.name}
+                                score={product.score} price={product.price} img={product.img} />
+                        ))}
+                    </section>
+                    <Pagination pageCount={paginatedData.pageCount} limit={paginatedData.limit} />
+                </>
+            ) : (
+                <div className="card">
+                    <EmptyState title="No favorites yet" description="Tap the heart on any product to save it here." icon={LuHeart}
+                        action={<Link href="/products" className="btn btn-primary btn-sm">Browse products</Link>} />
+                </div>
+            )}
+        </>
+    );
+}

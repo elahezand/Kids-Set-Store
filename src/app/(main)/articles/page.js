@@ -1,9 +1,8 @@
-import React from 'react'
-import ArticlesList from '@/components/template/articles/articlesList'
+import ArticlesList from '@/components/template/main/articles/articlesList'
 import connectToDB from '../../../../configs/db'
 import ArticleModel from '../../../../model/article'
 import { paginate } from '@/utils/helper'
-import Breadcrumb from '@/components/modules/breadCrumb/breadCrumb'
+import Breadcrumb from '@/components/modules/main/breadCrumb'
 
 export const metadata = {
     title: "Our Articles | My Website",
@@ -19,23 +18,15 @@ export const metadata = {
         description: "Read our latest articles, news, and insights on various topics.",
     },
 }
+
 export default async function page({ searchParams }) {
     await connectToDB();
     const params = await searchParams;
 
-    const paginatedData = await paginate(
-        ArticleModel,
-        params,
-        {},
-        null,
-        true,
-        false
-    );
+    const paginatedData = await paginate(ArticleModel, params, {}, null, true, false);
     return (
-        <div className="container">
-            <Breadcrumb
-                route={"articles"}
-                title={"Our Articles"} />
+        <div className="page-container">
+            <Breadcrumb route="articles" title="Our Articles" />
             <ArticlesList
                 nextCursor={paginatedData.nextCursor}
                 limit={paginatedData.limit}

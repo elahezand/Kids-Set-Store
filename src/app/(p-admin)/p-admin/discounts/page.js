@@ -1,35 +1,26 @@
 import connectToDB from "../../../../../configs/db";
 import DiscountModel from "../../../../../model/discount";
-import Table from "@/components/template/p-admin/discounts/table";
-import AddDiscount from "@/components/template/p-admin/discounts/addDiscount";
-import Pagination from "@/components/modules/pageination/pagination";
-import { paginate } from "@/utils/helper";
 import ProductModel from "../../../../../model/product";
-const Discounts = async ({ searchParams }) => {
+import { paginate } from "@/utils/helper";
+import PageHeader from "@/components/modules/panel/pageHeader";
+import Pagination from "@/components/modules/ui/pagination";
+import AddDiscount from "@/components/template/p-admin/discounts/addDiscount";
+import DiscountsTable from "@/components/template/p-admin/discounts/table";
+
+export default async function DiscountsPage({ searchParams }) {
     await connectToDB();
-    const paginatedData = await paginate(DiscountModel, searchParams, {})
-    const products = await ProductModel.find({}).lean()
+    const params = await searchParams;
+    const [paginatedData, products] = await Promise.all([
+        paginate(DiscountModel, params, {}),
+        ProductModel.find({}).select("name").lean(),
+    ]);
 
     return (
-            <main className="container">
-                <AddDiscount
-                    products={JSON.parse(JSON.stringify(products))} />
-                {paginatedData.data.length === 0 ? (
-                    <p className="empty">  No Discount Yet :(</p>
-                ) : (
-                    <Table
-                        discounts={JSON.parse(JSON.stringify(paginatedData.data))}
-                        title=" Discount List"
-                    />
-                )}
-                <Pagination
-                    href={`discounts?`}
-                    currentPage={paginatedData.page}
-                    pageCount={paginatedData.pageCount}
-                    limit={paginatedData.limit}
-                />
-            </main>
+        <>
+            <PageHeader title="Discounts" description="Create discount codes and track their usage." />
+            <AddDiscount products={JSON.parse(JSON.stringify(products))} />
+            <DiscountsTable discounts={JSON.parse(JSON.stringify(paginatedData.data))} total={paginatedData.totalCount} />
+            <Pagination pageCount={paginatedData.pageCount} limit={paginatedData.limit} />
+        </>
     );
-};
-
-export default Discounts;
+}

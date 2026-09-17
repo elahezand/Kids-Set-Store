@@ -1,4 +1,4 @@
-import connectToDB from "../../../../../db/db"
+import connectToDB from "../../../../../configs/db"
 import { cookies } from "next/headers"
 export async function POST() {
     connectToDB()

@@ -1,6 +1,6 @@
 import UserModel from "../../../../model/user";
 import otpModel from "../../../../model/otp";
-import connectToDB from "../../../../db/db";
+import connectToDB from "../../../../configs/db";
 import { hashPassword } from "@/utils/auth";
 import { NextResponse } from "next/server";
 

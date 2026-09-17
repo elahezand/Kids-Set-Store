@@ -1,6 +1,6 @@
 import connectToDB from "../../../../configs/db";
 import discountModel from "../../../../model/discount";
-import { discountValidationSchema } from "../../../../validators/discount";
+import { discountCreateSchema } from "../../../../validators/discount";
 import { NextResponse } from "next/server";
 import { authAdmin } from "@/utils/serverHelper";
 import { paginate } from "@/utils/helper";
@@ -20,10 +20,10 @@ export async function GET() {
             true,
         )
 
-        return NextResponse.json({ result }, { satatus: 200 })
+        return NextResponse.json({ result }, { status: 200 })
     }
     catch (err) {
-        return NextResponse.json({ message: "UnKnown Error" }, { satatus: 500 })
+        return NextResponse.json({ message: "UnKnown Error" }, { status: 500 })
     }
 }
 export async function POST(req) {
@@ -33,7 +33,7 @@ export async function POST(req) {
         if (!admin) throw new Error("This api Protected")
 
         const body = await req.json();
-        const parsed = discountValidationSchema.safeParse(body);
+        const parsed = discountCreateSchema.safeParse(body);
 
         if (!parsed.success) {
             return NextResponse.json(
@@ -42,16 +42,16 @@ export async function POST(req) {
             );
         }
 
-        const newOff = await offModel.create({
+        const newOff = await discountModel.create({
             ...parsed.data,
             creator: admin._id
         });
 
 
-        return NextResponse.json({ massage: "Discount Created Successfully :)", newOff }, { satatus: 200 })
+        return NextResponse.json({ massage: "Discount Created Successfully :)", newOff }, { status: 200 })
     }
     catch (err) {
-        return NextResponse.json({ message: "UnKnown Error" }, { satatus: 500 })
+        return NextResponse.json({ message: "UnKnown Error" }, { status: 500 })
     }
 }
 

@@ -1,16 +1,14 @@
-import Promote from "@/components/template/index/promote/promote";
+import Promote from "@/components/template/main/index/promote";
 import dynamic from "next/dynamic";
 import ProductModal from "../../../model/product";
 import connectToDB from "../../../configs/db";
-import Categories from "@/components/template/index/categories/categories";
-import Navbar from "@/components/modules/navbar/navbar";
+import Categories from "@/components/template/main/index/categories";
 import ArticleModel from "../../../model/article";
-import PromoText from "@/components/template/index/promoText/promoText";
+import PromoText from "@/components/template/main/index/promoText";
 
-
-const Articles = dynamic(() => import("@/components/template/index/articles/articles"))
-const BestSelling = dynamic(() => import("@/components/template/index/best-selling/bestSelling"))
-const Latest = dynamic(() => import("@/components/template/index/latest/latest"))
+const Articles = dynamic(() => import("@/components/template/main/index/articles/articles"))
+const BestSelling = dynamic(() => import("@/components/template/main/index/bestSelling"))
+const Latest = dynamic(() => import("@/components/template/main/index/latest"))
 
 
 export default async function Home() {
@@ -30,7 +28,6 @@ export default async function Home() {
 
   return (
     <>
-      <Navbar />
       <Latest products={JSON.parse(JSON.stringify(products))} />
       <PromoText />
       <BestSelling products={JSON.parse(JSON.stringify(bestSelling))} />

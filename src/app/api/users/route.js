@@ -1,5 +1,5 @@
 import UserModel from "../../../../model/user";
-import connectToDB from "../../../../db/db";
+import connectToDB from "../../../../configs/db";
 import { authAdmin } from "@/utils/serverHelper";
 import { paginate } from "@/utils/helper";
 import { userValidationSchema } from "../../../../validators/user";
