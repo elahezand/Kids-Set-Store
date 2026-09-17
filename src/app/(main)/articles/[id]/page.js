@@ -1,13 +1,11 @@
-import connectToDB from "../../../../../configs/db";
-import Breadcrumb from "@/components/modules/breadCrumb/breadCrumb";
-import styles from "@/styles/articles.module.css"
+import Breadcrumb from "@/components/modules/main/breadCrumb";
 import Image from 'next/image';
 import ArticleModel from '../../../../../model/article';
+import connectToDB from "../../../../../configs/db";
 import { JSDOM } from "jsdom"
 import createDOMPurify from "dompurify"
 import Link from 'next/link';
 
-// Generate metadata for SEO and social sharing
 export async function generateMetadata({ params }) {
     await connectToDB();
     const { id } = await params
@@ -29,6 +27,7 @@ export async function generateMetadata({ params }) {
         },
     };
 }
+
 export default async function page({ params }) {
     await connectToDB();
     const { id } = await params;
@@ -39,64 +38,58 @@ export default async function page({ params }) {
         .limit(4)
         .lean();
 
-
     const window = new JSDOM("").window
     const DOMPurify = createDOMPurify(window)
 
     return (
-        <div className="container">
-            <Breadcrumb
-                title={article.title}
-                route={"articles"} />
-            <div className={styles.container}>
-                <div className={styles.box}>
-                    <article className={styles.article}>
-                        <p>
-                            {article.title}
-                        </p>
+        <div className="page-container">
+            <Breadcrumb title={article.title} route="articles" />
+            <div className="flex flex-col gap-8 text-text dark:text-gray-100 lg:flex-row lg:gap-10">
+                <div className="w-full lg:w-[60%]">
+                    <article className="card card-body [&_h3]:mb-4 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:uppercase [&_h3]:text-sage-400 [&_p]:mb-4 [&_p]:text-base [&_p]:leading-7 [&_ul]:mb-5 [&_ul_li]:mb-2.5 [&_ul_li]:list-none [&_ul_li]:text-lg sm:p-8">
+                        <p className="mb-2.5 text-lg font-bold text-coral-300">{article.title}</p>
                         <h3>{article.shortDescription}</h3>
-                        <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content) }}>
-                        </div>
-                        <div className={styles.author_container}>
-                            <span> Posted by:</span>
-                            <div className={styles.author_img}>
+                        <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content) }} />
+                        <div className="mt-6 flex flex-wrap items-center gap-3 text-base">
+                            <span>Posted by:</span>
+                            <div className="flex items-center gap-2">
                                 <Image
                                     src="/images/user-profile-flat-illustration-avatar-person-icon-gender-neutral-silhouette-profile-picture-free-vector.jpg"
-                                    alt="Headshot of Laura Jones"
-                                    height={50}
-                                    width={50}
-                                    className={styles.author_img}
+                                    alt="Author"
+                                    height={40}
+                                    width={40}
+                                    className="h-10 w-10 rounded-full object-cover"
                                 />
-                                <strong>{article.author}</strong>
+                                <strong className="text-coral-300">{article.author}</strong>
                             </div>
-                            <span> Published:{article.createdAt.toLocaleDateString()}</span>
+                            <span>Published: {article.createdAt.toLocaleDateString()}</span>
                         </div>
                     </article>
                 </div>
-                <div className={styles.post_header}>
-                    <h2>{article.title}</h2>
-                    <div className={styles.post_img}>
+                <div className="w-full rounded-2xl bg-coral-300 p-6 shadow-card sm:p-8 lg:w-[35%]">
+                    <h2 className="mb-4 text-xl font-bold text-white">{article.title}</h2>
+                    <div className="overflow-hidden rounded-xl">
                         <Image
                             src={article.cover}
-                            alt="HTML code on a screen"
+                            alt={article.title}
                             width={400}
-                            height={400}
-                            className={styles.post_img} />
+                            height={250}
+                            className="h-[200px] w-full object-cover sm:h-[250px]"
+                        />
                     </div>
-                    <div className={styles.articles_info}>
-                        <div className={styles.article_info}>
-                            <span className={styles.articles_info__article__title}> New articles </span>
-                            <ul className={styles.last_articles__list}>
-                                {otherArticles.length ? otherArticles.map((item, index) => (
-                                    <li key={index + 1} className={styles.last_articles__item}>
-                                        <Link href={`/articles/${item._id}`}
-                                            className={styles.last_articles__link}>
-                                            {item.title}
-                                        </Link>
-                                    </li>
-                                )) : null}
-                            </ul>
-                        </div>
+                    <div className="mt-8 rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-float sm:p-8">
+                        <span className="relative pl-2 text-lg text-sage-400 before:absolute before:-left-4 before:-top-[5px] before:h-[39px] before:w-[22px] before:skew-x-[10deg] before:rounded-bl-[12px] before:rounded-tl-[8px] before:bg-sage-400">
+                            New articles
+                        </span>
+                        <ul className="mt-8">
+                            {otherArticles.length ? otherArticles.map((item, index) => (
+                                <li key={index + 1} className="border-b border-text py-4">
+                                    <Link href={`/articles/${item._id}`} className="text-base text-text dark:text-gray-100 transition-all duration-500 hover:text-sage-400">
+                                        {item.title}
+                                    </Link>
+                                </li>
+                            )) : null}
+                        </ul>
                     </div>
                 </div>
             </div>

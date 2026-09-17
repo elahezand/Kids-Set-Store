@@ -1,30 +1,20 @@
-import React from "react";
-import Table from "@/components/template/p-admin/users/table"
 import connectToDB from "../../../../../configs/db";
 import UserModel from "../../../../../model/user";
 import { paginate } from "@/utils/helper";
-import Pagination from "@/components/modules/pageination/pagination";
-const page = async ({ searchParams }) => {
-    await connectToDB()
-    const paginatedData = await paginate(UserModel, searchParams)
+import PageHeader from "@/components/modules/panel/pageHeader";
+import Pagination from "@/components/modules/ui/pagination";
+import UsersTable from "@/components/template/p-admin/users/table";
+
+export default async function UsersPage({ searchParams }) {
+    await connectToDB();
+    const params = await searchParams;
+    const paginatedData = await paginate(UserModel, params);
 
     return (
-        <main className="container">
-            {paginatedData.data.length === 0 ? (
-                <p className={styles.empty}>No User Yet :(</p>
-            ) : (
-                <Table
-                    users={JSON.parse(JSON.stringify(paginatedData.data))}
-                    title="User List"
-                />
-            )}
-            <Pagination
-                href={`users?`}
-                currentPage={paginatedData.page}
-                pageCount={paginatedData.pageCount}
-                limit={paginatedData.limit} />
-        </main>
+        <>
+            <PageHeader title="Users" description="Manage accounts, roles and access." />
+            <UsersTable users={JSON.parse(JSON.stringify(paginatedData.data))} total={paginatedData.totalCount} />
+            <Pagination pageCount={paginatedData.pageCount} limit={paginatedData.limit} />
+        </>
     );
-};
-
-export default page;
+}

@@ -1,5 +1,5 @@
 import ArticleModel from "../../../../../model/article"
-import connectToDB from "../../../../../db/db"
+import connectToDB from "../../../../../configs/db"
 import { isValidObjectId } from "mongoose"
 import { authAdmin } from "@/utils/serverHelper"
 import { writeFile } from "fs/promises"

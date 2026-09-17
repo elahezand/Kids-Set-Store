@@ -1,4 +1,4 @@
-import connectToDB from "../../../../../db/db"
+import connectToDB from "../../../../../configs/db"
 import UserModel from "../../../../../model/user"
 import { verifyRefreshToken, verifyToken } from "@/utils/auth"
 import { cookies } from "next/headers"

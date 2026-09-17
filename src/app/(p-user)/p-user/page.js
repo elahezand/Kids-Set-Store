@@ -1,48 +1,50 @@
-import { authUser } from "@/utils/serverHelper";
+import { LuHeart, LuMessageSquare, LuShoppingBag, LuTicket } from "react-icons/lu";
+import connectToDB from "../../../../configs/db";
 import FavoriteModel from "../../../../model/favorite";
 import TicketModel from "../../../../model/ticket";
-import commentModel from "../../../../model/comment";
-import Tickets from "@/components/template/p-user/index/tickets";
-import Orders from "@/components/template/p-user/index/orders";
-import styles from "@/styles/p-user/index.module.css";
-import Box from "@/components/modules/box/box";
+import CommentModel from "../../../../model/comment";
+import OrderModel from "../../../../model/order";
+import "../../../../model/department";
+import { authUser } from "@/utils/serverHelper";
+import PageHeader from "@/components/modules/panel/pageHeader";
+import StatCard from "@/components/modules/panel/statCard";
+import RecentTickets from "@/components/template/p-user/index/recentTickets";
+import RecentOrders from "@/components/template/p-user/index/recentOrders";
 
-const page = async () => {
-  let favorites = []
-  let tickets = []
-  let comments = []
-  let AllTickets = []
+export default async function UserDashboard() {
+    await connectToDB();
+    const user = await authUser();
+    const userId = user?._id;
 
-  const user = await authUser()
+    const [favorite, ticketsCount, commentsCount, ordersCount, tickets, orders] = userId
+        ? await Promise.all([
+            FavoriteModel.findOne({ user: userId }).select("products").lean(),
+            TicketModel.countDocuments({ user: userId, parent: null }),
+            CommentModel.countDocuments({ user: userId }),
+            OrderModel.countDocuments({ user: userId }),
+            TicketModel.find({ user: userId, parent: null }).sort({ _id: -1 }).limit(4).populate("department", "title").lean(),
+            OrderModel.find({ user: userId }).sort({ _id: -1 }).limit(4).lean(),
+        ])
+        : [null, 0, 0, 0, [], []];
 
-  if (user) {
-    favorites = await FavoriteModel.find({ userID: user._id })
+    return (
+        <>
+            <PageHeader
+                title={`Welcome back${user?.username ? `, ${user.username}` : ""}`}
+                description="Here's a quick look at your account."
+            />
 
-    tickets = await TicketModel.find({ "message.senderID": user._id })
-      .limit(3)
-      .populate("department", "title")
-      .sort({ _id: -1 })
+            <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <StatCard title="Orders" value={ordersCount} icon={LuShoppingBag} tone="peach" />
+                <StatCard title="Tickets" value={ticketsCount} icon={LuTicket} tone="coral" />
+                <StatCard title="Comments" value={commentsCount} icon={LuMessageSquare} tone="mint" />
+                <StatCard title="Favorites" value={favorite?.products?.length || 0} icon={LuHeart} tone="sage" />
+            </section>
 
-    comments = await commentModel.find({ userID: user._id })
-
-    AllTickets = await TicketModel.find({ "message.senderID": user._id })
-  }
-
-
-  return (
-      <main>
-        <section className={styles.boxes}>
-          <Box title="Tickets" value={AllTickets.length} />
-          <Box title=" Comments " value={comments.length} />
-          <Box title="Orders" value="2" />
-          <Box title="Favorites" value={favorites.length} />
-        </section>
-        <section className={styles.contents}>
-          <Tickets tickets={JSON.parse(JSON.stringify(tickets))} />
-          <Orders />
-        </section>
-      </main>
-  );
-};
-
-export default page;
+            <section className="mt-6 grid gap-6 xl:grid-cols-2">
+                <RecentTickets tickets={JSON.parse(JSON.stringify(tickets))} />
+                <RecentOrders orders={JSON.parse(JSON.stringify(orders))} />
+            </section>
+        </>
+    );
+}

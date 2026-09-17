@@ -1,21 +1,17 @@
 "use client"
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import styles from "@/components/template/login-register/register-login.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import Image from "next/image";
+import AuthShell from "@/components/modules/main/authShell";
 
 const phoneSchema = z.object({
-    phone: z
-        .string()
-        .length(11, "Phone number must be exactly 11 digits")
-        .regex(/^09\d{9}$/, "Invalid Iranian phone number format"),
+    phone: z.string().length(11, "Phone number must be exactly 11 digits").regex(/^09\d{9}$/, "Invalid Iranian phone number format"),
 });
 
 const resetPasswordSchema = z.object({
@@ -29,12 +25,8 @@ const ForgotPassword = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [resendTimer, setResendTimer] = useState(0);
 
-    const { register: registerPhone,
-        handleSubmit: handleSubmitPhone,
-        formState: { errors: phoneErrors } } =
-        useForm({
-            resolver: zodResolver(phoneSchema),
-        });
+    const { register: registerPhone, handleSubmit: handleSubmitPhone, formState: { errors: phoneErrors } } =
+        useForm({ resolver: zodResolver(phoneSchema) });
 
     const sendCodeMutation = useMutation({
         mutationFn: async (phone) => await axios.post("/api/auth/sms/send", { phone }),
@@ -51,13 +43,8 @@ const ForgotPassword = () => {
         sendCodeMutation.mutate(data.phone);
     };
 
-    const { register: registerReset,
-        handleSubmit: handleSubmitReset,
-        formState: { errors: resetErrors } } =
-        useForm({
-            resolver: zodResolver(resetPasswordSchema),
-        });
-
+    const { register: registerReset, handleSubmit: handleSubmitReset, formState: { errors: resetErrors } } =
+        useForm({ resolver: zodResolver(resetPasswordSchema) });
 
     const resetPasswordMutation = useMutation({
         mutationFn: async ({ phone, resetCode, newPassword }) =>
@@ -70,95 +57,59 @@ const ForgotPassword = () => {
     });
 
     const changePasswordHandler = (data) => {
-        resetPasswordMutation.mutate({
-            phone: phoneNumber,
-            resetCode: data.resetCode,
-            newPassword: data.newPassword
-        });
+        resetPasswordMutation.mutate({ phone: phoneNumber, resetCode: data.resetCode, newPassword: data.newPassword });
     };
 
     useEffect(() => {
         let interval;
-        if (resendTimer > 0) {
-            interval = setInterval(() => setResendTimer(prev => prev - 1), 1000);
-        }
+        if (resendTimer > 0) interval = setInterval(() => setResendTimer(prev => prev - 1), 1000);
         return () => clearInterval(interval);
     }, [resendTimer]);
 
-
     return (
-        <div className="forgot_password">
-            <div data-aos="fade-up" className={styles.bg}>
-                <div className={styles.form}>
-                    {!showResetPassword ? (
-                        <form onSubmit={handleSubmitPhone(forgotPassHandler)}>
-                            <label>Phone Number</label>
-                            <input
-                                className={styles.input}
-                                type="text"
-                                {...registerPhone("phone")}
-                            />
-                            {phoneErrors.phone && <p style={{ color: "red" }}>{phoneErrors.phone.message}</p>}
-                            <button
-                                type="submit"
-                                className={styles.btn}
-                                disabled={sendCodeMutation.isPending}
-                            >
-                                {sendCodeMutation.isPending ? "Sending..." : "Send Code"}
-                            </button>
-                        </form>
-                    ) : (
-                        <form onSubmit={handleSubmitReset(changePasswordHandler)}>
-                            <label>Reset Code</label>
-                            <input
-                                className={styles.input}
-                                type="text"
-                                {...registerReset("resetCode")}
-                            />
-                            {resetErrors.resetCode && <p style={{ color: "red" }}>{resetErrors.resetCode.message}</p>}
+        <AuthShell image="/images/55694782091264d5234a0dad5cbf505a.jpg">
+            <div className="auth-card">
+                {!showResetPassword ? (
+                    <form onSubmit={handleSubmitPhone(forgotPassHandler)} className="flex flex-col gap-1.5 text-left">
+                        <label className="label">Phone Number</label>
+                        <input className="input" type="text" {...registerPhone("phone")} />
+                        {phoneErrors.phone && <p className="field-error">{phoneErrors.phone.message}</p>}
+                        <button type="submit" className="btn btn-primary mt-3 w-full" disabled={sendCodeMutation.isPending}>
+                            {sendCodeMutation.isPending ? "Sending..." : "Send Code"}
+                        </button>
+                    </form>
+                ) : (
+                    <form onSubmit={handleSubmitReset(changePasswordHandler)} className="flex flex-col gap-1.5 text-left">
+                        <label className="label">Reset Code</label>
+                        <input className="input" type="text" {...registerReset("resetCode")} />
+                        {resetErrors.resetCode && <p className="field-error">{resetErrors.resetCode.message}</p>}
 
-                            <label>New Password</label>
-                            <input
-                                className={styles.input}
-                                type="password"
-                                {...registerReset("newPassword")}
-                            />
-                            {resetErrors.newPassword && <p style={{ color: "red" }}>{resetErrors.newPassword.message}</p>}
-                            <small>Include Upper, Lower Case, Number and @</small>
+                        <label className="label mt-2">New Password</label>
+                        <input className="input" type="password" {...registerReset("newPassword")} />
+                        {resetErrors.newPassword && <p className="field-error">{resetErrors.newPassword.message}</p>}
+                        <small className="field-hint text-sage-500">Include Upper, Lower Case, Number and @</small>
 
-                            <button
-                                type="submit"
-                                className={styles.btn}
-                                disabled={resetPasswordMutation.isPending}
-                            >
-                                {resetPasswordMutation.isPending ? "Processing..." : "Reset Password"}
-                            </button>
+                        <button type="submit" className="btn btn-primary mt-3 w-full" disabled={resetPasswordMutation.isPending}>
+                            {resetPasswordMutation.isPending ? "Processing..." : "Reset Password"}
+                        </button>
 
-                            <button
-                                type="button"
-                                className={styles.btn}
-                                disabled={resendTimer > 0 || sendCodeMutation.isPending}
-                                onClick={() => sendCodeMutation.mutate(phoneNumber)}
-                                style={{ marginTop: "1rem" }}
-                            >
-                                {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend Code"}
-                            </button>
-                        </form>
-                    )}
+                        <button
+                            type="button"
+                            className="btn btn-secondary w-full"
+                            disabled={resendTimer > 0 || sendCodeMutation.isPending}
+                            onClick={() => sendCodeMutation.mutate(phoneNumber)}
+                        >
+                            {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend Code"}
+                        </button>
+                    </form>
+                )}
 
-                    <Link href={"/login-register"} className={styles.back_to_login}>Back To Login</Link>
-                </div>
-                <Link href={"/login-register"} className={styles.redirect_to_home}>Cancel</Link>
+                <Link href="/login-register" className="mt-2 cursor-pointer text-sm font-semibold text-text dark:text-gray-100">Back To Login</Link>
             </div>
-            <div className="image-container">
-                <Image
-                    width={1000}
-                    height={1000}
-                    src="/images/55694782091264d5234a0dad5cbf505a.jpg"
-                    alt=""
-                />
-            </div>
-        </div>
+            <Link href="/login-register" className="btn btn-accent mx-auto mt-6 w-max">
+                Cancel
+            </Link>
+        </AuthShell>
     );
 };
 

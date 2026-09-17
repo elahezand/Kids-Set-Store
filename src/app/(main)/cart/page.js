@@ -1,7 +1,6 @@
-import Table from "@/components/template/cart/table";
-import styles from "@/styles/cart.module.css";
-import Breadcrumb from "@/components/modules/breadCrumb/breadCrumb";
-// Generate metadata for SEO and social sharing
+import Table from "@/components/template/main/cart/table";
+import Breadcrumb from "@/components/modules/main/breadCrumb";
+
 export const metadata = {
   title: "Shopping Cart - YourSiteName",
   description: "View and manage the items in your shopping cart. Proceed to checkout or continue shopping.",
@@ -11,14 +10,7 @@ export const metadata = {
     description: "View and manage the items in your shopping cart. Proceed to checkout or continue shopping.",
     url: "https://yoursite.com/cart",
     siteName: "YourSiteName",
-    images: [
-      {
-        url: "https://yoursite.com/images/cart-og-image.png",
-        width: 800,
-        height: 600,
-        alt: "Shopping Cart",
-      },
-    ],
+    images: [{ url: "https://yoursite.com/images/cart-og-image.png", width: 800, height: 600, alt: "Shopping Cart" }],
     locale: "en_US",
     type: "website",
   },
@@ -31,13 +23,13 @@ export const metadata = {
 };
 
 export default async function page() {
-
   return (
-    <div className="container">
-      <Breadcrumb title={"Basket CART"} route={"Cart"} />
+    <div className="page-container">
+      <Breadcrumb title="Basket CART" route="Cart" />
       <div
-        className={styles.cart}
-        data-aos="fade-up">
+        className="flex w-full flex-col items-start gap-8 lg:flex-row"
+        data-aos="fade-up"
+      >
         <Table />
       </div>
     </div>

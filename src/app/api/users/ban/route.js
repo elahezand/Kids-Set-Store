@@ -1,6 +1,5 @@
 import connectToDB from "../../../../../configs/db";
 import BanModel from "../../../../../model/ban";
-import UserModel from "../../../../../model/user";
 import { authAdmin } from "@/utils/serverHelper";
 import { NextResponse } from "next/server";
 
@@ -10,21 +9,18 @@ export async function POST(req) {
     const admin = await authAdmin();
     if (!admin) throw new Error("This API is protected");
 
-    const { email, user } = await req.json();
-
-    const userExist = await BanModel.findOne({
-      $or: [{ email }, { user }]
+    const { email, username } = await req.json();
+    const existing = await BanModel.findOne({
+      $or: [
+        { email },
+        { username }
+      ]
     });
-    
-
-    if (!userExist) {
-      await BanModel.create({ user, email });
+    if (existing) {
+      await BanModel.deleteOne({ email: user.email });
+      return NextResponse.json({ message: "User unbanned successfully" }, { status: 200 });
     }
-
-    await UserModel.findOneAndDelete({
-      $or: [{ email }, { _id: user }]
-    });
-
+    await BanModel.create({ email: user.email });
     return NextResponse.json({ message: "User banned successfully" }, { status: 200 });
   } catch (err) {
     return NextResponse.json({ message: err.message }, { status: 500 });

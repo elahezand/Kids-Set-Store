@@ -1,32 +1,20 @@
-import React from "react";
 import connectToDB from "../../../../../configs/db";
-import commentModel from "../../../../../model/comment";
-import Table from "@/components/template/p-admin/comments/table"
-import Pagination from "@/components/modules/pageination/pagination";
+import CommentModel from "../../../../../model/comment";
 import { paginate } from "@/utils/helper";
+import PageHeader from "@/components/modules/panel/pageHeader";
+import Pagination from "@/components/modules/ui/pagination";
+import CommentsTable from "@/components/template/p-admin/comments/table";
 
-const page = async ({ searchParams }) => {
-  await connectToDB();
-  const paginatedData = await paginate(commentModel, searchParams, {}, "productID")
+export default async function CommentsPage({ searchParams }) {
+    await connectToDB();
+    const params = await searchParams;
+    const paginatedData = await paginate(CommentModel, params, {}, "productID");
 
-  return (
-    <main className="container">
-      {paginatedData.data.length === 0 ? (
-        <p className="empty">No Comment Yet :( </p>
-      ) : (
-        <Table
-          comments={JSON.parse(JSON.stringify(paginatedData.data))}
-          title="Comment List"
-        />
-      )}
-      <Pagination
-        href={`comments?`}
-        currentPage={paginatedData.page}
-        pageCount={paginatedData.pageCount}
-        limit={paginatedData.limit}
-      />
-    </main>
-  );
-};
-
-export default page;
+    return (
+        <>
+            <PageHeader title="Comments" description="Review, approve and answer customer comments." />
+            <CommentsTable comments={JSON.parse(JSON.stringify(paginatedData.data))} total={paginatedData.totalCount} />
+            <Pagination pageCount={paginatedData.pageCount} limit={paginatedData.limit} />
+        </>
+    );
+}

@@ -1,126 +1,95 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import swal from "sweetalert";
-import EditModal from "@/components/modules/modals/editModal";
-import { useDelete, usePut, usePost } from "@/utils/hooks/useReactQueryPanel";
 import toast from "react-hot-toast";
-import { log } from "three";
+import { LuBan, LuPencil, LuShieldCheck, LuTrash2, LuUsers } from "react-icons/lu";
+import { useDelete, usePut, usePost } from "@/utils/hooks/useReactQueryPanel";
+import EmptyState from "@/components/modules/ui/emptyState";
+import EditUserModal from "./editUserModal";
 
-export default function DataTable({ users, title }) {
-    const [showModalEdit, setShowModalEdit] = useState(false);
-    const [user, setUser] = useState(null);
+export default function UsersTable({ users = [], total }) {
     const router = useRouter();
-    const hideModal = () => setShowModalEdit(false);
+    const [editing, setEditing] = useState(null);
 
-    const { mutate: deleteUserMutate } = useDelete(`/users`, {
-        onSuccess: () => {
-            toast.success("User Removed Successfully :)");
-            router.refresh();
-        },
-    });
-
-    const { mutate: changeRoleMutate } = usePut(`/users/role`, {
-        onSuccess: () => {
-            toast.success("Role Changed Successfully :)");
-            router.refresh();
-        },
-    });
-
-    const { mutate: banUserMutate } = usePost(`/users/ban`, {
-        onSuccess: () => {
-            toast.success("User Banned Successfully :)");
-            router.refresh();
-        },
-    });
-
-    const removeHandler = (id) => {
-        swal({
-            title: "Are you sure to remove this user?",
-            icon: "warning",
-            buttons: ["No", "Yes"]
-        }).then(result => {
-            if (result) deleteUserMutate(id);
-        });
+    const refresh = (message) => () => {
+        toast.success(message);
+        router.refresh();
     };
 
-    const changeRoleHandler = (id) => {
-        if (!id) return toast.error("User ID not found!");
-      changeRoleMutate({ 
-        id: id, 
-        payload: {}
-    });
-    };
-    const banHandler = (userID, email) => {
-        swal({
-            title: "Are you sure to ban this user?",
-            icon: "warning",
-            buttons: ["No", "Yes"]
-        }).then(result => {
-            if (result) banUserMutate({ user: userID, email });
-        });
-    };
+    const { mutate: deleteUser } = useDelete("/users", { onSuccess: refresh("User removed successfully") });
+    const { mutate: changeRole } = usePut("/users/role", { onSuccess: refresh("Role changed successfully") });
+    const { mutate: banUser } = usePost("/users/ban", { onSuccess: refresh("User banned successfully") });
+
+    const confirm = (title, button, action) =>
+        swal({ title, icon: "warning", buttons: ["Cancel", button], dangerMode: true }).then((ok) => ok && action());
 
     return (
-        <>
-            <div>
-                <h1 className="title"><span>{title}</span></h1>
+        <section className="card overflow-hidden">
+            <div className="card-header">
+                <h2 className="card-title">Users list</h2>
+                {typeof total === "number" && <span className="badge badge-neutral">{total} users</span>}
             </div>
-            <div className="table_container">
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Edit</th>
-                            <th>Change Role</th>
-                            <th>Remove</th>
-                            <th>Ban</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {users.map((user, index) => (
-                            <tr key={user._id}>
-                                <td>{index + 1}</td>
-                                <td>{user.username}</td>
-                                <td>{user.email || "No Email Found"}</td>
-                                <td>{user.role === "ADMIN" ? "Admin" : "User"}</td>
-                                <td>
-                                    <button className="edit_btn" onClick={() => {
-                                        setUser(user);
-                                        setShowModalEdit(true);
-                                    }}>Edit</button>
-                                </td>
-                                <td>
-                                    <button className="edit_btn" onClick={() => changeRoleHandler(user._id)}>
-                                        Change Role
-                                    </button>
-                                </td>
-                                <td>
-                                    <button className="delete_btn" onClick={() => removeHandler(user._id)}>
-                                        Remove
-                                    </button>
-                                </td>
-                                <td>
-                                    <button className="delete_btn" onClick={() => banHandler(user._id, user.phone, user.email)}>
-                                        Ban
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
 
-                {showModalEdit && (
-                    <EditModal
-                        showEditModal={setShowModalEdit}
-                        hideModal={hideModal}
-                        data={user}
-                    />
-                )}
-            </div>
-        </>
+            {users.length === 0 ? (
+                <EmptyState title="No users yet" icon={LuUsers} />
+            ) : (
+                <div className="table-wrap">
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Phone</th>
+                                <th>Role</th>
+                                <th className="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {users.map((user) => (
+                                <tr key={user._id}>
+                                    <td>
+                                        <div className="flex items-center gap-3">
+                                            <span className="flex size-9 items-center justify-center rounded-full bg-sage-50 text-sm font-semibold text-sage-700 uppercase dark:bg-sage-500/10 dark:text-sage-300">
+                                                {user.username?.[0] || "?"}
+                                            </span>
+                                            <div className="leading-tight">
+                                                <p className="font-medium text-gray-900 dark:text-gray-100">{user.username}</p>
+                                                <p className="text-xs text-gray-700 dark:text-gray-500">{user.email || "No email"}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="tabular-nums">{user.phone || "—"}</td>
+                                    <td>
+                                        <span className={`badge ${user.role === "ADMIN" ? "badge-success" : "badge-neutral"}`}>
+                                            {user.role === "ADMIN" ? "Admin" : "User"}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div className="flex justify-end gap-2">
+                                            <button type="button" className="btn btn-secondary btn-sm" onClick={() => setEditing(user)}>
+                                                <LuPencil className="size-3.5" /> Edit
+                                            </button>
+                                            <button type="button" className="btn btn-soft-primary btn-sm" onClick={() => changeRole({ id: user._id, payload: {} })}>
+                                                <LuShieldCheck className="size-3.5" /> {user.role === "ADMIN" ? "Make user" : "Make admin"}
+                                            </button>
+                                            <button type="button" className="btn btn-soft-danger btn-sm" title="Ban"
+                                                onClick={() => confirm("Ban this user?", "Ban", () => banUser({ user: user._id, email: user.email, phone: user.phone }))}>
+                                                <LuBan className="size-3.5" />
+                                            </button>
+                                            <button type="button" className="btn btn-soft-danger btn-sm" title="Remove"
+                                                onClick={() => confirm("Remove this user?", "Remove", () => deleteUser(user._id))}>
+                                                <LuTrash2 className="size-3.5" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
+            {editing && <EditUserModal data={editing} hideModal={() => setEditing(null)} />}
+        </section>
     );
 }

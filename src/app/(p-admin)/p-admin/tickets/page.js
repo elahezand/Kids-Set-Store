@@ -1,31 +1,21 @@
-import React from "react";
 import connectToDB from "../../../../../configs/db";
 import TicketModel from "../../../../../model/ticket";
-import Table from "@/components/template/p-admin/tickets/table"
-import Pagination from "@/components/modules/pageination/pagination";
-import DepartmentModel from "../../../../../model/department";
+import "../../../../../model/department";
 import { paginate } from "@/utils/helper";
-const page = async ({ searchParams }) => {
-    await connectToDB()
-    const paginatedData = await paginate(TicketModel, searchParams, {parent:null}, "department")
+import PageHeader from "@/components/modules/panel/pageHeader";
+import Pagination from "@/components/modules/ui/pagination";
+import TicketsTable from "@/components/template/p-admin/tickets/table";
+
+export default async function TicketsPage({ searchParams }) {
+    await connectToDB();
+    const params = await searchParams;
+    const paginatedData = await paginate(TicketModel, params, { parent: null }, ["department", { path: "user", select: "username email phone" }]);
 
     return (
-        <main className="container">
-            {paginatedData.data.length === 0 ? (
-                <p className={styles.empty}>No Ticket Yet :(</p>
-            ) : (
-                <Table
-                    tickets={JSON.parse(JSON.stringify(paginatedData.data))}
-                    title="Ticket List"
-                />
-            )}
-            <Pagination
-                href={`tikets?`}
-                currentPage={paginatedData.page}
-                pageCount={paginatedData.pageCount}
-                limit={paginatedData.limit} />
-        </main>
+        <>
+            <PageHeader title="Tickets" description="Customer support requests." />
+            <TicketsTable tickets={JSON.parse(JSON.stringify(paginatedData.data))} total={paginatedData.totalCount} />
+            <Pagination pageCount={paginatedData.pageCount} limit={paginatedData.limit} />
+        </>
     );
-};
-
-export default page;
+}

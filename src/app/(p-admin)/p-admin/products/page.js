@@ -1,31 +1,22 @@
-import connectToDB from '../../../../../configs/db'
-import ProductModal from '../../../../../model/product'
-import AddProduct from '@/components/template/p-admin/products/addNewProduct'
-import DataTable from '@/components/template/p-admin/products/table'
-import Pagination from '@/components/modules/pageination/pagination'
-import { paginate } from '@/utils/helper'
-const Products = async ({ searchParams }) => {
-  await connectToDB()
-  const paginatedData = await paginate(ProductModal, searchParams, {})
+import connectToDB from "../../../../../configs/db";
+import ProductModel from "../../../../../model/product";
+import { paginate } from "@/utils/helper";
+import PageHeader from "@/components/modules/panel/pageHeader";
+import Pagination from "@/components/modules/ui/pagination";
+import AddProduct from "@/components/template/p-admin/products/addNewProduct";
+import ProductsTable from "@/components/template/p-admin/products/table";
 
-  return (
-      <main className='container'>
-        <AddProduct />
-        {paginatedData.data.length === 0 ? (
-          <p className="empty">  No Discount Yet :(</p>
-        ) : (
-          <DataTable
-            products={JSON.parse(JSON.stringify(paginatedData.data))}
-            title=" Products List"
-          />
-        )}
-        <Pagination
-          href={`products?`}
-          currentPage={paginatedData.page}
-          pageCount={paginatedData.pageCount}
-          limit={paginatedData.limit} />
-      </main>
-  )
+export default async function ProductsPage({ searchParams }) {
+    await connectToDB();
+    const params = await searchParams;
+    const paginatedData = await paginate(ProductModel, params, {});
+
+    return (
+        <>
+            <PageHeader title="Products" description="Create, edit and manage your store products." />
+            <AddProduct />
+            <ProductsTable products={JSON.parse(JSON.stringify(paginatedData.data))} total={paginatedData.totalCount} />
+            <Pagination pageCount={paginatedData.pageCount} limit={paginatedData.limit} />
+        </>
+    );
 }
-
-export default Products

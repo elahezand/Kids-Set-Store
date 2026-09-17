@@ -1,7 +1,6 @@
-import Breadcrumb from "@/components/modules/breadCrumb/breadCrumb";
-import styles from "@/styles/contact-us.module.css";
-import Form from "@/components/template/contactUs/form/Form";
-import Map from "@/components/template/contactUs/form/map";
+import Breadcrumb from "@/components/modules/main/breadCrumb";
+import Form from "@/components/template/main/form/Form";
+import Map from "@/components/template/main/form/map";
 import Image from "next/image";
 
 export const metadata = {
@@ -14,14 +13,7 @@ export const metadata = {
         description: "Get in touch with SET KIDS. Reach out for questions, feedback, or support.",
         url: "https://yourwebsite.com/contact",
         siteName: "Set kids",
-        images: [
-            {
-                url: "https://yourwebsite.com/images/contact-og.jpg",
-                width: 1200,
-                height: 630,
-                alt: "Contact Set kids",
-            },
-        ],
+        images: [{ url: "https://yourwebsite.com/images/contact-og.jpg", width: 1200, height: 630, alt: "Contact Set kids" }],
         locale: "en_US",
         type: "website",
     },
@@ -32,15 +24,13 @@ export const metadata = {
         images: ["https://yourwebsite.com/images/contact-og.jpg"],
     },
 };
-const page = async () => {
 
+const page = async () => {
     return (
-        <div className="container">
-            <Breadcrumb
-                route={"Contact-Us"}
-                title={"ContactUs"} />
-            <div className={styles.container}>
-                <div className={styles.contents}>
+        <div className="page-container text-text dark:text-gray-100">
+            <Breadcrumb route="Contact-Us" title="ContactUs" />
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12">
+                <div className="flex flex-col items-center justify-center gap-6">
                     <Image
                         width={200}
                         height={200}
@@ -48,11 +38,12 @@ const page = async () => {
                         priority
                         sizes="100vw"
                         fetchPriority="high"
-                        src={"/images/59aa50c82c33be2762280e2c0939bde3.jpg"}
+                        src="/images/59aa50c82c33be2762280e2c0939bde3.jpg"
+                        className="h-[140px] w-full object-contain sm:h-[180px]"
                     />
                     <Form />
                 </div>
-                <div>
+                <div className="h-[350px] overflow-hidden rounded-2xl shadow-card sm:h-[450px] md:h-full">
                     <Map />
                 </div>
             </div>

@@ -2,7 +2,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import Footer from '@/components/modules/footer/footer';
+import Footer from '@/components/modules/main/footer';
 
 const noFooterRoutes = ["/login-register"];
 

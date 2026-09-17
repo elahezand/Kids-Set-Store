@@ -1,18 +1,14 @@
-import DetailProfile from "@/components/template/p-user/detail-profile/detail-profile";
 import { getMe } from "@/utils/serverHelper";
-const page = async () => {
-  const Info = await getMe()
+import PageHeader from "@/components/modules/panel/pageHeader";
+import ProfileForm from "@/components/modules/panel/profileForm";
 
-  return (
-    <main className="container">
-      <div>
-        <h1 className="title">
-          <span>Detail-account</span>
-        </h1>
-      </div>
-      <DetailProfile userData={JSON.parse(JSON.stringify(Info))} />
-    </main>
-  );
-};
+export default async function ProfilePage() {
+    const info = await getMe();
 
-export default page;
+    return (
+        <>
+            <PageHeader title="Profile" description="Manage your personal information and password." />
+            <ProfileForm userData={JSON.parse(JSON.stringify(info))} />
+        </>
+    );
+}

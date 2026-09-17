@@ -1,43 +1,22 @@
-import React from 'react'
-import orderModel from '../../../../../model/order'
-import { authUser } from '@/utils/serverHelper'
-import { paginate } from '@/utils/helper'
-import DataTable from '@/components/template/p-user/comments/DataTable'
-import Pagination from '@/components/modules/pageination/pagination'
+import connectToDB from "../../../../../configs/db";
+import OrderModel from "../../../../../model/order";
+import { authUser } from "@/utils/serverHelper";
+import { paginate } from "@/utils/helper";
+import PageHeader from "@/components/modules/panel/pageHeader";
+import Pagination from "@/components/modules/ui/pagination";
+import OrdersTable from "@/components/template/p-user/orders/ordersTable";
 
-export default async function page({ searchParams }) {
-  const user = await authUser()
-  const searchparams = searchParams
+export default async function OrdersPage({ searchParams }) {
+    await connectToDB();
+    const params = await searchParams;
+    const user = await authUser();
+    const paginatedData = await paginate(OrderModel, params, { user: user?._id });
 
-  const paginatedData = await paginate(
-    orderModel,
-    searchparams,
-    { userID: user._id },
-    "productID"
-  )
-  return (
-    <main className="container">
-      <div>
-        <h1 className="title">
-          <span>Orders</span>
-        </h1>
-      </div>
-      {paginatedData.data.length > 0 &&
-        <DataTable
-          comments={JSON.parse(JSON.stringify(paginatedData.data))}
-          title="Orders "
-        />
-      }
-      {paginatedData.data.length === 0 &&
-        <p className="empty">
-          No Orders Yet :(
-        </p>}
-      <Pagination
-        href={`orders?`}
-        currentPage={paginatedData.page}
-        pageCount={paginatedData.pageCount}
-        limit={paginatedData.limit}
-      />
-    </main>
-  )
+    return (
+        <>
+            <PageHeader title="Orders" description="Track your purchases and their status." />
+            <OrdersTable orders={JSON.parse(JSON.stringify(paginatedData.data))} />
+            <Pagination pageCount={paginatedData.pageCount} limit={paginatedData.limit} />
+        </>
+    );
 }

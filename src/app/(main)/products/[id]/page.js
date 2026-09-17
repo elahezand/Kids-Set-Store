@@ -2,13 +2,12 @@ import connectToDB from "../../../../../configs/db";
 import ProductModel from "../../../../../model/product";
 import commentModel from "../../../../../model/comment";
 import { isValidObjectId } from "mongoose";
-import styles from "@/styles/product.module.css";
-import Gallery from "@/components/template/product/gallery/gallery";
-import MoreProducts from "@/components/template/product/moreProducts/moreProducts";
-import Tabs from "@/components/template/product/tabs/tabs";
-import Comments from "@/components/template/product/comments/comments";
-import Details from "@/components/template/product/details/detail";
-import Breadcrumb from "@/components/modules/breadCrumb/breadCrumb";
+import Gallery from "@/components/template/main/product/gallery";
+import MoreProducts from "@/components/template/main/product/moreProducts";
+import Tabs from "@/components/template/main/product/tabs";
+import Comments from "@/components/template/main/product/comments/comments";
+import Details from "@/components/template/main/product/detail";
+import Breadcrumb from "@/components/modules/main/breadCrumb";
 import { notFound } from "next/navigation";
 
 const product = async ({ params }) => {
@@ -21,10 +20,7 @@ const product = async ({ params }) => {
   }
   if (!product) return notFound()
 
-  product = {
-    ...product,
-    _id: product._id.toString()
-  };
+  product = { ...product, _id: product._id.toString() };
   const productComments = await commentModel.countDocuments({ productID: product._id, isAccept: true })
 
   const related = await ProductModel
@@ -36,31 +32,23 @@ const product = async ({ params }) => {
   const relatedProducts = JSON.parse(JSON.stringify(related));
 
   return (
-    <div className="container">
-      <Breadcrumb
-        route={`products/${product._id}`}
-        title={product.name} />
-      <div data-aos="fade-up"
-        className={styles.contents}>
-        <div className={styles.main}>
+    <div className="page-container">
+      <Breadcrumb route={`products/${product._id}`} title={product.name} />
+      <div data-aos="fade-up" className="mx-auto max-w-[1200px] text-text dark:text-gray-100">
+        <div className="flex flex-col gap-8 md:flex-row md:gap-10 lg:gap-14">
           <Gallery images={product.img} />
-          <Details
-            productComments={productComments}
-            product={product} />
+          <Details productComments={productComments} product={product} />
         </div>
         <Tabs
           color={product.color}
           availableSizes={product.availableSizes}
           material={product.material}
-          longDescription={product.longDescription} />
-        <section
-          className={styles.tabs_content}>
-          <Comments
-            productId={product._id}
-          />
+          longDescription={product.longDescription}
+        />
+        <section className="border-t border-gray-200 pt-10 dark:border-white/10">
+          <Comments productId={product._id} />
         </section>
-        <MoreProducts
-          related={relatedProducts} />
+        <MoreProducts related={relatedProducts} />
       </div>
     </div>
   );
