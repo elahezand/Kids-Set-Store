@@ -4,31 +4,32 @@ import { authAdmin } from "@/utils/serverHelper";
 import { NextResponse } from "next/server";
 import { articleSchema } from "../../../../validators/article";
 import handleFileUpload from "@/utils/serverFile";
-import { paginate } from "@/utils/helper";
+import { paginate } from "@/utils/paginate";
 
 export async function GET(req) {
   try {
     await connectToDB();
-    const admin = await authAdmin();
-    if (!admin) throw new Error("This API is protected");
 
     const { searchParams } = new URL(req.url);
-    const useCursor = searchParams.has("cursor");
 
-    const result = await paginate(
-      ArticleModel,    // Model
-      searchParams,    // searchParams
-      {},              // filter
-      null,            // populate
-      useCursor,       // useCursor
-      true             // cursor/page mode
-    );
+    const result = await paginate(ArticleModel, {
+      limit: Number(searchParams.get("limit")) || 9,
+      cursor: searchParams.get("cursor"),
+      filters: {},
+      sort: { _id: -1 },
+    });
 
     return NextResponse.json(result, { status: 200 });
   } catch (err) {
-    return NextResponse.json({ message: err.message || "Unknown Error" }, { status: 500 });
+    console.error("GET /api/article failed:", err);
+
+    return NextResponse.json(
+      { message: err.message || "Unknown Error" },
+      { status: 500 }
+    );
   }
 }
+
 
 export async function POST(req) {
   try {

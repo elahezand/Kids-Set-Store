@@ -3,7 +3,7 @@ import discountModel from "../../../../model/discount";
 import { discountCreateSchema } from "../../../../validators/discount";
 import { NextResponse } from "next/server";
 import { authAdmin } from "@/utils/serverHelper";
-import { paginate } from "@/utils/helper";
+import { paginate } from "@/utils/paginate";
 
 export async function GET() {
     try {

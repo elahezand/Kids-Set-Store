@@ -25,7 +25,9 @@ const ForgotPassword = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [resendTimer, setResendTimer] = useState(0);
 
-    const { register: registerPhone, handleSubmit: handleSubmitPhone, formState: { errors: phoneErrors } } =
+    const { register: registerPhone,
+        handleSubmit: handleSubmitPhone,
+        formState: { errors: phoneErrors } } =
         useForm({ resolver: zodResolver(phoneSchema) });
 
     const sendCodeMutation = useMutation({
@@ -37,6 +39,7 @@ const ForgotPassword = () => {
         },
         onError: (err) => toast.error(err.response?.data?.message || "Failed to send code"),
     });
+    
 
     const forgotPassHandler = (data) => {
         setPhoneNumber(data.phone);

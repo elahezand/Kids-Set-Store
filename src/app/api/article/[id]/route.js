@@ -16,7 +16,6 @@ export async function GET(req, { params }) {
 
         if (!isvalidId) return Response.json({ message: "Not Valid :)" }, { satatus: 422 })
 
-
         const article = await ArticleModel.findOne({ _id: id })
             .lean()
         if (!article) throw new Error(`Failed to get data`);
@@ -90,7 +89,7 @@ export async function PUT(req, { params }) {
                 shortDescription,
                 content,
                 status: status,
-                cover: `http://localhost:3000/uploads/${filename}`
+                cover: `/uploads/${filename}`
             }
         })
         return Response.json({ message: "Article Updated" }, { status: 200 })

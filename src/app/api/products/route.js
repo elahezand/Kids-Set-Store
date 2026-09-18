@@ -1,70 +1,116 @@
 import connectToDB from "../../../../configs/db"
 import ProductModal from "../../../../model/product"
 import CategoryModel from "../../../../model/category"
-import { paginate } from "@/utils/helper"
+import { paginate } from "@/utils/paginate"
 import { NextResponse } from "next/server"
-
+import ProductModel from "../../../../model/product"
 export async function GET(req) {
-    try {
-        await connectToDB()
-        const { searchParams } = new URL(req.url)
+  try {
+    await connectToDB();
 
-        const categoryName = searchParams.get("category")
-        const value = searchParams.get("value")
-        const color = searchParams.get("color")
-        const material = searchParams.get("material")
-        const maxPrice = searchParams.get("max")
+    const { searchParams } = new URL(req.url);
 
-        const sortType = searchParams.get("sort");
-        const useCursor =  searchParams.get("cursor");;
+    const limit = searchParams.get("limit");
+    const cursor = searchParams.get("cursor");
 
-        let filter = {}
+    const categoryName = searchParams.get("category");
+    const value = searchParams.get("value");
+    const color = searchParams.get("color");
+    const material = searchParams.get("material");
+    const maxPrice = searchParams.get("max");
+    const sortType = searchParams.get("sort");
 
-        if (categoryName) {
-            const category = await CategoryModel.findOne({ slug: categoryName })
-            if (category) filter.categoryPath = category._id
-        }
+    const filters = {};
 
-        if (color && color !== "-1") filter.color = color
+    // Category
+    if (categoryName) {
+      const category = await CategoryModel.findOne({
+        slug: categoryName,
+      }).lean();
 
-        if (material && material !== "-1") {
-            filter.material = { $regex: material, $options: "i" }
-        }
-
-        if (maxPrice) filter.price = { $lte: Number(maxPrice) }
-
-        if (value === "bestSelling") filter.score = { $gte: 4 }
-
-        let sortOption = { _id: -1 }
-
-        if (sortType === "price") {
-            sortOption = { price: 1, _id: -1 }
-        }
-
-        if (sortType === "popularity") {
-            sortOption = { score: -1, _id: -1 }
-        }
-
-        if (sortType === "latest") {
-            sortOption = { _id: -1 }
-        }
-
-        const result = await paginate(
-            ProductModal,
-            searchParams,
-            filter,
-            null,
-            useCursor,
-            true,
-            sortOption
-        )
-
-        return NextResponse.json(result, { status: 200 })
-
-    } catch (err) {
-        console.error("Error in GET products:", err)
-        return NextResponse.json({ message: "Unknown Error" }, { status: 500 })
+      if (category) {
+        filters.categoryPath = category._id;
+      }
     }
+
+    // Color
+    if (color && color !== "-1") {
+      filters.color = color;
+    }
+
+    // Material
+    if (material && material !== "-1") {
+      filters.material = {
+        $regex: material,
+        $options: "i",
+      };
+    }
+
+    // Max price
+    if (maxPrice) {
+      const price = Number(maxPrice);
+
+      if (!Number.isNaN(price)) {
+        filters.price = {
+          $lte: price,
+        };
+      }
+    }
+
+    // Best selling
+    if (value === "bestSelling") {
+      filters.score = {
+        $gte: 4,
+      };
+    }
+
+    // Sort
+    let sortOption = {
+      _id: -1,
+    };
+
+    if (sortType === "price") {
+      sortOption = {
+        price: 1,
+        _id: -1,
+      };
+    }
+
+    if (sortType === "popularity") {
+      sortOption = {
+        score: -1,
+        _id: -1,
+      };
+    }
+
+    if (sortType === "latest") {
+      sortOption = {
+        _id: -1,
+      };
+    }
+
+    const result = await paginate(ProductModel, {
+      limit,
+      cursor,
+      filters,
+      sort: sortOption,
+    });
+
+    return NextResponse.json({
+      success: true,
+      ...result,
+    });
+  } catch (err) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Unknown Error",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
 }
 
 export async function POST(req) {

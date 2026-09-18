@@ -20,7 +20,7 @@ export default function FilterSection({ categories }) {
         material: searchParams.get("material") || "",
         sort: searchParams.get("sort") || "",
         page: currentPage,
-        limit: searchParams.get("limit") || 15,
+        limit: searchParams.get("limit") || 6,
         value: searchParams.get("value") || ""
     }), [searchParams, currentPage]);
 
@@ -40,8 +40,8 @@ export default function FilterSection({ categories }) {
     };
 
     const boxClass = "group relative w-full cursor-pointer rounded-xl bg-sage-400 px-2";
-    const titleClass = "flex w-full items-center justify-center rounded-xl border-2 border-coral-300 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-text dark:text-gray-100 outline-none transition-all duration-300 sm:text-base";
-    const listClass = "invisible absolute left-0 top-full z-[999] mt-1.5 flex w-full flex-col rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-800 py-2 text-text dark:text-gray-100 opacity-0 shadow-float transition-all duration-300 group-hover:visible group-hover:opacity-100";
+    const titleClass = "flex w-full items-center justify-center rounded-xl border-2 border-coral-300 bg-white dark:bg-ink-800 px-4 py-3 text-sm text-text dark:text-gray-100 outline-none transition-all duration-300 sm:text-base";
+    const listClass = "invisible absolute left-0 top-full z-[999] mt-1.5 flex w-full flex-col rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-ink-800 py-2 text-text dark:text-gray-100 opacity-0 shadow-float transition-all duration-300 group-hover:visible group-hover:opacity-100";
 
     return (
         <div className="mb-8 grid grid-cols-1 gap-3 rounded-2xl bg-mint-200 p-4 shadow-card sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">

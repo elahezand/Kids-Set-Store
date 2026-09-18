@@ -28,8 +28,7 @@ export default async function page() {
       <Breadcrumb title="Basket CART" route="Cart" />
       <div
         className="flex w-full flex-col items-start gap-8 lg:flex-row"
-        data-aos="fade-up"
-      >
+        data-aos="fade-up" >
         <Table />
       </div>
     </div>

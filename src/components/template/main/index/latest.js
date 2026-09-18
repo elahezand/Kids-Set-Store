@@ -7,8 +7,7 @@ const Latest = ({ products }) => {
             <SectionHeader title="Our Products" href="/products" />
             <div
                 className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-6 xl:grid-cols-5"
-                data-aos="fade-up"
-            >
+                data-aos="fade-up"  >
                 {products.length ? products.map((item, index) => (
                     <Product {...item} key={index + 1} />
                 )) : null}

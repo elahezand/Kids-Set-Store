@@ -5,9 +5,9 @@ import connectToDB from "../../../../../configs/db";
 import FavoriteModel from "../../../../../model/favorite";
 import ProductModel from "../../../../../model/product";
 import { authUser } from "@/utils/serverHelper";
-import { paginate } from "@/utils/helper";
+import { paginate } from "@/utils/paginate";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import Pagination from "@/components/modules/ui/pagination";
+import Pagination from "@/components/modules/ui/loadMore";
 import EmptyState from "@/components/modules/ui/emptyState";
 import FavoriteCard from "@/components/template/p-user/favorites/favoriteCard";
 

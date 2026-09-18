@@ -1,9 +1,9 @@
 import connectToDB from "../../../../../configs/db";
 import OrderModel from "../../../../../model/order";
 import { authUser } from "@/utils/serverHelper";
-import { paginate } from "@/utils/helper";
+import { paginate } from "@/utils/paginate";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import Pagination from "@/components/modules/ui/pagination";
+import Pagination from "@/components/modules/ui/loadMore";
 import OrdersTable from "@/components/template/p-user/orders/ordersTable";
 
 export default async function OrdersPage({ searchParams }) {

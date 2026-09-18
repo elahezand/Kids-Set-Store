@@ -1,6 +1,6 @@
 import CommentForm from "../commentForm";
 import commentModel from "../../../../../../model/comment";
-import { paginate } from "@/utils/helper";
+import { paginate } from "@/utils/paginate";
 import CommentsList from "./commentsList";
 
 const Comments = async ({ productId, searchParams }) => {

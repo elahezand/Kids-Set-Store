@@ -1,9 +1,9 @@
 import connectToDB from "../../../../../configs/db";
 import DiscountModel from "../../../../../model/discount";
 import ProductModel from "../../../../../model/product";
-import { paginate } from "@/utils/helper";
+import { paginate } from "@/utils/paginate";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import Pagination from "@/components/modules/ui/pagination";
+import Pagination from "@/components/modules/ui/loadMore";
 import AddDiscount from "@/components/template/p-admin/discounts/addDiscount";
 import DiscountsTable from "@/components/template/p-admin/discounts/table";
 

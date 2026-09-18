@@ -1,8 +1,8 @@
 import connectToDB from "../../../../../configs/db";
 import ArticleModel from "../../../../../model/article";
-import { paginate } from "@/utils/helper";
+import { paginate } from "@/utils/paginate";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import Pagination from "@/components/modules/ui/pagination";
+import Pagination from "@/components/modules/ui/loadMore";
 import AddNewArticle from "@/components/template/p-admin/articles/addNewArticle";
 import ArticlesTable from "@/components/template/p-admin/articles/dataTable";
 

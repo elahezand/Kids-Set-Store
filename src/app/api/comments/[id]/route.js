@@ -1,7 +1,7 @@
 import connectToDB from "../../../../../configs/db";
 import { authAdmin } from "@/utils/serverHelper";
 import commentModel from "../../../../../model/comment";
-import { paginate } from "@/utils/helper";
+import { paginate } from "@/utils/paginate";
 import { isValidObjectId } from "mongoose";
 import { NextResponse } from "next/server";
 

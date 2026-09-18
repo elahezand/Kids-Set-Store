@@ -1,7 +1,7 @@
-import axios from "axios";
 import { unstable_cache } from "next/cache";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export const useServerData = async (
   endpoint,
   cacheKey,
@@ -10,8 +10,9 @@ export const useServerData = async (
   if (cacheKey && revalidateTime !== undefined) {
     const fetchData = unstable_cache(
       async () => {
-        const { data } = await axios.get(`${API_URL}${endpoint}`);
-        return data;
+        const res = await fetch(`${API_URL}${endpoint}`);
+        if (!res.ok) throw new Error(`Fetch failed with status ${res.status}`);
+        return res.json();
       },
       [cacheKey],
       { revalidate: revalidateTime }
@@ -21,14 +22,16 @@ export const useServerData = async (
   }
 
   try {
-    const { data } = await axios.get(`${API_URL}${endpoint}`, {
-      headers: {
-        "Cache-Control": "no-store",
-      },
+    const res = await fetch(`${API_URL}${endpoint}`, {
+      cache: "no-store",
     });
-    return data;
+    if (!res.ok) throw new Error(`Fetch failed with status ${res.status}`);
+    return res.json();
   } catch (error) {
-    console.error("SSR fetch error:", error?.message);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("SSR fetch error:", message);
     throw new Error("Data fetch failed");
   }
 };
+
+

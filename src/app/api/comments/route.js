@@ -5,7 +5,7 @@ import { commentValidationSchema } from "../../../../validators/comment";
 import { NextResponse } from "next/server";
 import { getMe } from "@/utils/serverHelper";
 import ProductModel from "../../../../model/product";
-import { paginate } from "@/utils/helper";
+import { paginate } from "@/utils/paginate";
 export async function GET(req) {
     try {
         await connectToDB();

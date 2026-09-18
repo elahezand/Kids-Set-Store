@@ -1,8 +1,8 @@
 import Breadcrumb from "@/components/modules/main/breadCrumb";
 import { getMe } from "@/utils/serverHelper";
-import { paginate } from "@/utils/helper";
+import { paginate } from "@/utils/paginate";
 import WishListItems from "@/components/template/main/wishList/wishListItems";
-import ProductModel from "../../../../model/product";
+
 import { redirect } from "next/navigation";
 import FavoriteModel from "../../../../model/favorite";
 
@@ -32,20 +32,39 @@ const page = async ({ searchParams }) => {
     const user = await getMe()
     if (!user) redirect("/login-register")
 
-    const searchparams = searchParams
+    const params = await searchParams
+    const result = await paginate(FavoriteModel, {
+        limit: Number(params?.limit) || 20,
+        cursor: params?.cursor || null,
 
-    const wishlist = await FavoriteModel.findOne({ user: user.id })
-    if (!wishlist) return null
+        filters: {
+            user: user._id,
+        },
 
-    const paginatedData = await paginate(ProductModel, searchparams, { _id: { $in: wishlist.products } })
+        populate: {
+            path: "products",
+        },
+    });
+
+    const wishLists = (result.data || [])
+        .map((favorite) => favorite.products)
+        .filter(Boolean)
+        .map((product) => JSON.parse(JSON.stringify(product)));
+console.log(wishLists);
+
+    const queryString = new URLSearchParams(
+        Object.entries(params || {}).filter(([key, value]) => key !== "cursor" && typeof value === "string")
+    ).toString();
 
     return (
         <div className="page-container">
             <Breadcrumb route="Favorites" title="Favorites List" />
             <WishListItems
-                nextCursor={paginatedData.nextCursor}
-                limit={paginatedData.limit}
-                data={JSON.parse(JSON.stringify(paginatedData.data))}
+                key={queryString}
+                initialWishlists={wishLists}
+                initialCursor={result.pagination?.nextCursor || null}
+                initialHasMore={result.pagination?.hasMore || false}
+                limit={Number(params?.limit) || 20}
             />
         </div>
     );

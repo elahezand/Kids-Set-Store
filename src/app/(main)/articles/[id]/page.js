@@ -77,7 +77,7 @@ export default async function page({ params }) {
                             className="h-[200px] w-full object-cover sm:h-[250px]"
                         />
                     </div>
-                    <div className="mt-8 rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-float sm:p-8">
+                    <div className="mt-8 rounded-2xl bg-white dark:bg-ink-800 p-6 shadow-float sm:p-8">
                         <span className="relative pl-2 text-lg text-sage-400 before:absolute before:-left-4 before:-top-[5px] before:h-[39px] before:w-[22px] before:skew-x-[10deg] before:rounded-bl-[12px] before:rounded-tl-[8px] before:bg-sage-400">
                             New articles
                         </span>

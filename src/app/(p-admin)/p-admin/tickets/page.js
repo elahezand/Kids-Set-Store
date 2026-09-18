@@ -1,9 +1,9 @@
 import connectToDB from "../../../../../configs/db";
 import TicketModel from "../../../../../model/ticket";
 import "../../../../../model/department";
-import { paginate } from "@/utils/helper";
+import { paginate } from "@/utils/paginate";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import Pagination from "@/components/modules/ui/pagination";
+import Pagination from "@/components/modules/ui/loadMore";
 import TicketsTable from "@/components/template/p-admin/tickets/table";
 
 export default async function TicketsPage({ searchParams }) {

@@ -1,8 +1,8 @@
 import connectToDB from "../../../../../configs/db";
 import UserModel from "../../../../../model/user";
-import { paginate } from "@/utils/helper";
+import { paginate } from "@/utils/paginate";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import Pagination from "@/components/modules/ui/pagination";
+import Pagination from "@/components/modules/ui/loadMore";
 import UsersTable from "@/components/template/p-admin/users/table";
 
 export default async function UsersPage({ searchParams }) {

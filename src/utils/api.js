@@ -1,6 +1,6 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import { manageError } from "./helper";
+import { manageError } from "./paginate";
 const publicApi = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
     withCredentials: true,

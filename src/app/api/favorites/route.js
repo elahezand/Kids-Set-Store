@@ -3,7 +3,7 @@ import FavoriteModel from "../../../../model/favorite";
 import ProductModel from "../../../../model/product";
 import { isValidObjectId } from "mongoose";
 import { getMe } from "@/utils/serverHelper";
-import { paginate } from "@/utils/helper";
+import { paginate } from "@/utils/paginate";
 import { NextResponse } from "next/server";
 export async function GET(req) {
   try {

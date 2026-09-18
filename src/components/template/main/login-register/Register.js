@@ -9,7 +9,7 @@ import { userValidationSchema } from "../../../../../validators/user";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { manageError } from "@/utils/helper";
+import { manageError } from "@/utils/paginate";
 import toast from "react-hot-toast";
 
 const Register = ({ showloginForm }) => {

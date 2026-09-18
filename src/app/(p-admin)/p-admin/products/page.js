@@ -1,8 +1,8 @@
 import connectToDB from "../../../../../configs/db";
 import ProductModel from "../../../../../model/product";
-import { paginate } from "@/utils/helper";
+import { paginate } from "@/utils/paginate";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import Pagination from "@/components/modules/ui/pagination";
+import Pagination from "@/components/modules/ui/loadMore";
 import AddProduct from "@/components/template/p-admin/products/addNewProduct";
 import ProductsTable from "@/components/template/p-admin/products/table";
 

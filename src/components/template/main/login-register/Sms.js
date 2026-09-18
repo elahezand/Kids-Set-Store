@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { manageError } from "@/utils/helper"
+import { manageError } from "@/utils/paginate"
 import toast from "react-hot-toast"
 import axios from "axios"
 import { useMutation } from "@tanstack/react-query"

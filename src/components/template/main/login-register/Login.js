@@ -8,7 +8,7 @@ import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { manageError } from "@/utils/helper";
+import { manageError } from "@/utils/paginate";
 import axios from "axios";
 import toast from "react-hot-toast";
 

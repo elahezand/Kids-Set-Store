@@ -1,6 +1,5 @@
 import Breadcrumb from "@/components/modules/main/breadCrumb";
 
-// Generate metadata for SEO and social sharing
 export async function generateMetadata() {
     return {
         title: "About Us - Your Company Name",
