@@ -1,18 +1,18 @@
-
 "use client";
 
-import useShop from "@/utils/hooks/useShop";
+import useShop from "@/utils/hooks/useCard";
 import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
 import { IoMdClose } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import { TbShoppingCartX } from "react-icons/tb";
-import { usePost } from "@/utils/hooks/useReactQueryPublic";
+import { useQueryClient } from "@tanstack/react-query";
+import { usePost } from "@/utils/hooks/useReactQuery";
 
 const shippingSchema = z.object({
   fullName: z.string().min(2, "Full name is required"),
@@ -22,25 +22,19 @@ const shippingSchema = z.object({
   postalCode: z.string().min(4, "Postal code is required"),
 });
 
+const shippingFields = ["fullName", "phone", "address", "city", "postalCode"];
+
 const Table = () => {
-  const {
-    removeFromCart,
-    cart,
-    increaseCount,
-    decreaseCount,
-  } = useShop();
+  const { removeFromCart, cart, increaseCount, decreaseCount } = useShop();
 
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [discount, setDiscount] = useState("");
   const [discountData, setDiscountData] = useState(null);
-  const [loadingDiscount, setLoadingDiscount] = useState(false);
 
   const total = useMemo(() => {
-    return cart.reduce(
-      (sum, item) => sum + item.price * item.count,
-      0
-    );
+    return cart.reduce((sum, item) => sum + item.price * item.count, 0);
   }, [cart]);
 
   const discountedTotal = useMemo(() => {
@@ -48,9 +42,7 @@ const Table = () => {
 
     return cart.reduce((sum, item) => {
       if (item._id === discountData.productId) {
-        const discountedPrice =
-          item.price * (1 - discountData.percent / 100);
-
+        const discountedPrice = item.price * (1 - discountData.percent / 100);
         return sum + discountedPrice * item.count;
       }
 
@@ -59,56 +51,46 @@ const Table = () => {
   }, [cart, discountData, total]);
 
   // Apply discount
-  const { mutate: applyDiscount } = usePost("/discount/use", {
-    onMutate: () => setLoadingDiscount(true),
+  const { mutate: applyDiscount, isPending: isApplyingDiscount } = usePost(
+    "/discount/use",
+    {
+      errorFallback: "Invalid discount code",
 
-    onSuccess: (data) => {
-      setDiscountData({
-        productId: data.productId,
-        percent: data.percent,
-      });
+      onSuccess: (data) => {
+        setDiscountData({
+          productId: data.productId,
+          percent: data.percent,
+        });
 
-      toast.success("Discount applied!");
-    },
-
-    onError: (err) => {
-      toast.error(
-        err?.response?.data?.message || "Invalid discount code"
-      );
-    },
-
-    onSettled: () => setLoadingDiscount(false),
-  });
+        toast.success("Discount applied!");
+      },
+    }
+  );
 
   const discountHandler = () => {
-    if (!discount.trim()) {
-      return toast.error("Enter discount code");
+    const code = discount.trim();
+
+    if (!code) {
+      toast.error("Enter discount code");
+      return;
     }
 
-    if (loadingDiscount) return;
+    if (isApplyingDiscount) return;
 
-    applyDiscount({
-      code: discount.trim(),
-    });
+    applyDiscount({ code });
   };
 
   // Create order
   const { mutate: createOrder, isPending: isCreatingOrder } = usePost(
     "/orders",
     {
+      errorFallback: "Failed to create order",
+
       onSuccess: () => {
         toast.success("Order created successfully!");
-
         localStorage.removeItem("cart");
-
+        queryClient.invalidateQueries({ queryKey: ["/orders"] });
         router.push("/orders");
-        router.refresh();
-      },
-
-      onError: (err) => {
-        toast.error(
-          err?.response?.data?.message || "Failed to create order"
-        );
       },
     }
   );
@@ -166,29 +148,20 @@ const Table = () => {
               <table className="w-full min-w-[640px] border-collapse bg-white text-text dark:bg-ink-800 dark:text-gray-100">
                 <thead>
                   <tr>
-                    <th className="bg-sage-400 p-4 text-center text-sm font-semibold uppercase tracking-wide text-white">
-                      Product
-                    </th>
-
-                    <th className="bg-sage-400 p-4 text-center text-sm font-semibold uppercase tracking-wide text-white">
-                      Price
-                    </th>
-
-                    <th className="bg-sage-400 p-4 text-center text-sm font-semibold uppercase tracking-wide text-white">
-                      Number
-                    </th>
-
-                    <th className="bg-sage-400 p-4 text-center text-sm font-semibold uppercase tracking-wide text-white">
-                      Total
-                    </th>
-
-                    <th className="bg-sage-400 p-4 text-center text-sm font-semibold uppercase tracking-wide text-white"></th>
+                    {["Product", "Price", "Number", "Total", ""].map((title) => (
+                      <th
+                        key={title || "actions"}
+                        className="bg-sage-400 p-4 text-center text-sm font-semibold uppercase tracking-wide text-white"
+                      >
+                        {title}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
 
-                {cart.map((item) => (
-                  <tbody key={item._id}>
-                    <tr>
+                <tbody>
+                  {cart.map((item) => (
+                    <tr key={item._id}>
                       <td className="w-[250px] border-b border-gray-200 p-4 text-left align-middle dark:border-white/10">
                         <div className="flex items-center gap-4">
                           <Image
@@ -214,23 +187,25 @@ const Table = () => {
 
                       <td className="min-w-[180px] border-b border-gray-200 p-4 text-center align-middle dark:border-white/10">
                         <div className="mx-auto flex w-[100px] items-center justify-between overflow-hidden rounded-lg border-2 border-coral-300">
-                          <span
+                          <button
+                            type="button"
                             onClick={() => decreaseCount(item._id)}
-                            className="flex-1 cursor-pointer select-none bg-gray-50 py-1 text-center transition-colors hover:bg-coral-300 hover:text-white dark:bg-ink-800"
+                            className="flex-1 select-none bg-gray-50 py-1 text-center transition-colors hover:bg-coral-300 hover:text-white dark:bg-ink-800"
+                            aria-label="Decrease quantity"
                           >
                             -
-                          </span>
+                          </button>
 
-                          <span className="px-2">
-                            {item.count}
-                          </span>
+                          <span className="px-2">{item.count}</span>
 
-                          <span
+                          <button
+                            type="button"
                             onClick={() => increaseCount(item._id)}
-                            className="flex-1 cursor-pointer select-none bg-gray-50 py-1 text-center transition-colors hover:bg-coral-300 hover:text-white dark:bg-ink-800"
+                            className="flex-1 select-none bg-gray-50 py-1 text-center transition-colors hover:bg-coral-300 hover:text-white dark:bg-ink-800"
+                            aria-label="Increase quantity"
                           >
                             +
-                          </span>
+                          </button>
                         </div>
                       </td>
 
@@ -238,15 +213,18 @@ const Table = () => {
                         {(item.count * item.price).toLocaleString()} $
                       </td>
 
-                      <td
-                        className="border-b border-gray-200 p-4 text-center align-middle dark:border-white/10"
-                        onClick={() => removeFromCart(item._id)}
-                      >
-                        <IoMdClose className="cursor-pointer text-2xl text-danger-500 transition-transform hover:scale-125" />
+                      <td className="border-b border-gray-200 p-4 text-center align-middle dark:border-white/10">
+                        <button
+                          type="button"
+                          onClick={() => removeFromCart(item._id)}
+                          aria-label="Remove from cart"
+                        >
+                          <IoMdClose className="text-2xl text-danger-500 transition-transform hover:scale-125" />
+                        </button>
                       </td>
                     </tr>
-                  </tbody>
-                ))}
+                  ))}
+                </tbody>
               </table>
             </div>
 
@@ -264,6 +242,7 @@ const Table = () => {
                   type="text"
                   value={discount}
                   onChange={(e) => setDiscount(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && discountHandler()}
                   placeholder="Discount code"
                   className="h-full w-[140px] border-none bg-transparent px-4 text-sm outline-none sm:w-[180px]"
                 />
@@ -272,9 +251,9 @@ const Table = () => {
                   type="button"
                   onClick={discountHandler}
                   className="h-full whitespace-nowrap bg-coral-300 px-4 text-sm font-semibold text-white transition-colors hover:bg-coral-400 disabled:opacity-60 sm:px-5"
-                  disabled={loadingDiscount}
+                  disabled={isApplyingDiscount}
                 >
-                  {loadingDiscount ? "Applying..." : "Submit"}
+                  {isApplyingDiscount ? "Applying..." : "Submit"}
                 </button>
               </div>
             </section>
@@ -306,19 +285,12 @@ const Table = () => {
           className="flex w-full flex-col gap-3.5"
         >
           <div className="flex flex-col gap-1">
-            {[
-              "fullName",
-              "phone",
-              "address",
-              "city",
-              "postalCode",
-            ].map((field) => (
+            {shippingFields.map((field) => (
               <div key={field}>
                 <input
                   {...formRegister(field)}
                   placeholder={field}
-                  className={`input w - full ${errors[field] ? "input-error" : ""
-                    } `}
+                  className={`input w-full ${errors[field] ? "input-error" : ""}`}
                 />
 
                 {errors[field] && (
@@ -343,9 +315,7 @@ const Table = () => {
             disabled={!cart.length || isCreatingOrder}
             className="btn btn-accent w-full disabled:opacity-60"
           >
-            {isCreatingOrder
-              ? "Processing..."
-              : "Proceed to Checkout"}
+            {isCreatingOrder ? "Processing..." : "Proceed to Checkout"}
           </button>
         </form>
       </div>
@@ -354,4 +324,3 @@ const Table = () => {
 };
 
 export default Table;
-

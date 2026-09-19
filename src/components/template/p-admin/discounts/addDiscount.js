@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { LuPlus } from "react-icons/lu";
-import { usePost } from "@/utils/hooks/useReactQueryPanel";
+import { usePost } from "@/utils/hooks/useReactQuery";
 import { discountSchema } from "../../../../../validators/discount";
 
 export default function AddDiscount({ products = [] }) {

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { LuSend } from "react-icons/lu";
-import { usePost } from "@/utils/hooks/useReactQueryPanel";
+import { usePost } from "@/utils/hooks/useReactQuery";
 
 export default function TicketReplyForm({ ticketID }) {
     const router = useRouter();

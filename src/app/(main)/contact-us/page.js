@@ -1,6 +1,6 @@
 import Breadcrumb from "@/components/modules/main/breadCrumb";
-import Form from "@/components/template/main/form/Form";
-import Map from "@/components/template/main/form/map";
+import Form from "@/components/template/main/contact-us/Form";
+import Map from "@/components/template/main/contact-us/map";
 import Image from "next/image";
 
 export const metadata = {

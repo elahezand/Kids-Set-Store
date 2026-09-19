@@ -5,7 +5,7 @@ import Image from "next/image";
 import { FaRegStar, FaStar } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import AddToFavoriteList from "./addToFavoriteList";
-import useShop from "@/utils/hooks/useShop";
+import useShop from "@/utils/hooks/useCard";
 
 export default function Product({ price, name, _id, score, img }) {
   const { addTocard } = useShop();

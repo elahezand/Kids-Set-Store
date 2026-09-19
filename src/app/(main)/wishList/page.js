@@ -50,7 +50,6 @@ const page = async ({ searchParams }) => {
         .map((favorite) => favorite.products)
         .filter(Boolean)
         .map((product) => JSON.parse(JSON.stringify(product)));
-console.log(wishLists);
 
     const queryString = new URLSearchParams(
         Object.entries(params || {}).filter(([key, value]) => key !== "cursor" && typeof value === "string")

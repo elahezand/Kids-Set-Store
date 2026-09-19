@@ -109,6 +109,11 @@
   --animate-fade-in: fade-in 0.2s ease-out;
   --animate-scale-in: scale-in 0.2s ease-out;
 }
+.dark [data-sonner-toaster][data-sonner-theme] {
+  --normal-bg: #1f2937;
+  --normal-text: #fff;
+  --normal-border: #374151;
+}
 
 /* 3. Base ---------------------------------------------------------------- */
 @font-face {

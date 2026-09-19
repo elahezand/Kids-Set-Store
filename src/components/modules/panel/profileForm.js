@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { usePut } from "@/utils/hooks/useReactQueryPanel";
+import { usePut } from "@/utils/hooks/useReactQuery";
 import { profileValidationSchema } from "../../../../validators/user";
 
 const DEFAULT_AVATAR = "/images/user-profile-flat-illustration-avatar-person-icon-gender-neutral-silhouette-profile-picture-free-vector.jpg";

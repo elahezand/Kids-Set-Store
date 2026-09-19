@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import swal from "sweetalert";
 import toast from "react-hot-toast";
 import { LuTrash2 } from "react-icons/lu";
-import { useDelete } from "@/utils/hooks/useReactQueryPanel";
+import { useDelete } from "@/utils/hooks/useReactQuery";
 import Stars from "@/components/modules/ui/stars";
 
 export default function FavoriteCard({ id, name, score, price, img }) {

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import swal from "sweetalert";
 import toast from "react-hot-toast";
 import { LuBan, LuEye, LuTicket } from "react-icons/lu";
-import { usePost } from "@/utils/hooks/useReactQueryPanel";
+import { usePost } from "@/utils/hooks/useReactQuery";
 import EmptyState from "@/components/modules/ui/emptyState";
 
 const priorities = {

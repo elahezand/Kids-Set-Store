@@ -10,7 +10,7 @@ const paginate = async (
     } = {}
 ) => {
     limit = Math.min(
-        Math.max(Number(limit) || 20, 1),
+        Math.max(Number(limit) || 15, 1),
         99
     );
 

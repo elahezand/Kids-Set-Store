@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 
 
-export default function useShop() {
+export default function useCard() {
     const [cart, setCart] = useState([]);
 
     useEffect(() => {

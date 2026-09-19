@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { LuSend } from "react-icons/lu";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { usePost } from "@/utils/hooks/useReactQueryPanel";
+import { usePost } from "@/utils/hooks/useReactQuery";
 import toast from "react-hot-toast";
 import { ticketValidationSchema } from "../../../../../validators/ticket";
 

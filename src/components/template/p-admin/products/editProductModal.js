@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { usePut } from "@/utils/hooks/useReactQueryPanel";
+import { usePut } from "@/utils/hooks/useReactQuery";
 import Modal from "@/components/modules/ui/modal";
 import { productSchema } from "../../../../../validators/product";
 

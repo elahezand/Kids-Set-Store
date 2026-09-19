@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import swal from "sweetalert";
 import toast from "react-hot-toast";
 import { LuBan, LuPencil, LuShieldCheck, LuTrash2, LuUsers } from "react-icons/lu";
-import { useDelete, usePut, usePost } from "@/utils/hooks/useReactQueryPanel";
+import { useDelete, usePut, usePost } from "@/utils/hooks/useReactQuery";
 import EmptyState from "@/components/modules/ui/emptyState";
 import EditUserModal from "./editUserModal";
 

@@ -1,19 +1,20 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Sms from "./Sms";
-import swal from "sweetalert";
 import Link from "next/link";
-import axios from "axios";
-import { userValidationSchema } from "../../../../../validators/user";
-import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { manageError } from "@/utils/paginate";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
+import { usePost } from "@/utils/hooks/useReactQuery";
+import { userValidationSchema } from "../../../../../validators/user";
+import Sms from "./Sms";
+
+const PHONE_REGEX = /^09\d{9}$/;
 
 const Register = ({ showloginForm }) => {
   const router = useRouter();
+
   const [showOtp, setShowOtp] = useState(false);
   const [phone, setPhone] = useState("");
   const [showPasswordField, setShowPasswordField] = useState(false);
@@ -21,48 +22,62 @@ const Register = ({ showloginForm }) => {
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    trigger,
+    getValues,
+    setError,
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(userValidationSchema),
-    mode: "onChange"
+    mode: "onChange",
+    defaultValues: {
+      username: "",
+      email: "",
+      phone: "",
+      password: "",
+    },
   });
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (data) => {
-      const res = await axios.post("/api/auth/signup", data);
-      return res.data;
-    },
+  // Public auth route: no refresh on 401, show the real server message
+  const { mutate: signUp, isPending: isSigningUp } = usePost("/auth/signup", {
+    axiosConfig: { skipRefresh: true },
+    errorFallback: "Sign up failed",
+
     onSuccess: () => {
-      toast.success("SignUp Successfully :)");
+      toast.success("Signed up successfully :)");
       router.replace("/");
+      router.refresh();
     },
-    onError: (error) => manageError(error.response?.status),
   });
 
-  const onSubmit = (data) => { mutate(data); };
+  const { mutate: sendOtp, isPending: isSendingOtp } = usePost(
+    "/auth/sms/send",
+    {
+      axiosConfig: { skipRefresh: true },
+      errorFallback: "Failed to send OTP",
 
-  const { mutate: mutationOtp, isPending: optPending } = useMutation({
-    mutationFn: async (phoneNumber) => {
-      const res = await axios.post("/api/auth/sms/send", { phone: phoneNumber });
-      return res.data;
-    },
-    onSuccess: () => {
-      toast.success("OTP Sent Successfully :)");
-      setShowOtp(true);
-    },
-    onError: (error) => manageError(error.response?.status),
-  });
+      onSuccess: (_, variables) => {
+        toast.success("OTP sent successfully :)");
+        setPhone(variables.phone);
+        setShowOtp(true);
+      },
+    }
+  );
 
-  const handleOtp = () => {
-    swal({
-      title: "Please enter your phone number",
-      content: "input",
-    }).then((result) => {
-      if (result) {
-        setPhone(result);
-        mutationOtp(result);
-      }
-    });
+  const onSubmit = (data) => signUp(data);
+
+  // Uses the Phone field of the form instead of asking again in a popup
+  const handleOtp = async () => {
+    const isValid = await trigger("phone");
+    const phoneNumber = getValues("phone")?.trim();
+
+    if (!isValid || !PHONE_REGEX.test(phoneNumber)) {
+      setError("phone", {
+        message: "Enter a valid phone number to register with OTP",
+      });
+      return;
+    }
+
+    sendOtp({ phone: phoneNumber });
   };
 
   if (showOtp) {
@@ -70,50 +85,102 @@ const Register = ({ showloginForm }) => {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full" noValidate>
       <div className="auth-card">
         <div className="text-left">
-          <input className="input" placeholder="Username" {...register("username")} />
-          {errors.username && <span className="field-error">{errors.username.message}</span>}
+          <input
+            className="input"
+            placeholder="Username"
+            autoComplete="username"
+            {...register("username")}
+          />
+          {errors.username && (
+            <span className="field-error">{errors.username.message}</span>
+          )}
         </div>
 
         <div className="text-left">
-          <input className="input" placeholder="Email (optional)" {...register("email")} />
-          {errors.email && <span className="field-error">{errors.email.message}</span>}
+          <input
+            className="input"
+            type="email"
+            placeholder="Email (optional)"
+            autoComplete="email"
+            {...register("email")}
+          />
+          {errors.email && (
+            <span className="field-error">{errors.email.message}</span>
+          )}
         </div>
 
         <div className="text-left">
-          <input className="input" placeholder="Phone" {...register("phone")} />
-          {errors.phone && <span className="field-error">{errors.phone.message}</span>}
+          <input
+            className="input"
+            type="tel"
+            inputMode="numeric"
+            placeholder="Phone"
+            autoComplete="tel"
+            {...register("phone")}
+          />
+          {errors.phone && (
+            <span className="field-error">{errors.phone.message}</span>
+          )}
         </div>
 
         {showPasswordField && (
           <div className="text-left">
-            <input className="input" type="password" placeholder="Password" {...register("password")} />
-            {errors.password && <span className="field-error">{errors.password.message}</span>}
-            <small className="field-hint text-sage-500">Include Upper, Lower Case, Number and @</small>
+            <input
+              className="input"
+              type="password"
+              placeholder="Password"
+              autoComplete="new-password"
+              {...register("password")}
+            />
+            {errors.password && (
+              <span className="field-error">{errors.password.message}</span>
+            )}
+            <small className="field-hint text-sage-500">
+              Include Upper, Lower Case, Number and @
+            </small>
           </div>
         )}
 
         {!showPasswordField ? (
-          <button type="button" className="btn btn-primary w-full" onClick={() => setShowPasswordField(true)}>
+          <button
+            type="button"
+            className="btn btn-primary w-full"
+            onClick={() => setShowPasswordField(true)}
+          >
             Register with Password
           </button>
         ) : (
-          <button type="submit" className="btn btn-primary w-full" disabled={isPending}>
-            {isPending ? "Registering..." : "Register"}
+          <button
+            type="submit"
+            className="btn btn-primary w-full disabled:opacity-60"
+            disabled={isSigningUp}
+          >
+            {isSigningUp ? "Registering..." : "Register"}
           </button>
         )}
 
-        <button type="button" className="btn btn-secondary w-full" onClick={handleOtp} disabled={optPending}>
-          {optPending ? "Sending..." : "Register with Phone"}
+        <button
+          type="button"
+          className="btn btn-secondary w-full disabled:opacity-60"
+          onClick={handleOtp}
+          disabled={isSendingOtp}
+        >
+          {isSendingOtp ? "Sending..." : "Register with Phone"}
         </button>
 
-        <p onClick={showloginForm} className="mt-2 cursor-pointer font-bold text-text dark:text-gray-100">
+        <button
+          type="button"
+          onClick={showloginForm}
+          className="mt-2 font-bold text-text dark:text-gray-100"
+        >
           Already have an account? <br />
           <strong className="text-sage-500">Log In</strong>
-        </p>
+        </button>
       </div>
+
       <Link href="/" className="btn btn-accent mx-auto mt-6 w-max">
         Cancel
       </Link>

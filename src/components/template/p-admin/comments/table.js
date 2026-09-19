@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import swal from "sweetalert";
 import toast from "react-hot-toast";
 import { LuBan, LuCheck, LuEye, LuMessageSquare, LuPencil, LuReply, LuX } from "react-icons/lu";
-import { usePost, usePut } from "@/utils/hooks/useReactQueryPanel";
+import { usePost, usePut } from "@/utils/hooks/useReactQuery";
 import EmptyState from "@/components/modules/ui/emptyState";
 import Stars from "@/components/modules/ui/stars";
 
