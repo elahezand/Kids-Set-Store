@@ -1,61 +1,73 @@
-const mongoose = require("mongoose");
-import ProductModel from "./product";
+import mongoose from "mongoose";
 
-const schema = new mongoose.Schema(
-    {
-        code: {
-            type: String,
-            required: [true, "Discount code is required"],
-            trim: true,
-            unique: true,
-        },
-        percent: {
-            type: Number,
-            required: [true, "Discount percent is required"],
-            min: [0, "Percent cannot be negative"],
-            max: [100, "Percent cannot exceed 100"],
-        },
-        product: {
-            type: mongoose.Types.ObjectId,
-            ref: "Product",
-            required: [true, "Course reference is required"],
-        },
-        max: {
-            type: Number,
-            required: [true, "Max usage is required"],
-            min: [1, "Max usage must be at least 1"],
-        },
-        uses: {
-            type: Number,
-            default: 0,
-            min: [0, "Uses cannot be negative"],
-        },
-        creator: {
-            type: mongoose.Types.ObjectId,
-            ref: "User",
-            required: [true, "Creator reference is required"],
-        },
-        usedBy: {
-            type: [mongoose.Schema.Types.ObjectId],
-            ref: "User",
-            default: [],
-        },
-    },
-    {
-        timestamps: true,
-        toObject: { virtuals: true },
-        toJSON: {
-            virtuals: true,
-            transform(doc, ret) {
-                ret.id = ret._id.toString();
-                delete ret._id;
-                delete ret.__v;
-                return ret;
-            },
-        },
-    }
+const { Schema, Types } = mongoose;
+
+const toJSONTransform = (doc, ret) => {
+  ret.id = String(ret._id);
+  delete ret._id;
+  return ret;
+};
+
+const discountSchema = new Schema(
+  {
+    code: { type: String, required: true, trim: true, uppercase: true },
+
+    percent: { type: Number, required: true, min: 1, max: 100 },
+    product: { type: Types.ObjectId, ref: "Product", required: true },
+
+    maxUses: { type: Number, required: true, min: 1 },
+    uses: { type: Number, default: 0, min: 0 },
+    usedBy: { type: [{ type: Types.ObjectId, ref: "User" }], default: [] },
+    startsAt: { type: Date, default: null },
+    expiresAt: { type: Date, default: null },
+    isActive: { type: Boolean, default: true },
+
+    creator: { type: Types.ObjectId, ref: "User", required: true },
+  },
+  {
+    timestamps: true,
+    versionKey: false,
+    toJSON: { transform: toJSONTransform },
+    toObject: { transform: toJSONTransform },
+  }
 );
 
-const discountModel = mongoose.models.Discount || mongoose.model("Discount", schema);
+/* ---------- Indexes ---------- */
 
-export default discountModel;
+discountSchema.index({ code: 1 }, { unique: true });
+discountSchema.index({ product: 1, isActive: 1 });
+discountSchema.index({ isActive: 1, expiresAt: 1 });
+
+/* ---------- Statics ---------- */
+
+const usableFilter = (code, userId) => {
+  const now = new Date();
+
+  return {
+    code: String(code).trim().toUpperCase(),
+    isActive: true,
+    usedBy: { $ne: userId },
+    $expr: { $lt: ["$uses", "$maxUses"] },
+    $and: [
+      { $or: [{ startsAt: null }, { startsAt: { $lte: now } }] },
+      { $or: [{ expiresAt: null }, { expiresAt: { $gt: now } }] },
+    ],
+  };
+};
+
+
+discountSchema.statics.findUsable = function (code, userId) {
+  return this.findOne(usableFilter(code, userId)).lean();
+};
+
+discountSchema.statics.redeem = function (code, userId) {
+  return this.findOneAndUpdate(
+    usableFilter(code, userId),
+    { $inc: { uses: 1 }, $push: { usedBy: userId } },
+    { new: true }
+  ).lean();
+};
+
+const DiscountModel = mongoose.models.Discount || mongoose.model("Discount", discountSchema);
+
+export default DiscountModel;

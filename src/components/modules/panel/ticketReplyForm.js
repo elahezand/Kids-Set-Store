@@ -1,8 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
-import { LuSend } from "react-icons/lu";
+import { toast } from "sonner";import { LuSend } from "react-icons/lu";
 import { usePost } from "@/utils/hooks/useReactQuery";
 
 export default function TicketReplyForm({ ticketID }) {

@@ -1,74 +1,117 @@
-const mongoose = require("mongoose")
-const orderSchema = new mongoose.Schema(
+import mongoose from "mongoose";
+
+const { Schema, Types } = mongoose;
+
+export const ORDER_STATUS = Object.freeze({
+  PENDING: "pending", 
+  PAID: "paid",
+  PROCESSING: "processing", 
+  SHIPPED: "shipped",
+  DELIVERED: "delivered",
+  CANCELED: "canceled",
+});
+
+export const PAYMENT_STATUS = Object.freeze({
+  UNPAID: "unpaid",
+  PAID: "paid",
+  FAILED: "failed",
+  REFUNDED: "refunded",
+});
+
+const toJSONTransform = (doc, ret) => {
+  ret.id = String(ret._id);
+  delete ret._id;
+  return ret;
+};
+
+/* ---------- Sub schemas ---------- */
+const orderItemSchema = new Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+    product: { type: Types.ObjectId, ref: "Product", required: true },
+    name: { type: String, required: true, trim: true },
+    img: { type: String, default: null },
+    size: { type: String, trim: true, default: null },
+    color: { type: String, trim: true, default: null },
+    price: { type: Number, required: true, min: 0 },
+    quantity: { type: Number, required: true, min: 1 },
+  },
+  { _id: false }
+);
 
-    items: [
-      {
-        product: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
-          required: true,
-        },
-        title: String,
-        price: {
-          type: Number,
-          required: true,
-        },
-        count: {
-          type: Number,
-          required: true,
-          min: 1,
-        },
-      },
-    ],
+const pricingSchema = new Schema(
+  {
+    itemsTotal: { type: Number, min: 0, default: 0 }, 
+    subtotal: { type: Number, required: true, min: 0 }, 
+    discount: { type: Number, min: 0, default: 0 },
+    shippingCost: { type: Number, min: 0, default: 0 },
+    total: { type: Number, required: true, min: 0 }, 
+  },
+  { _id: false }
+);
 
-    totalPrice: {
-      type: Number,
-      required: true,
-      min: 0,
+const shippingAddressSchema = new Schema(
+  {
+    fullName: { type: String, required: true, trim: true },
+    phone: { type: String, required: true, trim: true },
+    address: { type: String, required: true, trim: true },
+    city: { type: String, required: true, trim: true },
+    postalCode: { type: String, required: true, trim: true },
+  },
+  { _id: false }
+);
+
+const paymentSchema = new Schema(
+  {
+    status: {
+      type: String,
+      enum: Object.values(PAYMENT_STATUS),
+      default: PAYMENT_STATUS.UNPAID,
     },
+    method: { type: String, trim: true, default: null },
+    transactionId: { type: String, trim: true, default: null },
+    paidAt: { type: Date, default: null },
+  },
+  { _id: false }
+);
+
+/* ---------- Order ---------- */
+const orderSchema = new Schema(
+  {
+    user: { type: Types.ObjectId, ref: "User", required: true },
+
+    items: { type: [orderItemSchema], required: true },
+    coupon: { type: Types.ObjectId, ref: "Coupon", default: null },
+
+    pricing: { type: pricingSchema, required: true },
 
     status: {
       type: String,
-      enum: ["pending", "paid", "processing", "shipped", "delivered", "canceled"],
-      default: "pending",
+      enum: Object.values(ORDER_STATUS),
+      default: ORDER_STATUS.PENDING,
     },
 
-    isPaid: {
-      type: Boolean,
-      default: false,
-    },
+    payment: { type: paymentSchema, default: () => ({}) },
 
-    paidAt: Date,
+    shippingAddress: { type: shippingAddressSchema, required: true },
 
-    shippingAddress: {
-      fullName: String,
-      phone: String,
-      address: String,
-      city: String,
-      postalCode: String,
-    },
+    trackingCode: { type: String, trim: true, default: null }, 
+    cancelReason: { type: String, trim: true, default: null },
   },
   {
     timestamps: true,
-    toJSON: {
-      transform(doc, ret) {
-        ret.id = ret._id.toString();
-        delete ret._id;
-        delete ret.__v;
-        return ret;
-      },
-    }
+    versionKey: false,
+    toJSON: { transform: toJSONTransform },
+    toObject: { transform: toJSONTransform },
   }
 );
 
-const orderModel = mongoose.models.Order ||
-  mongoose.model("Order", orderSchema);
+/* ---------- Indexes ---------- */
 
+orderSchema.index({ user: 1, createdAt: -1 }); 
+orderSchema.index({ status: 1, createdAt: -1 });
+orderSchema.index({ "payment.status": 1 });
+orderSchema.index({ "items.product": 1 }); 
 
-export default orderModel
+const OrderModel = mongoose.models.Order || mongoose.model("Order", orderSchema);
+
+export default OrderModel;

@@ -1,7 +1,6 @@
 "use client";
 import { useActionState, useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
-import { LuSend } from "react-icons/lu";
+import { toast } from "sonner";import { LuSend } from "react-icons/lu";
 import { NewArticle } from "@/utils/actions/articleServerAction";
 import RichEditor from "./richEditor";
 

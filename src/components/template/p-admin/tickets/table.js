@@ -2,8 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import swal from "sweetalert";
-import toast from "react-hot-toast";
-import { LuBan, LuEye, LuTicket } from "react-icons/lu";
+import { toast } from "sonner";import { LuBan, LuEye, LuTicket } from "react-icons/lu";
 import { usePost } from "@/utils/hooks/useReactQuery";
 import EmptyState from "@/components/modules/ui/emptyState";
 

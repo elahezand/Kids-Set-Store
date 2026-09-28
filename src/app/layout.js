@@ -1,11 +1,8 @@
-// ✅ app/layout.js - Optimized
 import "./globals.css";
 import { Suspense } from "react";
-import { Toaster } from "sonner";
 import ScrollToTop from "@/components/modules/ui/scrollToTop";
 import PageLoader from "@/components/modules/ui/pageLoader";
 import QueryProvider from "@/utils/providers/react-query-client-provider";
-
 export const metadata = {
   title: "Set Kids - Premium Children's Clothing",
   description: "Shop premium and stylish children's clothing for all ages",
@@ -43,16 +40,6 @@ export default function RootLayout({ children }) {
       </head>
 
       <body className="bg-white dark:bg-gray-900 transition-colors duration-300">
-        <Toaster
-          position="top-center"
-          offset={20}
-          theme="light"
-          closeButton
-          toastOptions={{
-            duration: 4000,
-          }}
-        />
-
         <QueryProvider>
           <div className="min-h-screen flex flex-col">
             <ScrollToTop />

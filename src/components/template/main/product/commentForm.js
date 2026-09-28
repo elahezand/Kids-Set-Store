@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { usePost } from "@/utils/hooks/useReactQuery";
-import { commentValidationSchema } from "../../../../../validators/comment";
+import { commentValidationSchema } from "../../../../../validations/comment";
 
 const USER_DATA_KEY = "userData";
 

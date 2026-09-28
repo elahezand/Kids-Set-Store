@@ -1,74 +1,92 @@
+import { NextResponse } from "next/server";
 import connectToDB from "../../../../configs/db";
 import ArticleModel from "../../../../model/article";
+import {
+  createArticleSchema,
+  articleListQuerySchema,
+} from "../../../../validators/article";
 import { authAdmin } from "@/utils/serverHelper";
-import { NextResponse } from "next/server";
-import { articleSchema } from "../../../../validators/article";
 import handleFileUpload from "@/utils/serverFile";
 import { paginate } from "@/utils/paginate";
+import {
+  formDataToObject,
+  validationError,
+  jsonError,
+  handleRouteError,
+} from "@/utils/apiHelpers";
 
+// Only public fields of the user (never password, phone, ...)
+const AUTHOR_FIELDS = "name username";
+
+/* GET /api/article
+   - public: only published articles
+   - admin:  all articles, optional ?status=publish|unpublish */
 export async function GET(req) {
   try {
     await connectToDB();
 
     const { searchParams } = new URL(req.url);
+    const query = articleListQuerySchema.parse(
+      Object.fromEntries(searchParams.entries())
+    );
+
+    const admin = await authAdmin();
+
+    const filters = admin
+      ? query.status
+        ? { status: query.status }
+        : {}
+      : { status: "publish" };
 
     const result = await paginate(ArticleModel, {
-      limit: Number(searchParams.get("limit")) || 9,
-      cursor: searchParams.get("cursor"),
-      filters: {},
+      limit: query.limit,
+      cursor: query.cursor,
+      filters,
       sort: { _id: -1 },
     });
 
     return NextResponse.json(result, { status: 200 });
   } catch (err) {
-    console.error("GET /api/article failed:", err);
-
-    return NextResponse.json(
-      { message: err.message || "Unknown Error" },
-      { status: 500 }
-    );
+    return handleRouteError(err, "GET /api/article");
   }
 }
 
-
+/* POST /api/article (admin) */
 export async function POST(req) {
   try {
     await connectToDB();
+
     const admin = await authAdmin();
-    if (!admin) throw new Error("This API is protected");
+    if (!admin) return jsonError("Admin access required", 401);
 
     const formData = await req.formData();
-    const rawData = Object.fromEntries(formData.entries());
+    const parsed = createArticleSchema.safeParse(formDataToObject(formData));
 
-    const parsed = articleSchema.safeParse(rawData);
-    if (!parsed.success) {
-      return NextResponse.json(
-        { message: "Validation failed", errors: parsed.error.flatten().fieldErrors },
-        { status: 400 }
-      );
-    }
+    if (!parsed.success) return validationError(parsed.error);
 
-    const isArticleExist = await ArticleModel.findOne({ name: parsed.data.name });
+    const { cover, ...fields } = parsed.data;
+
+    const isArticleExist = await ArticleModel.exists({ title: fields.title });
     if (isArticleExist) {
-      return NextResponse.json({ message: "Article already exists" }, { status: 409 });
+      return jsonError("An article with this title already exists", 409);
     }
 
-    let imgPath = "";
-    const imageFile = formData.get("cover");
-    if (imageFile && imageFile.size > 0) {
-      imgPath = await handleFileUpload(imageFile);
-    }
+    const coverPath = await handleFileUpload(cover);
 
+    // Author is always the logged-in admin, never taken from the form
     const article = await ArticleModel.create({
-      ...parsed.data,
-      cover: imgPath,
+      ...fields,
+      author: admin._id,
+      cover: coverPath,
     });
+
+    await article.populate("author", AUTHOR_FIELDS);
 
     return NextResponse.json(
       { message: "Article created successfully", data: article },
-      { status: 200 }
+      { status: 201 }
     );
   } catch (err) {
-    return NextResponse.json({ message: err.message || "Unknown Error" }, { status: 500 });
+    return handleRouteError(err, "POST /api/article");
   }
 }

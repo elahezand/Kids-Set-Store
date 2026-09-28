@@ -1,7 +1,7 @@
 "use server"
 import connectToDB from "../../../configs/db";
 import ArticleModel from "../../../model/article";
-import { articleSchema } from "../../../validators/article";
+import { articleSchema } from "../../../validations/article";
 import { authAdmin } from "../serverHelper";
 import handleFileUpload from "../serverFile";
 const createResponse = (status, message, data = null, errors = null) => {

@@ -22,34 +22,6 @@ const nextConfig = {
 
   reactStrictMode: true,
   productionBrowserSourceMaps: false,
-
-  experimental: {
-    optimizePackageImports: [
-      'react-icons',
-      '@mui/material',
-    ],
-  },
-
-  headers: async () => [
-    {
-      source: '/_next/static/:path*',
-      headers: [
-        {
-          key: 'Cache-Control',
-          value: 'public, max-age=31536000, immutable',
-        },
-      ],
-    },
-    {
-      source: '/uploads/:path*',
-      headers: [
-        {
-          key: 'Cache-Control',
-          value: 'public, max-age=604800',
-        },
-      ],
-    },
-  ],
 };
 
 export default nextConfig;

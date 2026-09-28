@@ -1,43 +1,35 @@
-import connectToDB from "../../../../configs/db"
-import { authAdmin } from "@/utils/serverHelper"
-import CategoryModel from "../../../../model/category"
-export async function GET() {
-    try {
-        await connectToDB()
-        const categories = await CategoryModel.find({}, "-__v")
-        return Response.json({ categories }, { status: 200 })
+import { NextResponse } from "next/server";
+import { isValidObjectId } from "mongoose";
+import connectToDB from "../../../../configs/db";
+import CategoryModel from "../../../../model/category";
+import { jsonError, handleRouteError } from "@/utils/apiHelpers";
 
-    }
-    catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
-    }
-}
+/* GET /api/category */
+export async function GET(req) {
+  try {
+    await connectToDB();
 
-export async function POST(req) {
-    try {
-        await connectToDB()
-        const admin = await authAdmin()
-        if (!admin) throw new Error("This api Protected")
+    const { searchParams } = new URL(req.url);
 
-        const reqBody = await req.json()
-        const { name, slug, parentId } = reqBody
-
-        if (!name.trim()) return Response.json({ message: "Title Not Valid :(" }, { status: 422 })
-
-        const iscategoryExisted = await CategoryModel.findOne({ name })
-
-        if (!iscategoryExisted) {
-            await CategoryModel.create({
-                name,
-                parentId,
-                slug
-            });
-
-
-        }
-        return Response.json({ message: "Category created Successfully" }, { status: 200 })
-    } catch (err) {
-        return Response.json({ message: "UnKnown Error" }, { status: 500 })
+    if (searchParams.get("tree") === "true") {
+      const categories = await CategoryModel.getTree();
+      return NextResponse.json({ categories }, { status: 200 });
     }
 
+    const parentParam = searchParams.get("parentId");
+    const isRootQuery = parentParam === "null" || parentParam === "";
+
+    if (parentParam !== null && !isRootQuery && !isValidObjectId(parentParam)) {
+      return jsonError("Invalid parentId", 400);
+    }
+
+    const filter =
+      parentParam === null ? {} : { parentId: isRootQuery ? null : parentParam };
+
+    const categories = await CategoryModel.find(filter).sort({ name: 1 });
+
+    return NextResponse.json({ categories }, { status: 200 });
+  } catch (err) {
+    return handleRouteError(err, "GET /api/category");
+  }
 }

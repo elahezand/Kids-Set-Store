@@ -1,104 +1,136 @@
-import ArticleModel from "../../../../../model/article"
-import connectToDB from "../../../../../configs/db"
-import { isValidObjectId } from "mongoose"
-import { authAdmin } from "@/utils/serverHelper"
-import { writeFile } from "fs/promises"
-import path from "path"
+import { NextResponse } from "next/server";
+import { isValidObjectId } from "mongoose";
+import connectToDB from "../../../../../configs/db";
+import ArticleModel from "../../../../../model/article";
+import { updateArticleSchema } from "../../../../../validations/article";
+import { authAdmin } from "@/utils/serverHelper";
+import handleFileUpload from "@/utils/serverFile";
+import {
+  formDataToObject,
+  validationError,
+  jsonError,
+  handleRouteError,
+} from "@/utils/apiHelpers";
+
+// Only public fields of the user (never password, phone, ...)
+const AUTHOR_FIELDS = "name username";
+
+const getId = async (params) => {
+  const { id } = await params;
+  return isValidObjectId(id) ? id : null;
+};
+
+const safeDecode = (value) => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
+/* GET /api/article/:slug  (an id also works, for articles without a slug)
+   - public: only if published
+   - admin:  any status */
 export async function GET(req, { params }) {
-    try {
-        connectToDB()
-        const admin = await authAdmin()
-        if (!admin) {
-            throw new Error("This api Protected")
-        }
-        const { id } = await params
-        const isvalidId = isValidObjectId(id)
+  try {
+    await connectToDB();
 
-        if (!isvalidId) return Response.json({ message: "Not Valid :)" }, { satatus: 422 })
+    const { id: idOrSlug } = await params;
 
-        const article = await ArticleModel.findOne({ _id: id })
-            .lean()
-        if (!article) throw new Error(`Failed to get data`);
+    const filter = isValidObjectId(idOrSlug)
+      ? { _id: idOrSlug }
+      : { slug: safeDecode(idOrSlug).toLowerCase() };
 
-        return Response.json(article, { status: 200 })
+    const article = await ArticleModel.findOne(filter).populate(
+      "author",
+      AUTHOR_FIELDS
+    );
+    if (!article) return jsonError("Article not found", 404);
 
-
-    } catch (err) {
-        return Response.json({ message: err.message }, { status: 500 })
-    }
-}
-
-export async function DELETE(req, { params }) {
-    try {
-        connectToDB()
-        const admin = await authAdmin()
-        if (!admin) {
-            throw new Error("This api Protected")
-        }
-        const { id } = await params
-
-        if (!isValidObjectId(id)) {
-            return Response.json({ message: "Not Found" }, { status: 404 })
-        }
-
-
-        await ArticleModel.findOneAndDelete({ _id: id })
-        return Response.json({ message: "Article Removed" }, { status: 200 })
-
-
-    } catch (err) {
-
-        return Response.json({ message: "UnKnown Error" }, { status: 200 })
-
+    if (article.status !== "publish") {
+      const admin = await authAdmin();
+      if (!admin) return jsonError("Article not found", 404);
     }
 
+    return NextResponse.json(article, { status: 200 });
+  } catch (err) {
+    return handleRouteError(err, "GET /api/article/:id");
+  }
 }
 
-
+/* PUT /api/article/:id (admin)
+   Partial update: send only the fields that changed, cover is optional */
 export async function PUT(req, { params }) {
-    connectToDB()
-    try {
-        const user = await authAdmin()
-        if (!user) {
-            throw new Error("This api Protected")
-        }
+  try {
+    await connectToDB();
 
-        const { id } = await params
-        if (!isValidObjectId(id)) {
-            return Response.json({ message: "Not Found" }, { status: 404 })
-        }
+    const admin = await authAdmin();
+    if (!admin) return jsonError("Admin access required", 401);
 
-        const formData = await req.formData()
+    const id = await getId(params);
+    if (!id) return jsonError("Article not found", 404);
 
-        const cover = formData.get("cover")
-        const title = formData.get("title")
-        const shortDescription = formData.get("shortDescription")
-        const content = formData.get("content")
-        const author = formData.get("author")
-        const status = formData.get("status")
+    const formData = await req.formData();
+    const parsed = updateArticleSchema.safeParse(
+      formDataToObject(formData, { skipEmpty: true })
+    );
 
+    if (!parsed.success) return validationError(parsed.error);
 
-        const buffer = Buffer.from(await cover.arrayBuffer())
-        const filename = Date.now() + cover.name
-        await writeFile(path.join(process.cwd(), "public/uploads/" + filename), buffer)
+    const article = await ArticleModel.findById(id);
+    if (!article) return jsonError("Article not found", 404);
 
-        await ArticleModel.findOneAndUpdate({ _id: id }, {
-            $set: {
-                title,
-                author,
-                shortDescription,
-                content,
-                status: status,
-                cover: `/uploads/${filename}`
-            }
-        })
-        return Response.json({ message: "Article Updated" }, { status: 200 })
+    const { cover, ...fields } = parsed.data;
 
-    } catch (err) {
+    if (fields.title && fields.title !== article.title) {
+      const isTitleTaken = await ArticleModel.exists({
+        title: fields.title,
+        _id: { $ne: id },
+      });
 
-        return Response.json({ message: "UnKnown Error" }, { status: 200 })
-
+      if (isTitleTaken) {
+        return jsonError("An article with this title already exists", 409);
+      }
     }
 
+    Object.assign(article, fields);
+
+    if (cover) {
+      article.cover = await handleFileUpload(cover);
+    }
+
+    // save() (not findOneAndUpdate) so the model hooks run: publishedAt, slug
+    await article.save();
+    await article.populate("author", AUTHOR_FIELDS);
+
+    return NextResponse.json(
+      { message: "Article updated successfully", data: article },
+      { status: 200 }
+    );
+  } catch (err) {
+    return handleRouteError(err, "PUT /api/article/:id");
+  }
 }
 
+/* DELETE /api/article/:id (admin) */
+export async function DELETE(req, { params }) {
+  try {
+    await connectToDB();
+
+    const admin = await authAdmin();
+    if (!admin) return jsonError("Admin access required", 401);
+
+    const id = await getId(params);
+    if (!id) return jsonError("Article not found", 404);
+
+    const article = await ArticleModel.findByIdAndDelete(id);
+    if (!article) return jsonError("Article not found", 404);
+
+    return NextResponse.json(
+      { message: "Article removed successfully" },
+      { status: 200 }
+    );
+  } catch (err) {
+    return handleRouteError(err, "DELETE /api/article/:id");
+  }
+}

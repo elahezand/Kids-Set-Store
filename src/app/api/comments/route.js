@@ -1,70 +1,92 @@
-
-import connectToDB from "../../../../configs/db";
-import commentModel from "../../../../model/comment";
-import { commentValidationSchema } from "../../../../validators/comment";
 import { NextResponse } from "next/server";
-import { getMe } from "@/utils/serverHelper";
+import connectToDB from "../../../../configs/db";
+import CommentModel from "../../../../model/comment";
 import ProductModel from "../../../../model/product";
+import {
+  createCommentSchema,
+  commentListQuerySchema,
+} from "../../../../validators/comment";
+import { getMe } from "@/utils/serverHelper";
 import { paginate } from "@/utils/paginate";
+import { validationError, jsonError, handleRouteError } from "@/utils/apiHelpers";
+
+/* GET /api/comment?productId=...&cursor=...&limit=... (public)
+   Approved reviews of a product, each with its approved replies */
 export async function GET(req) {
-    try {
-        await connectToDB();
-        const { searchParams } = new URL(req.url);
+  try {
+    await connectToDB();
 
-        const useCursor = searchParams.has("cursor");
-        const productId = searchParams.get("productId")
+    const { searchParams } = new URL(req.url);
+    const parsed = commentListQuerySchema.safeParse(
+      Object.fromEntries(searchParams.entries())
+    );
+    if (!parsed.success) return validationError(parsed.error);
 
-        const result = await paginate(
-            commentModel,               // Model
-            searchParams,               // searchParams
-            productId ? {  isAccept: true } : {}, // filter
-            null,                       // populate
-            useCursor,
-            true                  // cursor /page
-        );
+    const { productId, limit, cursor } = parsed.data;
 
-        return NextResponse.json(result, { status: 200 });
-    } catch (err) {
-        return NextResponse.json({ message: err.message }, { status: 500 });
-    }
+    const result = await paginate(CommentModel, {
+      limit,
+      cursor: cursor ?? null,
+      filters: { productId, parentId: null, status: "approved", deletedAt: null },
+      sort: { _id: -1 },
+    });
+
+    const reviews = await CommentModel.populate(result.data || [], {
+      path: "user",
+      select: "name username",
+    });
+
+    const data = await CommentModel.attachReplies(reviews);
+
+    return NextResponse.json({ data, pagination: result.pagination }, { status: 200 });
+  } catch (err) {
+    return handleRouteError(err, "GET /api/comment");
+  }
 }
 
+/* POST /api/comment (logged-in user)
+   Body: { productId, rating, body, pros?, cons?, recommendation? } */
 export async function POST(req) {
-    try {
-        await connectToDB();
+  try {
+    await connectToDB();
 
-        const user = await getMe();
-        if (!user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const user = await getMe();
+    if (!user) return jsonError("Please log in to write a review", 401);
 
-        const body = await req.json();
+    const body = await req.json().catch(() => null);
+    if (!body) return jsonError("Invalid JSON body", 400);
 
-        body.score = Number(body.score);
+    const parsed = createCommentSchema.safeParse(body);
+    if (!parsed.success) return validationError(parsed.error);
 
-        const parsed = commentValidationSchema.safeParse(body);
+    const { productId, ...fields } = parsed.data;
 
-        if (!parsed.success) {
-            return NextResponse.json(
-                { errors: parsed.error.flatten().fieldErrors },
-                { status: 400 }
-            );
-        }
-
-        const product = await ProductModel.findById(body.product);
-        if (!product) {
-            return NextResponse.json({ message: "Product not found" }, { status: 404 });
-        }
-
-        await commentModel.create({
-            ...parsed.data,
-            product: body.product,
-            user: user._id,
-        });
-
-        return NextResponse.json(
-            { message: "Comment sent successfully" },
-            { status: 201 }
-        );
-    } catch (err) {
-        return NextResponse.json({ message: err.message }, { status: 500 });
+    if (!(await ProductModel.exists({ _id: productId }))) {
+      return jsonError("Product not found", 404);
     }
+
+    const alreadyReviewed = await CommentModel.exists({
+      user: user._id,
+      productId,
+      parentId: null,
+      deletedAt: null,
+    });
+    if (alreadyReviewed) return jsonError("You have already reviewed this product", 409);
+
+    // Always a pending review: status, parentId and moderation can't come from the user
+    const comment = await CommentModel.create({
+      ...fields,
+      productId,
+      user: user._id,
+      parentId: null,
+    });
+
+    return NextResponse.json(
+      { message: "Your review was sent and will be shown after approval", data: comment },
+      { status: 201 }
+    );
+  } catch (err) {
+    if (err?.code === 11000) return jsonError("You have already reviewed this product", 409);
+    return handleRouteError(err, "POST /api/comment");
+  }
 }

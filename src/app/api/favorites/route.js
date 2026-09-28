@@ -1,73 +1,66 @@
+import { NextResponse } from "next/server";
 import connectToDB from "../../../../configs/db";
 import FavoriteModel from "../../../../model/favorite";
 import ProductModel from "../../../../model/product";
-import { isValidObjectId } from "mongoose";
+import { addFavoriteSchema } from "../../../../validators/favorite";
 import { getMe } from "@/utils/serverHelper";
-import { paginate } from "@/utils/paginate";
-import { NextResponse } from "next/server";
-export async function GET(req) {
+import { validationError, jsonError, handleRouteError } from "@/utils/apiHelpers";
+
+/* GET /api/favorite (logged-in user) */
+export async function GET() {
   try {
     await connectToDB();
 
     const user = await getMe();
-    if (!user) throw new Error("This API Protected");
+    if (!user) return jsonError("Please log in", 401);
 
-    const { searchParams } = new URL(req.url);
-    const useCursor = searchParams.has("cursor");
+    const wishlist = await FavoriteModel.findOne({ user: user._id })
+      .populate("products", "name price img score ratingCount isAvailable")
+      .lean();
 
-    const wishlist = await FavoriteModel.findOne({ user: user._id }).lean();
-    if (!wishlist) {
-      return NextResponse.json(
-        { data: [], nextCursor: null, limit: 0 },
-        { status: 200 }
-      );
-    }
+    // Deleted products come back as null after populate -> drop them
+    const products = (wishlist?.products || []).filter(Boolean).reverse();
 
-    const result = await paginate(
-      ProductModel,                 
-      searchParams,
-      { _id: { $in: wishlist.products } }, 
-      null,
-      useCursor,
-      true
-    );
-
-    return NextResponse.json(result, { status: 200 });
+    return NextResponse.json({ data: products, count: products.length }, { status: 200 });
   } catch (err) {
-    console.log(err);
-    
-    return NextResponse.json(
-      { message: err.message || "Unknown Error" },
-      { status: 500 }
-    );
+    return handleRouteError(err, "GET /api/favorite");
   }
 }
+
+/* POST /api/favorite (logged-in user) */
 export async function POST(req) {
-    try {
-        await connectToDB();
-        const user = await getMe();
-        if (!user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  try {
+    await connectToDB();
 
-        const body = await req.json();
-        const { productID } = body;
+    const user = await getMe();
+    if (!user) return jsonError("Please log in to add favorites", 401);
 
-        if (!isValidObjectId(productID)) return NextResponse.json({ message: "Invalid Product ID" }, { status: 422 });
+    const body = await req.json().catch(() => null);
+    if (!body) return jsonError("Invalid JSON body", 400);
 
-        const product = await ProductModel.findById(productID);
-        if (!product) return NextResponse.json({ message: "Product not found" }, { status: 404 });
+    const parsed = addFavoriteSchema.safeParse(body);
+    if (!parsed.success) return validationError(parsed.error);
 
-        const exists = await FavoriteModel.findOne({ user: user._id, products: productID });
-        if (exists) return NextResponse.json({ message: "Product already in wishlist" }, { status: 409 });
+    const { productId } = parsed.data;
 
-        await FavoriteModel.findOneAndUpdate(
-            { user: user._id },
-            { $push: { products: productID } },
-            { upsert: true }
-        );
-
-        return NextResponse.json({ message: "Product added to wishlist" }, { status: 200 });
-    } catch (err) {      
-        return NextResponse.json({ message:err.message }, { status: 500 });
+    if (!(await ProductModel.exists({ _id: productId }))) {
+      return jsonError("Product not found", 404);
     }
-}
 
+ 
+    const wishlist = await FavoriteModel.findOneAndUpdate(
+      { user: user._id },
+      { $addToSet: { products: productId } },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    )
+      .select("products")
+      .lean();
+
+    return NextResponse.json(
+      { message: "Added to your wishlist", count: wishlist.products.length },
+      { status: 200 }
+    );
+  } catch (err) {
+    return handleRouteError(err, "POST /api/favorite");
+  }
+}

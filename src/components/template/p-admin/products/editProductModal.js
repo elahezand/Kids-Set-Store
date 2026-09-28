@@ -3,10 +3,9 @@ import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import toast from "react-hot-toast";
-import { usePut } from "@/utils/hooks/useReactQuery";
+import { toast } from "sonner";import { usePut } from "@/utils/hooks/useReactQuery";
 import Modal from "@/components/modules/ui/modal";
-import { productSchema } from "../../../../../validators/product";
+import { productSchema } from "../../../../../validations/product";
 
 const joinList = (value) => (Array.isArray(value) ? value.join(", ") : value || "");
 

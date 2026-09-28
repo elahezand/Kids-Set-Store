@@ -1,13 +1,37 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const schema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true,
-    },
+const toJSONTransform = (doc, ret) => {
+  ret.id = String(ret._id);
+  delete ret._id;
+  return ret;
+};
 
-});
+const departmentSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true, trim: true },
+    description: { type: String, trim: true, default: null },
+    isActive: { type: Boolean, default: true },
+    order: { type: Number, default: 0 },
+  },
+  {
+    timestamps: true,
+    versionKey: false,
+    toJSON: { transform: toJSONTransform },
+    toObject: { transform: toJSONTransform },
+  }
+);
 
-const DepartmentModel = mongoose.models.Department || mongoose.model("Department", schema);
+/* ---------- Indexes ---------- */
+
+departmentSchema.index(
+  { title: 1 },
+  { unique: true, collation: { locale: "en", strength: 2 } }
+);
+
+// Active departments in display order
+departmentSchema.index({ isActive: 1, order: 1 });
+
+const DepartmentModel =
+  mongoose.models.Department || mongoose.model("Department", departmentSchema);
 
 export default DepartmentModel;

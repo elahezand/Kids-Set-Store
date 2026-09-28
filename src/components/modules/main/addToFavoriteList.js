@@ -1,8 +1,7 @@
 "use client"
 import { CiHeart } from "react-icons/ci";
-import { usePost } from "@/utils/hooks/useReactQueryPublic";
-import toast from "react-hot-toast";
-
+import { usePost } from "@/utils/hooks/useReactQuery";
+import { toast } from "sonner";
 export default function AddToFavoriteList({ productId }) {
     const { mutate } = usePost("/favorites", {
         onSuccess: () => {

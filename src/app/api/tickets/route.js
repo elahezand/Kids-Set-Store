@@ -2,7 +2,7 @@ import connectToDB from "../../../../configs/db";
 import ticketModel from "../../../../model/ticket";
 import { authUser } from "@/utils/serverHelper";
 import { NextResponse } from "next/server";
-import { ticketValidationSchema } from "../../../../validators/ticket";
+import { ticketValidationSchema } from "../../../../validations/ticket";
 
 export async function GET() {
     try {

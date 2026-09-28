@@ -1,65 +1,82 @@
-import { handleTree } from "@/utils/tree";
-import { buildProductQuery } from "@/utils/productQuery";
-
+import { cache } from "react";
+import connectToDB from "../../../../configs/db";
 import CategoryModel from "../../../../model/category";
 import Listing from "../../../../model/product";
-
+import { buildProductQuery } from "@/utils/productQuery";
+import { paginate } from "@/utils/paginate";
 import FilterSection from "@/components/template/main/products/filterSection";
 import ProductList from "@/components/template/main/products/productList";
-import connectToDB from "../../../../configs/db";
-import { paginate } from "@/utils/paginate";
 
+const LIMIT = 12;
+const MAX_LIMIT = 50;
+
+const getLimit = (value) =>
+  Math.min(Math.max(Number(value) || LIMIT, 1), MAX_LIMIT);
+
+const getCategoryBySlug = cache(async (slug) => {
+  if (!slug) return null;
+
+  await connectToDB();
+
+  return CategoryModel.findOne({ slug: String(slug).toLowerCase() })
+    .select("name slug")
+    .lean();
+});
 
 export async function generateMetadata({ searchParams }) {
-    await connectToDB();
-    const params = await searchParams;
-    const categoryName = params?.category || "Products";
+  const params = (await searchParams) || {};
+  const category = await getCategoryBySlug(params.category);
 
-    const category = await CategoryModel.findOne({ slug: categoryName }).select("name").lean();
-
-    return {
-        title: category ? `${category.name} Products | SET KIDS` : "All Products | SET KIDS",
-        description: category
-            ? `Explore our ${category.name} products.`
-            : "Browse our full collection of products.",
-    };
+  return {
+    title: category ? `${category.name} Products | SET KIDS` : "All Products | SET KIDS",
+    description: category
+      ? `Explore our ${category.name} products.`
+      : "Browse our full collection of products.",
+  };
 }
 
 export default async function Page({ searchParams }) {
-    await connectToDB();
+  await connectToDB();
 
-    const params = await searchParams;
-    const tree = await handleTree();
-    const { filters, sort } = await buildProductQuery(params);
+  const params = (await searchParams) || {};
+  const limit = getLimit(params.limit);
 
-    const categoryName = params?.category;
+  const [tree, category, { filters, sort }] = await Promise.all([
+    CategoryModel.getTree(),
+    getCategoryBySlug(params.category),
+    buildProductQuery(params),
+  ]);
 
-    const result = await paginate(Listing, {
-        limit: Number(params?.limit),
-        cursor: params?.cursor || null,
-        filters,
-        sort,
-    });
+  const result = await paginate(Listing, {
+    limit,
+    cursor: params.cursor || null,
+    filters,
+    sort,
+  });
 
-    const products = JSON.parse(JSON.stringify(result.data || []));
-    const queryString = new URLSearchParams(
-        Object.entries(params || {}).filter(([key, value]) => key !== "cursor" && typeof value === "string")
-    ).toString();
+  const products = JSON.parse(JSON.stringify(result.data || []));
 
-    return (
-        <div className="page-container">
-            <h1 className="section-title mb-8 capitalize">
-                {categoryName ? categoryName.replace(/-/g, " ") : "Products"}
-            </h1>
+  const queryString = new URLSearchParams(
+    Object.entries(params).filter(
+      ([key, value]) => key !== "cursor" && typeof value === "string"
+    )
+  ).toString();
 
-            <FilterSection categories={tree} />
-            <ProductList
-                key={queryString}
-                initialProducts={products}
-                initialCursor={result.pagination?.nextCursor || null}
-                initialHasMore={result.pagination?.hasMore || false}
-                limit={Number(params?.limit)}
-            />
-        </div>
-    );
+  return (
+    <div className="page-container">
+      <h1 className="section-title mb-8 capitalize">
+        {category?.name || "Products"}
+      </h1>
+
+      <FilterSection categories={tree} />
+
+      <ProductList
+        key={queryString}
+        initialProducts={products}
+        initialCursor={result.pagination?.nextCursor || null}
+        initialHasMore={result.pagination?.hasMore || false}
+        limit={limit}
+      />
+    </div>
+  );
 }

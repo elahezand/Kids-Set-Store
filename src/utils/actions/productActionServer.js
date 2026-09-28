@@ -1,7 +1,7 @@
 "use server"
 import connectToDB from "../../../configs/db";
 import ProductModal from "../../../model/product";
-import { productSchema } from "../../../validators/product";
+import { productSchema } from "../../../validations/product";
 import handleFileUpload from "../serverFile";
 import { authAdmin } from "../serverHelper";
 

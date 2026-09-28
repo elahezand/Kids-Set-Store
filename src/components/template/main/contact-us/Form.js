@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { usePost } from "@/utils/hooks/useReactQuery";
-import { contactValidationSchema } from "../../../../../validators/contact";
+import { contactValidationSchema } from "../../../../../validations/contact";
 
 const Field = ({ id, label, error, as = "input", ...props }) => {
   const Component = as;

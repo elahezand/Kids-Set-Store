@@ -4,9 +4,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import toast from "react-hot-toast";
-import { usePut } from "@/utils/hooks/useReactQuery";
-import { profileValidationSchema } from "../../../../validators/user";
+import { toast } from "sonner";import { usePut } from "@/utils/hooks/useReactQuery";
+import { profileValidationSchema } from "../../../../validations/user";
 
 const DEFAULT_AVATAR = "/images/user-profile-flat-illustration-avatar-person-icon-gender-neutral-silhouette-profile-picture-free-vector.jpg";
 

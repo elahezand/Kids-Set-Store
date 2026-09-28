@@ -2,7 +2,7 @@ import UserModel from "../../../../model/user";
 import connectToDB from "../../../../configs/db";
 import { authAdmin } from "@/utils/serverHelper";
 import { paginate } from "@/utils/paginate";
-import { userValidationSchema } from "../../../../validators/user";
+import { userValidationSchema } from "../../../../validations/user";
 export async function GET(req) {
     try {
         await connectToDB()

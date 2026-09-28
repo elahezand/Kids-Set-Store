@@ -3,8 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import swal from "sweetalert";
-import toast from "react-hot-toast";
-import { LuTrash2 } from "react-icons/lu";
+import { toast } from "sonner";import { LuTrash2 } from "react-icons/lu";
 import { useDelete } from "@/utils/hooks/useReactQuery";
 import Stars from "@/components/modules/ui/stars";
 

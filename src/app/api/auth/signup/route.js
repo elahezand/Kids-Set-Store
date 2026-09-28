@@ -1,7 +1,7 @@
 import UserModel from "../../../../../model/user"
 import connectToDB from "../../../../../configs/db"
 import { generateToken, hashPassword, generateRefreshToken } from "@/utils/auth"
-import { userValidationSchema } from "../../../../../validators/user"
+import { userValidationSchema } from "../../../../../validations/user"
 
 export async function POST(req) {
     try {

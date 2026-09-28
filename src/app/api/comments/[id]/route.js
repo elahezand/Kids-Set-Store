@@ -1,74 +1,83 @@
-import connectToDB from "../../../../../configs/db";
-import { authAdmin } from "@/utils/serverHelper";
-import commentModel from "../../../../../model/comment";
-import { paginate } from "@/utils/paginate";
-import { isValidObjectId } from "mongoose";
 import { NextResponse } from "next/server";
+import { isValidObjectId } from "mongoose";
+import connectToDB from "../../../../../configs/db";
+import CommentModel from "../../../../../model/comment";
+import { updateOwnCommentSchema } from "../../../../../validators/comment";
+import { getMe } from "@/utils/serverHelper";
+import { validationError, jsonError, handleRouteError } from "@/utils/apiHelpers";
 
-export async function GET(req, { params }) {
-    try {
-        await connectToDB();
-        const { id } = await params;
+const getId = async (params) => {
+  const { id } = await params;
+  return isValidObjectId(id) ? id : null;
+};
 
-        if (!isValidObjectId(id))
-            return NextResponse.json({ message: "Not valid ID" }, { status: 422 });
-
-        const { searchParams } = new URL(req.url);
-        const useCursor = searchParams.has("cursor");
-
-        const result = await paginate(
-            commentModel,   // Model
-            searchParams,   // searchParams
-            { userID: id },             // filter
-            null,           // populate
-            useCursor,
-            true     // cursor | pagination
-        );
-
-        return NextResponse.json(result, { status: 200 });
-    } catch (err) {
-        return NextResponse.json({ message: err.message }, { status: 500 });
-    }
-}
-
+/* PUT /api/comment/:id (owner)
+   Edit own review while it's still pending */
 export async function PUT(req, { params }) {
-    try {
-        await connectToDB();
-        const admin = await authAdmin();
-        if (!admin) throw new Error("This API is protected");
+  try {
+    await connectToDB();
 
-        const { id } = await params;
-        if (!isValidObjectId(id))
-            return NextResponse.json({ message: "Not valid ID" }, { status: 422 });
+    const user = await getMe();
+    if (!user) return jsonError("Please log in", 401);
 
-        const { body } = await req.json();
+    const id = await getId(params);
+    if (!id) return jsonError("Comment not found", 404);
 
-        await commentModel.findOneAndUpdate(
-            { _id: id },
-            { $set: { body: body } },
-            { new: true }
-        );
+    const body = await req.json().catch(() => null);
+    if (!body) return jsonError("Invalid JSON body", 400);
 
-        return NextResponse.json({ message: "Comment updated successfully" }, { status: 200 });
-    } catch (err) {
-        return NextResponse.json({ message: err.message }, { status: 500 });
+    const parsed = updateOwnCommentSchema.safeParse(body);
+    if (!parsed.success) return validationError(parsed.error);
+
+    const comment = await CommentModel.findOne({ _id: id, user: user._id, deletedAt: null });
+    if (!comment) return jsonError("Comment not found", 404);
+
+    if (comment.status !== "pending") {
+      return jsonError("Only pending comments can be edited", 409);
     }
+
+    Object.assign(comment, parsed.data);
+    await comment.save(); // sets editedAt
+
+    return NextResponse.json(
+      { message: "Comment updated successfully", data: comment },
+      { status: 200 }
+    );
+  } catch (err) {
+    return handleRouteError(err, "PUT /api/comment/:id");
+  }
 }
 
+/* DELETE /api/comment/:id (owner)
+   Soft delete own comment, reason is "Deleted by user" */
 export async function DELETE(req, { params }) {
-    try {
-        await connectToDB();
-        const admin = await authAdmin();
-        if (!admin) throw new Error("This API is protected");
+  try {
+    await connectToDB();
 
-        const { id } = await params;
+    const user = await getMe();
+    if (!user) return jsonError("Please log in", 401);
 
-        if (!isValidObjectId(id))
-            return NextResponse.json({ message: "Not valid ID" }, { status: 422 });
+    const id = await getId(params);
+    if (!id) return jsonError("Comment not found", 404);
 
-        await commentModel.findOneAndDelete({ _id: id });
-        return NextResponse.json({ message: "Comment removed successfully" }, { status: 200 });
-    } catch (err) {
-        return NextResponse.json({ message: err.message }, { status: 500 });
-    }
+    const now = new Date();
+
+    // findOneAndUpdate -> the model hook updates the product rating
+    const comment = await CommentModel.findOneAndUpdate(
+      { _id: id, user: user._id, deletedAt: null },
+      {
+        status: "deleted",
+        deletedAt: now,
+        deletedBy: user._id,
+        moderation: { moderatedBy: user._id, moderatedAt: now, reason: "Deleted by user" },
+      },
+      { new: true }
+    );
+
+    if (!comment) return jsonError("Comment not found", 404);
+
+    return NextResponse.json({ message: "Comment removed successfully" }, { status: 200 });
+  } catch (err) {
+    return handleRouteError(err, "DELETE /api/comment/:id");
+  }
 }

@@ -1,28 +1,34 @@
+import { NextResponse } from "next/server";
+import { isValidObjectId } from "mongoose";
 import connectToDB from "../../../../../configs/db";
 import FavoriteModel from "../../../../../model/favorite";
-import { isValidObjectId } from "mongoose";
-import { authUser } from "@/utils/serverHelper";
-import { NextResponse } from "next/server";
+import { getMe } from "@/utils/serverHelper";
+import { jsonError, handleRouteError } from "@/utils/apiHelpers";
 
-export async function DELETE(req,{params}) {
-    try {
-        await connectToDB();
-        const user = await authUser();
-        if (!user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+/* DELETE /api/favorite/:productId (logged-in user) */
+export async function DELETE(req, { params }) {
+  try {
+    await connectToDB();
 
-        const { id } = await params
+    const user = await getMe();
+    if (!user) return jsonError("Please log in", 401);
 
-        if (!isValidObjectId(id)) return NextResponse.json({ message: "Invalid Product ID" }, { status: 422 });
+    const { productId } = await params;
+    if (!isValidObjectId(productId)) return jsonError("Product not found", 404);
 
-        await FavoriteModel.findOneAndUpdate(
-            { user: user._id },
-            { $pull: { products: id } }
-        );
+    const wishlist = await FavoriteModel.findOneAndUpdate(
+      { user: user._id },
+      { $pull: { products: productId } },
+      { new: true }
+    )
+      .select("products")
+      .lean();
 
-        return NextResponse.json({ message: "Product removed from wishlist" }, { status: 200 });
-    } catch (err) {
-        console.log(err);
-        
-        return NextResponse.json({ message:err.message }, { status: 500 });
-    }
+    return NextResponse.json(
+      { message: "Removed from your wishlist", count: wishlist?.products?.length ?? 0 },
+      { status: 200 }
+    );
+  } catch (err) {
+    return handleRouteError(err, "DELETE /api/favorite/:productId");
+  }
 }

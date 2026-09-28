@@ -1,8 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import swal from "sweetalert";
-import toast from "react-hot-toast";
-import { LuBadgePercent, LuTrash2 } from "react-icons/lu";
+import { toast } from "sonner";import { LuBadgePercent, LuTrash2 } from "react-icons/lu";
 import { useDelete } from "@/utils/hooks/useReactQuery";
 import EmptyState from "@/components/modules/ui/emptyState";
 

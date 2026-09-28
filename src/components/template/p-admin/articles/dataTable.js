@@ -3,8 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import swal from "sweetalert";
-import toast from "react-hot-toast";
-import { LuNewspaper, LuPencil, LuTrash2 } from "react-icons/lu";
+import { toast } from "sonner";import { LuNewspaper, LuPencil, LuTrash2 } from "react-icons/lu";
 import { useDelete } from "@/utils/hooks/useReactQuery";
 import EmptyState from "@/components/modules/ui/emptyState";
 

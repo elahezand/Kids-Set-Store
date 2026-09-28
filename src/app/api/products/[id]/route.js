@@ -1,7 +1,7 @@
 import connectToDB from "../../../../../configs/db";
 import ProductModel from "../../../../../model/product";
 import handleFileUpload from "@/utils/serverFile";
-import { productSchema } from "../../../../../validators/product";
+import { productSchema } from "../../../../../validations/product";
 import { NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose"
 import { authAdmin } from "@/utils/serverHelper";
