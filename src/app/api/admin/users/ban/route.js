@@ -1,6 +1,6 @@
 import connectToDB from "../../../../../configs/db";
 import BanModel from "../../../../../model/ban";
-import { authAdmin } from "@/utils/serverHelper";
+import { authAdmin } from "@/utils/api/authGaurd";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {

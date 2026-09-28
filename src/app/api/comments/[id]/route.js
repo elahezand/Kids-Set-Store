@@ -3,7 +3,7 @@ import { isValidObjectId } from "mongoose";
 import connectToDB from "../../../../../configs/db";
 import CommentModel from "../../../../../model/comment";
 import { updateOwnCommentSchema } from "../../../../../validators/comment";
-import { getMe } from "@/utils/serverHelper";
+import { getMe } from "@/utils/api/authGaurd";
 import { validationError, jsonError, handleRouteError } from "@/utils/apiHelpers";
 
 const getId = async (params) => {

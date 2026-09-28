@@ -1,44 +1,70 @@
 import { NextResponse } from "next/server";
 import connectToDB from "../../../../../configs/db";
-import ContactModel from "../../../../../model/contact";
-import { adminContactsQuerySchema } from "../../../../../validators/contact";
-import { authAdmin } from "@/utils/serverHelper";
-import { paginate } from "@/utils/paginate";
-import { jsonError, handleRouteError } from "@/utils/apiHelpers";
+import {
+    adminContactsQuerySchema,
+} from "../../../../../validators/contact";
+import { authAdmin } from "@/utils/api/authGaurd";
+import validate from "@/utils/api/validate";
+import contactService from "@/services/contactService";
+import {
+    validationError,
+    jsonError,
+    handleRouteError,
+} from "@/utils/apiHelpers";
 
 /* GET /api/admin/contacts?status=new&cursor=...&limit=... */
+
 export async function GET(req) {
-  try {
-    await connectToDB();
+    try {
+        await connectToDB();
 
-    const admin = await authAdmin();
-    if (!admin) return jsonError("Admin access required", 401);
+        const admin = await authAdmin();
 
-    const { searchParams } = new URL(req.url);
-    const { status, limit, cursor } = adminContactsQuerySchema.parse(
-      Object.fromEntries(searchParams.entries())
-    );
+        if (!admin) {
+            return jsonError(
+                "Admin access required",
+                401
+            );
+        }
 
-    const [result, unreadCount] = await Promise.all([
-      paginate(ContactModel, {
-        limit,
-        cursor: cursor ?? null,
-        filters: status ? { status } : {},
-        sort: { _id: -1 },
-      }),
-      ContactModel.countDocuments({ status: "new" }),
-    ]);
+        const { searchParams } =
+            new URL(req.url);
 
-    const data = await ContactModel.populate(result.data || [], [
-      { path: "user", select: "name username" },
-      { path: "handledBy", select: "name username" },
-    ]);
+        const query =
+            Object.fromEntries(
+                searchParams.entries()
+            );
 
-    return NextResponse.json(
-      { data, pagination: result.pagination, unreadCount },
-      { status: 200 }
-    );
-  } catch (err) {
-    return handleRouteError(err, "GET /api/admin/contacts");
-  }
+        const result = validate(
+            adminContactsQuerySchema,
+            query
+        );
+
+        if (!result.success) {
+            return validationError(
+                result.errors
+            );
+        }
+
+        const serviceResult =
+            await contactService.getContacts(
+                result.data
+            );
+
+        return NextResponse.json(
+            {
+                data: serviceResult.data,
+                pagination:
+                    serviceResult.pagination,
+                unreadCount:
+                    serviceResult.unreadCount,
+            },
+            { status: 200 }
+        );
+    } catch (err) {
+        return handleRouteError(
+            err,
+            "GET /api/admin/contacts"
+        );
+    }
 }

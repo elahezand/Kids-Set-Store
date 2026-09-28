@@ -1,6 +1,6 @@
 import connectToDB from "../../../../../configs/db";
 import CommentModel from "../../../../../model/comment";
-import { authUser } from "@/utils/serverHelper";
+import { authUser } from "@/utils/api/authGaurd";
 import { paginate } from "@/utils/paginate";
 import PageHeader from "@/components/modules/panel/pageHeader";
 import Pagination from "@/components/modules/ui/loadMore";

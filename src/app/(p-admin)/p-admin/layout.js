@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { authAdmin } from "@/utils/serverHelper";
+import { authAdmin } from "@/utils/api/authGaurd";
 import PanelShell from "@/components/modules/panel/panelShell";
 import RefreshAccessToken from "@/components/modules/ui/refreshAccessToken";
 

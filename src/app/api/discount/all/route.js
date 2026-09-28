@@ -2,7 +2,7 @@ import connectToDB from "../../../../../configs/db";
 import discountModel from "../../../../../model/discount";
 import { NextResponse } from "next/server";
 import { discountValidationSchema } from "../../../../../validations/discount";
-import { authAdmin } from "@/utils/serverHelper";
+import { authAdmin } from "@/utils/api/authGaurd";
 import ProductModel from "../../../../../model/product";
 
 export async function POST(req) {

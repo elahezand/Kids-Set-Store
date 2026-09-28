@@ -2,7 +2,7 @@
 import connectToDB from "../../../configs/db";
 import ArticleModel from "../../../model/article";
 import { articleSchema } from "../../../validations/article";
-import { authAdmin } from "../serverHelper";
+import { authAdmin } from "../api/authGaurd";
 import handleFileUpload from "../serverFile";
 const createResponse = (status, message, data = null, errors = null) => {
     return { status, message, data, errors };

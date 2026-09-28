@@ -4,7 +4,7 @@ import handleFileUpload from "@/utils/serverFile";
 import { productSchema } from "../../../../../validations/product";
 import { NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose"
-import { authAdmin } from "@/utils/serverHelper";
+import { authAdmin } from "@/utils/api/authGaurd";
 /*  GET  */
 export async function GET(req, { params }) {
     try {

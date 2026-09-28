@@ -1,72 +1,153 @@
-import connectToDB from "../../../../../../configs/db"
-import otpMOdel from "../../../../../../model/otp"
-import { generateToken, generateRefreshToken } from "@/utils/auth"
-import UserModel from "../../../../../../model/user"
-import { z } from "zod"
+import { NextResponse } from "next/server";
+import User from "../../models/user";
+import { compare } from "bcryptjs";
+import redisClient from "../../redis";
+import connectToDB from "../../configs/db";
+import sessionService from "../../services/shared/session";
+import authCookies from "@/utils/api/cookies";
 
-const schema = z.object({
-  phone: z
-    .string()
-    .length(11)
-    .regex(/^09\d{9}$/),
-  code: z.string().min(4),
-})
+const OTP_TTL_SECONDS = 60;
+const MAX_OTP_ATTEMPTS = 5;
+
+const getOtpKey = (phone) => `otp:${phone}`;
+const getOtpAttemptsKey = (phone) =>
+    `otp:attempts:${phone}`;
 
 export async function POST(req) {
-  try {
-    await connectToDB()
+    try {
+        await connectToDB();
 
-    const body = await req.json()
-    const parsed = schema.safeParse(body)
+        const { phone, code } = await req.json();
 
-    if (!parsed.success)
-      return Response.json({ message: "Invalid data" }, { status: 422 })
+        if (!phone || !code) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Phone and code are required",
+                },
+                { status: 400 }
+            );
+        }
 
-    const { phone, code } = parsed.data
-    const now = Date.now()
+        const savedOtp = await redisClient.get(
+            getOtpKey(phone)
+        );
 
-    const otp = await otpMOdel.findOne({ phone, code })
-    if (!otp)
-      return Response.json({ message: "Code is not correct" }, { status: 422 })
+        if (!savedOtp) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "OTP expired",
+                },
+                { status: 410 }
+            );
+        }
 
-    if (otp.expTime < now)
-      return Response.json({ message: "Code is expired" }, { status: 410 })
+        const attempts = await redisClient.incr(
+            getOtpAttemptsKey(phone)
+        );
 
-    let user = await UserModel.findOne({ phone })
-    if (!user) {
-      const count = await UserModel.countDocuments()
-      user = await UserModel.create({
-        phone,
-        role: count < 3 ? "ADMIN" : "USER",
-      })
+        if (attempts === 1) {
+            await redisClient.expire(
+                getOtpAttemptsKey(phone),
+                OTP_TTL_SECONDS
+            );
+        }
+
+        if (attempts > MAX_OTP_ATTEMPTS) {
+            await redisClient.del(getOtpKey(phone));
+
+            return NextResponse.json(
+                {
+                    success: false,
+                    message:
+                        "Too many wrong codes. Request a new code.",
+                },
+                { status: 429 }
+            );
+        }
+
+        const isValid = await compare(
+            String(code),
+            savedOtp
+        );
+
+        if (!isValid) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Invalid OTP",
+                },
+                { status: 400 }
+            );
+        }
+
+        const deleted = await redisClient.del(
+            getOtpKey(phone)
+        );
+
+        await redisClient.del(
+            getOtpAttemptsKey(phone)
+        );
+
+        if (!deleted) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "OTP expired",
+                },
+                { status: 410 }
+            );
+        }
+
+        let user = await User.findOne({ phone });
+
+        if (!user) {
+            user = await User.create({
+                phone,
+                username: "DEALORA-USER",
+                role: ["USER"],
+            });
+        }
+
+        const {
+            accessToken,
+            refreshToken,
+        } = await sessionService.createSession(
+            user,
+            req
+        );
+
+        const response = NextResponse.json(
+            {
+                success: true,
+                message: "Login successful",
+                data: {
+                    user: user.toObject(),
+                },
+            },
+            { status: 200 }
+        );
+
+        authCookies.setAuthCookies(response, {
+            accessToken,
+            refreshToken,
+        });
+
+        return response;
+
+    } catch (err) {
+        console.error(
+            "OTP verification error:",
+            err
+        );
+
+        return NextResponse.json(
+            {
+                success: false,
+                message: "Server Error",
+            },
+            { status: 500 }
+        );
     }
-
-    const email = user.email || `${phone}@gmail.com`
-
-    // Generate tokens
-    const accessToken = await generateToken({ email })
-    const refreshToken = await generateRefreshToken({ email })
-
-    // Save refresh token in DB
-    await UserModel.findByIdAndUpdate(user._id, { refreshToken })
-
-    // Set cookies
-    const cookieOptions = `Path=/; HttpOnly; SameSite=Lax`
-
-    return Response.json(
-      { message: "Logged in successfully" },
-      {
-        status: 200,
-        headers: {
-          "Set-Cookie": [
-            `token=${accessToken}; ${cookieOptions}`,
-            `refreshToken=${refreshToken}; ${cookieOptions}`,
-          ],
-        },
-      }
-    )
-  } catch (err) {
-    console.log(err)
-    return Response.json({ message: "Server error" }, { status: 500 })
-  }
 }

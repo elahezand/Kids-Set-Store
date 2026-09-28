@@ -2,7 +2,7 @@ import connectToDB from "../../../../../../configs/db";
 import ticketModel from "../../../../../../model/ticket";
 import { NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose";
-import { authUser } from "@/utils/serverHelper";
+import { authUser } from "@/utils/api/authGaurd";
 
 export async function POST(req, { params }) {
     try {

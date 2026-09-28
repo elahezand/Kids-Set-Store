@@ -1,4 +1,4 @@
-import { authAdmin } from "@/utils/serverHelper"
+import { authAdmin } from "@/utils/api/authGaurd"
 import connectToDB from "../../../../../configs/db"
 import discountModel from "../../../../../model/discount";
 import { updateOffSchema } from "../../../../../validations/discount";

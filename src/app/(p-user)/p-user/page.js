@@ -5,7 +5,7 @@ import TicketModel from "../../../../model/ticket";
 import CommentModel from "../../../../model/comment";
 import OrderModel from "../../../../model/order";
 import "../../../../model/department";
-import { authUser } from "@/utils/serverHelper";
+import { authUser } from "@/utils/api/authGaurd";
 import PageHeader from "@/components/modules/panel/pageHeader";
 import StatCard from "@/components/modules/panel/statCard";
 import RecentTickets from "@/components/template/p-user/index/recentTickets";

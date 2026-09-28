@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose";
 import connectToDB from "../../../../../configs/db";
 import FavoriteModel from "../../../../../model/favorite";
-import { getMe } from "@/utils/serverHelper";
+import { getMe } from "@/utils/api/authGaurd";
 import { jsonError, handleRouteError } from "@/utils/apiHelpers";
 
 /* DELETE /api/favorite/:productId (logged-in user) */

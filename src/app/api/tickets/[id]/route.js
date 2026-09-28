@@ -1,6 +1,6 @@
 import connectToDB from "../../../../../configs/db";
 import ticketModel from "../../../../../model/ticket";
-import { authAdmin } from "@/utils/serverHelper";
+import { authAdmin } from "@/utils/api/authGaurd";
 import { isValidObjectId } from "mongoose";
 import { NextResponse } from "next/server";
 

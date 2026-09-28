@@ -1,6 +1,6 @@
 import connectToDB from "../../../../../configs/db"
 import UserModel from "../../../../../model/user"
-import { authAdmin } from "@/utils/serverHelper"
+import { authAdmin } from "@/utils/api/authGaurd"
 import { verifyPassword } from "@/utils/auth"
 import handleFileUpload from "@/utils/serverFile"
 import { isValidObjectId } from "mongoose"

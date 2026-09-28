@@ -1,144 +1,107 @@
-import mongoose from "mongoose";
-import CategoryModel from "./category";
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
+const { nanoid } = require("nanoid");
+const notifyUser = require("../utils/notify");
+const { calcFinalPrice, computeMinPrice, getOfferFinalPrices } = require("../utils/pricing");
 
-const MAX_CATEGORY_DEPTH = 10;
-
-const toJSONTransform = (doc, ret) => {
-  ret.id = ret._id.toString();
-  delete ret._id;
-  return ret;
-};
-
-const cleanList = (arr) =>
-  Array.isArray(arr)
-    ? [...new Set(arr.map((value) => String(value).trim()).filter(Boolean))]
-    : [];
-
-const round = (value) => Math.round(value * 100) / 100;
-
-const calcFinalPrice = (price, discountPercent = 0) =>
-  round(price * (1 - (discountPercent || 0) / 100));
-
-const productSchema = new mongoose.Schema(
+const VariantSchema = new Schema(
   {
-    name: { type: String, required: true, trim: true },
-    price: { type: Number, required: true, min: 0 },
-    discountPercent: { type: Number, default: 0, min: 0, max: 100 },
+    attributes: {
+      type: Map,
+      of: String,
+      required: [true, "Variant attributes are required"],
+    },
+    sku: { type: String, required: true, trim: true },
+    price: { type: Number, required: [true, "Variant price is required"], min: 0 },
+    discount: { type: Number, default: 0, min: 0, max: 100 },
     finalPrice: { type: Number, min: 0 },
+    stock: { type: Number, default: 0, min: 0 },
+  },
+  { _id: true }
+);
 
-    shortDescription: { type: String, required: true, trim: true },
-    longDescription: { type: String, required: true },
-    color: { type: String, required: true, trim: true },
-    material: { type: String, required: true, trim: true },
-    img: { type: String, trim: true },
-    tags: { type: [String], required: true, set: cleanList },
-    availableSizes: { type: [String], default: [], set: cleanList },
-    isAvailable: { type: Boolean, default: true },
-
+const UnifiedListingSchema = new Schema(
+  {
+    title: { type: String, required: true, trim: true, maxlength: 150 },
+    slug: { type: String, unique: true, sparse: true, lowercase: true, trim: true },
+    description: { type: String, required: true, trim: true, maxlength: 3000 },
+    images: {
+      type: [String],
+      default: [],
+      validate: [(v) => Array.isArray(v) && v.length <= 10, "Maximum 10 images allowed"],
+    },
     categoryPath: {
-      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
-      required: true,
+      type: [Schema.Types.ObjectId],
+      ref: "Category",
+      default: [],
+    },
+    price: {
+      type: Number,
+      min: 0,
     },
 
-    score: { type: Number, default: 0 },
-    ratingCount: { type: Number, default: 0 },
+    shipping: {
+      type: {
+        type: String,
+        enum: ["standard", "express", "free"],
+        default: "standard",
+      },
+      cost: { type: Number, default: 0, min: 0 },
+    },
+    variants: {
+      type: [VariantSchema],
+      required: true,
+
+    },
+    shortIdentifier: { type: String, unique: true, sparse: true },
+    tags: { type: [String], default: [] },
+    specs: { type: Map, of: String, default: {} },
+    metrics: {
+      views: { type: Number, default: 0, min: 0 },
+      sold: { type: Number, default: 0, min: 0 },
+      score: { type: Number, default: 0, min: 0, max: 5 },
+      reviewsCount: { type: Number, default: 0, min: 0 },
+    },
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected", "deleted", "active", "inactive", "draft"],
+      default: function () {
+        return this.listingType === "user_ad" ? "pending" : "draft";
+      },
+    },
   },
   {
     timestamps: true,
     versionKey: false,
-    toJSON: { virtuals: true, transform: toJSONTransform },
-    toObject: { virtuals: true, transform: toJSONTransform },
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
-/* ---------- Indexes ---------- */
 
-productSchema.index({ categoryPath: 1, createdAt: -1 });
-productSchema.index({ finalPrice: 1 });
-productSchema.index({ discountPercent: -1 });
-productSchema.index({ score: -1 });
-
-/* ---------- Virtuals ---------- */
-
-productSchema.virtual("category").get(function () {
-  return this.categoryPath?.at(-1) ?? null;
-});
-
-/* ---------- Category path ---------- */
-
-const buildCategoryPath = async (categoryId) => {
-  if (!categoryId) return [];
-
-  const path = [];
-  let currentId = categoryId;
-
-  while (currentId && path.length < MAX_CATEGORY_DEPTH) {
-    const category = await CategoryModel.findById(currentId).select("parentId").lean();
-
-    if (!category) break;
-
-    path.unshift(category._id);
-    currentId = category.parentId;
+/* === HOOKS === */
+UnifiedListingSchema.pre("save", async function () {
+  if (!this.shortIdentifier) {
+    this.shortIdentifier = nanoid(8);
   }
-
-  if (!path.length) {
-    throw new Error("Category not found");
-  }
-
-  return path;
-};
-
-const lastItem = (path) => (Array.isArray(path) ? path.at(-1) : path);
-
-/* ---------- Hooks: create() / save() ---------- */
-
-productSchema.pre("save", async function () {
-  if (this.isNew || this.isModified("categoryPath")) {
-    this.categoryPath = await buildCategoryPath(lastItem(this.categoryPath));
-  }
-
-  if (this.isNew || this.isModified("price") || this.isModified("discountPercent")) {
-    this.finalPrice = calcFinalPrice(this.price, this.discountPercent);
+  if (this.isModified("title") && this.title) {
+    const cleanTitle = this.title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\u0600-\u06FFa-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-");
+    this.slug = `${cleanTitle}-${this.shortIdentifier}`;
   }
 });
 
-/* ---------- Hooks: findByIdAndUpdate / findOneAndUpdate / updateOne ---------- */
+/* === INDEXES === */
+UnifiedListingSchema.index({ listingType: 1, status: 1, categoryPath: 1, minPrice: 1 });
+UnifiedListingSchema.index({ owner: 1, status: 1 });
+UnifiedListingSchema.index({ "variants.sku": 1 }, { sparse: true });
+UnifiedListingSchema.index({ tags: 1 });
+UnifiedListingSchema.index(
+  { title: "text", description: "text" },
+  { weights: { title: 10, description: 2 }, name: "ListingTextIndex" }
+);
 
-const syncOnUpdate = async function () {
-  const update = this.getUpdate() || {};
-  const set = { ...(update.$set || {}) };
-  const rest = { ...update };
-  delete rest.$set;
-
-  const read = (key) => set[key] ?? rest[key];
-  const path = read("categoryPath");
-  if (path !== undefined) {
-    delete rest.categoryPath;
-    set.categoryPath = await buildCategoryPath(lastItem(path));
-  }
-  const newPrice = read("price");
-  const newDiscount = read("discountPercent");
-
-  if (newPrice !== undefined || newDiscount !== undefined) {
-    const current = await this.model
-      .findOne(this.getQuery())
-      .select("price discountPercent")
-      .lean();
-
-    if (current) {
-      set.finalPrice = calcFinalPrice(
-        newPrice ?? current.price,
-        newDiscount ?? current.discountPercent
-      );
-    }
-  }
-
-  this.setUpdate({ ...rest, $set: set });
-};
-
-productSchema.pre("findOneAndUpdate", syncOnUpdate);
-productSchema.pre("updateOne", syncOnUpdate);
-
-const ProductModel = mongoose.models.Product || mongoose.model("Product", productSchema);
-
-export default ProductModel;
+module.exports = mongoose.models.Listing || mongoose.model("Listing", UnifiedListingSchema);

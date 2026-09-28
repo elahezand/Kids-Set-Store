@@ -1,56 +1,125 @@
-import UserModel from "../../../../../model/user"
-import connectToDB from "../../../../../configs/db"
-import { generateToken, hashPassword, generateRefreshToken } from "@/utils/auth"
-import { userValidationSchema } from "../../../../../validations/user"
+import UserModel from "../../../../../model/user";
+import connectToDB from "../../../../../configs/db";
+import { hashPassword } from "@/utils/auth";
+import { userValidationSchema } from "../../../../../validations/user";
+import sessionService from "../../../../services/shared/session";
+import { NextResponse } from "next/server";
+import validate from "@/utils/validate";
+import authCookies from "@/utils/api/cookies";
 
 export async function POST(req) {
     try {
-        await connectToDB()
-        const body = await req.json()
-        const parsed = userValidationSchema.safeParse(body)
-        if (!parsed.success) {
-            return Response.json({ message: "Invalid data", errors: parsed.error.issues }, { status: 422 })
+        await connectToDB();
+
+        const body = await req.json();
+
+        const result = validate(
+            userValidationSchema,
+            body
+        );
+
+        if (!result.success) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Invalid data",
+                    errors: result.errors,
+                },
+                { status: 422 }
+            );
         }
 
-        const { username, email, password, phone } = parsed.data
+        const {
+            username,
+            email,
+            password,
+            phone,
+        } = result.data;
 
         const isUserExist = await UserModel.findOne({
-            $or: [{ phone }, { email: email || "NULL_EMAIL" }, { username }]
-        })
+            $or: [
+                { phone },
+                ...(email ? [{ email }] : []),
+                { username },
+            ],
+        });
 
         if (isUserExist) {
-            return Response.json({ message: "User already exists with this info" }, { status: 409 })
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "User already exists with this info",
+                },
+                { status: 409 }
+            );
         }
 
-        const hashedPassword = await hashPassword(password)
+        const hashedPassword = await hashPassword(password);
 
-        const usersCount = await UserModel.countDocuments()
-        const role = usersCount < 3 ? "ADMIN" : "USER"
+        const usersCount =
+            await UserModel.countDocuments();
+
+        const role =
+            usersCount < 3
+                ? "ADMIN"
+                : "USER";
 
         const newUser = await UserModel.create({
             username,
             email: email || null,
             phone,
             password: hashedPassword,
-            role
-        })
+            role,
+        });
 
-        const payload = { email: newUser.email, id: newUser._id };
-        const accessToken = await generateToken(payload)
-        const refreshToken = await generateRefreshToken(payload)
+        const {
+            accessToken,
+            refreshToken,
+        } = await sessionService.createSession(
+            newUser,
+            req
+        );
 
-        const response = Response.json(
-            { message: "Registered successfully." },
+        const response = NextResponse.json(
+            {
+                success: true,
+                message: "Registered successfully.",
+                data: {
+                    user: newUser.toObject(),
+                },
+            },
             { status: 201 }
         );
 
-        response.headers.append("Set-Cookie", `token=${accessToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400`);
-        response.headers.append("Set-Cookie", `refreshToken=${refreshToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800`);
+        response.cookies.set(
+            "accessToken",
+            accessToken,
+            {
+                ...authCookies.cookieOptions,
+                maxAge: 60 * 60 * 24,
+            }
+        );
+
+        response.cookies.set(
+            "refreshToken",
+            refreshToken,
+            {
+                ...authCookies.cookieOptions,
+                maxAge: 60 * 60 * 24 * 7,
+            }
+        );
 
         return response;
 
     } catch (err) {
-        console.error("Register Error:", err)
-        return Response.json({ message: "Server Error" }, { status: 500 })
+        console.error("Register Error:", err);
+
+        return NextResponse.json(
+            {
+                success: false,
+                message: "Server Error",
+            },
+            { status: 500 }
+        );
     }
 }

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import connectToDB from "../../../../configs/db";
 import ContactModel from "../../../../model/contact";
 import { contactValidationSchema } from "../../../../validators/contact";
-import { getMe } from "@/utils/serverHelper";
+import { getMe } from "@/utils/api/authGaurd";
 import { validationError, jsonError, handleRouteError } from "@/utils/apiHelpers";
 
 // Same email can send one message per minute

@@ -2,7 +2,7 @@ import { LuTicket } from "react-icons/lu";
 import connectToDB from "../../../../../configs/db";
 import TicketModel from "../../../../../model/ticket";
 import "../../../../../model/department";
-import { authUser } from "@/utils/serverHelper";
+import { authUser } from "@/utils/api/authGaurd";
 import { paginate } from "@/utils/paginate";
 import PageHeader from "@/components/modules/panel/pageHeader";
 import Pagination from "@/components/modules/ui/loadMore";

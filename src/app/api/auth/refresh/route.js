@@ -1,37 +1,61 @@
-import connectToDB from '../../../../../configs/db'
-import UserModel from '../../../../../model/user'
-import { verifyRefreshToken, generateToken } from '@/utils/auth'
-import { cookies } from 'next/headers'
+import { NextResponse } from "next/server";
+import { rotateSession } from "@/services/api/shared/session";
+import authCookies from "@/utils/api/cookies";
 
 export async function POST(req) {
     try {
-       await connectToDB()
-        const cookiSrore = await cookies()
+        const refreshToken = req.cookies.get("refreshToken")?.value;
 
-        const refreshtoken = cookiSrore.get("refreshToken").value
+        if (!refreshToken) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Unauthorized",
+                },
+                { status: 401 }
+            );
+        }
 
-        if (!refreshtoken) return Response.json({ message: "User unauthorized" }, { status: 401 })
+        const result = await rotateSession(
+            refreshToken,
+            req
+        );
 
-        const user = await UserModel.findOne({ refreshToken: refreshtoken })
+        if (!result.ok) {
+            const response = NextResponse.json(
+                {
+                    success: false,
+                    message: "Session invalid",
+                },
+                { status: 401 }
+            );
 
-        if (!user) return Response.json({ message: "User unauthorized" }, { status: 401 })
+            authCookies.clearAuthCookies(response);
 
-        const payloadToken = await verifyRefreshToken(refreshtoken)
+            return response;
+        }
 
-        const newAccessToken = await generateToken({ email: payloadToken.email })
-
-        return new Response({ message: newAccessToken },
+        const response = NextResponse.json(
             {
-                status: 200,
-                headers: {
-                    "Set-Cookie": `token=${newAccessToken}; Path=/; HttpOnly; SameSite=Lax`,
-                }
-            }
-        )
+                success: true,
+                message: "Token refreshed",
+            },
+            { status: 200 }
+        );
 
+        authCookies.setAuthCookies(response, result);
 
+        return response;
 
-    } catch (err) {  
-        return Response.json({ message: err.message }, { status: 500 })
+    } catch (err) {
+        console.error("Refresh error:", err);
+
+        return NextResponse.json(
+            {
+                success: false,
+                message: "Server Error",
+            },
+            { status: 500 }
+        );
     }
 }

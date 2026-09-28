@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import connectToDB from "../../../../../configs/db";
 import DiscountModel from "../../../../../model/discount";
 import { applyDiscountSchema } from "../../../../../validators/discount";
-import { getMe } from "@/utils/serverHelper";
+import { getMe } from "@/utils/api/authGaurd";
 import { validationError, jsonError, handleRouteError } from "@/utils/apiHelpers";
 
 /* POST /api/discount/use (logged-in user)*/

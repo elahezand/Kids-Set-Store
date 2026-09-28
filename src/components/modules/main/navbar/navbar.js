@@ -7,7 +7,7 @@ import connectToDB from "../../../../../configs/db";
 import CartCount from "./cart";
 import MobileMenu from "./mobileMenu";
 import ThemeToggle from "@/components/modules/ui/themeToggle";
-import { getMe } from "@/utils/serverHelper";
+import { getMe } from "@/utils/api/authGaurd";
 
 const categoryHref = (category) =>
   `/products?category=${encodeURIComponent(category.slug)}`;

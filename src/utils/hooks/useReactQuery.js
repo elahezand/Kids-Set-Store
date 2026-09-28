@@ -1,4 +1,4 @@
-import { api } from "../services/interceptor";
+import { api } from "../../services/interceptor";
 import {
   useQuery,
   useInfiniteQuery,

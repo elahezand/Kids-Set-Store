@@ -1,5 +1,5 @@
 import Breadcrumb from "@/components/modules/main/breadCrumb";
-import { getMe } from "@/utils/serverHelper";
+import { getMe } from "@/utils/api/authGaurd";
 import { paginate } from "@/utils/paginate";
 import WishListItems from "@/components/template/main/wishList/wishListItems";
 

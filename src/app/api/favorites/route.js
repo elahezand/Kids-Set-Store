@@ -3,7 +3,7 @@ import connectToDB from "../../../../configs/db";
 import FavoriteModel from "../../../../model/favorite";
 import ProductModel from "../../../../model/product";
 import { addFavoriteSchema } from "../../../../validators/favorite";
-import { getMe } from "@/utils/serverHelper";
+import { getMe } from "@/utils/api/authGaurd";
 import { validationError, jsonError, handleRouteError } from "@/utils/apiHelpers";
 
 /* GET /api/favorite (logged-in user) */

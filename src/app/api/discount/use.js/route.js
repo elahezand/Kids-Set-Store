@@ -1,7 +1,7 @@
 import connectToDB from "../../../../../configs/db";
 import discountModel from "../../../../../model/discount";
 import { NextResponse } from "next/server";
-import { authUser } from "@/utils/serverHelper";
+import { authUser } from "@/utils/api/authGaurd";
 
 export async function POST(req) {
     try {

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import connectToDB from "../../../../../configs/db";
 import CommentModel from "../../../../../model/comment";
 import { myCommentsQuerySchema } from "../../../../../validators/comment";
-import { getMe } from "@/utils/serverHelper";
+import { getMe } from "@/utils/api/authGaurd";
 import { paginate } from "@/utils/paginate";
 import { jsonError, handleRouteError } from "@/utils/apiHelpers";
 

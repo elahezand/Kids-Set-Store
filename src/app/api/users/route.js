@@ -1,6 +1,6 @@
 import UserModel from "../../../../model/user";
 import connectToDB from "../../../../configs/db";
-import { authAdmin } from "@/utils/serverHelper";
+import { authAdmin } from "@/utils/api/authGaurd";
 import { paginate } from "@/utils/paginate";
 import { userValidationSchema } from "../../../../validations/user";
 export async function GET(req) {

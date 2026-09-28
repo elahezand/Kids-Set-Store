@@ -1,0 +1,47 @@
+import { NextResponse } from "next/server";
+import connectToDB from "@/configs/db";
+
+import { authAdmin } from "@/utils/auth/authGaurd";
+import validateObjectId from "@/utils/validateObjectId";
+
+import orderService from "@/services/orderService";
+
+import {
+    handleRouteError,
+    jsonError,
+} from "@/utils/apiResponse";
+
+export async function PATCH(request, { params }) {
+    try {
+        await connectToDB();
+
+        const admin = await authAdmin();
+
+        if (!admin) {
+            return jsonError("Unauthorized", 401);
+        }
+
+        const { id } = await params;
+
+        if (!validateObjectId(id)) {
+            return jsonError("Invalid order ID", 400);
+        }
+
+        const result =
+            await orderService.markDelivered(id);
+
+        if (!result.success) {
+            return jsonError(
+                result.message,
+                result.status
+            );
+        }
+
+        return NextResponse.json({
+            message: "Order marked as delivered successfully",
+            data: result.data,
+        });
+    } catch (error) {
+        return handleRouteError(error);
+    }
+}

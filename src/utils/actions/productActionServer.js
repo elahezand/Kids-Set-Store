@@ -3,7 +3,7 @@ import connectToDB from "../../../configs/db";
 import ProductModal from "../../../model/product";
 import { productSchema } from "../../../validations/product";
 import handleFileUpload from "../serverFile";
-import { authAdmin } from "../serverHelper";
+import { authAdmin } from "../api/authGaurd";
 
 const createResponse = (status, message, data = null, errors = null) => {
     return { status, message, data, errors };

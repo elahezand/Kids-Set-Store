@@ -6,7 +6,7 @@ import {
   createCommentSchema,
   commentListQuerySchema,
 } from "../../../../validators/comment";
-import { getMe } from "@/utils/serverHelper";
+import { getMe } from "@/utils/api/authGaurd";
 import { paginate } from "@/utils/paginate";
 import { validationError, jsonError, handleRouteError } from "@/utils/apiHelpers";
 

@@ -4,7 +4,7 @@ import { LuArrowLeft } from "react-icons/lu";
 import connectToDB from "../../../../../../configs/db";
 import TicketModel from "../../../../../../model/ticket";
 import "../../../../../../model/department";
-import { authUser } from "@/utils/serverHelper";
+import { authUser } from "@/utils/api/authGaurd";
 import PageHeader from "@/components/modules/panel/pageHeader";
 import TicketThread from "@/components/modules/panel/ticketThread";
 import TicketReplyForm from "@/components/modules/panel/ticketReplyForm";

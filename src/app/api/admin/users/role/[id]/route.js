@@ -1,5 +1,5 @@
 import connectToDB from "../../../../../../configs/db";
-import { authAdmin } from "@/utils/serverHelper";
+import { authAdmin } from "@/utils/api/authGaurd";
 import UserModel from "../../../../../../model/user";
 import { NextResponse } from "next/server";
 

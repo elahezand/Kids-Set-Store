@@ -4,7 +4,7 @@ import { LuHeart } from "react-icons/lu";
 import connectToDB from "../../../../../configs/db";
 import FavoriteModel from "../../../../../model/favorite";
 import ProductModel from "../../../../../model/product";
-import { authUser } from "@/utils/serverHelper";
+import { authUser } from "@/utils/api/authGaurd";
 import { paginate } from "@/utils/paginate";
 import PageHeader from "@/components/modules/panel/pageHeader";
 import Pagination from "@/components/modules/ui/loadMore";

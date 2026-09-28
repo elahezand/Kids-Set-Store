@@ -1,38 +1,32 @@
-import mongoose from "mongoose";
-
+const mongoose = require("mongoose");
 const { Schema, Types } = mongoose;
-
-const toJSONTransform = (doc, ret) => {
-  ret.id = String(ret._id);
-  delete ret._id;
-  return ret;
-};
 
 const favoriteSchema = new Schema(
   {
-    user: { type: Types.ObjectId, ref: "User", required: true },
-
-    products: {
-      type: [{ type: Types.ObjectId, ref: "Product" }],
-      default: [],
+    user: {
+      type: Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+    productId: {
+      type: Types.ObjectId,
+      ref: "Listing",
+      required: true,
+      index: true,
     },
   },
   {
     timestamps: true,
     versionKey: false,
-    toJSON: { transform: toJSONTransform },
-    toObject: { transform: toJSONTransform },
   }
 );
 
-/* ---------- Indexes ---------- */
+favoriteSchema.index({ user: 1, productId: 1 }, { unique: true });
+favoriteSchema.index({ user: 1, createdAt: -1 });
 
-// One wishlist per user
-favoriteSchema.index({ user: 1 }, { unique: true });
+const Favorite =
+  mongoose.models.Favorite ||
+  mongoose.model("Favorite", favoriteSchema);
 
-// "How many users liked this product?"
-favoriteSchema.index({ products: 1 });
-
-const FavoriteModel = mongoose.models.Favorite || mongoose.model("Favorite", favoriteSchema);
-
-export default FavoriteModel;
+module.exports = Favorite;

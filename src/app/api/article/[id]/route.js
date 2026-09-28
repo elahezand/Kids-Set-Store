@@ -3,7 +3,7 @@ import { isValidObjectId } from "mongoose";
 import connectToDB from "../../../../../configs/db";
 import ArticleModel from "../../../../../model/article";
 import { updateArticleSchema } from "../../../../../validations/article";
-import { authAdmin } from "@/utils/serverHelper";
+import { authAdmin } from "@/utils/api/authGaurd";
 import handleFileUpload from "@/utils/serverFile";
 import {
   formDataToObject,

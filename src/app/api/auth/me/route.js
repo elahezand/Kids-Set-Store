@@ -1,35 +1,26 @@
-import connectToDB from "../../../../../configs/db"
-import UserModel from "../../../../../model/user"
-import { verifyRefreshToken, verifyToken } from "@/utils/auth"
-import { cookies } from "next/headers"
-export async function GET() {
+import { NextResponse } from "next/server";
+
+export async function GET(req) {
     try {
-        connectToDB()
+        const user = await req.user;
+        return NextResponse.json(
+            {
+                success: true,
+                data: {
+                    user: user.toObject(),
+                },
+            },
+            { status: 200 }
+        );
+    } catch (err) {
+        console.error("Get Me Error:", err);
 
-        const cookiesStore = await cookies()
-
-        let token = cookiesStore.get("token")
-
-        if (!token) return Response.json({ message: "Not Found" }, { status: 404 })
-
-        let payloadToken = await verifyToken(token.value)
-
-        if (!payloadToken) {
-            token = cookiesStore.get("refreshToken")
-
-            if (!token) return Response.json({ message: "Unauthorized" }, { status: 401 })
-
-            payloadToken = await verifyRefreshToken(token.value);
-
-        }
-        const user = await UserModel.findOne({ email: payloadToken.email }, "-password -refreshToken -__v")
-
-        if (!user) return Response.json({ message: "Not Found" }, { status: 404 })
-
-        return Response.json(user, { status: 200 })
-    }
-    catch (err) {
-        return Response.json({ message: "UnKnownError" }, { status: 500 })
+        return NextResponse.json(
+            {
+                success: false,
+                message: "Server Error",
+            },
+            { status: 500 }
+        );
     }
 }
-

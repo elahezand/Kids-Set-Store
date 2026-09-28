@@ -1,6 +1,6 @@
 import connectToDB from "../../../../configs/db";
 import ticketModel from "../../../../model/ticket";
-import { authUser } from "@/utils/serverHelper";
+import { authUser } from "@/utils/api/authGaurd";
 import { NextResponse } from "next/server";
 import { ticketValidationSchema } from "../../../../validations/ticket";
 

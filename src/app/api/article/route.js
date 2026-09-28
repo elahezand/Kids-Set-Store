@@ -5,7 +5,7 @@ import {
   createArticleSchema,
   articleListQuerySchema,
 } from "../../../../validators/article";
-import { authAdmin } from "@/utils/serverHelper";
+import { authAdmin } from "@/utils/api/authGaurd";
 import handleFileUpload from "@/utils/serverFile";
 import { paginate } from "@/utils/paginate";
 import {

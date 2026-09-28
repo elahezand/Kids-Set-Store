@@ -1,66 +1,119 @@
-import UserModel from "../../../../../model/user"
-import connectToDB from "../../../../../configs/db"
-import {
-  generateRefreshToken,
-  generateToken,
-  verifyPassword,
-} from "@/utils/auth"
-import { z } from "zod"
-
-const schema = z.object({
-  identifier: z.string(),
-  password: z.string().min(6),
-  remember: z.boolean().optional(),
-})
+import UserModel from "../../../../../model/user";
+import connectToDB from "../../../../../configs/db";
+import { verifyPassword } from "@/utils/api/auth";
+import { createSession } from "@/services/api/shared/session";
+import { NextResponse } from "next/server";
+import authSchema from "../../../../../validations/auth";
+import validate from "@/utils/validate";
+import authCookies from "@/utils/api/cookies";
 
 export async function POST(req) {
-  try {
-    await connectToDB()
+    try {
+        await connectToDB();
 
-    const body = await req.json()
-    const parsed = schema.safeParse(body)
-    if (!parsed.success)
-      return Response.json({ message: "Invalid data" }, { status: 422 })
+        const body = await req.json();
 
-    const { identifier, password, remember } = parsed.data
+        const result = validate(authSchema, body);
 
-    const user = await UserModel.findOne({
-      $or: [{ phone: identifier }, { email: identifier }],
-    })    
-    if (!user)
-      return Response.json({ message: "User not found" }, { status: 404 })
+        if (!result.success) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Invalid data",
+                    errors: result.errors,
+                },
+                { status: 422 }
+            );
+        }
 
-    const isValid = await verifyPassword(password, user.password)
-    
-    if (!isValid)
-      return Response.json({ message: "Invalid password" }, { status: 401 })
+        const {
+            identifier,
+            password,
+            remember,
+        } = result.data;
 
-    const email = user.email || `${user.phone}@gmail.com`
+        const user = await UserModel.findOne({
+            $or: [
+                { phone: identifier },
+                { email: identifier },
+                { username: identifier },
+            ],
+        });
 
-    const accessToken = await generateToken({ email })
-    const refreshToken = await generateRefreshToken({ email })
+        if (!user) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "User not found",
+                },
+                { status: 404 }
+            );
+        }
 
-    await UserModel.findByIdAndUpdate(user._id, {
-      $set: { refreshToken },
-    })
+        const isValid = await verifyPassword(
+            password,
+            user.password
+        );
 
-    const cookieOptions = `Path=/; HttpOnly; SameSite=Lax${
-      process.env.NODE_ENV === "production" ? "; Secure" : ""
-    }${remember ? "; Max-Age=2592000" : ""}` 
+        if (!isValid) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Invalid password",
+                },
+                { status: 401 }
+            );
+        }
 
-    return Response.json(
-      { message: "Logged in successfully" },
-      {
-        status: 200,
-        headers: {
-          "Set-Cookie": [
-            `token=${accessToken}; ${cookieOptions}`,
-            `refreshToken=${refreshToken}; ${cookieOptions}`,
-          ],
-        },
-      }
-    )
-  } catch (err) {    
-    return Response.json({ message: "Server error" }, { status: 500 })
-  }
+        const {
+            accessToken,
+            refreshToken,
+        } = await createSession(user, req);
+
+        const response = NextResponse.json(
+            {
+                success: true,
+                message: "Logged in successfully",
+                data: {
+                    user: user.toObject(),
+                },
+            },
+            { status: 200 }
+        );
+
+        // Access token
+        response.cookies.set(
+            "accessToken",
+            accessToken,
+            {
+                ...authCookies.cookieOptions,
+                maxAge: 60 * 60 * 24,
+            }
+        );
+
+        // Refresh token
+        response.cookies.set(
+            "refreshToken",
+            refreshToken,
+            {
+                ...authCookies.cookieOptions,
+                maxAge: remember
+                    ? 60 * 60 * 24 * 30
+                    : 60 * 60 * 24 * 7,
+            }
+        );
+
+        return response;
+
+    } catch (err) {
+        console.error("Login Error:", err);
+
+        return NextResponse.json(
+            {
+                success: false,
+                message: "Server error",
+            },
+            { status: 500 }
+        );
+    }
 }
