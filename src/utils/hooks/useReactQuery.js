@@ -10,6 +10,12 @@ const resolveUrl = (url, data) => {
   return typeof url === "function" ? url(data) : url;
 };
 
+const isPlainObject = (value) =>
+  value !== null &&
+  typeof value === "object" &&
+  !Array.isArray(value) &&
+  Object.getPrototypeOf(value) === Object.prototype;
+
 /*
    ERROR HANDLER
 */
@@ -36,6 +42,7 @@ const showErrorToast = (error, fallback) => {
 
 /*
    GET
+   usage: useGet(url, params?, options?)
 */
 
 export const useGet = (url, params, options) => {
@@ -43,10 +50,11 @@ export const useGet = (url, params, options) => {
     axiosConfig,
     silentError,
     errorFallback,
+    queryKey: customQueryKey,
     ...queryOptions
   } = options || {};
 
-  const queryKey = options?.queryKey ?? [url, params];
+  const queryKey = customQueryKey ?? [url, params];
 
   return useQuery({
     queryKey,
@@ -152,10 +160,18 @@ const createMutationHook = (method) => (url, options) => {
     mutationFn: async (data) => {
       const targetUrl = resolveUrl(url, data);
 
-      const { data: res } =
-        method === "delete"
-          ? await api.delete(targetUrl, axiosConfig)
-          : await api[method](targetUrl, data, axiosConfig);
+      let res;
+
+      if (method === "delete") {
+        const config =
+          typeof url !== "function" && isPlainObject(data)
+            ? { ...axiosConfig, data }
+            : axiosConfig;
+
+        ({ data: res } = await api.delete(targetUrl, config));
+      } else {
+        ({ data: res } = await api[method](targetUrl, data, axiosConfig));
+      }
 
       return res;
     },

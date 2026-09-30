@@ -1,55 +1,71 @@
+import { cache } from "react";
+import { notFound } from "next/navigation";
 import connectToDB from "@/configs/db";
 import ProductModel from "@/model/product";
-import commentModel from "@/model/comment";
-import { isValidObjectId } from "mongoose";
-import MoreProducts from "@/components/template/main/product/moreProducts";
-import Comments from "@/components/template/main/product/comments/comments";
+import { getProductById } from "@/services/public/product";
+import commentService from "@/services/public/comment";
 import Breadcrumb from "@/components/modules/main/breadCrumb";
 import ProductContent from "@/components/template/main/product/productContent";
-import { notFound } from "next/navigation";
-import { toProductView } from "@/utils/productView";
+import Comments from "@/components/template/main/product/comments/comments";
+import MoreProducts from "@/components/template/main/product/moreProducts";
+import { toProductView, toProductCard } from "@/utils/productView";
 
-const Product = async ({ params }) => {
+const OBJECT_ID_REGEX = /^[a-f\d]{24}$/i;
+const RELATED_LIMIT = 5;
+
+// cache => generateMetadata va page yek query mizanan
+const getProduct = cache(async (id) => {
+    if (!OBJECT_ID_REGEX.test(id)) return null;
     await connectToDB();
+    const result = await getProductById(id);
 
+    if (!result.success) return null;
+
+    return result.data;
+});
+
+export async function generateMetadata({ params }) {
     const { id } = await params;
 
-    let product = null;
+    const product = await getProduct(id);
+    if (!product) return {};
 
-    if (isValidObjectId(id)) {
-        product = await ProductModel.findOne({
-            _id: id,
-            status: "active",
-        }).lean();
-    }
+    const view = toProductView(product);
+    return {
+        title: view.name,
+        description: view.shortDescription,
+        openGraph: {
+            title: view.name,
+            images: [view.img],
+        },
+    };
+}
 
-    if (!product) return notFound();
+const Product = async ({ params }) => {
+    const { id } = await params;
+
+    const product = await getProduct(id);
+    if (!product) notFound();
 
     const view = toProductView(product);
 
-    const productComments =
-        await commentModel.countDocuments({
-            product: view._id,
-            status: "approved",
-            parentId: null,
-        });
+    const [commentsCount, related] = await Promise.all([
+        commentService.countByProduct(product._id),
 
-    const related = await ProductModel.find({
-        status: "active",
-        categoryPath: {
-            $in: product.categoryPath || [],
-        },
-        _id: {
-            $ne: product._id,
-        },
-    })
-        .sort({ _id: -1 })
-        .limit(5)
-        .lean();
+        ProductModel.find({
+            status: "active",
+            _id: { $ne: product._id },
+            categoryPath: {
+                $in: product.categoryPath ?? [],
+            },
+        })
+            .select("title images price variants metrics")
+            .sort({ _id: -1 })
+            .limit(RELATED_LIMIT)
+            .lean(),
+    ]);
 
-    const relatedProducts = JSON.parse(
-        JSON.stringify(related)
-    );
+    const relatedProducts = related.map(toProductCard);
 
     return (
         <div className="page-container">
@@ -61,7 +77,7 @@ const Product = async ({ params }) => {
             >
                 <ProductContent
                     product={view}
-                    productComments={productComments}
+                    commentsCount={commentsCount}
                 />
 
                 <section className="border-t border-gray-200 pt-10 dark:border-white/10">

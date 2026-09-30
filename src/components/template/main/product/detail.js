@@ -1,20 +1,220 @@
 "use client";
 
+import { useMemo } from "react";
+import Link from "next/link";
 import {
     FaFacebookF,
-    FaStar,
-    FaTwitter,
-    FaTelegram,
     FaLinkedinIn,
     FaPinterest,
+    FaStar,
+    FaTelegram,
+    FaTwitter,
 } from "react-icons/fa";
-import { IoCheckmark } from "react-icons/io5";
-import { TbSwitch3 } from "react-icons/tb";
 import { FaRegStar } from "react-icons/fa6";
-import Link from "next/link";
-import { useState } from "react";
+import { IoCheckmarkCircle, IoCloseCircle } from "react-icons/io5";
+import { TbSwitch3 } from "react-icons/tb";
 import AddToBasket from "@/components/modules/main/addToBasket";
 import AddToFavoriteList from "@/components/modules/main/addToFavorite";
+
+const MAX_SCORE = 5;
+const COLOR_KEYS = ["color", "colour"];
+
+/* ---------- helpers ---------- */
+
+const getPrice = (variant, fallback) =>
+    variant?.finalPrice ?? variant?.price ?? fallback;
+
+// [[name, [values]], ...]
+const getAttributeOptions = (variants = []) => {
+    const options = {};
+
+    for (const variant of variants) {
+        for (const [key, value] of Object.entries(variant.attributes ?? {})) {
+            if (value === undefined || value === null || value === "") continue;
+            (options[key] ??= new Set()).add(String(value));
+        }
+    }
+
+    return Object.entries(options).map(([name, values]) => [name, [...values]]);
+};
+
+// variant-i ke value-ye jadid ro dare va bishtarin shabahat ro ba entekhab-e feli
+const pickVariant = (variants = [], current, attribute, value) => {
+    const candidates = variants.filter(
+        (v) => String(v.attributes?.[attribute]) === value
+    );
+    if (!candidates.length) return null;
+
+    const currentAttrs = current?.attributes ?? {};
+    const similarity = (v) =>
+        Object.entries(currentAttrs).filter(
+            ([k, val]) =>
+                k !== attribute && String(v.attributes?.[k]) === String(val)
+        ).length;
+
+    return candidates.reduce((best, v) =>
+        similarity(v) > similarity(best) ? v : best
+    );
+};
+
+const getShareLinks = (product) => {
+    const url = encodeURIComponent(
+        `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/product/${product._id}`
+    );
+    const text = encodeURIComponent(product.name);
+    const media = encodeURIComponent(product.img ?? "");
+
+    return [
+        { name: "Telegram", Icon: FaTelegram, href: `https://t.me/share/url?url=${url}&text=${text}` },
+        { name: "LinkedIn", Icon: FaLinkedinIn, href: `https://www.linkedin.com/sharing/share-offsite/?url=${url}` },
+        { name: "Pinterest", Icon: FaPinterest, href: `https://pinterest.com/pin/create/button/?url=${url}&media=${media}&description=${text}` },
+        { name: "Twitter", Icon: FaTwitter, href: `https://twitter.com/intent/tweet?url=${url}&text=${text}` },
+        { name: "Facebook", Icon: FaFacebookF, href: `https://www.facebook.com/sharer/sharer.php?u=${url}` },
+    ];
+};
+
+/* ---------- small components ---------- */
+
+const Rating = ({ score, commentsCount }) => (
+    <div className="flex flex-wrap items-center gap-3">
+        <div
+            className="flex items-center gap-1"
+            role="img"
+            aria-label={`Rated ${score} out of ${MAX_SCORE}`}
+        >
+            <div className="flex items-center gap-0.5">
+                {Array.from({ length: MAX_SCORE }, (_, i) =>
+                    i < score ? (
+                        <FaStar key={i} className="text-lg text-coral-300" />
+                    ) : (
+                        <FaRegStar key={i} className="text-lg text-coral-300" />
+                    )
+                )}
+            </div>
+            <span className="text-sm font-semibold">
+                {score}/{MAX_SCORE}
+            </span>
+        </div>
+
+        <span className="h-4 w-px bg-gray-300 dark:bg-white/20" aria-hidden />
+
+        <a
+            href="#comments"
+            className="text-sm text-gray-500 underline-offset-2 hover:text-sage-400 hover:underline dark:text-gray-400"
+        >
+            {commentsCount} comments
+        </a>
+    </div>
+);
+
+const Price = ({ variant, fallback }) => {
+    const current = getPrice(variant, fallback);
+    const original = variant?.price;
+    const hasDiscount = original !== undefined && current < original;
+    const percent = hasDiscount
+        ? Math.round(((original - current) / original) * 100)
+        : 0;
+
+    return (
+        <div className="flex flex-wrap items-baseline gap-3">
+            <span className="font-shabnam-bold text-4xl leading-none text-sage-400">
+                {current} $
+            </span>
+
+            {hasDiscount && (
+                <>
+                    <span className="text-lg text-gray-400 line-through">
+                        {original} $
+                    </span>
+                    <span className="rounded-full bg-coral-300 px-2.5 py-0.5 text-sm font-semibold text-white">
+                        -{percent}%
+                    </span>
+                </>
+            )}
+        </div>
+    );
+};
+
+const StockBadge = ({ inStock }) => (
+    <span
+        className={`inline-flex items-center gap-1.5 text-sm font-medium ${inStock
+                ? "text-green-600 dark:text-green-400"
+                : "text-red-600 dark:text-red-400"
+            }`}
+    >
+        {inStock ? (
+            <IoCheckmarkCircle className="text-lg" />
+        ) : (
+            <IoCloseCircle className="text-lg" />
+        )}
+        {inStock ? "In stock" : "Out of stock"}
+    </span>
+);
+
+const VariantSelector = ({ options, variants, selectedAttributes, onSelect }) => {
+    if (!options.length) return null;
+
+    return (
+        <div className="flex flex-col gap-5">
+            {options.map(([attribute, values]) => {
+                const isColor = COLOR_KEYS.includes(attribute.toLowerCase());
+
+                return (
+                    <div key={attribute} className="flex flex-col gap-2.5">
+                        <span className="text-sm font-semibold capitalize">
+                            {attribute}
+                            <span className="ml-1 font-normal text-gray-500 dark:text-gray-400">
+                                : {String(selectedAttributes[attribute] ?? "-")}
+                            </span>
+                        </span>
+
+                        <div className="flex flex-wrap gap-2">
+                            {values.map((value) => {
+                                const isActive =
+                                    String(selectedAttributes[attribute]) ===
+                                    value;
+
+                                // age hich variant-e mojudi ba in value nabashe
+                                const available = variants.some(
+                                    (v) =>
+                                        String(v.attributes?.[attribute]) ===
+                                        value && (v.stock ?? 0) > 0
+                                );
+
+                                return (
+                                    <button
+                                        key={value}
+                                        type="button"
+                                        aria-pressed={isActive}
+                                        onClick={() => onSelect(attribute, value)}
+                                        className={`flex min-h-[44px] min-w-[52px] items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-400 focus-visible:ring-offset-2 ${isActive
+                                                ? "border-sage-400 bg-sage-400/10 text-sage-400 ring-1 ring-sage-400"
+                                                : "border-gray-300 hover:border-sage-400 dark:border-white/20"
+                                            } ${available
+                                                ? ""
+                                                : "opacity-50 line-through"
+                                            }`}
+                                    >
+                                        {isColor && (
+                                            <span
+                                                className="h-4 w-4 rounded-full border border-black/10"
+                                                style={{ backgroundColor: value }}
+                                                aria-hidden
+                                            />
+                                        )}
+                                        {value}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
+/* ---------- main ---------- */
 
 const Details = ({
     product,
@@ -22,276 +222,114 @@ const Details = ({
     selectedVariant,
     onVariantChange,
 }) => {
-    const variants = product.variants || [];
+    
+    const variants = product.variants ?? [];
+    const tags = product.tags ?? [];
 
-    const attributes = [
-        ...new Set(
-            variants.flatMap((variant) =>
-                Object.keys(variant?.attributes || {})
-            )
-        ),
-    ];
+    const options = useMemo(
+        () => getAttributeOptions(product.variants),
+        [product.variants]
+    );
+    const shareLinks = useMemo(() => getShareLinks(product), [product]);
 
-    const [selectedAttributes, setSelectedAttributes] =
-        useState(
-            selectedVariant?.attributes || {}
-        );
+    const selectedAttributes = selectedVariant?.attributes ?? {};
+    const price = getPrice(selectedVariant, product.price);
 
-    const handleAttributeChange = (attribute, value) => {
-        const newSelection = {
-            ...selectedAttributes,
-            [attribute]: value,
-        };
+    // mahsul-e bedun-e variant ham mitune mojud bashe
+    const inStock = selectedVariant
+        ? (selectedVariant.stock ?? 0) > 0
+        : variants.length === 0;
 
-        setSelectedAttributes(newSelection);
-
-        const matchedVariant = variants.find((variant) =>
-            Object.entries(newSelection).every(
-                ([key, selectedValue]) =>
-                    String(
-                        variant?.attributes?.[key]
-                    ) === String(selectedValue)
-            )
-        );
-
-        if (matchedVariant) {
-            onVariantChange(matchedVariant);
-        }
+    const handleSelect = (attribute, value) => {
+        const next = pickVariant(variants, selectedVariant, attribute, value);
+        if (next) onVariantChange(next);
     };
 
     return (
-        <main className="w-full md:w-[63%]">
-            <h2 className="text-xl sm:text-2xl">
-                {product.name}
-            </h2>
+        <div className="flex w-full flex-col gap-7 self-start md:sticky md:top-24 md:w-[63%]">
+            {/* Title + rating */}
+            <header className="flex flex-col gap-3">
+                <h1 className="text-2xl font-bold leading-snug tracking-tight sm:text-3xl">
+                    {product.name}
+                </h1>
+                <Rating score={product.score} commentsCount={productComments} />
+            </header>
 
-            {/* Rating */}
-            <div className="mt-8 flex items-center gap-1">
-                <p>Comments ({productComments})</p>
-
-                {[...Array(5)].map((_, index) =>
-                    index < product.score ? (
-                        <FaStar
-                            key={index}
-                            className="text-xl text-coral-300"
-                        />
-                    ) : (
-                        <FaRegStar
-                            key={index}
-                            className="text-xl text-coral-300"
-                        />
-                    )
-                )}
+            {/* Price card */}
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-sage-400/20 bg-sage-400/5 p-5">
+                <Price variant={selectedVariant} fallback={product.price} />
+                <StockBadge inStock={inStock} />
             </div>
 
-            {/* Price */}
-            <p className="my-6 font-shabnam-bold text-2xl text-sage-400">
-                {selectedVariant?.price ?? product.price} $
-            </p>
-
-            {/* Description */}
-            <span className="block w-full text-[15px] text-[rgb(160,151,151)] sm:w-[93%]">
-                {product.shortDescription}
-            </span>
-
-            <hr className="my-5" />
-
-            {/* Availability */}
-            <div className="mb-12 flex items-center gap-1.5">
-                <IoCheckmark className="text-2xl" />
-
-                <p>
-                    {selectedVariant?.stock > 0
-                        ? "Available"
-                        : "Unavailable"}
+            {product.shortDescription && (
+                <p className="max-w-prose text-[15px] leading-7 text-gray-600 dark:text-gray-300">
+                    {product.shortDescription}
                 </p>
-            </div>
-
-            {/* Variant selection */}
-            {attributes.length > 0 && (
-                <div className="mb-8 flex flex-col gap-5">
-                    <strong>AVAILABLE OPTIONS:</strong>
-
-                    {attributes.map((attribute) => {
-                        const values = [
-                            ...new Set(
-                                variants
-                                    .map(
-                                        (variant) =>
-                                            variant?.attributes?.[
-                                                attribute
-                                            ]
-                                    )
-                                    .filter(
-                                        (value) =>
-                                            value !== undefined &&
-                                            value !== null &&
-                                            value !== ""
-                                    )
-                                    .map(String)
-                            ),
-                        ];
-
-                        return (
-                            <div
-                                key={attribute}
-                                className="flex flex-col gap-2"
-                            >
-                                <span className="font-semibold capitalize">
-                                    {attribute}:
-                                </span>
-
-                                <div className="flex flex-wrap gap-2">
-                                    {values.map((value) => (
-                                        <button
-                                            key={value}
-                                            type="button"
-                                            onClick={() =>
-                                                handleAttributeChange(
-                                                    attribute,
-                                                    value
-                                                )
-                                            }
-                                            className={`rounded border px-3 py-1 text-sm ${
-                                                String(
-                                                    selectedAttributes?.[
-                                                        attribute
-                                                    ]
-                                                ) === String(value)
-                                                    ? "border-sage-400 bg-sage-400 text-white"
-                                                    : "border-gray-300"
-                                            }`}
-                                        >
-                                            {value}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
             )}
 
-            {/* Add to basket */}
-            <AddToBasket
-                name={product.name}
-                price={
-                    selectedVariant?.price ?? product.price
-                }
-                img={product.images?.[0] || ""}
-                id={product._id}
+            <VariantSelector
+                options={options}
+                variants={variants}
+                selectedAttributes={selectedAttributes}
+                onSelect={handleSelect}
             />
 
-            {/* Favorite + Compare */}
-            <section className="mb-8 mt-6 flex flex-wrap gap-5">
-                <AddToFavoriteList
-                    productId={product._id}
-                />
-
-                <div className="flex items-center gap-1">
-                    <TbSwitch3 className="text-xl text-sage-400" />
-
-                    <Link
-                        href="/"
-                        className="text-sm transition-all hover:cursor-pointer hover:text-gray-700"
-                    >
-                        Compare
-                    </Link>
+            {/* Actions */}
+            <div className="flex flex-wrap items-stretch gap-3">
+                <div className="min-w-[240px] flex-1">
+                    <AddToBasket
+                        key={selectedVariant?._id}
+                        productId={product._id}
+                        variantId={selectedVariant?._id ?? null}
+                    />
                 </div>
-            </section>
 
-            <hr className="my-5" />
+                <AddToFavoriteList productId={product._id} />
+                {/* TODO: href-e vagheyi-ye compare */}
+                <Link
+                    href="/"
+                    className="flex h-12 items-center justify-center gap-1.5 rounded-xl border border-gray-300 px-4 text-sm text-gray-600 transition hover:border-sage-400 hover:text-sage-400 dark:border-white/20 dark:text-gray-300"
+                >
+                    <TbSwitch3 className="text-xl text-sage-400" />
+                    Compare
+                </Link>
+            </div>
 
-            {/* Product information */}
-            <div className="mt-8 flex flex-col gap-5">
-                <strong>
-                    Product ID: {product._id}
-                </strong>
-
-                <p>
-                    <strong>TAGS:</strong>{" "}
-                    {product.tags?.length
-                        ? product.tags.join(", ")
-                        : "No tags"}
-                </p>
-
-                {selectedVariant && (
-                    <div>
-                        <strong className="mb-3 block">
-                            SELECTED VARIANT:
-                        </strong>
-
-                        <div className="flex flex-col gap-2 text-sm">
-                            {Object.entries(
-                                selectedVariant.attributes || {}
-                            ).map(([key, value]) => (
-                                <div
-                                    key={key}
-                                    className="flex gap-2"
-                                >
-                                    <span className="font-semibold capitalize">
-                                        {key}:
-                                    </span>
-
-                                    <span>
-                                        {String(value)}
-                                    </span>
-                                </div>
-                            ))}
-
-                            <div className="flex gap-2">
-                                <span className="font-semibold">
-                                    Price:
-                                </span>
-
-                                <span>
-                                    {selectedVariant.price} $
-                                </span>
-                            </div>
-
-                            <div className="flex gap-2">
-                                <span className="font-semibold">
-                                    Stock:
-                                </span>
-
-                                <span>
-                                    {selectedVariant.stock}
-                                </span>
-                            </div>
-                        </div>
+            {/* Footer: tags + share */}
+            <footer className="flex flex-col gap-4 border-t border-gray-200 pt-5 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
+                {tags.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2">
+                        {tags.map((tag) => (
+                            <span
+                                key={tag}
+                                className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600 dark:bg-white/10 dark:text-gray-300"
+                            >
+                                #{tag}
+                            </span>
+                        ))}
                     </div>
                 )}
-            </div>
 
-            {/* Share */}
-            <div className="mt-8 flex items-center gap-2 text-sage-400">
-                <p className="text-text dark:text-gray-100">
-                    Share:
-                </p>
+                <div className="flex items-center gap-2">
+                    <span className="mr-1 text-sm text-gray-500 dark:text-gray-400">
+                        Share
+                    </span>
 
-                <Link href="/">
-                    <FaTelegram className="text-lg" />
-                </Link>
-
-                <Link href="/">
-                    <FaLinkedinIn className="text-lg" />
-                </Link>
-
-                <Link href="/">
-                    <FaPinterest className="text-lg" />
-                </Link>
-
-                <Link href="/">
-                    <FaTwitter className="text-lg" />
-                </Link>
-
-                <Link href="/">
-                    <FaFacebookF className="text-lg" />
-                </Link>
-            </div>
-
-            <hr className="my-5" />
-        </main>
+                    {shareLinks.map(({ name, Icon, href }) => (
+                        <a
+                            key={name}
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Share on ${name}`}
+                            className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-sage-400 transition hover:-translate-y-0.5 hover:bg-sage-400 hover:text-white dark:border-white/20"
+                        >
+                            <Icon className="text-base" />
+                        </a>
+                    ))}
+                </div>
+            </footer>
+        </div>
     );
 };
 

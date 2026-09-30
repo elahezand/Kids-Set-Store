@@ -1,27 +1,41 @@
-"use client"
-import { CiHeart } from "react-icons/ci";
-import { usePost } from "@/utils/hooks/useReactQuery";
+"use client";
+
+import { useState } from "react";
+import { FaHeart, FaRegHeart } from "react-icons/fa6";
 import { toast } from "sonner";
+import { usePost } from "@/utils/hooks/useReactQuery";
+
 export default function AddToFavoriteList({ productId }) {
-    const { mutate } = usePost("/user/favorites", {
+    const [added, setAdded] = useState(false);
+
+    const { mutate, isPending } = usePost("/user/favorites", {
         onSuccess: () => {
-            toast.success("Product added To favorite Successfully :");
-        }
+            setAdded(true);
+            toast.success("Product added to favorites");
+        },
+        onError: (error) => {
+            toast.error(
+                error?.response?.data?.message ?? "Something went wrong"
+            );
+        },
     });
 
-    const addToFavoriteList = async () => {
+    const handleClick = () => {
+        if (added || isPending) return;
         mutate({ productId });
     };
 
     return (
-        <div className="group/fav flex cursor-pointer items-center gap-1">
-            <CiHeart />
-            <p
-                onClick={addToFavoriteList}
-                className="ml-2 whitespace-nowrap rounded bg-sage-400 px-3 text-xs leading-[34px] text-white opacity-0 transition-opacity group-hover/fav:opacity-100"
-            >
-                Add to Favorite
-            </p>
-        </div>
+        <button
+            type="button"
+            onClick={handleClick}
+            disabled={isPending}
+            aria-pressed={added}
+            aria-label={added ? "In your favorites" : "Add to favorites"}
+            title={added ? "In your favorites" : "Add to favorites"}
+            className="flex h-12 w-12 items-center justify-center rounded-xl border border-gray-300 text-xl text-coral-300 transition hover:border-coral-300 hover:bg-coral-300/10 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-300 dark:border-white/20"
+        >
+            {added ? <FaHeart /> : <FaRegHeart />}
+        </button>
     );
 }

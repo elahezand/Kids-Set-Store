@@ -1,17 +1,12 @@
-
 import CommentForm from "@/components/template/main/product/commentForm";
 import CommentsList from "@/components/template/main/product/comments/commentsList";
-import { getByProduct } from "@/services/public/comment";
-
+import commentService from "@/services/public/comment";
 const Comments = async ({ productId }) => {
-    const result = await getByProduct(productId, {
+    const result = await commentService.getByProduct(productId, {
         limit: 5,
     });
 
-    const data = JSON.parse(
-        JSON.stringify(result.data)
-    );
-
+    const data = JSON.parse(JSON.stringify(result.data));
     return (
         <div>
             <h2 className="section-title mb-6">

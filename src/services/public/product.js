@@ -243,9 +243,3 @@ export {
     getProductById,
     smartSearch,
 };
-
-export default {
-    getAllProducts,
-    getProductById,
-    smartSearch,
-};

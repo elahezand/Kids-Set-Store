@@ -28,6 +28,9 @@ const Navbar = async () => {
     getAllCategories(),
   ]);
 
+  console.log(user);
+  
+
   let favoriteCount = 0;
 
   if (user) {

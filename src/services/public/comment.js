@@ -35,11 +35,11 @@ const getByProduct = async (product, query = {}) => {
 
     const replies = parentIds.length
         ? await Comment.find({
-            product,
-            parentId: { $in: parentIds },
-            status: "approved",
-            deletedAt: null,
-        }).populate("user", PUBLIC_USER_FIELDS)
+              product,
+              parentId: { $in: parentIds },
+              status: "approved",
+              deletedAt: null,
+          }).populate("user", PUBLIC_USER_FIELDS)
         : [];
 
     const byParent = new Map();
@@ -72,7 +72,22 @@ const getByProduct = async (product, query = {}) => {
     };
 };
 
-export {
-    getByProduct,
+const countByProduct = async (product) => {
+    if (!isValidObjectId(product)) {
+        return 0;
+    }
+
+    return Comment.countDocuments({
+        product,
+        parentId: null,
+        status: "approved",
+        deletedAt: null,
+    });
 };
 
+const commentService = {
+    getByProduct,
+    countByProduct,
+};
+
+export default commentService;

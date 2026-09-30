@@ -4,11 +4,11 @@ const AppError = require("@/utils/AppError");
 
 const Product = require("@/model/product");
 const logger = require("@/utils/logger");
-const { round2, variantFinalPrice } = require("@/utils/pricing");
+const { round2 } = require("@/utils/pricing");
 const { dateRangeFilter } = require("@/utils/listQuery");
 const { paginate } = require("@/utils/paginate");
 
-const isValidId = mongoose.Types.ObjectId.isValid;
+const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 function escapeRegex(text) {
     return String(text).replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
@@ -31,13 +31,19 @@ function normalizeSearchText(str) {
 
 async function buildProductFilters(query, { isAdmin = false } = {}) {
     const filters = {};
+    const andConditions = [];
+
+    // 1. Status
     if (isAdmin) {
         // admin: one status, or "all" / nothing = every status except deleted
-        filters.status = query.status && query.status !== "all" ? query.status : { $ne: "deleted" };
-    } else if (query.status) {
+        filters.status =
+            query.status && query.status !== "all"
+                ? query.status
+                : { $ne: "deleted" };
+    } else {
+        // public users always see only active products
         filters.status = "active";
     }
-
 
     // 2. Photos Filter
     if (query.hasPhoto === "true") {
@@ -51,7 +57,9 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
 
     // 4. Category Filter
     if (query.category) {
-        const categoryDoc = await Category.findOne({ slug: query.category }).select("_id").lean();
+        const categoryDoc = await Category.findOne({ slug: query.category })
+            .select("_id")
+            .lean();
         filters.categoryPath = categoryDoc ? categoryDoc._id : null;
     } else if (query.categoryId && isValidId(query.categoryId)) {
         filters.categoryPath = new mongoose.Types.ObjectId(query.categoryId);
@@ -77,23 +85,25 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
 
     // 6. Tags
     if (query.tags) {
-        const tagsArray = String(query.tags).split(",").map((t) => t.trim()).filter(Boolean);
+        const tagsArray = String(query.tags)
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean);
         if (tagsArray.length > 0) filters.tags = { $in: tagsArray };
     }
 
-    // 8. Rating
+    // 7. Rating
     if (query.rating) {
         const minRating = Number(query.rating);
         if (!isNaN(minRating)) filters["metrics.score"] = { $gte: minRating };
     }
 
-
-    // 10. Variant attributes (color, size)
+    // 8. Variant attributes (color, size)
     for (const key of ["color", "size"]) {
         if (query[key]) filters[`variants.attributes.${key}`] = String(query[key]);
     }
 
-    // 11. Specs (JSON)
+    // 9. Specs (JSON)
     if (query.filter) {
         let parsedFilter;
         try {
@@ -107,7 +117,7 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
         }
     }
 
-    // 12. Text search (q)
+    // 10. Text search (q)
     if (query.q) {
         const cleanQuery = normalizeSearchText(query.q).slice(0, 100);
         if (cleanQuery) {
@@ -118,18 +128,22 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
                 { title: { $regex: new RegExp(escapeRegex(cleanQuery), "i") } },
             ];
             if (compactQuery !== cleanQuery) {
-                searchConditions.push({ title: { $regex: new RegExp(escapeRegex(compactQuery), "i") } });
+                searchConditions.push({
+                    title: { $regex: new RegExp(escapeRegex(compactQuery), "i") },
+                });
             }
             if (tokens.length > 1) {
                 searchConditions.push({
-                    $and: tokens.map((token) => ({ title: { $regex: new RegExp(escapeRegex(token), "i") } })),
+                    $and: tokens.map((token) => ({
+                        title: { $regex: new RegExp(escapeRegex(token), "i") },
+                    })),
                 });
             }
             andConditions.push({ $or: searchConditions });
         }
     }
 
-    // 13. Created-at range, shared by every dashboard table (?from / ?to / ?preset)
+    // 11. Created-at range, shared by every dashboard table (?from / ?to / ?preset)
     Object.assign(filters, dateRangeFilter(query, "createdAt"));
 
     if (andConditions.length > 0) filters.$and = andConditions;
@@ -138,9 +152,10 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
 }
 
 /* ═══════════════════════════ CART ═══════════════════════════ */
-const itemKey = (item) => {
-    return `${String(item.productId || "")}::${String(item.variantId || "")}`;
-};
+const itemKey = (item) =>
+    `${String(item.productId?._id || item.productId || "")}::${String(
+        item.variantId?._id || item.variantId || ""
+    )}`;
 
 const findVariant = (product, variantId) => {
     if (!variantId || !product?.variants?.length) return null;
@@ -152,9 +167,10 @@ const findVariant = (product, variantId) => {
 const getVariantSnapshot = (product, variantId) => {
     const variant = findVariant(product, variantId);
     if (!variant) return null;
-    const attributes = variant.attributes instanceof Map
-        ? Object.fromEntries(variant.attributes)
-        : variant.attributes || null;
+    const attributes =
+        variant.attributes instanceof Map
+            ? Object.fromEntries(variant.attributes)
+            : variant.attributes || null;
     return { attributes, sku: variant.sku };
 };
 
@@ -164,6 +180,33 @@ const productInfoOf = (product) => ({
     slug: product.slug,
     images: product.images || [],
 });
+
+/* Chizi ke kharidari mishe: ya yek variant, ya khod-e mahsul (age variant nadare) */
+const getSellable = (product, variantId) => {
+    const hasVariants = product.variants?.length > 0;
+
+    if (!hasVariants) {
+        return {
+            variantId: null,
+            price: Number(product.price ?? product.minPrice),
+            // age product.stock ta'rif nashode, mahdudiyat nadarim
+            stock: product.stock == null ? Infinity : Number(product.stock),
+            snapshot: null,
+        };
+    }
+
+    if (!variantId) return { problem: { reason: "missing_variant_id" } };
+
+    const variant = findVariant(product, variantId);
+    if (!variant) return { problem: { reason: "variant_not_found" } };
+
+    return {
+        variantId,
+        price: Number(variant.price),
+        stock: variant.stock,
+        snapshot: getVariantSnapshot(product, variantId),
+    };
+};
 
 const getCouponProblem = (couponDoc) => {
     if (!couponDoc) return "Coupon not found";
@@ -189,119 +232,50 @@ const calcCouponDiscount = (couponDoc, subtotal) => {
     return round2(Math.min(discount, subtotal));
 };
 
-const calculateCartTotals = async (rawItems, couponDoc = null, shippingCost = 0) => {
-    const normalizedItems = [];
-    const skippedItems = [];
-    let subtotal = 0;
+const mergeCartItems = (currentItems, newItems) => {
+    const merged = currentItems.map((item) => {
+        const plainItem = item.toObject?.() ?? item;
 
-
-    const items = mergeCartItems([], rawItems || []);
-
-    const directItems = items;
-
-    /* Price every item from its variant */
-    const productIds = [...new Set(directItems.map((i) => String(i.productId || "")))].filter(isValidId);
-    const products = productIds.length ? await Product.find({ _id: { $in: productIds } }) : [];
-
-    directItems.forEach((item) => {
-        if (!item.productId) {
-            skippedItems.push({ reason: "missing_product_id" });
-            return;
-        }
-        const found = products.find((l) => String(l._id) === String(item.productId));
-        if (!found) {
-            skippedItems.push({ productId: item.productId, reason: "product_not_found" });
-        }
+        return {
+            ...plainItem,
+            productId:
+                plainItem.productId?._id ||
+                plainItem.productId,
+            variantId:
+                plainItem.variantId?._id ||
+                plainItem.variantId ||
+                null,
+        };
     });
 
-    products.forEach((product) => {
-        const itemsOfProduct = directItems.filter(
-            (i) => String(i.productId) === String(product._id)
+    for (const rawItem of newItems || []) {
+        const newItem = rawItem.toObject?.() ?? rawItem;
+
+        const normalized = {
+            productId:
+                newItem.productId?._id ||
+                newItem.productId,
+
+            variantId:
+                newItem.variantId?._id ||
+                newItem.variantId ||
+                null,
+
+            quantity: Math.max(
+                Number(newItem.quantity) || 1,
+                1
+            ),
+        };
+
+        const existing = merged.find(
+            (item) =>
+                itemKey(item) === itemKey(normalized)
         );
 
-        if (!["active", "accepted"].includes(product.status)) {
-            itemsOfProduct.forEach((item) => {
-                skippedItems.push({ productId: item.productId, reason: "product_not_available", status: product.status });
-            });
-            return;
-        }
-
-        itemsOfProduct.forEach((item) => {
-            if (!item.variantId) {
-                skippedItems.push({ productId: item.productId, reason: "missing_variant_id" });
-                return;
-            }
-            const variant = findVariant(product, item.variantId);
-            if (!variant) {
-                skippedItems.push({ productId: item.productId, reason: "variant_not_found" });
-                return;
-            }
-            if (!(variant.stock > 0)) {
-                skippedItems.push({ productId: item.productId, reason: "variant_out_of_stock", stock: variant.stock });
-                return;
-            }
-            if (variant.stock < item.quantity) {
-                skippedItems.push({ productId: item.productId, reason: "insufficient_stock", stock: variant.stock, requested: item.quantity });
-                return;
-            }
-
-            const price = variant.price;
-            const discount = variant.discount || 0;
-            const finalPrice = variantFinalPrice(variant);
-
-            if (typeof finalPrice !== "number" || typeof price !== "number") {
-                skippedItems.push({ productId: item.productId, reason: "price_not_available" });
-                return;
-            }
-
-            subtotal += finalPrice * item.quantity;
-
-            normalizedItems.push({
-                productId: product._id,
-                variantId: item.variantId || null,
-                quantity: item.quantity,
-                price,
-                discount,
-                finalPrice,
-                variantSnapshot: getVariantSnapshot(product, item.variantId),
-                shipsWithinDays: 3,
-                productInfo: productInfoOf(product),
-            });
-        });
-    });
-
-    if (skippedItems.length > 0) {
-        logger.warn("[cart] skipped items while calculating totals:", skippedItems);
-    }
-
-    subtotal = round2(subtotal);
-    const couponDiscount = calcCouponDiscount(couponDoc, subtotal);
-    const shipping = round2(Number(shippingCost || 0));
-
-    return {
-        items: normalizedItems,
-        skippedItems,
-        pricing: {
-            subtotal,
-            discount: couponDiscount,
-            shippingCost: shipping,
-            total: round2(subtotal - couponDiscount + shipping),
-        },
-    };
-};
-const mergeCartItems = (currentItems, newItems) => {
-    const merged = currentItems.map((item) => ({ ...item }));
-
-    for (const newItem of newItems) {
-        const normalized = {
-            productId: newItem.productId,
-            variantId: newItem.variantId || null,
-            quantity: Math.max(Number(newItem.quantity) || 1, 1),
-        };
-        const existing = merged.find((item) => itemKey(item) === itemKey(normalized));
-
         if (existing) {
-            existing.quantity = Number(existing.quantity) + normalized.quantity;
+            existing.quantity =
+                Number(existing.quantity) +
+                normalized.quantity;
         } else {
             merged.push(normalized);
         }
@@ -310,6 +284,228 @@ const mergeCartItems = (currentItems, newItems) => {
     return merged;
 };
 
+const resolveItemVariants = async (rawItems) => {
+    const normalized = (rawItems || []).map((item) => {
+        const plainItem = item.toObject?.() ?? item;
+
+        return {
+            ...plainItem,
+            productId:
+                plainItem.productId?._id ||
+                plainItem.productId,
+            variantId:
+                plainItem.variantId?._id ||
+                plainItem.variantId ||
+                null,
+            quantity: Number(plainItem.quantity) || 1,
+        };
+    });
+
+    const needIds = [
+        ...new Set(
+            normalized
+                .filter((i) => !i.variantId && i.productId)
+                .map((i) => String(i.productId))
+                .filter(isValidId)
+        ),
+    ];
+
+    if (!needIds.length) return normalized;
+
+    const products = await Product.find({
+        _id: { $in: needIds },
+    }).select("variants._id");
+
+    const singleVariant = new Map();
+
+    for (const product of products) {
+        if (product.variants?.length === 1) {
+            singleVariant.set(
+                String(product._id),
+                product.variants[0]._id
+            );
+        }
+    }
+
+    return normalized.map((item) =>
+        !item.variantId &&
+            singleVariant.has(String(item.productId))
+            ? {
+                ...item,
+                variantId: singleVariant.get(
+                    String(item.productId)
+                ),
+            }
+            : item
+    );
+};
+
+const calculateCartTotals = async (
+    rawItems,
+    couponDoc = null,
+    shippingCost = 0
+) => {
+    const normalizedItems = [];
+    const skippedItems = [];
+    let subtotal = 0;
+
+    const resolvedItems = await resolveItemVariants(rawItems);
+
+    const items = mergeCartItems([], resolvedItems);
+
+    const productIds = [
+        ...new Set(
+            items
+                .map((i) => String(i.productId || ""))
+                .filter((id) => id && isValidId(id))
+        ),
+    ];
+
+    const products = productIds.length
+        ? await Product.find({ _id: { $in: productIds } })
+        : [];
+
+    const productMap = new Map(
+        products.map((p) => [String(p._id), p])
+    );
+
+    for (const item of items) {
+        if (!item.productId) {
+            skippedItems.push({
+                reason: "missing_product_id",
+            });
+            continue;
+        }
+
+        const product = productMap.get(
+            String(item.productId)
+        );
+
+        if (!product) {
+            skippedItems.push({
+                productId: item.productId,
+                reason: "product_not_found",
+            });
+            continue;
+        }
+
+        if (!["active", "accepted"].includes(product.status)) {
+            skippedItems.push({
+                productId: item.productId,
+                reason: "product_not_available",
+                status: product.status,
+            });
+            continue;
+        }
+
+        const sellable = getSellable(
+            product,
+            item.variantId
+        );
+
+        if (sellable.problem) {
+            skippedItems.push({
+                productId: item.productId,
+                variantId: item.variantId,
+                ...sellable.problem,
+            });
+            continue;
+        }
+
+        const {
+            price,
+            stock,
+            snapshot,
+        } = sellable;
+
+        const ref = {
+            productId: item.productId,
+            variantId: sellable.variantId,
+        };
+
+        if (!(stock > 0)) {
+            skippedItems.push({
+                ...ref,
+                reason: "out_of_stock",
+                stock,
+            });
+            continue;
+        }
+
+        if (stock < item.quantity) {
+            skippedItems.push({
+                ...ref,
+                reason: "insufficient_stock",
+                stock,
+                requested: item.quantity,
+            });
+            continue;
+        }
+
+        if (!Number.isFinite(price)) {
+            skippedItems.push({
+                ...ref,
+                reason: "price_not_available",
+            });
+            continue;
+        }
+
+        const discount = 0;
+        const finalPrice = price;
+
+        subtotal += finalPrice * item.quantity;
+
+        normalizedItems.push({
+            productId: product._id,
+            variantId: sellable.variantId,
+            quantity: item.quantity,
+            price,
+            discount,
+            finalPrice,
+            variantSnapshot: snapshot,
+            shipsWithinDays: 3,
+            productInfo: productInfoOf(product),
+        });
+    }
+
+    console.log(
+        "NORMALIZED ITEMS:",
+        normalizedItems
+    );
+
+    if (skippedItems.length > 0) {
+        logger.warn(
+            "[cart] skipped items while calculating totals:",
+            skippedItems
+        );
+    }
+
+    subtotal = round2(subtotal);
+
+    const couponDiscount = calcCouponDiscount(
+        couponDoc,
+        subtotal
+    );
+
+    const shipping = round2(
+        Number(shippingCost || 0)
+    );
+
+    return {
+        items: normalizedItems,
+        skippedItems,
+        pricing: {
+            subtotal,
+            discount: couponDiscount,
+            shippingCost: shipping,
+            total: round2(
+                subtotal -
+                couponDiscount +
+                shipping
+            ),
+        },
+    };
+};
 module.exports = {
     paginate,
     buildProductFilters,
@@ -317,6 +513,7 @@ module.exports = {
     normalizeSearchText,
     mergeCartItems,
     calculateCartTotals,
+    resolveItemVariants,
     itemKey,
     getCouponProblem,
 };

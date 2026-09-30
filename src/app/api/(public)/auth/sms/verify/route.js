@@ -105,7 +105,7 @@ export async function POST(req) {
         if (!user) {
             user = await User.create({
                 phone,
-                username: "DEALORA-USER",
+                username: "SETKID-USER",
                 role: ["USER"],
             });
         }

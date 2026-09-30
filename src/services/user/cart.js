@@ -28,19 +28,13 @@ const findUsableCoupon = async (code) => {
         };
     }
 
-    return {
-        success: true,
-        data: couponDoc,
-    };
+    return { success: true, data: couponDoc };
 };
 
 const getOrCreateActiveCart = async (userId) => {
     try {
         return await Cart.findOneAndUpdate(
-            {
-                user: userId,
-                status: "active",
-            },
+            { user: userId, status: "active" },
             {
                 $setOnInsert: {
                     user: userId,
@@ -48,17 +42,11 @@ const getOrCreateActiveCart = async (userId) => {
                     status: "active",
                 },
             },
-            {
-                returnDocument: "after",
-                upsert: true,
-            }
+            { returnDocument: "after", upsert: true }
         );
     } catch (err) {
         if (err?.code === 11000) {
-            return Cart.findOne({
-                user: userId,
-                status: "active",
-            });
+            return Cart.findOne({ user: userId, status: "active" });
         }
 
         throw err;
@@ -68,17 +56,25 @@ const getOrCreateActiveCart = async (userId) => {
 const getUserCart = async (userId) => {
     const cart = await getOrCreateActiveCart(userId);
 
-    return buildCartView(cart);
+    return await buildCartView(cart);
 };
 
-const addToCart = async (userId, items) => {
+const addToCart = async (userId, rawItems) => {
+    if (!Array.isArray(rawItems) || rawItems.length === 0) {
+        return {
+            success: false,
+            status: 400,
+            message: "Items are required",
+        };
+    }
+
     const cart = await getOrCreateActiveCart(userId);
 
     const mergedItems = mergeCartItems(
         cart.items.map(
             (item) => item.toObject?.() ?? item
         ),
-        items
+        rawItems
     );
 
     const totals = await calculateCartTotals(
@@ -91,7 +87,7 @@ const addToCart = async (userId, items) => {
         totals.items.map((item) => itemKey(item))
     );
 
-    const droppedRequested = items.filter(
+    const droppedRequested = rawItems.filter(
         (item) => !resultKeys.has(itemKey(item))
     );
 
@@ -99,8 +95,7 @@ const addToCart = async (userId, items) => {
         return {
             success: false,
             status: 400,
-            message:
-                "Some items could not be added to the cart.",
+            message: "Some items could not be added to the cart.",
             details: totals.skippedItems,
         };
     }
@@ -111,7 +106,7 @@ const addToCart = async (userId, items) => {
 
     return {
         success: true,
-        data: buildCartView(cart, {
+        data: await buildCartView(cart, {
             prune: false,
         }),
     };
@@ -124,17 +119,12 @@ const removeFromCart = async (userId, itemId) => {
 
     cart.items = cart.items.filter((item) => {
         const matchesDirectVariant =
-            item.variantId &&
-            String(item.variantId) === String(itemId);
+            item.variantId && String(item.variantId) === String(itemId);
 
         const matchesDirectProduct =
-            !item.variantId &&
-            String(item.productId) === String(itemId);
+            !item.variantId && String(item.productId) === String(itemId);
 
-        return !(
-            matchesDirectVariant ||
-            matchesDirectProduct
-        );
+        return !(matchesDirectVariant || matchesDirectProduct);
     });
 
     if (cart.items.length === beforeCount) {
@@ -149,7 +139,7 @@ const removeFromCart = async (userId, itemId) => {
 
     return {
         success: true,
-        data: buildCartView(cart),
+        data: await buildCartView(cart),
     };
 };
 
@@ -179,9 +169,7 @@ const updateCart = async (userId, data) => {
     if (data.removeCoupon) {
         cart.coupon = null;
     } else if (data.couponCode) {
-        const result = await findUsableCoupon(
-            data.couponCode
-        );
+        const result = await findUsableCoupon(data.couponCode);
 
         if (!result.success) {
             return result;
@@ -194,29 +182,18 @@ const updateCart = async (userId, data) => {
 
     return {
         success: true,
-        data: buildCartView(cart, {
+        data: await buildCartView(cart, {
             prune: false,
         }),
     };
 };
-
 const clearCart = async (userId) => {
     await Cart.updateOne(
-        {
-            user: userId,
-            status: "active",
-        },
-        {
-            $set: {
-                items: [],
-                coupon: null,
-            },
-        }
+        { user: userId, status: "active" },
+        { $set: { items: [], coupon: null } }
     );
 
-    return {
-        success: true,
-    };
+    return { success: true };
 };
 
 export {

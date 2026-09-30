@@ -1,72 +1,78 @@
 "use client";
 
-import { Swiper, SwiperSlide } from "swiper/react";
+import { useState } from "react";
 import Image from "next/image";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { FreeMode, Thumbs } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/thumbs";
-import { FreeMode, Navigation, Thumbs } from "swiper/modules";
-import { useState } from "react";
 
-const Gallery = ({ images, title }) => {
-  const [thumbsSwiper, setThumbsSwiper] = useState(null);
+const PLACEHOLDER = "/placeholder.png";
 
-  const list = Array.isArray(images)
-    ? images.filter(Boolean)
-    : images
-      ? [images]
-      : [];
+const Gallery = ({ images = [], title = "Product image" }) => {
+    const [thumbsSwiper, setThumbsSwiper] = useState(null);
 
-  if (!list.length) return null;
+    const filtered = images.filter(Boolean);
+    const list = filtered.length ? filtered : [PLACEHOLDER];
 
-  return (
-    <section className="w-full md:w-[36%]">
-      <Swiper
-        spaceBetween={10}
-        thumbs={{
-          swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null,
-        }}
-        modules={[FreeMode, Thumbs]}
-        className="mySwiper2 !h-[280px] w-full sm:!h-[360px] md:!h-[420px]"
-      >
-        {list.map((img, index) => (
-          <SwiperSlide key={img || index} className="relative">
-            <Image
-              src={img}
-              alt={title || "Product image"}
-              fill
-              className="object-contain"
-              sizes="(max-width: 768px) 100vw, 36vw"
-            />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+    return (
+        <section className="w-full md:w-[36%]">
+            <Swiper
+                spaceBetween={10}
+                modules={[FreeMode, Thumbs]}
+                thumbs={{
+                    swiper:
+                        thumbsSwiper && !thumbsSwiper.destroyed
+                            ? thumbsSwiper
+                            : null,
+                }}
+                className="mySwiper2 !h-[280px] w-full sm:!h-[360px] md:!h-[420px]"
+            >
+                {list.map((src, index) => (
+                    <SwiperSlide key={`${src}-${index}`} className="relative">
+                        <Image
+                            src={src}
+                            alt={`${title} - ${index + 1}`}
+                            fill
+                            priority={index === 0}
+                            sizes="(max-width: 768px) 100vw, 36vw"
+                            className="object-contain"
+                        />
+                    </SwiperSlide>
+                ))}
+            </Swiper>
 
-      {list.length > 1 && (
-        <Swiper
-          onSwiper={setThumbsSwiper}
-          spaceBetween={10}
-          slidesPerView={4}
-          freeMode
-          watchSlidesProgress
-          modules={[FreeMode, Navigation, Thumbs]}
-          className="gallery-slider-2 !h-[70px] w-full sm:!h-[90px]"
-        >
-          {list.map((img, index) => (
-            <SwiperSlide key={img || index} className="relative">
-              <Image
-                src={img}
-                alt={title || "Product image"}
-                fill
-                className="object-contain"
-                sizes="100px"
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      )}
-    </section>
-  );
+            {list.length > 1 && (
+                <Swiper
+                    onSwiper={setThumbsSwiper}
+                    spaceBetween={10}
+                    slidesPerView={4}
+                    freeMode
+                    watchSlidesProgress
+                    modules={[FreeMode, Thumbs]}
+                    className="gallery-slider-2 mt-2 !h-[70px] w-full sm:!h-[90px]
+                        [&_.swiper-slide]:cursor-pointer [&_.swiper-slide]:opacity-50
+                        [&_.swiper-slide-thumb-active]:opacity-100"
+                >
+                    {list.map((src, index) => (
+                        <SwiperSlide
+                            key={`thumb-${src}-${index}`}
+                            className="relative"
+                        >
+                            <Image
+                                src={src}
+                                alt=""
+                                fill
+                                sizes="100px"
+                                className="object-contain"
+                            />
+                        </SwiperSlide>
+                    ))}
+                </Swiper>
+            )}
+        </section>
+    );
 };
 
 export default Gallery;

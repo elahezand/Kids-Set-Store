@@ -1,6 +1,7 @@
 import connectToDB from "@/configs/db";
 import { cookies } from "next/headers";
 import UserModel from "@/model/user";
+import Session from "@/model/session";
 import {
     verifyToken,
     verifyRefreshToken,
@@ -16,13 +17,21 @@ const getAuthUser = async (tokenName, verify) => {
 
     const payload = await verify(token.value);
 
-    if (!payload) {
+    if (!payload?.id || !payload?.sid) {
         return { status: "expired" };
     }
 
-    const user = await UserModel.findOne({
-        email: payload.email,
-    });
+    const session = await Session.findById(payload.sid);
+
+    if (!session || !session.isActive()) {
+        return { status: "expired" };
+    }
+
+    if (String(session.user) !== String(payload.id)) {
+        return null;
+    }
+
+    const user = await UserModel.findById(payload.id);
 
     if (!user) return null;
 
@@ -30,12 +39,12 @@ const getAuthUser = async (tokenName, verify) => {
 };
 
 const authUser = async () => {
-    return getAuthUser("token", verifyToken);
+    return getAuthUser("accessToken", verifyToken);
 };
 
 const authAdmin = async () => {
     const user = await getAuthUser(
-        "token",
+        "accessToken",
         verifyToken
     );
 

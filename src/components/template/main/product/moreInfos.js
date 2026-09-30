@@ -1,44 +1,32 @@
-const MoreInfoes = ({ variant }) => {
-    const attributes = variant?.attributes || {};
+const MoreInfoes = ({ specs = {} }) => {
+    const entries = Object.entries(specs).filter(
+        ([, value]) => value !== undefined && value !== null && value !== ""
+    );
+
+    if (!entries.length) {
+        return (
+            <p className="text-gray-500 dark:text-gray-400">
+                No additional information available.
+            </p>
+        );
+    }
 
     return (
-        <div>
-            <p>More Information :</p>
-
-            <hr className="my-4" />
-            <main className="flex flex-col gap-3">
-                {Object.entries(attributes).map(
-                    ([key, value]) => (
-                        <div
-                            key={key}
-                            className="flex justify-between gap-4"
-                        >
-                            <p className="capitalize">
-                                {key}
-                            </p>
-
-                            <p>
-                                {String(value)}
-                            </p>
-                        </div>
-                    )
-                )}
-
-                {variant?.price !== undefined && (
-                    <div className="flex justify-between">
-                        <p>Price</p>
-                        <p>{variant.price} $</p>
-                    </div>
-                )}
-
-                {variant?.stock !== undefined && (
-                    <div className="flex justify-between">
-                        <p>Stock</p>
-                        <p>{variant.stock}</p>
-                    </div>
-                )}
-            </main>
-        </div>
+        <dl className="mx-auto max-w-xl divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 dark:divide-white/10 dark:border-white/10">
+            {entries.map(([key, value], index) => (
+                <div
+                    key={key}
+                    className={`flex justify-between gap-4 px-4 py-3 text-sm sm:text-base ${
+                        index % 2 === 0 ? "bg-gray-50 dark:bg-white/5" : ""
+                    }`}
+                >
+                    <dt className="font-medium capitalize text-gray-600 dark:text-gray-300">
+                        {key}
+                    </dt>
+                    <dd className="text-right">{String(value)}</dd>
+                </div>
+            ))}
+        </dl>
     );
 };
 
