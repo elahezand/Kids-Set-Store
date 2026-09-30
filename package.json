@@ -1,11 +1,12 @@
 {
-  "name": "project-9",
+  "name": "set-kids",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@amcharts/amcharts4": "^4.10.40",
@@ -34,6 +35,7 @@
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "mongoose": "^9.0.0",
+    "nanoid": "^3.3.11",
     "next": "15.5.4",
     "nodemailer": "^7.0.13",
     "qs": "^6.14.0",
@@ -45,6 +47,7 @@
     "react-intersection-observer": "^10.0.0",
     "react-leaflet": "^5.0.0",
     "recharts": "^2.15.4",
+    "slugify": "^1.6.6",
     "sonner": "^2.0.8",
     "sweetalert": "^2.1.2",
     "swiper": "^12.0.2",

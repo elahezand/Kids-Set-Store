@@ -26,3 +26,7 @@ pnpm-debug.log*
 
 # Optional: coverage reports
 coverage/
+
+# Uploaded files
+public/uploads/*
+!public/uploads/.gitkeep
