@@ -1,5 +1,5 @@
 "use client";
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import swal from "sweetalert";
 import { LuPlus } from "react-icons/lu";
 import { NewProduct } from "@/utils/actions/productActionServer";
@@ -15,22 +15,16 @@ export default function AddProduct() {
             const res = await fetch("/api/categories");
             if (res.ok) {
                 const data = await res.json();
-                setCategories(data.categories || []);
+                setCategories(data.data || []);
             }
         };
         getCategories();
     }, []);
 
-    const tree = useMemo(() => {
-        const build = (parentId) =>
-            categories
-                .filter((cat) => (parentId ? cat.parentId === parentId : !cat.parentId))
-                .map((cat) => ({ _id: cat.id, name: cat.slug, children: build(cat.id) }));
-        return build(null);
-    }, [categories]);
+    const tree = categories; // already nested: { _id, name, slug, subCategories }
 
-    const level2Options = tree.find((c) => c._id === path[0])?.children || [];
-    const level3Options = level2Options.find((c) => c._id === path[1])?.children || [];
+    const level2Options = tree.find((c) => c._id === path[0])?.subCategories || [];
+    const level3Options = level2Options.find((c) => c._id === path[1])?.subCategories || [];
 
     const selectLevel = (level) => (e) => {
         const next = path.slice(0, level);
@@ -62,12 +56,22 @@ export default function AddProduct() {
                 </div>
             </div>
             <form action={formAction} className="card-body grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {textField("name", "Name *", { required: true })}
+                {textField("title", "Title *", { required: true })}
                 {textField("price", "Price *", { required: true, inputMode: "decimal" })}
+                {textField("discount", "Discount %", { inputMode: "decimal", defaultValue: 0 })}
+                {textField("stock", "Stock (per size) *", { required: true, inputMode: "numeric", defaultValue: 0 })}
                 {textField("material", "Material")}
                 {textField("color", "Color")}
                 {textField("tags", "Tags", { placeholder: "Cloths, Boy, Red" })}
-                {textField("availableSizes", "Available sizes", { placeholder: "S, M, L" })}
+                {textField("sizes", "Sizes", { placeholder: "S, M, L (one variant per size)" })}
+                <div>
+                    <label htmlFor="product-status" className="label">Status</label>
+                    <select id="product-status" name="status" className="input" defaultValue="active">
+                        <option value="active">Active (visible in store)</option>
+                        <option value="draft">Draft</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
 
                 <div>
                     <label className="label">Category</label>
@@ -96,20 +100,14 @@ export default function AddProduct() {
                 )}
                 <input type="hidden" name="categoryPath" value={JSON.stringify(path.filter(Boolean))} />
 
-                <div className="sm:col-span-2 lg:col-span-3 grid gap-5 sm:grid-cols-2">
-                    <div>
-                        <label htmlFor="product-short" className="label">Short description</label>
-                        <textarea id="product-short" name="shortDescription" rows={3} className="input" />
-                    </div>
-                    <div>
-                        <label htmlFor="product-long" className="label">Long description</label>
-                        <textarea id="product-long" name="longDescription" rows={3} className="input" />
-                    </div>
+                <div className="sm:col-span-2 lg:col-span-3">
+                    <label htmlFor="product-description" className="label">Description *</label>
+                    <textarea id="product-description" name="description" rows={4} className="input" required />
                 </div>
 
                 <div className="sm:col-span-2">
-                    <label htmlFor="product-img" className="label">Image</label>
-                    <input id="product-img" type="file" name="img" accept="image/*" className="input" />
+                    <label htmlFor="product-images" className="label">Images (up to 10)</label>
+                    <input id="product-images" type="file" name="images" accept="image/*" multiple className="input" />
                 </div>
 
                 <div className="flex items-end justify-end sm:col-span-2 lg:col-span-1">

@@ -1,15 +1,15 @@
-import connectToDB from "../../../../../configs/db";
-import TicketModel from "../../../../../model/ticket";
-import "../../../../../model/department";
-import { paginate } from "@/utils/paginate";
+import connectToDB from "@/configs/db";
+import TicketModel from "@/model/ticket";
+import "@/model/department";
+import { paginatePage } from "@/utils/paginate";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import Pagination from "@/components/modules/ui/loadMore";
+import Pagination from "@/components/modules/ui/pagination";
 import TicketsTable from "@/components/template/p-admin/tickets/table";
 
 export default async function TicketsPage({ searchParams }) {
     await connectToDB();
     const params = await searchParams;
-    const paginatedData = await paginate(TicketModel, params, { parent: null }, ["department", { path: "user", select: "username email phone" }]);
+    const paginatedData = await paginatePage(TicketModel, params, { parent: null }, ["department", { path: "user", select: "username email phone" }]);
 
     return (
         <>

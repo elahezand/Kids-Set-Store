@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { HiChevronDown } from "react-icons/hi";
-import Article from "../index/articles/article";
+import Article from "@/components/template/main/index/articles/article";
 
 const getKey = (item) => String(item.id ?? item._id);
 

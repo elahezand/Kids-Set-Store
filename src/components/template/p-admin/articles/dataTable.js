@@ -10,7 +10,7 @@ import EmptyState from "@/components/modules/ui/emptyState";
 export default function ArticlesTable({ data = [], total }) {
     const router = useRouter();
 
-    const { mutate } = useDelete("/article", {
+    const { mutate } = useDelete((id) => `/admin/article/${id}`, {
         onSuccess: () => {
             toast.success("Article removed successfully");
             router.refresh();

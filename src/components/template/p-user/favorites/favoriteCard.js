@@ -10,7 +10,7 @@ import Stars from "@/components/modules/ui/stars";
 export default function FavoriteCard({ id, name, score, price, img }) {
     const router = useRouter();
 
-    const { mutate, isPending } = useDelete("/favorites", {
+    const { mutate, isPending } = useDelete((productId) => `/user/favorites/${productId}`, {
         onSuccess: () => {
             toast.success("Removed from favorites");
             router.refresh();

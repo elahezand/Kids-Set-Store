@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LuArrowLeft } from "react-icons/lu";
-import connectToDB from "../../../../../../configs/db";
-import TicketModel from "../../../../../../model/ticket";
-import "../../../../../../model/department";
-import { authUser } from "@/utils/api/authGaurd";
+import connectToDB from "@/configs/db";
+import TicketModel from "@/model/ticket";
+import "@/model/department";
+import { authUser } from "@/utils/auth/authGuard";
 import PageHeader from "@/components/modules/panel/pageHeader";
 import TicketThread from "@/components/modules/panel/ticketThread";
 import TicketReplyForm from "@/components/modules/panel/ticketReplyForm";

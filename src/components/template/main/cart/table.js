@@ -52,7 +52,7 @@ const Table = () => {
 
   // Apply discount
   const { mutate: applyDiscount, isPending: isApplyingDiscount } = usePost(
-    "/discount/use",
+    "/user/coupon/validate",
     {
       errorFallback: "Invalid discount code",
 

@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";import { usePut } from "@/utils/hooks/useReactQuery";
 import Modal from "@/components/modules/ui/modal";
-import { userUpdateSchema } from "../../../../../validations/user";
+import { userUpdateSchema } from "@/validators/user";
 
 export default function EditUserModal({ hideModal, data }) {
     const router = useRouter();

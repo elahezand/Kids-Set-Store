@@ -17,7 +17,7 @@ const columns = [
             { label: "All products", href: "/products" },
             { label: "New arrivals", href: "/products?value=latest&page=1" },
             { label: "Best sellers", href: "/products?value=bestSelling&page=1" },
-            { label: "Favorites", href: "/wishList" },
+            { label: "Favorites", href: "/favorite" },
         ],
     },
     {

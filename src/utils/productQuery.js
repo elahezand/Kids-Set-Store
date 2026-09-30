@@ -1,4 +1,4 @@
-import CategoryModel from "../../model/category";
+import CategoryModel from "@/model/category";
 
 export async function buildProductQuery(params = {}) {
     const {
@@ -10,7 +10,7 @@ export async function buildProductQuery(params = {}) {
         sort,
     } = params;
 
-    const filters = {};
+    const filters = { status: "active" };
 
     // Category
     if (category) {
@@ -27,12 +27,12 @@ export async function buildProductQuery(params = {}) {
 
     // Color
     if (color && color !== "-1") {
-        filters.color = color;
+        filters["variants.attributes.color"] = color;
     }
 
     // Material
     if (material && material !== "-1") {
-        filters.material = {
+        filters["specs.material"] = {
             $regex: material,
             $options: "i",
         };
@@ -43,7 +43,7 @@ export async function buildProductQuery(params = {}) {
         const price = Number(max);
 
         if (!Number.isNaN(price)) {
-            filters.price = {
+            filters.minPrice = {
                 $lte: price,
             };
         }
@@ -51,7 +51,7 @@ export async function buildProductQuery(params = {}) {
 
     // Best selling
     if (value === "bestSelling") {
-        filters.score = {
+        filters["metrics.score"] = {
             $gte: 4,
         };
     }
@@ -64,14 +64,14 @@ export async function buildProductQuery(params = {}) {
     switch (sort) {
         case "price":
             sortOption = {
-                price: 1,
+                minPrice: 1,
                 _id: -1,
             };
             break;
 
         case "popularity":
             sortOption = {
-                score: -1,
+                "metrics.score": -1,
                 _id: -1,
             };
             break;

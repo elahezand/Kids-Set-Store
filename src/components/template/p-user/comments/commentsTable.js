@@ -29,12 +29,12 @@ export default function CommentsTable({ comments = [] }) {
                         <tbody>
                             {comments.map((comment) => (
                                 <tr key={comment._id}>
-                                    <td className="max-w-[240px] truncate font-medium text-gray-900 dark:text-gray-100">{comment.productID?.name || "—"}</td>
-                                    <td className="tabular-nums">{comment.date?.slice(0, 10)}</td>
-                                    <td><Stars score={comment.score} className="text-xs" /></td>
+                                    <td className="max-w-[240px] truncate font-medium text-gray-900 dark:text-gray-100">{comment.product?.title || "—"}</td>
+                                    <td className="tabular-nums">{comment.createdAt?.slice(0, 10)}</td>
+                                    <td><Stars score={comment.rating} className="text-xs" /></td>
                                     <td>
-                                        <span className={`badge ${comment.isAccept ? "badge-success" : "badge-warning"}`}>
-                                            {comment.isAccept ? "Approved" : "Pending"}
+                                        <span className={`badge ${(comment.status === "approved") ? "badge-success" : "badge-warning"}`}>
+                                            {(comment.status === "approved") ? "Approved" : "Pending"}
                                         </span>
                                     </td>
                                     <td>

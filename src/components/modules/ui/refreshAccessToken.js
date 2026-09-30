@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import PageLoader from "./pageLoader";
+import PageLoader from "@/components/modules/ui/pageLoader";
 import { useRouter } from "next/navigation";
 export default function RefreshAccessToken({ shouldRefresh, children }) {
     const [loading, setLoading] = useState(Boolean(shouldRefresh));

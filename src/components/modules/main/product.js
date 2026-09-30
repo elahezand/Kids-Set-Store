@@ -4,11 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { FaRegStar, FaStar } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
-import AddToFavoriteList from "./addToFavoriteList";
+import AddToFavoriteList from "@/components/modules/main/addToFavorite";
 import useShop from "@/utils/hooks/useCard";
+import { toProductView } from "@/utils/productView";
 
-export default function Product({ price, name, _id, score, img }) {
+export default function Product(product) {
   const { addTocard } = useShop();
+  const { _id, name, img, price, score } = toProductView(product);
 
   return (
     <div className="group relative flex h-full w-full flex-col rounded-2xl bg-white p-2 text-text shadow-card dark:bg-ink-800 dark:text-gray-100">

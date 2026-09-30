@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { LuArrowRight, LuTicket } from "react-icons/lu";
 import EmptyState from "@/components/modules/ui/emptyState";
-import TicketCard from "../tickets/ticketCard";
+import TicketCard from "@/components/template/p-user/tickets/ticketCard";
 
 export default function RecentTickets({ tickets = [] }) {
     return (

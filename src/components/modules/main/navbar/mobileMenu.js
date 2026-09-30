@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaRegHeart } from "react-icons/fa";
 import { LuChevronDown, LuX, LuMenu, LuChevronRight } from "react-icons/lu";
-import CartCount from "./cart";
+import CartCount from "@/components/modules/main/navbar/cart";
 import ThemeToggle from "@/components/modules/ui/themeToggle";
 
 const accountLinks = [
@@ -96,7 +96,7 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
                     <div className="flex items-center gap-3 text-xl text-gray-800 dark:text-gray-300">
                         <ThemeToggle />
                         <CartCount />
-                        <Link href="/wishList" className="relative" aria-label="Favorites">
+                        <Link href="/favorite" className="relative" aria-label="Favorites">
                             <FaRegHeart />
                             <span className="absolute -right-2 -top-2 flex size-4 items-center justify-center rounded-full bg-coral-400 text-[10px] leading-none text-white">
                                 {favoriteCount || 0}

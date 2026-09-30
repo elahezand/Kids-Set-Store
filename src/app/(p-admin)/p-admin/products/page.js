@@ -1,15 +1,15 @@
-import connectToDB from "../../../../../configs/db";
-import ProductModel from "../../../../../model/product";
-import { paginate } from "@/utils/paginate";
+import connectToDB from "@/configs/db";
+import ProductModel from "@/model/product";
+import { paginatePage } from "@/utils/paginate";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import Pagination from "@/components/modules/ui/loadMore";
+import Pagination from "@/components/modules/ui/pagination";
 import AddProduct from "@/components/template/p-admin/products/addNewProduct";
 import ProductsTable from "@/components/template/p-admin/products/table";
 
 export default async function ProductsPage({ searchParams }) {
     await connectToDB();
     const params = await searchParams;
-    const paginatedData = await paginate(ProductModel, params, {});
+    const paginatedData = await paginatePage(ProductModel, params, {});
 
     return (
         <>

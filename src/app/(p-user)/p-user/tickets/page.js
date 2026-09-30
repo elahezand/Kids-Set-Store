@@ -1,11 +1,11 @@
 import { LuTicket } from "react-icons/lu";
-import connectToDB from "../../../../../configs/db";
-import TicketModel from "../../../../../model/ticket";
-import "../../../../../model/department";
-import { authUser } from "@/utils/api/authGaurd";
-import { paginate } from "@/utils/paginate";
+import connectToDB from "@/configs/db";
+import TicketModel from "@/model/ticket";
+import "@/model/department";
+import { authUser } from "@/utils/auth/authGuard";
+import { paginatePage } from "@/utils/paginate";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import Pagination from "@/components/modules/ui/loadMore";
+import Pagination from "@/components/modules/ui/pagination";
 import EmptyState from "@/components/modules/ui/emptyState";
 import TicketCard from "@/components/template/p-user/tickets/ticketCard";
 import SendTicket from "@/components/template/p-user/tickets/sendTicket";
@@ -14,7 +14,7 @@ export default async function TicketsPage({ searchParams }) {
     await connectToDB();
     const params = await searchParams;
     const user = await authUser();
-    const paginatedData = await paginate(TicketModel, params, { user: user?._id, parent: null }, "department");
+    const paginatedData = await paginatePage(TicketModel, params, { user: user?._id, parent: null }, "department");
     const tickets = JSON.parse(JSON.stringify(paginatedData.data));
 
     return (

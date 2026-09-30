@@ -1,8 +1,11 @@
-import "./globals.css";
+import "@/app/globals.css";
 import { Suspense } from "react";
 import ScrollToTop from "@/components/modules/ui/scrollToTop";
 import PageLoader from "@/components/modules/ui/pageLoader";
 import QueryProvider from "@/utils/providers/react-query-client-provider";
+// Every page reads the database and the auth cookies, so nothing is prerendered at build time.
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Set Kids - Premium Children's Clothing",
   description: "Shop premium and stylish children's clothing for all ages",

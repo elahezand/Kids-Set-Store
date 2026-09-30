@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { LuArrowRight, LuPackage, LuShoppingBag, LuTicket, LuUsers } from "react-icons/lu";
-import connectToDB from "../../../../configs/db";
-import UserModel from "../../../../model/user";
-import ProductModel from "../../../../model/product";
-import TicketModel from "../../../../model/ticket";
-import OrderModel from "../../../../model/order";
+import connectToDB from "@/configs/db";
+import UserModel from "@/model/user";
+import ProductModel from "@/model/product";
+import TicketModel from "@/model/ticket";
+import OrderModel from "@/model/order";
 import PageHeader from "@/components/modules/panel/pageHeader";
 import StatCard from "@/components/modules/panel/statCard";
 import EmptyState from "@/components/modules/ui/emptyState";

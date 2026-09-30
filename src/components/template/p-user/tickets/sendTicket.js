@@ -5,7 +5,7 @@ import { LuSend } from "react-icons/lu";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePost } from "@/utils/hooks/useReactQuery";
-import { toast } from "sonner";import { ticketValidationSchema } from "../../../../../validations/ticket";
+import { toast } from "sonner";import { ticketValidationSchema } from "@/validators/ticket";
 
 export default function SendTicket() {
     const router = useRouter();

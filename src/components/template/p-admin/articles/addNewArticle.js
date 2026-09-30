@@ -2,7 +2,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";import { LuSend } from "react-icons/lu";
 import { NewArticle } from "@/utils/actions/articleServerAction";
-import RichEditor from "./richEditor";
+import RichEditor from "@/components/template/p-admin/articles/richEditor";
 
 export default function AddNewArticle({ article }) {
     const formRef = useRef(null);

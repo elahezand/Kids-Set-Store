@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";import { LuPlus } from "react-icons/lu";
 import { usePost } from "@/utils/hooks/useReactQuery";
-import { discountSchema } from "../../../../../validations/discount";
+import { discountSchema } from "@/validators/coupon";
 
 export default function AddDiscount({ products = [] }) {
     const router = useRouter();
@@ -19,7 +19,7 @@ export default function AddDiscount({ products = [] }) {
         },
     });
 
-    const { mutate, isPending } = usePost("/discount", {
+    const { mutate, isPending } = usePost("/admin/coupon", {
         onSuccess: () => {
             toast.success("Discount added successfully");
             reset();

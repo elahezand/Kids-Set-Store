@@ -59,16 +59,16 @@ export default function CommentsTable({ comments = [], total }) {
                             {comments.map((comment) => (
                                 <tr key={comment._id}>
                                     <td>
-                                        <p className="font-medium text-gray-900 dark:text-gray-100">{comment.username}</p>
-                                        <p className="text-xs text-gray-700 dark:text-gray-500">{comment.email}</p>
+                                        <p className="font-medium text-gray-900 dark:text-gray-100">{comment.user?.username || "—"}</p>
+                                        <p className="text-xs text-gray-700 dark:text-gray-500">{comment.user?.email}</p>
                                     </td>
-                                    <td className="max-w-[180px] truncate">{comment.productID?.name || "—"}</td>
-                                    <td><Stars score={comment.score} className="text-xs" /></td>
-                                    <td className="tabular-nums">{comment.date?.slice(0, 10)}</td>
+                                    <td className="max-w-[180px] truncate">{comment.product?.title || "—"}</td>
+                                    <td><Stars score={comment.rating} className="text-xs" /></td>
+                                    <td className="tabular-nums">{comment.createdAt?.slice(0, 10)}</td>
                                     <td>
                                         <div className="flex flex-wrap gap-1.5">
-                                            <span className={`badge ${comment.isAccept ? "badge-success" : "badge-warning"}`}>
-                                                {comment.isAccept ? "Approved" : "Pending"}
+                                            <span className={`badge ${(comment.status === "approved") ? "badge-success" : "badge-warning"}`}>
+                                                {(comment.status === "approved") ? "Approved" : "Pending"}
                                             </span>
                                             {comment.answer && <span className="badge badge-neutral">Answered</span>}
                                         </div>
@@ -81,14 +81,14 @@ export default function CommentsTable({ comments = [], total }) {
                                             <button type="button" title="Edit" className="btn btn-ghost btn-sm" onClick={() => editComment(comment._id, comment.body)}>
                                                 <LuPencil className="size-4" />
                                             </button>
-                                            <button type="button" className={`btn btn-sm ${comment.isAccept ? "btn-soft-danger" : "btn-soft-primary"}`}
+                                            <button type="button" className={`btn btn-sm ${(comment.status === "approved") ? "btn-soft-danger" : "btn-soft-primary"}`}
                                                 onClick={() => acceptMutate({ id: `${comment._id}/accept` })}>
-                                                {comment.isAccept ? <><LuX className="size-3.5" /> Reject</> : <><LuCheck className="size-3.5" /> Accept</>}
+                                                {(comment.status === "approved") ? <><LuX className="size-3.5" /> Reject</> : <><LuCheck className="size-3.5" /> Accept</>}
                                             </button>
                                             <button type="button" className="btn btn-secondary btn-sm" onClick={() => answerComment(comment._id)}>
                                                 <LuReply className="size-3.5" /> {comment.answer ? "Answered" : "Answer"}
                                             </button>
-                                            <button type="button" title="Ban user" className="btn btn-soft-danger btn-sm" onClick={() => banUser(comment.email, comment.username)}>
+                                            <button type="button" title="Ban user" className="btn btn-soft-danger btn-sm" onClick={() => banUser(comment.user?.email, comment.user?.username)}>
                                                 <LuBan className="size-3.5" />
                                             </button>
                                         </div>

@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { usePost } from "@/utils/hooks/useReactQuery";
-import { contactValidationSchema } from "../../../../../validations/contact";
+import { contactValidationSchema } from "@/validators/contact";
 
 const Field = ({ id, label, error, as = "input", ...props }) => {
   const Component = as;
@@ -46,7 +46,7 @@ const Form = () => {
     },
   });
 
-  const { mutate: sendMessage, isPending } = usePost("/contact", {
+  const { mutate: sendMessage, isPending } = usePost("/contacts", {
     errorFallback: "Failed to send message",
 
     onSuccess: () => {

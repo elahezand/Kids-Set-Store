@@ -1,35 +1,22 @@
 "use client";
-import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";import { usePut } from "@/utils/hooks/useReactQuery";
+import { toast } from "sonner";
+import { usePut } from "@/utils/hooks/useReactQuery";
 import Modal from "@/components/modules/ui/modal";
-import { productSchema } from "../../../../../validations/product";
-
-const joinList = (value) => (Array.isArray(value) ? value.join(", ") : value || "");
+import { productFormSchema } from "@/validators/product";
+import { buildProductPayload, productToFormValues } from "@/utils/productForm";
 
 export default function EditProductModal({ hideModal, data }) {
     const router = useRouter();
-    const fileInputRef = useRef(null);
 
     const { register, handleSubmit, formState: { errors } } = useForm({
-        resolver: zodResolver(productSchema),
-        defaultValues: {
-            name: data?.name || "",
-            price: data?.price || 0,
-            shortDescription: data?.shortDescription || "",
-            longDescription: data?.longDescription || "",
-            color: data?.color || "",
-            material: data?.material || "",
-            tags: joinList(data?.tags),
-            availableSizes: joinList(data?.availableSizes),
-            isAvailable: data?.isAvailable ?? true,
-            categoryPath: data?.categoryPath || [],
-        },
+        resolver: zodResolver(productFormSchema),
+        defaultValues: productToFormValues(data),
     });
 
-    const { mutate, isPending } = usePut("/products", {
+    const { mutate, isPending } = usePut((body) => `/admin/products/${body.id}`, {
         onSuccess: () => {
             toast.success("Product updated successfully");
             hideModal();
@@ -39,21 +26,20 @@ export default function EditProductModal({ hideModal, data }) {
     });
 
     const onSubmit = (values) => {
-        const formData = new FormData();
-        ["name", "price", "color", "material", "shortDescription", "longDescription"].forEach((key) =>
-            formData.append(key, values[key] ?? "")
-        );
-        formData.append("tags", JSON.stringify(values.tags));
-        formData.append("availableSizes", JSON.stringify(values.availableSizes));
-        formData.append("categoryPath", JSON.stringify(values.categoryPath));
-        if (fileInputRef.current?.files?.[0]) formData.append("img", fileInputRef.current.files[0]);
-        mutate({ id: data._id, payload: formData });
+        // images stay as they are (the update API keeps them when none are sent)
+        mutate({ id: data._id, ...buildProductPayload(values) });
     };
 
     const field = (name, label, props = {}) => (
         <div>
             <label htmlFor={`edit-${name}`} className="label">{label}</label>
-            <input id={`edit-${name}`} autoComplete="off" className={`input ${errors[name] ? "input-error" : ""}`} {...register(name, props.registerOptions)} {...props.input} />
+            <input
+                id={`edit-${name}`}
+                autoComplete="off"
+                className={`input ${errors[name] ? "input-error" : ""}`}
+                {...register(name, props.registerOptions)}
+                {...props.input}
+            />
             {errors[name] && <span className="field-error">{errors[name].message}</span>}
         </div>
     );
@@ -61,7 +47,7 @@ export default function EditProductModal({ hideModal, data }) {
     return (
         <Modal
             title="Edit product"
-            description={data?.name}
+            description={data?.title}
             hideModal={hideModal}
             size="lg"
             footer={
@@ -74,15 +60,26 @@ export default function EditProductModal({ hideModal, data }) {
             }
         >
             <form id="edit-product-form" onSubmit={handleSubmit(onSubmit)} className="grid gap-5 sm:grid-cols-2">
-                {field("name", "Name")}
-                {field("price", "Price", { registerOptions: { valueAsNumber: true }, input: { type: "number" } })}
+                {field("title", "Title")}
+                {field("price", "Price", { input: { type: "number", step: "0.01" } })}
+                {field("discount", "Discount %", { input: { type: "number" } })}
+                {field("stock", "Stock (per size)", { input: { type: "number" } })}
                 {field("color", "Color")}
                 {field("material", "Material")}
-                {field("availableSizes", "Sizes", { input: { placeholder: "S, M, L" } })}
+                {field("sizes", "Sizes", { input: { placeholder: "S, M, L" } })}
                 {field("tags", "Tags")}
+                <div>
+                    <label htmlFor="edit-status" className="label">Status</label>
+                    <select id="edit-status" className="input" {...register("status")}>
+                        <option value="active">Active</option>
+                        <option value="draft">Draft</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
                 <div className="sm:col-span-2">
-                    <label htmlFor="edit-img" className="label">Replace image</label>
-                    <input id="edit-img" ref={fileInputRef} type="file" accept="image/*" className="input" />
+                    <label htmlFor="edit-description" className="label">Description</label>
+                    <textarea id="edit-description" rows={4} className={`input ${errors.description ? "input-error" : ""}`} {...register("description")} />
+                    {errors.description && <span className="field-error">{errors.description.message}</span>}
                 </div>
             </form>
         </Modal>

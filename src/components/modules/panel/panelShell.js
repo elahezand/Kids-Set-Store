@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import Sidebar from "./sidebar";
-import Topbar from "./topbar";
+import Sidebar from "@/components/modules/panel/sidebar";
+import Topbar from "@/components/modules/panel/topbar";
 
 // Shared layout for the admin & user panels: sidebar + topbar + content area
 export default function PanelShell({ variant = "user", user, children }) {

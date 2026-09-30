@@ -8,7 +8,7 @@ export default function TicketReplyForm({ ticketID }) {
     const router = useRouter();
     const [content, setContent] = useState("");
 
-    const { mutate, isPending } = usePost(`/tickets/${ticketID}/answer`, {
+    const { mutate, isPending } = usePost(`/user/tickets/${ticketID}/answer`, {
         onSuccess: () => {
             toast.success("Your reply was sent successfully");
             setContent("");

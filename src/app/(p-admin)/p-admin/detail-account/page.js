@@ -1,4 +1,4 @@
-import { getMe } from "@/utils/api/authGaurd";
+import { getMe } from "@/utils/auth/authGuard";
 import PageHeader from "@/components/modules/panel/pageHeader";
 import ProfileForm from "@/components/modules/panel/profileForm";
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { LuArrowLeft } from "react-icons/lu";
-import connectToDB from "../../../../../../configs/db";
-import ArticleModel from "../../../../../../model/article";
+import connectToDB from "@/configs/db";
+import ArticleModel from "@/model/article";
 import PageHeader from "@/components/modules/panel/pageHeader";
 import AddNewArticle from "@/components/template/p-admin/articles/addNewArticle";
 

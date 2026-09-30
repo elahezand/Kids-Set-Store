@@ -1,7 +1,7 @@
 import { cache } from "react";
-import connectToDB from "../../../../configs/db";
-import CategoryModel from "../../../../model/category";
-import Listing from "../../../../model/product";
+import connectToDB from "@/configs/db";
+import CategoryModel from "@/model/category";
+import Product from "@/model/product";
 import { buildProductQuery } from "@/utils/productQuery";
 import { paginate } from "@/utils/paginate";
 import FilterSection from "@/components/template/main/products/filterSection";
@@ -47,7 +47,7 @@ export default async function Page({ searchParams }) {
     buildProductQuery(params),
   ]);
 
-  const result = await paginate(Listing, {
+  const result = await paginate(Product, {
     limit,
     cursor: params.cursor || null,
     filters,

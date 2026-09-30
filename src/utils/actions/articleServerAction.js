@@ -1,9 +1,9 @@
 "use server"
-import connectToDB from "../../../configs/db";
-import ArticleModel from "../../../model/article";
-import { articleSchema } from "../../../validations/article";
-import { authAdmin } from "../api/authGaurd";
-import handleFileUpload from "../serverFile";
+import connectToDB from "@/configs/db";
+import ArticleModel from "@/model/article";
+import { articleSchema } from "@/validators/article";
+import { authAdmin } from "@/utils/auth/authGuard";
+import handleFileUpload from "@/utils/serverFile";
 const createResponse = (status, message, data = null, errors = null) => {
     return { status, message, data, errors };
 };

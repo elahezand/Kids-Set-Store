@@ -8,7 +8,7 @@ import EmptyState from "@/components/modules/ui/emptyState";
 export default function DiscountsTable({ discounts = [], total }) {
     const router = useRouter();
 
-    const { mutate: removeDiscount } = useDelete("/discount", {
+    const { mutate: removeDiscount } = useDelete((id) => `/admin/coupon/${id}`, {
         onSuccess: () => {
             toast.success("Code removed successfully");
             router.refresh();

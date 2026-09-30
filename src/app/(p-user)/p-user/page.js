@@ -1,11 +1,11 @@
 import { LuHeart, LuMessageSquare, LuShoppingBag, LuTicket } from "react-icons/lu";
-import connectToDB from "../../../../configs/db";
-import FavoriteModel from "../../../../model/favorite";
-import TicketModel from "../../../../model/ticket";
-import CommentModel from "../../../../model/comment";
-import OrderModel from "../../../../model/order";
-import "../../../../model/department";
-import { authUser } from "@/utils/api/authGaurd";
+import connectToDB from "@/configs/db";
+import FavoriteModel from "@/model/favorite";
+import TicketModel from "@/model/ticket";
+import CommentModel from "@/model/comment";
+import OrderModel from "@/model/order";
+import "@/model/department";
+import { authUser } from "@/utils/auth/authGuard";
 import PageHeader from "@/components/modules/panel/pageHeader";
 import StatCard from "@/components/modules/panel/statCard";
 import RecentTickets from "@/components/template/p-user/index/recentTickets";
@@ -16,9 +16,9 @@ export default async function UserDashboard() {
     const user = await authUser();
     const userId = user?._id;
 
-    const [favorite, ticketsCount, commentsCount, ordersCount, tickets, orders] = userId
+    const [favoritesCount, ticketsCount, commentsCount, ordersCount, tickets, orders] = userId
         ? await Promise.all([
-            FavoriteModel.findOne({ user: userId }).select("products").lean(),
+            FavoriteModel.countDocuments({ user: userId }),
             TicketModel.countDocuments({ user: userId, parent: null }),
             CommentModel.countDocuments({ user: userId }),
             OrderModel.countDocuments({ user: userId }),
@@ -38,7 +38,7 @@ export default async function UserDashboard() {
                 <StatCard title="Orders" value={ordersCount} icon={LuShoppingBag} tone="peach" />
                 <StatCard title="Tickets" value={ticketsCount} icon={LuTicket} tone="coral" />
                 <StatCard title="Comments" value={commentsCount} icon={LuMessageSquare} tone="mint" />
-                <StatCard title="Favorites" value={favorite?.products?.length || 0} icon={LuHeart} tone="sage" />
+                <StatCard title="Favorites" value={favoritesCount || 0} icon={LuHeart} tone="sage" />
             </section>
 
             <section className="mt-6 grid gap-6 xl:grid-cols-2">

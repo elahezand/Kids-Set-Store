@@ -1,97 +1,96 @@
-// ✅ app/(main)/page.js - Fixed
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import Banner from "@/components/modules/main/banner";
 import Categories from "@/components/template/main/index/categories";
 import Promote from "@/components/template/main/index/promote";
 import PromoText from "@/components/template/main/index/promoText";
-import ProductModal from "../../../model/product";
-import ArticleModel from "../../../model/article";
-import connectToDB from "../../../configs/db";
+import Product from "@/model/product";
+import Article from "@/model/article";
+import connectToDB from "@/configs/db";
 
-// Lazy load components - Remove ssr: false from Server Component
 const Latest = dynamic(
   () => import("@/components/template/main/index/latest"),
-  { 
+  {
     loading: () => <SkeletonLoader />,
-    ssr: true  // ✅ Server-side rendering enabled
+    ssr: true,
   }
 );
 
 const BestSelling = dynamic(
   () => import("@/components/template/main/index/bestSelling"),
-  { 
+  {
     loading: () => <SkeletonLoader />,
-    ssr: true  // ✅ Server-side rendering enabled
+    ssr: true,
   }
 );
 
 const Articles = dynamic(
   () => import("@/components/template/main/index/articles/articles"),
-  { 
+  {
     loading: () => <SkeletonLoader />,
-    ssr: true  // ✅ Changed from false to true
+    ssr: true,
   }
 );
 
-// Skeleton Loader Component
 function SkeletonLoader() {
   return (
-    <div className="h-96 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 animate-pulse rounded-lg" />
+    <div className="h-96 animate-pulse rounded-lg bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700" />
   );
 }
 
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 3600;
 
 export default async function Home() {
-    await connectToDB();
+  await connectToDB();
 
-    // Parallel database queries
-    const [products, bestSelling, articles] = await Promise.all([
-      ProductModal.find({})
-        .sort({ _id: -1 })
-        .limit(10)
-        .lean()
-        .exec(),
-      ProductModal.find({ score: { $gte: 4 } })
-        .sort({ _id: -1 })
-        .limit(10)
-        .lean()
-        .exec(),
-      ArticleModel.find({})
-        .sort({ _id: -1 })
-        .limit(10)
-        .lean()
-        .exec(),
-    ]);
+  const [products, bestSelling, articles] = await Promise.all([
+    Product.find({ status: "active" })
+      .sort({ _id: -1 })
+      .limit(10)
+      .lean()
+      .exec(),
 
-    // Serialize data once
-    const serializedProducts = JSON.parse(JSON.stringify(products));
-    const serializedBestSelling = JSON.parse(JSON.stringify(bestSelling));
-    const serializedArticles = JSON.parse(JSON.stringify(articles));
+    Product.find({
+      status: "active",
+      "metrics.score": { $gte: 4 },
+    })
+      .sort({ _id: -1 })
+      .limit(10)
+      .lean()
+      .exec(),
 
-    return (
-      <main className="min-h-screen">
-        <Banner />
-        
-        <Suspense fallback={<SkeletonLoader />}>
-          <Latest products={serializedProducts} />
-        </Suspense>
+    Article.find({})
+      .sort({ _id: -1 })
+      .limit(10)
+      .lean()
+      .exec(),
+  ]);
 
-        <PromoText />
+  const serializedProducts = JSON.parse(JSON.stringify(products));
+  const serializedBestSelling = JSON.parse(JSON.stringify(bestSelling));
+  const serializedArticles = JSON.parse(JSON.stringify(articles));
 
-        <Suspense fallback={<SkeletonLoader />}>
-          <BestSelling products={serializedBestSelling} />
-        </Suspense>
+  return (
+    <main className="min-h-screen">
+      <Banner />
 
-        <Categories />
+      <Suspense fallback={<SkeletonLoader />}>
+        <Latest products={serializedProducts} />
+      </Suspense>
 
-        <Suspense fallback={<SkeletonLoader />}>
-          <Articles articles={serializedArticles} />
-        </Suspense>
+      <PromoText />
 
-        <Promote />
-      </main>
-    );
- 
+      <Suspense fallback={<SkeletonLoader />}>
+        <BestSelling products={serializedBestSelling} />
+      </Suspense>
+
+      <Categories />
+
+      <Suspense fallback={<SkeletonLoader />}>
+        <Articles articles={serializedArticles} />
+      </Suspense>
+
+      <Promote />
+    </main>
+  );
 }

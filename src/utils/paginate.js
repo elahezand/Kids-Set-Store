@@ -120,6 +120,38 @@ const paginate = async (
     };
 };
 
+/**
+ * Page-number pagination for dashboard tables (?page=2&limit=10).
+ * `params` is the page's searchParams; returns { data, totalCount, pageCount, page, limit }.
+ */
+const paginatePage = async (
+    Model,
+    params = {},
+    filters = {},
+    populate = null,
+    sort = { createdAt: -1 }
+) => {
+    const limit = Math.min(Math.max(Number(params?.limit) || 10, 1), 99);
+    const requested = Math.max(Number(params?.page) || 1, 1);
+
+    const totalCount = await Model.countDocuments(filters);
+    const pageCount = Math.max(Math.ceil(totalCount / limit), 1);
+    const page = Math.min(requested, pageCount);
+
+    let query = Model.find(filters)
+        .sort(sort)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean();
+
+    if (populate) query = query.populate(populate);
+
+    const data = await query;
+
+    return { data, totalCount, pageCount, page, limit };
+};
+
 module.exports = {
     paginate,
+    paginatePage,
 };

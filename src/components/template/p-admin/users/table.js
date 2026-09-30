@@ -5,7 +5,7 @@ import swal from "sweetalert";
 import { toast } from "sonner";import { LuBan, LuPencil, LuShieldCheck, LuTrash2, LuUsers } from "react-icons/lu";
 import { useDelete, usePut, usePost } from "@/utils/hooks/useReactQuery";
 import EmptyState from "@/components/modules/ui/emptyState";
-import EditUserModal from "./editUserModal";
+import EditUserModal from "@/components/template/p-admin/users/editUserModal";
 
 export default function UsersTable({ users = [], total }) {
     const router = useRouter();

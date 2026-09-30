@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import swal from "sweetalert";
 import { LuLogOut, LuStore, LuX } from "react-icons/lu";
-import { panelNav, isLinkActive } from "./navLinks";
+import { panelNav, isLinkActive } from "@/components/modules/panel/navLinks";
 
 export default function Sidebar({ variant = "user", open = false, onClose }) {
     const pathname = usePathname();

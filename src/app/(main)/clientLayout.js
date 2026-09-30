@@ -1,4 +1,4 @@
-import ShowFooter from "./showFooter";
+import ShowFooter from "@/app/(main)/showFooter";
 import Navbar from "@/components/modules/main/navbar/navbar";
 
 export default function ClientLayout({ children }) {

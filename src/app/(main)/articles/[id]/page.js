@@ -6,8 +6,8 @@ import Link from "next/link";
 import { JSDOM } from "jsdom";
 import createDOMPurify from "dompurify";
 import Breadcrumb from "@/components/modules/main/breadCrumb";
-import connectToDB from "../../../../../configs/db";
-import ArticleModel from "../../../../../model/article";
+import connectToDB from "@/configs/db";
+import ArticleModel from "@/model/article";
 
 // Created once per server instance instead of on every request
 const DOMPurify = createDOMPurify(new JSDOM("").window);

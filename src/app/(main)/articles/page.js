@@ -1,8 +1,8 @@
 import ArticlesList from "@/components/template/main/articles/articlesList";
 import Breadcrumb from "@/components/modules/main/breadCrumb";
-import connectToDB from "../../../../configs/db";
-import ArticleModel from "../../../../model/article";
-import { articleListQuerySchema } from "../../../../validations/article";
+import connectToDB from "@/configs/db";
+import ArticleModel from "@/model/article";
+import { articleListQuerySchema } from "@/validators/article";
 import { paginate } from "@/utils/paginate";
 
 export const metadata = {

@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
 import SectionHeader from "@/components/modules/main/sectionHeader";
-import Article from "./article";
+import Article from "@/components/template/main/index/articles/article";
 
 const MAX_SLIDES_PER_VIEW = 3;
 
