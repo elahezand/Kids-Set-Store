@@ -33,8 +33,16 @@ const userSchema = new mongoose.Schema(
 
         email: {
             type: String,
-            lowercase: true, 
+            lowercase: true,
             trim: true,
+        },
+
+        // bcrypt hash. Users created by OTP login have no password.
+        // select:false => never leaves the DB unless asked with .select("+password")
+        password: {
+            type: String,
+            default: null,
+            select: false,
         },
 
         // refunds of cancelled orders land here
@@ -70,6 +78,15 @@ const userSchema = new mongoose.Schema(
             virtuals: true,
             transform: (_doc, ret) => {
                 delete ret.__v;
+                delete ret.password;
+                return ret;
+            },
+        },
+
+        toObject: {
+            virtuals: true,
+            transform: (_doc, ret) => {
+                delete ret.password;
                 return ret;
             },
         },

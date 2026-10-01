@@ -35,13 +35,12 @@ const categorySchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
     slug: { type: String, required: true, trim: true },
-    parent: {
+    parentId: {
       type: Schema.Types.ObjectId,
       ref: "Category",
       default: null,
       index: true,
     },
-
     description: { type: String, default: "" },
 
     icon: {
@@ -79,12 +78,13 @@ categorySchema.pre("validate", function (next) {
   }
   next();
 });
-
 categorySchema.virtual("children", {
   ref: "Category",
   localField: "_id",
-  foreignField: "parent",
+  foreignField: "parentId",
 });
 
-module.exports =
+const Category =
   mongoose.models.Category || mongoose.model("Category", categorySchema);
+
+module.exports = Category;

@@ -90,8 +90,5 @@ export const replyCommentSchema = z.object({
     .max(2000, "Reply must be at most 2000 characters"),
 });
 
-/* client-side form on the product page (rating + text; the author is the logged-in user) */
-export const commentValidationSchema = z.object({
-  body: z.string().trim().min(3, "Comment must be at least 3 characters").max(2000),
-  score: z.coerce.number().int().min(1, "Please choose a rating").max(5),
-});
+/* client-side form on the product page (same rules as createCommentSchema, productId comes from the page) */
+export const commentValidationSchema = createCommentSchema.omit({ productId: true });

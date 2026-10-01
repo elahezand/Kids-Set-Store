@@ -21,6 +21,10 @@ const articleSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
+    cover: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );
