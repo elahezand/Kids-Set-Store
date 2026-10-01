@@ -6,8 +6,7 @@ const Product = require("@/model/product");
 const logger = require("@/utils/logger");
 const { round2 } = require("@/utils/pricing");
 const { dateRangeFilter } = require("@/utils/listQuery");
-const { paginate } = require("@/utils/paginate");
-
+const paginate = require("@/utils/paginate");
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 function escapeRegex(text) {
@@ -57,7 +56,9 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
 
     // 4. Category Filter
     if (query.category) {
-        const categoryDoc = await Category.findOne({ slug: query.category })
+        const categoryDoc = await Category.findOne({
+            slug: String(query.category).trim().toLowerCase(),
+        })
             .select("_id")
             .lean();
         filters.categoryPath = categoryDoc ? categoryDoc._id : null;
@@ -83,6 +84,16 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
         }
     }
 
+    // 5b. ?min= / ?max= (used by the shop filter bar) — same field as ?price=
+    const minPrice = query.min !== undefined && query.min !== "" ? Number(query.min) : NaN;
+    const maxPrice = query.max !== undefined && query.max !== "" ? Number(query.max) : NaN;
+    if (!Number.isNaN(minPrice) || !Number.isNaN(maxPrice)) {
+        const priceFilter = { ...(filters.minPrice && typeof filters.minPrice === "object" ? filters.minPrice : {}) };
+        if (!Number.isNaN(minPrice)) priceFilter.$gte = minPrice;
+        if (!Number.isNaN(maxPrice)) priceFilter.$lte = maxPrice;
+        filters.minPrice = priceFilter;
+    }
+
     // 6. Tags
     if (query.tags) {
         const tagsArray = String(query.tags)
@@ -100,7 +111,18 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
 
     // 8. Variant attributes (color, size)
     for (const key of ["color", "size"]) {
-        if (query[key]) filters[`variants.attributes.${key}`] = String(query[key]);
+        if (query[key]) {
+            filters[`variants.attributes.${key}`] = {
+                $regex: new RegExp(`^${escapeRegex(String(query[key]).slice(0, 50))}$`, "i"),
+            };
+        }
+    }
+
+    // 8b. Material lives in specs (case-insensitive)
+    if (query.material) {
+        filters["specs.material"] = {
+            $regex: new RegExp(`^${escapeRegex(String(query.material).slice(0, 50))}$`, "i"),
+        };
     }
 
     // 9. Specs (JSON)
@@ -467,11 +489,6 @@ const calculateCartTotals = async (
             productInfo: productInfoOf(product),
         });
     }
-
-    console.log(
-        "NORMALIZED ITEMS:",
-        normalizedItems
-    );
 
     if (skippedItems.length > 0) {
         logger.warn(

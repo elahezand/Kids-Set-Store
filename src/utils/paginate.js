@@ -1,157 +1,135 @@
+const mongoose = require("mongoose");
+
+/*
+  Cursor pagination shared by every service.
+
+  - sort can have several keys ({ minPrice: 1, _id: -1 }); _id is always added as the
+    last key so the order is stable even when many docs share the same price / score.
+  - nextCursor is an opaque string (base64 of the last doc's sort values). Clients only
+    send it back, they never build it themselves.
+  - an old-style cursor (a plain ObjectId / value) still works for single-key sorts.
+*/
+
+const MAX_LIMIT = 99;
+const DEFAULT_LIMIT = 21;
+
+const getPath = (obj, path) =>
+  path.split(".").reduce((acc, key) => (acc == null ? acc : acc[key]), obj);
+
+const encodeCursor = (values) =>
+  Buffer.from(JSON.stringify(values)).toString("base64url");
+
+const toCursorValue = (value) => {
+  if (value === null || value === undefined) return null;
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === "object") return String(value); // ObjectId
+  return value;
+};
+
+const decodeCursor = (cursor) => {
+  try {
+    const parsed = JSON.parse(Buffer.from(String(cursor), "base64url").toString("utf8"));
+    return Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
+// values in the cursor are JSON -> turn ids / dates back into real types
+const revive = (key, value) => {
+  if (value === null || value === undefined) return value;
+  if (key === "_id" && mongoose.isValidObjectId(value)) {
+    return new mongoose.Types.ObjectId(String(value));
+  }
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
+    const date = new Date(value);
+    if (!Number.isNaN(date.getTime())) return date;
+  }
+  return value;
+};
+
+const normalizeSort = (sort) => {
+  const entries = Object.entries(sort || {}).map(([key, dir]) => [
+    key,
+    Number(dir) === 1 || dir === "asc" ? 1 : -1,
+  ]);
+  if (!entries.some(([key]) => key === "_id")) entries.push(["_id", -1]);
+  return entries;
+};
+
+/* (a > x) OR (a = x AND b > y) OR ... */
+const buildCursorCondition = (sortEntries, values) => {
+  const or = sortEntries.map(([key, dir], index) => {
+    const condition = {};
+    for (let i = 0; i < index; i++) {
+      const [prevKey] = sortEntries[i];
+      condition[prevKey] = values[i];
+    }
+    condition[key] = dir === 1 ? { $gt: values[index] } : { $lt: values[index] };
+    return condition;
+  });
+  return { $or: or };
+};
+
 const paginate = async (
-    Model,
-    {
-        limit,
-        cursor = null,
-        filters = {},
-        sort = { createdAt: -1 },
-        populate = null,
-        select = null,
-    } = {}
-) => {
-    limit = Math.min(
-        Math.max(Number(limit) || 15, 1),
-        99
-    );
-
-    const sortKeys = Object.keys(sort);
-
-    const sortKey = sortKeys[0] || "_id";
-    const sortOrder = sort[sortKey];
-
-    const query = { ...filters };
-
-    /*
-     * Cursor
-     */
-    if (cursor) {
-        try {
-            const decoded = JSON.parse(
-                Buffer.from(cursor, "base64").toString("utf8")
-            );
-
-            const cursorValue = decoded.value;
-            const cursorId = decoded.id;
-
-            if (sortKey === "_id") {
-                query._id =
-                    sortOrder === 1
-                        ? { $gt: cursorId }
-                        : { $lt: cursorId };
-            } else {
-                const operator =
-                    sortOrder === 1 ? "$gt" : "$lt";
-
-                query.$or = [
-                    {
-                        [sortKey]: {
-                            [operator]: cursorValue,
-                        },
-                    },
-                    {
-                        [sortKey]: cursorValue,
-                        _id:
-                            sortOrder === 1
-                                ? { $lt: cursorId }
-                                : { $gt: cursorId },
-                    },
-                ];
-            }
-        } catch (error) {
-            console.error(
-                "Invalid pagination cursor:",
-                error
-            );
-
-            return {
-                data: [],
-                pagination: {
-                    limit,
-                    nextCursor: null,
-                    hasMore: false,
-                },
-            };
-        }
-    }
-
-    let dbQuery = Model.find(query)
-        .sort(sort)
-        .limit(limit + 1)
-        .lean();
-
-    if (populate) {
-        dbQuery = dbQuery.populate(populate);
-    }
-
-    if (select) {
-        dbQuery = dbQuery.select(select);
-    }
-
-    const data = await dbQuery;
-
-    const hasMore = data.length > limit;
-
-    if (hasMore) {
-        data.pop();
-    }
-
-    let nextCursor = null;
-
-    if (hasMore && data.length) {
-        const lastItem = data[data.length - 1];
-
-        const cursorData = {
-            value: lastItem[sortKey],
-            id: lastItem._id,
-        };
-
-        nextCursor = Buffer.from(
-            JSON.stringify(cursorData)
-        ).toString("base64");
-    }
-
-    return {
-        data,
-        pagination: {
-            limit,
-            nextCursor,
-            hasMore,
-        },
-    };
-};
-
-/**
- * Page-number pagination for dashboard tables (?page=2&limit=10).
- * `params` is the page's searchParams; returns { data, totalCount, pageCount, page, limit }.
- */
-const paginatePage = async (
-    Model,
-    params = {},
+  Model,
+  {
+    limit,
+    cursor = null,
     filters = {},
+    sort = { createdAt: -1 },
     populate = null,
-    sort = { createdAt: -1 }
+    select = null,
+  } = {}
 ) => {
-    const limit = Math.min(Math.max(Number(params?.limit) || 10, 1), 99);
-    const requested = Math.max(Number(params?.page) || 1, 1);
+  const safeLimit = Math.min(Math.max(Number(limit) || DEFAULT_LIMIT, 1), MAX_LIMIT);
+  const sortEntries = normalizeSort(sort);
+  const sortObject = Object.fromEntries(sortEntries);
 
-    const totalCount = await Model.countDocuments(filters);
-    const pageCount = Math.max(Math.ceil(totalCount / limit), 1);
-    const page = Math.min(requested, pageCount);
+  const query = { ...filters };
 
-    let query = Model.find(filters)
-        .sort(sort)
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .lean();
+  if (cursor) {
+    const decoded = decodeCursor(cursor);
+    let condition = null;
 
-    if (populate) query = query.populate(populate);
+    if (decoded && decoded.length === sortEntries.length) {
+      const values = decoded.map((value, i) => revive(sortEntries[i][0], value));
+      condition = buildCursorCondition(sortEntries, values);
+    } else if (!decoded) {
+      // legacy cursor: value of the first sort key
+      const [firstKey, firstDir] = sortEntries[0];
+      condition = { [firstKey]: firstDir === 1 ? { $gt: cursor } : { $lt: cursor } };
+    }
 
-    const data = await query;
+    if (condition) query.$and = [...(query.$and || []), condition];
+  }
 
-    return { data, totalCount, pageCount, page, limit };
+  let dbQuery = Model.find(query).sort(sortObject).limit(safeLimit + 1);
+
+  if (select) dbQuery = dbQuery.select(select);
+  if (populate) dbQuery = dbQuery.populate(populate);
+
+  const docs = await dbQuery.lean();
+
+  const hasMore = docs.length > safeLimit;
+  const data = hasMore ? docs.slice(0, safeLimit) : docs;
+  const last = data[data.length - 1];
+
+  const nextCursor =
+    hasMore && last
+      ? encodeCursor(sortEntries.map(([key]) => toCursorValue(getPath(last, key))))
+      : null;
+
+  return {
+    data,
+    pagination: {
+      limit: safeLimit,
+      nextCursor,
+      hasMore,
+    },
+  };
 };
 
-module.exports = {
-    paginate,
-    paginatePage,
-};
+module.exports = paginate;
+module.exports.paginate = paginate;
+module.exports.default = paginate;
