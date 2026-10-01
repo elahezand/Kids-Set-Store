@@ -5,7 +5,7 @@ import Gallery from "@/components/template/main/product/gallery";
 import Details from "@/components/template/main/product/detail";
 import Tabs from "@/components/template/main/product/tabs";
 
-const ProductContent = ({ product, commentsCount }) => {
+const ProductContent = ({ product, commentsCount, isFavorited }) => {
     const [selectedVariant, setSelectedVariant] = useState(
         () =>
             product.variants.find((v) => v._id === product.defaultVariantId) ??
@@ -22,13 +22,13 @@ const ProductContent = ({ product, commentsCount }) => {
                     productComments={commentsCount}
                     selectedVariant={selectedVariant}
                     onVariantChange={setSelectedVariant}
+                    isFavorited={isFavorited}
                 />
             </div>
 
             <Tabs
                 longDescription={product.longDescription}
                 specs={product.specs}
-                selectedVariant={selectedVariant}
             />
         </>
     );

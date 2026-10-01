@@ -9,7 +9,7 @@ const TABS = [
     { id: "moreInfoes", label: "More Infos" },
 ];
 
-const Tabs = ({ longDescription, specs, selectedVariant }) => {
+const Tabs = ({ longDescription, specs }) => {
     const [activeTab, setActiveTab] = useState(TABS[0].id);
 
     return (

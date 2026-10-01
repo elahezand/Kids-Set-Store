@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { HiChevronDown } from "react-icons/hi";
 import Article from "@/components/template/main/index/articles/article";
 
-const getKey = (item) => String(item.id ?? item._id);
+const getKey = (item) => String(item._id ?? item.id);
 
 export default function ArticlesList({
   data: initialData = [],
@@ -22,11 +22,16 @@ export default function ArticlesList({
 
   useEffect(() => {
     if (lastBatch.current === initialData) return;
+
     lastBatch.current = initialData;
 
     setArticles((current) => {
       const seen = new Set(current.map(getKey));
-      return [...current, ...initialData.filter((item) => !seen.has(getKey(item)))];
+
+      return [
+        ...current,
+        ...initialData.filter((item) => !seen.has(getKey(item))),
+      ];
     });
   }, [initialData]);
 
@@ -34,10 +39,13 @@ export default function ArticlesList({
     if (!nextCursor || !hasMore || isPending) return;
 
     const params = new URLSearchParams(searchParams.toString());
+
     params.set("cursor", nextCursor);
 
     startTransition(() => {
-      router.push(`?${params.toString()}`, { scroll: false });
+      router.push(`?${params.toString()}`, {
+        scroll: false,
+      });
     });
   };
 
@@ -51,7 +59,10 @@ export default function ArticlesList({
 
   return (
     <>
-      <div data-aos="fade-up" className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div
+        data-aos="fade-up"
+        className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+      >
         {articles.map((item) => (
           <Article {...item} key={getKey(item)} />
         ))}
@@ -66,7 +77,12 @@ export default function ArticlesList({
             className="btn btn-lg btn-secondary w-full rounded-full sm:w-auto sm:px-10"
           >
             <span>{isPending ? "Loading..." : "Load more"}</span>
-            <HiChevronDown className={`size-5 ${isPending ? "animate-bounce" : ""}`} />
+
+            <HiChevronDown
+              className={`size-5 ${
+                isPending ? "animate-bounce" : ""
+              }`}
+            />
           </button>
         </div>
       )}

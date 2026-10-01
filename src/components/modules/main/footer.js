@@ -1,23 +1,31 @@
 import Link from "next/link";
-import { FaFacebookF, FaInstagram, FaPinterestP, FaXTwitter, FaYoutube } from "react-icons/fa6";
+import { FaInstagram, FaLinkedinIn, FaTelegram } from "react-icons/fa6";
 import { LuMail, LuMapPin, LuPhone } from "react-icons/lu";
+import NewsletterForm from "@/components/modules/main/newsletterForm";
 
-const socialLinks = [
-    { icon: FaInstagram, label: "Instagram", href: "/" },
-    { icon: FaFacebookF, label: "Facebook", href: "/" },
-    { icon: FaXTwitter, label: "X", href: "/" },
-    { icon: FaPinterestP, label: "Pinterest", href: "/" },
-    { icon: FaYoutube, label: "YouTube", href: "/" },
-];
+/* info = model/info (services/public/info getInfo), may be null */
+const buildSocials = (info) =>
+    [
+        { icon: FaInstagram, label: "Instagram", href: info?.socials?.instagram },
+        { icon: FaTelegram, label: "Telegram", href: info?.socials?.telegram },
+        { icon: FaLinkedinIn, label: "LinkedIn", href: info?.socials?.linkedin },
+    ].filter((item) => item.href);
+
+const buildContact = (info) =>
+    [
+        info?.address && { icon: LuMapPin, text: info.address },
+        info?.phone && { icon: LuPhone, text: info.phone, href: `tel:${info.phone.replace(/[^\d+]/g, "")}` },
+        info?.email && { icon: LuMail, text: info.email, href: `mailto:${info.email}` },
+    ].filter(Boolean);
 
 const columns = [
     {
         title: "Shop",
         links: [
             { label: "All products", href: "/products" },
-            { label: "New arrivals", href: "/products?value=latest&page=1" },
-            { label: "Best sellers", href: "/products?value=bestSelling&page=1" },
-            { label: "Favorites", href: "/favorite" },
+            { label: "New arrivals", href: "/products?sort=latest" },
+            { label: "Best sellers", href: "/products?sort=bestSelling" },
+            { label: "Favorites", href: "/favorites" },
         ],
     },
     {
@@ -40,13 +48,10 @@ const columns = [
     },
 ];
 
-const contactInfo = [
-    { icon: LuMapPin, text: "Teaxs, USA" },
-    { icon: LuPhone, text: "+1 (940) 987654345", href: "tel:+194034567" },
-    { icon: LuMail, text: "support@set-kids.com", href: "mailto:support@set-kids.com" },
-];
+const Footer = ({ info = null }) => {
+    const contactInfo = buildContact(info);
+    const socialLinks = buildSocials(info);
 
-const Footer = () => {
     return (
         <footer className="border-t border-gray-200 bg-gray-50 text-text dark:border-white/10 dark:bg-ink-950 dark:text-gray-300">
             <div className="container-x grid gap-12 py-14 md:grid-cols-[1.4fr_2fr] md:gap-16 lg:py-16">
@@ -74,6 +79,8 @@ const Footer = () => {
                             </li>
                         ))}
                     </ul>
+
+                    <NewsletterForm />
                 </div>
 
                 {/* ستون‌های لینک */}
@@ -110,13 +117,15 @@ const Footer = () => {
                     <ul className="flex items-center gap-1">
                         {socialLinks.map(({ icon: Icon, label, href }) => (
                             <li key={label}>
-                                <Link
+                                <a
                                     href={href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     aria-label={label}
                                     className="flex size-9 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-white hover:text-sage-600 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-sage-300"
                                 >
                                     <Icon className="size-4" />
-                                </Link>
+                                </a>
                             </li>
                         ))}
                     </ul>

@@ -1,46 +1,61 @@
+import Image from "next/image";
+import { LuMail, LuMapPin, LuPhone } from "react-icons/lu";
 import Breadcrumb from "@/components/modules/main/breadCrumb";
 import Form from "@/components/template/main/contact-us/Form";
 import Map from "@/components/template/main/contact-us/map";
-import Image from "next/image";
+import connectToDB from "@/configs/db";
+import { getInfo } from "@/services/public/info";
 
 export const metadata = {
-    title: "Contact Us - SET KIDS",
-    description: "Get in touch with Set KIDS. Reach out for questions, feedback, or support. We'd love to hear from you!",
-    keywords: ["Set Kids", "Contact", "Support", "Feedback", "Customer Service"],
-    authors: [{ name: "SET KIDS Team" }],
+    title: "Contact Us | SET KIDS",
+    description: "Get in touch with Set Kids for questions, feedback or support.",
     openGraph: {
-        title: "Contact Us - SET KIDS",
-        description: "Get in touch with SET KIDS. Reach out for questions, feedback, or support.",
-        url: "https://yourwebsite.com/contact",
-        siteName: "Set kids",
-        images: [{ url: "https://yourwebsite.com/images/contact-og.jpg", width: 1200, height: 630, alt: "Contact Set kids" }],
-        locale: "en_US",
+        title: "Contact Us | SET KIDS",
+        description: "Get in touch with Set Kids for questions, feedback or support.",
         type: "website",
-    },
-    twitter: {
-        card: "summary_large_image",
-        title: "Contact Us - Set Kids",
-        description: "Get in touch with Set Kids. Reach out for questions, feedback, or support.",
-        images: ["https://yourwebsite.com/images/contact-og.jpg"],
     },
 };
 
-const page = async () => {
+const ContactPage = async () => {
+    await connectToDB();
+    // same service as GET /api/info
+    const info = await getInfo().catch(() => null);
+
+    const details = [
+        info?.address && { Icon: LuMapPin, text: info.address },
+        info?.phone && { Icon: LuPhone, text: info.phone, href: `tel:${info.phone.replace(/[^\d+]/g, "")}` },
+        info?.email && { Icon: LuMail, text: info.email, href: `mailto:${info.email}` },
+    ].filter(Boolean);
+
     return (
         <div className="page-container text-text dark:text-gray-100">
-            <Breadcrumb route="Contact-Us" title="ContactUs" />
+            <Breadcrumb route="contact-us" title="Contact Us" />
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12">
                 <div className="flex flex-col items-center justify-center gap-6">
                     <Image
                         width={200}
                         height={200}
-                        alt="Slide"
+                        alt=""
                         priority
-                        sizes="100vw"
-                        fetchPriority="high"
                         src="/images/59aa50c82c33be2762280e2c0939bde3.jpg"
                         className="h-[140px] w-full object-contain sm:h-[180px]"
                     />
+
+                    {details.length > 0 && (
+                        <ul className="flex w-full flex-col gap-3 rounded-2xl bg-mint-200/60 p-5 text-sm dark:bg-ink-800">
+                            {details.map(({ Icon, text, href }) => (
+                                <li key={text} className="flex items-center gap-3">
+                                    <Icon className="size-4 shrink-0 text-sage-600" />
+                                    {href ? (
+                                        <a href={href} className="hover:text-coral-400">{text}</a>
+                                    ) : (
+                                        <span>{text}</span>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+
                     <Form />
                 </div>
                 <div className="h-[350px] overflow-hidden rounded-2xl shadow-card sm:h-[450px] md:h-full">
@@ -51,4 +66,4 @@ const page = async () => {
     );
 };
 
-export default page;
+export default ContactPage;

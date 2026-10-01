@@ -27,7 +27,7 @@ export default function FavoriteItems({
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const normalizedInitialFavorites = initialFavorites.flat();
+    const normalizedInitialFavorites = initialFavorites;
 
     const [favorites, setFavorites] = useState(
         normalizedInitialFavorites
@@ -40,7 +40,7 @@ export default function FavoriteItems({
 
         lastBatch.current = initialFavorites;
 
-        const newProducts = initialFavorites.flat();
+        const newProducts = initialFavorites;
 
         setFavorites((current) => {
             const seen = new Set(
@@ -72,10 +72,9 @@ export default function FavoriteItems({
         });
     };
 
+    // the new page arrived -> stop the spinner
     useEffect(() => {
-        if (isLoading) {
-            setIsLoading(false);
-        }
+        setIsLoading(false);
     }, [initialFavorites]);
 
     if (!favorites.length) {
@@ -114,10 +113,7 @@ export default function FavoriteItems({
         <>
             <div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
                 {favorites.map((item) => (
-                    <Product
-                        key={String(item._id)}
-                        {...item}
-                    />
+                    <Product key={item._id} {...item} />
                 ))}
             </div>
 

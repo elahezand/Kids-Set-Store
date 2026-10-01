@@ -2,64 +2,119 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { FaRegStar, FaStar } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import AddToFavoriteList from "@/components/modules/main/addToFavorite";
-import useShop from "@/utils/hooks/useCard";
-import { toProductView } from "@/utils/productView";
+import Stars from "@/components/modules/ui/stars";
+import { usePost } from "@/utils/hooks/useReactQuery";
+import { formatPrice } from "@/utils/format";
+import { PLACEHOLDER_IMAGE } from "@/utils/productView";
 
-export default function Product(product) {
-  const { addTocard } = useShop();
-  const { _id, name, img, price, score } = toProductView(product);
+/*
+  Product card. Expects the shape of toProductCard() (utils/productView):
+  { _id, name, img, price, originalPrice, score, variantsCount, defaultVariantId, inStock }
+
+  "Add to cart" talks to POST /api/user/cart (services/user/cart) — the same cart the
+  /cart page and the navbar badge read. A product with several variants needs a choice,
+  so the button sends the user to the product page instead.
+*/
+export default function Product({
+  _id,
+  name,
+  img,
+  price,
+  originalPrice,
+  score = 0,
+  variantsCount = 0,
+  defaultVariantId = null,
+  inStock = true,
+}) {
+  const queryClient = useQueryClient();
+  const href = `/products/${_id}`;
+  const needsChoice = variantsCount > 1;
+
+  const { mutate: addToCart, isPending } = usePost("/user/cart", {
+    errorFallback: "Could not add to cart",
+    onSuccess: async () => {
+      toast.success("Added to cart");
+      await queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+  });
+
+  const handleAdd = () => {
+    if (isPending || !inStock) return;
+    addToCart({
+      items: [{ productId: _id, variantId: defaultVariantId, quantity: 1 }],
+    });
+  };
+
+  const actionClass =
+    "invisible absolute bottom-0 left-1/2 z-[3] w-max -translate-x-1/2 translate-y-1/2 whitespace-nowrap rounded-md border border-white bg-transparent px-3 py-1 text-sm text-white opacity-0 transition-all duration-300 group-hover:visible group-hover:bottom-1/2 group-hover:opacity-100 hover:bg-coral-300 disabled:cursor-not-allowed";
 
   return (
     <div className="group relative flex h-full w-full flex-col rounded-2xl bg-white p-2 text-text shadow-card dark:bg-ink-800 dark:text-gray-100">
       <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl">
         <Image
           fill
-          src={img}
+          src={img || PLACEHOLDER_IMAGE}
           alt={name}
           sizes="(min-width: 1280px) 20vw, (min-width: 768px) 25vw, 50vw"
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
 
+        {!inStock && (
+          <span className="absolute left-2 top-2 z-[4] rounded-full bg-gray-900/80 px-2.5 py-1 text-xs text-white">
+            Out of stock
+          </span>
+        )}
+
         <div className="pointer-events-none absolute inset-0 z-[2] rounded-xl bg-black/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-        <div className="invisible absolute left-0 top-2 z-[3] flex flex-col gap-2 text-lg text-white opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 sm:text-xl md:text-2xl">
-          <Link href={`/products/${_id}`} className="group/look flex items-center gap-1">
-            <CiSearch className="cursor-pointer" />
-            <p className="rounded-md bg-coral-300 px-3 text-[13px] leading-[34px] text-white opacity-0 transition-opacity group-hover/look:opacity-100">
-              LOOK
-            </p>
+        <div className="invisible absolute right-2 top-2 z-[3] flex flex-col items-end gap-2 text-white opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
+          <Link
+            href={href}
+            aria-label={`View ${name}`}
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 text-xl text-coral-300"
+          >
+            <CiSearch />
           </Link>
-          <AddToFavoriteList productId={_id}>Add To Favorite</AddToFavoriteList>
+          <AddToFavoriteList productId={_id} compact />
         </div>
 
-        <button
-          onClick={() => addTocard(name, price, img, _id)}
-          className="invisible absolute bottom-0 left-1/2 z-[3] w-max -translate-x-1/2 translate-y-1/2 whitespace-nowrap rounded-md border border-white bg-transparent px-3 py-1 text-sm text-white opacity-0 transition-all duration-300 group-hover:visible group-hover:bottom-1/2 group-hover:opacity-100 hover:bg-coral-300"
-        >
-          Add To Card
-        </button>
+        {needsChoice ? (
+          <Link href={href} className={actionClass}>
+            Choose options
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={handleAdd}
+            disabled={isPending || !inStock}
+            className={actionClass}
+          >
+            {!inStock ? "Out of stock" : isPending ? "Adding..." : "Add to cart"}
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col items-center justify-center gap-1 px-1 py-2.5 text-center">
-        <Link href={`/products/${_id}`} className="line-clamp-1 text-[13px] sm:text-sm">
+        <Link href={href} className="line-clamp-1 text-[13px] sm:text-sm">
           {name}
         </Link>
-        {score && (
-          <div className="flex items-center gap-0.5 text-sage-400">
-            {Array.from({ length: score }).map((_, index) => (
-              <FaStar key={index} />
-            ))}
-            {Array.from({ length: 5 - score }).map((_, index) => (
-              <FaRegStar key={index} />
-            ))}
-          </div>
-        )}
-        <span className="text-[13px] text-text dark:text-gray-100 sm:text-sm md:text-base">
-          {price} $
-        </span>
+
+        {score > 0 && <Stars score={score} className="text-sage-400" />}
+
+        <div className="flex items-baseline gap-2">
+          <span className="text-[13px] text-text dark:text-gray-100 sm:text-sm md:text-base">
+            {formatPrice(price)}
+          </span>
+          {originalPrice > price && (
+            <span className="text-xs text-gray-400 line-through">
+              {formatPrice(originalPrice)}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

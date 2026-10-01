@@ -26,6 +26,7 @@ const pageLinks = [
 ];
 
 export default function MobileMenu({ tree = [], username = null, favoriteCount = 0 }) {
+    const isLoggedIn = Boolean(username);
     const [open, setOpen] = useState(false);
     const [openCategory, setOpenCategory] = useState(null);
     const [openSub, setOpenSub] = useState(null);
@@ -95,8 +96,8 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
 
                     <div className="flex items-center gap-3 text-xl text-gray-800 dark:text-gray-300">
                         <ThemeToggle />
-                        <CartCount />
-                        <Link href="/favorite" className="relative" aria-label="Favorites">
+                        <CartCount isLoggedIn={isLoggedIn} />
+                        <Link href="/favorites" className="relative" aria-label="Favorites">
                             <FaRegHeart />
                             <span className="absolute -right-2 -top-2 flex size-4 items-center justify-center rounded-full bg-coral-400 text-[10px] leading-none text-white">
                                 {favoriteCount || 0}
@@ -122,14 +123,14 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
                     <ul className="flex flex-col">
                         {tree.map((category) => {
                             const hasChildren = category.children?.length > 0;
-                            const isOpen = openCategory === category._id;
+                            const isOpen = openCategory === category.id;
 
                             return (
-                                <li key={category._id} className="border-b border-gray-100 dark:border-white/5">
+                                <li key={category.id} className="border-b border-gray-100 dark:border-white/5">
                                     <div className="flex items-center">
                                         {/* خود دسته‌ی اصلی همیشه قابل کلیک است */}
                                         <Link
-                                            href={`/products?category=${category.name}`}
+                                            href={`/products?category=${encodeURIComponent(category.slug)}`}
                                             className="flex-1 rounded-lg px-2 py-3.5 text-[15px] font-semibold capitalize text-text transition-colors hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-white/5"
                                         >
                                             {category.name}
@@ -138,7 +139,7 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
                                         {hasChildren && (
                                             <button
                                                 type="button"
-                                                onClick={() => toggleCategory(category._id)}
+                                                onClick={() => toggleCategory(category.id)}
                                                 aria-expanded={isOpen}
                                                 aria-label={`${isOpen ? "Hide" : "Show"} ${category.name} subcategories`}
                                                 className="flex size-10 shrink-0 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5"
@@ -160,13 +161,13 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
                                                 <ul className="mb-2 ml-2 flex flex-col gap-0.5 border-l-2 border-sage-200 pl-3 dark:border-sage-700">
                                                     {category.children.map((sub) => {
                                                         const hasGrandChildren = sub.children?.length > 0;
-                                                        const isSubOpen = openSub === sub._id;
+                                                        const isSubOpen = openSub === sub.id;
 
                                                         return (
-                                                            <li key={sub._id}>
+                                                            <li key={sub.id}>
                                                                 <div className="flex items-center">
                                                                     <Link
-                                                                        href={`/products?category=${sub.name}`}
+                                                                        href={`/products?category=${encodeURIComponent(sub.slug)}`}
                                                                         className="flex-1 rounded-lg px-2 py-2.5 text-sm capitalize text-gray-700 transition-colors hover:bg-gray-50 hover:text-sage-600 dark:text-gray-300 dark:hover:bg-white/5"
                                                                     >
                                                                         {sub.name}
@@ -175,7 +176,7 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
                                                                     {hasGrandChildren && (
                                                                         <button
                                                                             type="button"
-                                                                            onClick={() => setOpenSub(isSubOpen ? null : sub._id)}
+                                                                            onClick={() => setOpenSub(isSubOpen ? null : sub.id)}
                                                                             aria-expanded={isSubOpen}
                                                                             aria-label={`${isSubOpen ? "Hide" : "Show"} ${sub.name} subcategories`}
                                                                             className="flex size-8 shrink-0 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-500 dark:hover:bg-white/5"
@@ -195,9 +196,9 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
                                                                         <div className="overflow-hidden">
                                                                             <ul className="mb-1 ml-2 flex flex-col border-l border-gray-200 pl-3 dark:border-white/10">
                                                                                 {sub.children.map((item) => (
-                                                                                    <li key={item._id}>
+                                                                                    <li key={item.id}>
                                                                                         <Link
-                                                                                            href={`/products?category=${item.name}`}
+                                                                                            href={`/products?category=${encodeURIComponent(item.slug)}`}
                                                                                             className="block rounded-lg px-2 py-2 text-sm capitalize text-gray-600 transition-colors hover:text-sage-600 dark:text-gray-500"
                                                                                         >
                                                                                             {item.name}
@@ -214,7 +215,7 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
 
                                                     <li>
                                                         <Link
-                                                            href={`/products?category=${category.name}`}
+                                                            href={`/products?category=${encodeURIComponent(category.slug)}`}
                                                             className="block rounded-lg px-2 py-2.5 text-sm font-semibold text-coral-400 transition-colors hover:text-coral-500"
                                                         >
                                                             View all {category.name}

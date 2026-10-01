@@ -1,22 +1,14 @@
-"use client"
-import React from 'react'
-import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-import Footer from '@/components/modules/main/footer';
+"use client";
 
-const noFooterRoutes = ["/login-register"];
+import { usePathname } from "next/navigation";
+import Footer from "@/components/modules/main/footer";
 
-export default function ShowFooter() {
+const NO_FOOTER_ROUTES = ["/login-register", "/forgotPass"];
 
+export default function ShowFooter({ info = null }) {
     const pathname = usePathname();
-    const [showFooter, setShowFooter] = useState(true);
 
-    useEffect(() => {
-        setShowFooter(!noFooterRoutes.includes(pathname));
-    }, [pathname]);
-    return (
-        <>
-            {showFooter && <Footer />}
-        </>
-    )
+    if (NO_FOOTER_ROUTES.includes(pathname)) return null;
+
+    return <Footer info={info} />;
 }

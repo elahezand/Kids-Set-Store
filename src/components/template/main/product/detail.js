@@ -12,9 +12,9 @@ import {
 } from "react-icons/fa";
 import { FaRegStar } from "react-icons/fa6";
 import { IoCheckmarkCircle, IoCloseCircle } from "react-icons/io5";
-import { TbSwitch3 } from "react-icons/tb";
 import AddToBasket from "@/components/modules/main/addToBasket";
 import AddToFavoriteList from "@/components/modules/main/addToFavorite";
+import { formatPrice } from "@/utils/format";
 
 const MAX_SCORE = 5;
 const COLOR_KEYS = ["color", "colour"];
@@ -59,7 +59,7 @@ const pickVariant = (variants = [], current, attribute, value) => {
 
 const getShareLinks = (product) => {
     const url = encodeURIComponent(
-        `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/product/${product._id}`
+        `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/products/${product._id}`
     );
     const text = encodeURIComponent(product.name);
     const media = encodeURIComponent(product.img ?? "");
@@ -118,13 +118,13 @@ const Price = ({ variant, fallback }) => {
     return (
         <div className="flex flex-wrap items-baseline gap-3">
             <span className="font-shabnam-bold text-4xl leading-none text-sage-400">
-                {current} $
+                {formatPrice(current)}
             </span>
 
             {hasDiscount && (
                 <>
                     <span className="text-lg text-gray-400 line-through">
-                        {original} $
+                        {formatPrice(original)}
                     </span>
                     <span className="rounded-full bg-coral-300 px-2.5 py-0.5 text-sm font-semibold text-white">
                         -{percent}%
@@ -221,8 +221,9 @@ const Details = ({
     productComments,
     selectedVariant,
     onVariantChange,
+    isFavorited,
 }) => {
-    
+
     const variants = product.variants ?? [];
     const tags = product.tags ?? [];
 
@@ -233,7 +234,6 @@ const Details = ({
     const shareLinks = useMemo(() => getShareLinks(product), [product]);
 
     const selectedAttributes = selectedVariant?.attributes ?? {};
-    const price = getPrice(selectedVariant, product.price);
 
     // mahsul-e bedun-e variant ham mitune mojud bashe
     const inStock = selectedVariant
@@ -278,22 +278,40 @@ const Details = ({
             <div className="flex flex-wrap items-stretch gap-3">
                 <div className="min-w-[240px] flex-1">
                     <AddToBasket
-                        key={selectedVariant?._id}
+                        key={selectedVariant?._id ?? "no-variant"}
                         productId={product._id}
                         variantId={selectedVariant?._id ?? null}
+                        maxQty={selectedVariant?.stock}
+                        disabled={!inStock}
                     />
                 </div>
 
-                <AddToFavoriteList productId={product._id} />
-                {/* TODO: href-e vagheyi-ye compare */}
-                <Link
-                    href="/"
-                    className="flex h-12 items-center justify-center gap-1.5 rounded-xl border border-gray-300 px-4 text-sm text-gray-600 transition hover:border-sage-400 hover:text-sage-400 dark:border-white/20 dark:text-gray-300"
-                >
-                    <TbSwitch3 className="text-xl text-sage-400" />
-                    Compare
-                </Link>
+                <AddToFavoriteList
+                    productId={product._id}
+                    initialFavorited={isFavorited}
+                />
             </div>
+
+            {selectedVariant?.sku && (
+                <p className="-mt-3 text-xs text-gray-500 dark:text-gray-400">
+                    SKU: {selectedVariant.sku}
+                </p>
+            )}
+
+            {product.categories?.length > 0 && (
+                <p className="-mt-3 flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <span>Category:</span>
+                    {product.categories.map((category) => (
+                        <Link
+                            key={category._id}
+                            href={`/products?category=${encodeURIComponent(category.slug)}`}
+                            className="text-sage-500 hover:text-coral-300 hover:underline"
+                        >
+                            {category.title}
+                        </Link>
+                    ))}
+                </p>
+            )}
 
             {/* Footer: tags + share */}
             <footer className="flex flex-col gap-4 border-t border-gray-200 pt-5 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">

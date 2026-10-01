@@ -1,96 +1,84 @@
 import dynamic from "next/dynamic";
-import { Suspense } from "react";
 import Banner from "@/components/modules/main/banner";
 import Categories from "@/components/template/main/index/categories";
 import Promote from "@/components/template/main/index/promote";
 import PromoText from "@/components/template/main/index/promoText";
-import Product from "@/model/product";
-import Article from "@/model/article";
 import connectToDB from "@/configs/db";
+import productService from "@/services/public/product";
+import articleService from "@/services/public/article";
+import { getAllCategories } from "@/services/public/category";
+import { getPopularProducts } from "@/services/public/favorite";
+import { getPublicStats } from "@/services/public/stats";
+import { toProductCards } from "@/utils/productView";
+import { toPlain } from "@/utils/format";
 
-const Latest = dynamic(
-  () => import("@/components/template/main/index/latest"),
-  {
-    loading: () => <SkeletonLoader />,
-    ssr: true,
-  }
-);
+function SkeletonLoader() {
+  return (
+    <div className="page-container">
+      <div className="h-96 animate-pulse rounded-lg bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700" />
+    </div>
+  );
+}
+
+const Latest = dynamic(() => import("@/components/template/main/index/latest"), {
+  loading: () => <SkeletonLoader />,
+});
 
 const BestSelling = dynamic(
   () => import("@/components/template/main/index/bestSelling"),
-  {
-    loading: () => <SkeletonLoader />,
-    ssr: true,
-  }
+  { loading: () => <SkeletonLoader /> }
 );
 
 const Articles = dynamic(
   () => import("@/components/template/main/index/articles/articles"),
-  {
-    loading: () => <SkeletonLoader />,
-    ssr: true,
-  }
+  { loading: () => <SkeletonLoader /> }
 );
 
-function SkeletonLoader() {
-  return (
-    <div className="h-96 animate-pulse rounded-lg bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700" />
-  );
-}
+const HOME_LIMIT = 10;
 
-export const revalidate = 3600;
+// one broken section must not take the whole home page down
+const safe = async (promise, fallback) => {
+  try {
+    return await promise;
+  } catch (error) {
+    console.error("[home] section failed:", error);
+    return fallback;
+  }
+};
 
 export default async function Home() {
   await connectToDB();
 
-  const [products, bestSelling, articles] = await Promise.all([
-    Product.find({ status: "active" })
-      .sort({ _id: -1 })
-      .limit(10)
-      .lean()
-      .exec(),
-
-    Product.find({
-      status: "active",
-      "metrics.score": { $gte: 4 },
-    })
-      .sort({ _id: -1 })
-      .limit(10)
-      .lean()
-      .exec(),
-
-    Article.find({})
-      .sort({ _id: -1 })
-      .limit(10)
-      .lean()
-      .exec(),
-  ]);
-
-  const serializedProducts = JSON.parse(JSON.stringify(products));
-  const serializedBestSelling = JSON.parse(JSON.stringify(bestSelling));
-  const serializedArticles = JSON.parse(JSON.stringify(articles));
+  // same services the public API uses (/api/products, /api/articles, /api/categories, /api/favorites, /api/stat)
+  const [latest, bestSelling, popular, articles, categories, stats] =
+    await Promise.all([
+      safe(productService.getLatestProducts(HOME_LIMIT), []),
+      safe(productService.getBestSellingProducts(HOME_LIMIT), []),
+      safe(getPopularProducts({ limit: HOME_LIMIT }), []),
+      safe(articleService.getPublicArticles({ limit: HOME_LIMIT }), { data: [] }),
+      safe(getAllCategories(), []),
+      safe(getPublicStats(), null),
+    ]);
 
   return (
-    <main className="min-h-screen">
+    <div className="min-h-screen">
       <Banner />
 
-      <Suspense fallback={<SkeletonLoader />}>
-        <Latest products={serializedProducts} />
-      </Suspense>
+      <Latest products={toProductCards(latest)} />
 
       <PromoText />
 
-      <Suspense fallback={<SkeletonLoader />}>
-        <BestSelling products={serializedBestSelling} />
-      </Suspense>
+      <BestSelling title="Best Sellers" href="/products?sort=bestSelling" products={toProductCards(bestSelling)} />
 
-      <Categories />
+      <Categories categories={categories.slice(0, 4)} />
 
-      <Suspense fallback={<SkeletonLoader />}>
-        <Articles articles={serializedArticles} />
-      </Suspense>
+      {popular.length > 0 && (
+        <BestSelling title="Most Loved" href="/products?sort=popularity" products={toProductCards(popular)} />
+      )}
 
-      <Promote />
-    </main>
+      <Articles articles={toPlain(articles.data ?? [])} />
+
+      <Promote stats={stats} />
+    </div>
   );
 }

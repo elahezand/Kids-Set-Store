@@ -1,32 +1,45 @@
-"use client"
+"use client";
+
 import Product from "@/components/modules/main/product";
 import SectionHeader from "@/components/modules/main/sectionHeader";
 import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
 import { Autoplay } from "swiper/modules";
+import "swiper/css";
 
-export default function BestSelling({ products }) {
+const MAX_SLIDES_PER_VIEW = 5;
+
+/* Product slider (used for "Best Sellers" and "Most Loved" on the home page) */
+export default function BestSelling({
+    products = [],
+    title = "Best Sellers",
+    href = "/products?sort=bestSelling",
+}) {
+    if (!products.length) return null;
+
+    // Swiper loop needs more slides than are visible at once
+    const canLoop = products.length > MAX_SLIDES_PER_VIEW;
+
     return (
         <div className="page-container">
-            <SectionHeader title="Best Products" href="products?value=bestSelling&page=1" />
+            <SectionHeader title={title} href={href} />
             <Swiper
                 slidesPerView={1}
                 spaceBetween={10}
                 breakpoints={{
                     640: { slidesPerView: 2, spaceBetween: 16 },
                     768: { slidesPerView: 3, spaceBetween: 20 },
-                    1200: { slidesPerView: 5, spaceBetween: 30 },
+                    1200: { slidesPerView: MAX_SLIDES_PER_VIEW, spaceBetween: 30 },
                 }}
-                autoplay={{ delay: 1500, disableOnInteraction: false }}
-                rewind={true}
-                loop={true}
+                autoplay={{ delay: 2500, disableOnInteraction: false, pauseOnMouseEnter: true }}
+                loop={canLoop}
+                rewind={!canLoop}
                 modules={[Autoplay]}
             >
-                {products.length ? products.map((item, index) => (
-                    <SwiperSlide key={index + 1} className="!h-auto py-1">
-                        <Product {...item} key={index + 1} />
+                {products.map((item) => (
+                    <SwiperSlide key={item._id} className="!h-auto py-1">
+                        <Product {...item} />
                     </SwiperSlide>
-                )) : null}
+                ))}
             </Swiper>
         </div>
     );

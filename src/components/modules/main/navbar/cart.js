@@ -1,27 +1,33 @@
-"use client"
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
+"use client";
+
+import Link from "next/link";
 import { FaShoppingCart } from "react-icons/fa";
-export default function CartCount() {
-    const [cartCount, setCartCount] = useState(0)
+import { useGet } from "@/utils/hooks/useReactQuery";
 
-    const updateCartCount = () => {
-        const saved = JSON.parse(localStorage.getItem("cart"))
-        if (saved) setCartCount(saved.length)
-    }
+/*
+  Badge = number of pieces in the server cart (GET /api/user/cart, query key ["cart"]).
+  Every component that changes the cart invalidates ["cart"], so the badge follows.
+*/
+export default function CartCount({ isLoggedIn = false }) {
+    const { data } = useGet("/user/cart", undefined, {
+        queryKey: ["cart"],
+        enabled: isLoggedIn,
+        silentError: true,
+        axiosConfig: { silentAuth: true },
+        retry: false,
+    });
 
-    useEffect(() => {
-        updateCartCount()
-        window.addEventListener("cartUpdated", updateCartCount)
-        return () => window.removeEventListener("cartUpdated", updateCartCount)
-    }, [cartCount])
+    const count = (data?.data?.items ?? []).reduce(
+        (sum, item) => sum + (Number(item.quantity) || 0),
+        0
+    );
 
     return (
-        <Link href="/cart" className="relative">
+        <Link href="/cart" className="relative" aria-label={`Cart (${count} items)`}>
             <FaShoppingCart />
-            <span className="absolute -left-[9px] -top-[7px] flex h-4 w-4 items-center justify-center rounded-full bg-coral-300 text-[10px] leading-none text-white">
-                {cartCount ? cartCount : "0"}
+            <span className="absolute -left-[9px] -top-[7px] flex h-4 min-w-4 items-center justify-center rounded-full bg-coral-300 px-0.5 text-[10px] leading-none text-white">
+                {count > 99 ? "99+" : count}
             </span>
         </Link>
-    )
+    );
 }

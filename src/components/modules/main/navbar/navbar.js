@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { IoIosArrowDown } from "react-icons/io";
 import { FaRegHeart } from "react-icons/fa";
-import FavoriteModel from "@/model/favorite";
 import connectToDB from "@/configs/db";
 import CartCount from "@/components/modules/main/navbar/cart";
 import MobileMenu from "@/components/modules/main/navbar/mobileMenu";
 import ThemeToggle from "@/components/modules/ui/themeToggle";
 import { getMe } from "@/utils/auth/authGuard";
 import { getAllCategories } from "@/services/public/category";
+import favoriteService from "@/services/user/favorite";
+import { log } from "three/src/utils.js";
 
 const categoryHref = (category) =>
   `/products?category=${encodeURIComponent(category.slug)}`;
@@ -28,16 +29,12 @@ const Navbar = async () => {
     getAllCategories(),
   ]);
 
-  console.log(user);
+  console.log(tree);
   
-
-  let favoriteCount = 0;
-
-  if (user) {
-    favoriteCount = await FavoriteModel.countDocuments({
-      user: user._id,
-    });
-  }
+  // same service as GET /api/user/favorites/count
+  const favoriteCount = user
+    ? (await favoriteService.getFavoriteCount(user._id)).data.count
+    : 0;
 
   return (
     <nav className="fixed inset-x-0 top-[5px] z-[9999] mx-auto h-[70px] rounded-2xl bg-sage-400 shadow-float dark:bg-sage-700 sm:mx-4 lg:mx-6">
@@ -103,7 +100,11 @@ const Navbar = async () => {
           ))}
 
           <li className="text-[17px] font-medium text-white">
-            <Link href="/contact-us">Contact With Us</Link>
+            <Link href="/articles">Articles</Link>
+          </li>
+
+          <li className="text-[17px] font-medium text-white">
+            <Link href="/contact-us">Contact Us</Link>
           </li>
 
           <li className="text-[17px] font-medium text-white">
@@ -157,10 +158,10 @@ const Navbar = async () => {
         <div className="hidden items-center gap-5 text-2xl text-white lg:flex">
           <ThemeToggle />
 
-          <CartCount />
+          <CartCount isLoggedIn={Boolean(user)} />
 
           <Link
-            href="/favorite"
+            href="/favorites"
             className="relative"
             aria-label="Wish list"
           >

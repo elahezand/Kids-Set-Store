@@ -9,8 +9,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import AuthShell from "@/components/modules/main/authShell";
 import { usePost } from "@/utils/hooks/useReactQuery";
+import { strongPasswordSchema } from "@/validators/user";
 
-const RESEND_SECONDS = 120;
+const RESEND_SECONDS = 60; // = OTP_TTL_SECONDS in /api/auth/sms/send
 
 const phoneSchema = z.object({
   phone: z
@@ -19,9 +20,10 @@ const phoneSchema = z.object({
     .regex(/^09\d{9}$/, "Invalid Iranian phone number format"),
 });
 
+// same rules as validators/user resetPasswordSchema (POST /api/reset-password)
 const resetPasswordSchema = z.object({
-  resetCode: z.string().length(6, "Code must be 6 digits"),
-  newPassword: z.string().min(6, "Password must be at least 6 characters"),
+  resetCode: z.string().trim().regex(/^\d{4,6}$/, "Code must be 4 to 6 digits"),
+  newPassword: strongPasswordSchema,
 });
 
 const ForgotPassword = () => {

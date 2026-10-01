@@ -39,14 +39,18 @@ const ClubArt = () => (
   </div>
 );
 
-const stats = [
-  { value: "12k+", label: "Happy families", color: "text-coral-500" },
-  { value: "500+", label: "Styles in store", color: "text-sage-600" },
-  { value: "4.9", label: "Average rating", color: "text-peach-600" },
-  { value: "48h", label: "Fast delivery", color: "text-mint-600" },
+const compact = (n) =>
+  n >= 1000 ? `${Math.floor(n / 100) / 10}k+` : `${n}`;
+
+/* stats = services/public/stats getPublicStats() (null when it failed) */
+const buildStats = (stats) => [
+  { value: stats ? compact(stats.activeUsers) : "-", label: "Happy families", color: "text-coral-500" },
+  { value: stats ? compact(stats.activeProducts) : "-", label: "Styles in store", color: "text-sage-600" },
+  { value: stats?.averageRating ? String(stats.averageRating) : "-", label: "Average rating", color: "text-peach-600" },
+  { value: stats ? compact(stats.successfulDeals) : "-", label: "Completed orders", color: "text-mint-600" },
 ];
 
-const StatsArt = () => (
+const StatsArt = ({ stats }) => (
   <div className="relative flex h-full min-h-[300px] w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_70%_30%,var(--color-peach-100),var(--color-coral-200))] p-8">
     <div
       aria-hidden="true"
@@ -55,7 +59,7 @@ const StatsArt = () => (
     <div aria-hidden="true" className="absolute -right-10 -top-10 size-44 rounded-full bg-white/50 blur-2xl" />
 
     <div className="relative grid w-full max-w-[340px] grid-cols-2 gap-3 sm:gap-4">
-      {stats.map((s) => (
+      {buildStats(stats).map((s) => (
         <div
           key={s.label}
           className="rounded-2xl bg-white/90 p-4 text-center shadow-card backdrop-blur-sm transition-transform duration-300 hover:-translate-y-1 dark:bg-ink-800/90"
@@ -68,7 +72,7 @@ const StatsArt = () => (
   </div>
 );
 
-const Promote = () => {
+const Promote = ({ stats = null }) => {
   return (
     <div className="page-container">
       <div className="flex w-full flex-col gap-6 sm:gap-8">
@@ -107,17 +111,17 @@ const Promote = () => {
               outfits at affordable prices.
             </div>
             <div className="flex gap-3">
-              <Link href="/about-us" className="btn btn-secondary">
+              <Link href="/about" className="btn btn-secondary">
                 About US
               </Link>
-              <Link href="/category" className="btn btn-secondary">
+              <Link href="/products" className="btn btn-secondary">
                 Store
               </Link>
             </div>
           </div>
 
           <div className="w-full md:w-1/2">
-            <StatsArt />
+            <StatsArt stats={stats} />
           </div>
         </div>
       </div>

@@ -1,10 +1,21 @@
 import Breadcrumb from "@/components/modules/main/breadCrumb";
 import Image from "next/image";
+import connectToDB from "@/configs/db";
+import { getInfo } from "@/services/public/info";
+
+export const metadata = {
+    title: "Terms & Rules | SET KIDS",
+    description: "Shopping rules, delivery and return policy of Set Kids.",
+};
 
 const page = async () => {
+    await connectToDB();
+    // contact line comes from model/info (same service as GET /api/info)
+    const info = await getInfo().catch(() => null);
+
     return (
         <div className="page-container">
-            <Breadcrumb route="rules" title="Rules" />
+            <Breadcrumb route="rules" title="Terms & Rules" />
             <div className="grid grid-cols-1 justify-between gap-8 text-text dark:text-gray-100 md:grid-cols-[40%_1fr]">
                 <Image
                     width={600}
@@ -23,7 +34,12 @@ const page = async () => {
                     </p>
                     <p className="mb-5 text-justify leading-7">Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem, eaque?</p>
                     <p className="mb-5 text-justify leading-7">If You Have Any Questions ,Please Contact Us Using The Information Below :</p>
-                    <p className="mb-5 text-justify leading-7">Contact Phone And Fax : +1(940) 3001175</p>
+                    {info?.phone && (
+                        <p className="mb-2 text-justify leading-7">Phone: {info.phone}</p>
+                    )}
+                    {info?.email && (
+                        <p className="mb-5 text-justify leading-7">Email: {info.email}</p>
+                    )}
                 </div>
             </div>
         </div>

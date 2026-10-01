@@ -1,103 +1,192 @@
-"use client"
-import { useMemo } from 'react'
-import { usePathname, useSearchParams, useRouter } from 'next/navigation'
-import qs from "qs"
+"use client";
 
-const materials = ["Catton", "Leather", "Wool", "Velvet", "Suede", "Linen", "Chashmere", "Polyester"]
-const colors = ["Blue", "Red", "Brown", "Gray", "Black", "Pink", "Metalic", "White", "Green", "Cream", "Camel"]
+import { useEffect, useState, useTransition } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { HiSearch, HiX } from "react-icons/hi";
+import { CURRENCY } from "@/utils/format";
 
-export default function FilterSection({ categories }) {
+/*
+  Every control writes a query param that buildProductFilters (utils/helper) understands:
+  q, category (slug), max, sort, color, material.
+*/
+const MAX_PRICE = 400;
+const MATERIALS = ["Cotton", "Leather", "Wool", "Velvet", "Suede", "Linen", "Cashmere", "Polyester"];
+const COLORS = ["Blue", "Red", "Brown", "Gray", "Black", "Pink", "Metallic", "White", "Green", "Cream", "Camel"];
+const SORTS = [
+    { value: "latest", label: "Latest" },
+    { value: "popularity", label: "Top rated" },
+    { value: "bestSelling", label: "Best selling" },
+    { value: "price", label: "Price: low to high" },
+    { value: "price-desc", label: "Price: high to low" },
+];
+
+// flat list for the <select>: "Kids", "— Boys", "—— T-shirts"
+const flatten = (nodes = [], depth = 0) =>
+    nodes.flatMap((node) => [
+        { slug: node.slug, label: `${"— ".repeat(depth)}${node.title ?? node.name}` },
+        ...flatten(node.children, depth + 1),
+    ]);
+
+const controlClass =
+    "w-full rounded-xl border-2 border-coral-300 bg-white px-4 py-2.5 text-sm text-text outline-none transition-all focus:border-sage-400 dark:bg-ink-800 dark:text-gray-100 sm:text-base";
+
+export default function FilterSection({ categories = [] }) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const [isPending, startTransition] = useTransition();
 
-    const currentPage = Number(searchParams.get("page")) || 1;
-    const currentFilters = useMemo(() => ({
-        category: searchParams.get("category") || "",
-        min: searchParams.get("min") || "",
-        max: searchParams.get("max") || "",
-        color: searchParams.get("color") || "",
-        material: searchParams.get("material") || "",
-        sort: searchParams.get("sort") || "",
-        page: currentPage,
-        limit: searchParams.get("limit") || 6,
-        value: searchParams.get("value") || ""
-    }), [searchParams, currentPage]);
+    const get = (key) => searchParams.get(key) ?? "";
 
-    const handleFilterChange = (newFilterParams) => {
-        const updatedFilters = { ...currentFilters, ...newFilterParams, page: 1 };
-        const cleanParams = Object.fromEntries(
-            Object.entries(updatedFilters)
-                .filter(([_, v]) => v !== "" && v !== null && v !== undefined && v !== "-1")
-        );
-        const queryString = qs.stringify(cleanParams, { encode: false });
-        router.push(`${pathname}?${queryString}`, { scroll: true });
+    const [search, setSearch] = useState(get("q"));
+    const [maxPrice, setMaxPrice] = useState(get("max") || String(MAX_PRICE));
+
+    // keep inputs in sync with back / forward navigation
+    useEffect(() => {
+        setSearch(searchParams.get("q") ?? "");
+        setMaxPrice(searchParams.get("max") || String(MAX_PRICE));
+    }, [searchParams]);
+
+    const update = (changes) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("cursor"); // a new filter starts from the first page
+        params.delete("value"); // old ?value= links are replaced by ?sort=
+
+        for (const [key, value] of Object.entries(changes)) {
+            if (value) params.set(key, value);
+            else params.delete(key);
+        }
+
+        const qs = params.toString();
+        startTransition(() => {
+            router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+        });
     };
 
-    const handleSelectChange = (e) => {
-        const { name, value } = e.target;
-        handleFilterChange({ [name]: value === "-1" ? "" : value });
-    };
-
-    const boxClass = "group relative w-full cursor-pointer rounded-xl bg-sage-400 px-2";
-    const titleClass = "flex w-full items-center justify-center rounded-xl border-2 border-coral-300 bg-white dark:bg-ink-800 px-4 py-3 text-sm text-text dark:text-gray-100 outline-none transition-all duration-300 sm:text-base";
-    const listClass = "invisible absolute left-0 top-full z-[999] mt-1.5 flex w-full flex-col rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-ink-800 py-2 text-text dark:text-gray-100 opacity-0 shadow-float transition-all duration-300 group-hover:visible group-hover:opacity-100";
+    const options = flatten(categories);
+    const hasFilters = ["q", "category", "max", "sort", "color", "material", "value"].some(
+        (key) => searchParams.get(key)
+    );
 
     return (
-        <div className="mb-8 grid grid-cols-1 gap-3 rounded-2xl bg-mint-200 p-4 shadow-card sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-            <div className={boxClass}>
-                <span className={titleClass}>Price: ${currentFilters?.max || 400}</span>
-                <ul className={listClass}>
-                    <div className="flex items-center gap-2.5 p-2">
-                        <span>0</span>
-                        <input name="max" onChange={handleSelectChange} type="range" min="0" max="400" value={currentFilters?.max || 400} className="w-full" />
-                        <span>$400</span>
-                    </div>
-                </ul>
-            </div>
+        <div
+            className={`mb-8 rounded-2xl bg-mint-200 p-4 shadow-card transition-opacity dark:bg-ink-800/60 ${isPending ? "opacity-70" : ""}`}
+            aria-busy={isPending}
+        >
+            <form
+                role="search"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    update({ q: search.trim() });
+                }}
+                className="mb-3 flex gap-2"
+            >
+                <div className="relative flex-1">
+                    <HiSearch className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-gray-400" />
+                    <input
+                        type="search"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Search products..."
+                        aria-label="Search products"
+                        maxLength={100}
+                        className={`${controlClass} pl-10`}
+                    />
+                </div>
+                <button type="submit" className="btn btn-secondary px-6" disabled={isPending}>
+                    Search
+                </button>
+            </form>
 
-            <div className={boxClass}>
-                <select name="sort" className={titleClass} onChange={handleSelectChange}>
-                    <option value="-1">Sorting</option>
-                    <option value="popularity">sort by popularity</option>
-                    <option value="latest">sort by Latest</option>
-                    <option value="price">sort by Price</option>
-                </select>
-            </div>
-
-            <div className={boxClass}>
-                <span className={titleClass}>Category</span>
-                <ul className={listClass}>
-                    {categories.map((item, index) => (
-                        !item.parentId &&
-                        <button
-                            key={index}
-                            onClick={() => handleFilterChange({ category: item.name })}
-                            className="cursor-pointer border-0 bg-transparent p-2 text-left text-sm text-text dark:text-gray-100 transition-all hover:!bg-blue-600 hover:text-white sm:text-base"
-                        >
-                            {item.name}
-                        </button>
-                    ))}
-                </ul>
-            </div>
-
-            <div className={boxClass}>
-                <select name="material" onChange={handleSelectChange} className={titleClass}>
-                    <option value="-1">Material</option>
-                    {materials.map((item, index) => (
-                        <option key={index} value={item}>{item}</option>
-                    ))}
-                </select>
-            </div>
-
-            <div className={boxClass}>
-                <select name="color" className={titleClass} onChange={handleSelectChange}>
-                    <option value="-1">Color</option>
-                    {colors.map((item, index) => (
-                        <option key={index} value={item}>{item}</option>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                <select
+                    aria-label="Category"
+                    value={get("category")}
+                    onChange={(e) => update({ category: e.target.value })}
+                    className={controlClass}
+                >
+                    <option value="">All categories</option>
+                    {options.map((option) => (
+                        <option key={option.slug} value={option.slug}>
+                            {option.label}
+                        </option>
                     ))}
                 </select>
+
+                <select
+                    aria-label="Sort"
+                    value={get("sort") || (get("value") === "bestSelling" ? "bestSelling" : "")}
+                    onChange={(e) => update({ sort: e.target.value })}
+                    className={controlClass}
+                >
+                    <option value="">Sort: newest</option>
+                    {SORTS.map((sort) => (
+                        <option key={sort.value} value={sort.value}>
+                            {sort.label}
+                        </option>
+                    ))}
+                </select>
+
+                <select
+                    aria-label="Color"
+                    value={get("color")}
+                    onChange={(e) => update({ color: e.target.value })}
+                    className={controlClass}
+                >
+                    <option value="">Any color</option>
+                    {COLORS.map((color) => (
+                        <option key={color} value={color}>
+                            {color}
+                        </option>
+                    ))}
+                </select>
+
+                <select
+                    aria-label="Material"
+                    value={get("material")}
+                    onChange={(e) => update({ material: e.target.value })}
+                    className={controlClass}
+                >
+                    <option value="">Any material</option>
+                    {MATERIALS.map((material) => (
+                        <option key={material} value={material}>
+                            {material}
+                        </option>
+                    ))}
+                </select>
+
+                <label className={`${controlClass} flex flex-col gap-1`}>
+                    <span className="text-xs text-gray-600 dark:text-gray-300">
+                        Max price: {maxPrice} {CURRENCY}
+                    </span>
+                    <input
+                        type="range"
+                        min="0"
+                        max={MAX_PRICE}
+                        step="5"
+                        value={maxPrice}
+                        onChange={(e) => setMaxPrice(e.target.value)}
+                        // only hit the server when the user lets go of the slider
+                        onPointerUp={() => update({ max: maxPrice === String(MAX_PRICE) ? "" : maxPrice })}
+                        onKeyUp={() => update({ max: maxPrice === String(MAX_PRICE) ? "" : maxPrice })}
+                        className="w-full accent-coral-300"
+                    />
+                </label>
             </div>
+
+            {hasFilters && (
+                <button
+                    type="button"
+                    onClick={() => {
+                        setSearch("");
+                        startTransition(() => router.push(pathname, { scroll: false }));
+                    }}
+                    className="mt-3 inline-flex items-center gap-1 text-sm text-gray-700 hover:text-coral-400 dark:text-gray-300"
+                >
+                    <HiX className="size-4" />
+                    Clear filters
+                </button>
+            )}
         </div>
-    )
+    );
 }

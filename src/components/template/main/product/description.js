@@ -1,12 +1,13 @@
-import React from "react";
+const Description = ({ description }) => {
+  if (!description) {
+    return (
+      <p className="text-gray-500 dark:text-gray-400">No description available.</p>
+    );
+  }
 
-const Description = ({description}) => {
   return (
-    <div>
-      <p>Explanation :</p>
-      <p>
+    <div className="max-w-prose whitespace-pre-line leading-7 text-gray-700 dark:text-gray-300">
       {description}
-      </p>
     </div>
   );
 };

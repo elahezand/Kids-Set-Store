@@ -1,33 +1,19 @@
 import Breadcrumb from "@/components/modules/main/breadCrumb";
 
-export async function generateMetadata() {
-    return {
-        title: "About Us - Your Company Name",
-        description: "Learn more about our story, mission, and values. We are dedicated to delivering high-quality products with a focus on customer satisfaction.",
-        openGraph: {
-            title: "About Us - Your Company Name",
-            description: "Learn more about our story, mission, and values.",
-            url: "https://yourdomain.com/about",
-            siteName: "Your Company Name",
-            images: [
-                { url: "https://yourdomain.com/images/about-og-image.jpg", width: 1200, height: 630, alt: "About Us" },
-            ],
-            locale: "en_US",
-            type: "website",
-        },
-        twitter: {
-            card: "summary_large_image",
-            title: "About Us - Your Company Name",
-            description: "Learn more about our story, mission, and values.",
-            images: ["https://yourdomain.com/images/about-og-image.jpg"],
-        },
-    };
-}
+export const metadata = {
+    title: "About Us | SET KIDS",
+    description: "Our story, mission and values.",
+    openGraph: {
+        title: "About Us | SET KIDS",
+        description: "Our story, mission and values.",
+        type: "website",
+    },
+};
 
 const page = async () => {
     return (
         <div className="page-container text-text dark:text-gray-100">
-            <Breadcrumb route="about" title="About US." />
+            <Breadcrumb route="about" title="About Us" />
             <div>
                 <div>
                     <span className="text-sm font-semibold text-coral-400">About Us</span>

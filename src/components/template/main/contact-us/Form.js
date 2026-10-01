@@ -41,12 +41,13 @@ const Form = () => {
       name: "",
       email: "",
       phone: "",
-      company: "",
       body: "",
     },
   });
 
+  // POST /api/contacts -> services/public/contact createContact (model/contact)
   const { mutate: sendMessage, isPending } = usePost("/contacts", {
+    axiosConfig: { skipRefresh: true },
     errorFallback: "Failed to send message",
 
     onSuccess: () => {
@@ -91,23 +92,16 @@ const Form = () => {
         />
       </div>
 
-      <div className="mb-4 flex flex-col gap-4 sm:flex-row">
+      <div className="mb-4">
         <Field
           id="phone"
           label="Phone"
           type="tel"
+          inputMode="numeric"
           autoComplete="tel"
+          placeholder="09xxxxxxxxx"
           error={errors.phone}
           {...formRegister("phone")}
-        />
-
-        <Field
-          id="company"
-          label="Company"
-          type="text"
-          autoComplete="organization"
-          error={errors.company}
-          {...formRegister("company")}
         />
       </div>
 
@@ -116,7 +110,7 @@ const Form = () => {
           as="textarea"
           id="body"
           label="Your Request"
-          rows={3}
+          rows={5}
           error={errors.body}
           {...formRegister("body")}
         />

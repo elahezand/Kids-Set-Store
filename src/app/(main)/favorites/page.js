@@ -1,73 +1,48 @@
-import Breadcrumb from "@/components/modules/main/breadCrumb";
-import { getMe } from "@/utils/auth/authGuard";
-import { paginate } from "@/utils/paginate";
-import FavoriteItems from "@/components/template/main/favorites/favoriteItems";
-
 import { redirect } from "next/navigation";
-import FavoriteModel from "@/model/favorite";
+import Breadcrumb from "@/components/modules/main/breadCrumb";
+import FavoriteItems from "@/components/template/main/favorites/favoriteItems";
+import connectToDB from "@/configs/db";
+import { getMe } from "@/utils/auth/authGuard";
+import favoriteService from "@/services/user/favorite";
+import { toProductCards } from "@/utils/productView";
 
 export const metadata = {
-    title: "Favorites List - SET KIDS",
-    description: "View your favorite products on Blue Tea. Keep track of all items you love and save them for later.",
-    keywords: ["SET KIDS", "Favorites", "Favorite", "Saved Products", "Shopping"],
-    authors: [{ name: "SET KIDS Team" }],
-    openGraph: {
-        title: "Favorites List - SET KIDS",
-        description: "View your favorite products on SET KIDS. Keep track of all items you love and save them for later.",
-        url: "https://yourwebsite.com/favorites",
-        siteName: "SET KIDS",
-        images: [{ url: "https://yourwebsite.com/images/favorites-og.jpg", width: 1200, height: 630, alt: "Favorites List" }],
-        locale: "en_US",
-        type: "website",
-    },
-    twitter: {
-        card: "summary_large_image",
-        title: "Favorites List - SET KIDS",
-        description: "View your favorite products on SET KIDS. Keep track of all items you love and save them for later.",
-        images: ["https://yourwebsite.com/images/favorites-og.jpg"],
-    },
+  title: "My Favorites | SET KIDS",
+  description: "Products you saved for later.",
+  robots: { index: false, follow: false },
 };
 
-const page = async ({ searchParams }) => {
-    const user = await getMe()
-    if (!user) redirect("/login-register")
+const LIMIT = 20;
 
-    const params = await searchParams
-    const result = await paginate(FavoriteModel, {
-        limit: Number(params?.limit) || 20,
-        cursor: params?.cursor || null,
+export default async function FavoritesPage({ searchParams }) {
+  await connectToDB();
 
-        filters: {
-            user: user._id,
-        },
+  const user = await getMe();
+  if (!user) redirect("/login-register");
 
-        populate: {
-            path: "productId",
-        },
-        sort: { _id: -1 },
-    });
+  const params = (await searchParams) || {};
+  const cursor = typeof params.cursor === "string" ? params.cursor : undefined;
 
-    const favorites = (result.data || [])
-        .map((favorite) => favorite.productId)
-        .filter(Boolean)
-        .map((product) => JSON.parse(JSON.stringify(product)));
+  // same service as GET /api/user/favorites
+  const result = await favoriteService.getUserFavorites(user._id, {
+    limit: LIMIT,
+    cursor,
+  });
 
-    const queryString = new URLSearchParams(
-        Object.entries(params || {}).filter(([key, value]) => key !== "cursor" && typeof value === "string")
-    ).toString();
+  // a favorite whose product was deleted has productId = null after populate
+  const products = (result.data ?? [])
+    .map((favorite) => favorite.productId)
+    .filter((product) => product && product.status === "active");
 
-    return (
-        <div className="page-container">
-            <Breadcrumb route="Favorites" title="Favorites List" />
-            <FavoriteItems
-                key={queryString}
-                initialFavorites={favorites}
-                initialCursor={result.pagination?.nextCursor || null}
-                initialHasMore={result.pagination?.hasMore || false}
-                limit={Number(params?.limit) || 20}
-            />
-        </div>
-    );
-};
-
-export default page;
+  return (
+    <div className="page-container">
+      <Breadcrumb route="favorites" title="Favorites" />
+      <FavoriteItems
+        initialFavorites={toProductCards(products)}
+        initialCursor={result.pagination?.nextCursor || null}
+        initialHasMore={result.pagination?.hasMore || false}
+        limit={LIMIT}
+      />
+    </div>
+  );
+}
