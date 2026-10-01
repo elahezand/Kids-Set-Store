@@ -1,26 +1,39 @@
-import Notification from "@/model/notification";
-import logger from "@/utils/logger";
 
-const notifyUser = async (
-    userId,
-    msg,
-    { type = "manual", link = null } = {}
-) => {
-    if (!userId) return;
+const logger = require("@/utils/logger");
+
+// required lazily: model/notification -> ... -> model/order -> utils/notify would be circular
+const getNotificationModel = () => require("@/model/notification");
+
+/** Where a user sees a notification in the main site / panel */
+const LINKS = Object.freeze({
+    userOrders: "/p-user/orders",
+    userTickets: "/p-user/tickets",
+    adminOrders: "/p-admin",
+});
+
+const notifyUser = async (userId, msg, { type = "manual", link = null } = {}) => {
+    if (!userId || !msg) return null;
 
     try {
-        await Notification.create({
-            user: userId,
-            msg,
-            type,
-            link,
-        });
+        const Notification = getNotificationModel();
+        return await Notification.create({ user: userId, msg, type, link });
     } catch (error) {
-        logger.error(
-            "Failed to create notification:",
-            error
-        );
+        logger.error("[notify] failed to create notification:", error);
+        return null;
     }
 };
 
-export default notifyUser;
+/** Same message to several users (e.g. every admin) */
+const notifyUsers = async (userIds = [], msg, options) =>
+    Promise.all([...new Set(userIds.map(String))].map((id) => notifyUser(id, msg, options)));
+
+/** "Your order #A1B2C3 status changed to shipped" */
+const orderStatusMessage = (orderId, status) =>
+    `Your order #${String(orderId).slice(-6).toUpperCase()} status changed to ${status}`;
+
+module.exports = notifyUser;
+module.exports.default = notifyUser;
+module.exports.notifyUser = notifyUser;
+module.exports.notifyUsers = notifyUsers;
+module.exports.orderStatusMessage = orderStatusMessage;
+module.exports.NOTIFY_LINKS = LINKS;

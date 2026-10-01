@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema, Types } = mongoose;
-const notifyUser = require("@/utils/notify");
-
+const { notifyUser, orderStatusMessage, NOTIFY_LINKS } = require("@/utils/notify");
 /*  Order item   */
 const orderItemSchema = new Schema({
   productId: { type: Types.ObjectId, ref: "Product", required: true },
@@ -115,52 +114,45 @@ orderSchema.index(
   { unique: true, partialFilterExpression: { idempotencyKey: { $type: "string" } } }
 );
 orderSchema.index({ "payment.authority": 1 });
+/* ---------- status change -> notification (utils/notify never throws) ---------- */
+
+const notifyStatus = (userId, orderId, status) =>
+  notifyUser(userId, orderStatusMessage(orderId, status), {
+    type: "order_status",
+    link: NOTIFY_LINKS.userOrders,
+  });
+
 orderSchema.pre("save", function () {
   this._statusChanged = this.isModified("status");
 });
+
 orderSchema.post("save", async function (doc) {
-  if (!doc._statusChanged) return;
-  const shortId = String(doc._id).slice(-6).toUpperCase();
-  await notifyUser(
-    doc.user,
-    `Your order #${shortId} status changed to ${doc.status}`,
-    { type: "order_status", link: `/dashboard/orders/${doc._id}` }
-  );
+  if (doc._statusChanged) await notifyStatus(doc.user, doc._id, doc.status);
 });
 
-orderSchema.pre("findOneAndUpdate", async function () {
+async function rememberPrevStatus() {
   const doc = await this.model.findOne(this.getQuery()).select("status").lean();
   this._prevStatus = doc?.status;
-});
+}
+
+const newStatusOf = (query) => {
+  const update = query.getUpdate() || {};
+  return update.status ?? update.$set?.status;
+};
+
+orderSchema.pre("findOneAndUpdate", rememberPrevStatus);
 orderSchema.post("findOneAndUpdate", async function (doc) {
-  if (!doc) return;
-  const update = this.getUpdate() || {};
-  const newStatus = update.status ?? update.$set?.status;
-  if (!newStatus || newStatus === this._prevStatus) return;
-  const shortId = String(doc._id).slice(-6).toUpperCase();
-  await notifyUser(
-    doc.user,
-    `Your order #${shortId} status changed to ${newStatus}`,
-    { type: "order_status", link: `/dashboard/orders/${doc._id}` }
-  );
+  const newStatus = newStatusOf(this);
+  if (!doc || !newStatus || newStatus === this._prevStatus) return;
+  await notifyStatus(doc.user, doc._id, newStatus);
 });
 
-orderSchema.pre("updateOne", async function () {
-  const doc = await this.model.findOne(this.getQuery()).select("status").lean();
-  this._prevStatus = doc?.status;
-});
+orderSchema.pre("updateOne", rememberPrevStatus);
 orderSchema.post("updateOne", async function () {
-  const doc = await this.model.findOne(this.getQuery());
-  if (!doc) return;
-  const update = this.getUpdate() || {};
-  const newStatus = update.status ?? update.$set?.status;
+  const newStatus = newStatusOf(this);
   if (!newStatus || newStatus === this._prevStatus) return;
-  const shortId = String(doc._id).slice(-6).toUpperCase();
-  await notifyUser(
-    doc.user,
-    `Your order #${shortId} status changed to ${newStatus}`,
-    { type: "order_status", link: `/dashboard/orders/${doc._id}` }
-  );
+  const doc = await this.model.findOne(this.getQuery()).select("user").lean();
+  if (doc) await notifyStatus(doc.user, doc._id, newStatus);
 });
 
 const Order = mongoose.models.Order || mongoose.model("Order", orderSchema);
