@@ -1,10 +1,6 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import contactService from "@/services/public/contact";
-import {
-    handleRouteError,
-    validationError,
-} from "@/utils/apiResponse";
+import contactService from "@/services/server/public/contact";
+import { handleRouteError, validationError, respond } from "@/utils/apiResponse";
 import validate from "@/utils/validate";
 import { contactSchema } from "@/validators/contact";
 
@@ -24,7 +20,7 @@ export async function POST(request) {
             result.data
         );
 
-        return NextResponse.json(
+        return respond(
             {
                 success: true,
                 message: "Contact submitted successfully",

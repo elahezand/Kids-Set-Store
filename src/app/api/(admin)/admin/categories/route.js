@@ -1,14 +1,9 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 import { createCategorySchema } from "@/validators/category";
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
-import categoryService from "@/services/admin/category";
-import {
-    validationError,
-    jsonError,
-    handleRouteError,
-} from "@/utils/apiResponse";
+import categoryService from "@/services/server/admin/category";
+import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
 export async function POST(req) {
     try {
@@ -57,7 +52,7 @@ export async function POST(req) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 message:
                     "Category created successfully",

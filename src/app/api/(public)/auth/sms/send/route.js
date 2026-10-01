@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { respond } from "@/utils/apiResponse";
 import connectToDB from "@/configs/db";
 import Ban from "@/model/ban";
 import axios from "axios";
@@ -48,7 +48,7 @@ export async function POST(req) {
         const { phone } = await req.json();
 
         if (!phone || typeof phone !== "string") {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: "Phone is required",
@@ -60,7 +60,7 @@ export async function POST(req) {
         const isBanned = await Ban.findOne({ phone });
 
         if (isBanned) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: "User Is Banned",
@@ -75,7 +75,7 @@ export async function POST(req) {
         } = await getOtpDetails(phone);
 
         if (!expired) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: `Try again after ${remainingTime}`,
@@ -95,7 +95,7 @@ export async function POST(req) {
         );
 
         if (attempts >= MAX_OTP_ATTEMPTS) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message:
@@ -144,7 +144,7 @@ export async function POST(req) {
                 err.message
             );
 
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: "SMS service failed",
@@ -168,7 +168,7 @@ export async function POST(req) {
 
         await redisClient.del(attemptsKey);
 
-        return NextResponse.json(
+        return respond(
             {
                 success: true,
                 message: "OTP sent successfully",
@@ -185,7 +185,7 @@ export async function POST(req) {
     } catch (err) {
         console.error("OTP error:", err);
 
-        return NextResponse.json(
+        return respond(
             {
                 success: false,
                 message: "Server Error",

@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import orderService from "@/services/user/order";
+import orderService from "@/services/server/user/order";
 import { authUser } from "@/utils/auth/authGuard";
-import { handleRouteError, jsonError } from "@/utils/apiResponse";
+import { handleRouteError, jsonError, respond , validationError } from "@/utils/apiResponse";
+import validate from "@/utils/validate";
+import { checkoutSchema } from "@/validators/order";
 
 export async function GET(request) {
     try {
@@ -22,7 +23,7 @@ export async function GET(request) {
             query
         );
 
-        return NextResponse.json({
+        return respond({
             success: true,
             ...result,
         });
@@ -41,14 +42,21 @@ export async function POST(request) {
             return jsonError("Unauthorized", 401);
         }
 
-        const body = await request.json();
+        const body = await request.json().catch(() => ({}));
+        const parsed = validate(checkoutSchema, body);
+
+        if (!parsed.success) {
+            return validationError(parsed.errors);
+        }
+
+        const { shippingAddress, paymentMethod, idempotencyKey, useWallet } = parsed.data;
 
         const result = await orderService.checkout(
             user._id,
-            body.shippingAddress,
-            body.paymentMethod,
-            body.idempotencyKey || null,
-            body.useWallet || false
+            shippingAddress,
+            paymentMethod,
+            idempotencyKey || null,
+            useWallet || false
         );
 
         if (!result.success) {
@@ -59,7 +67,7 @@ export async function POST(request) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 success: true,
                 data: result.data,

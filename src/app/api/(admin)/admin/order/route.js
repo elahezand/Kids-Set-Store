@@ -1,16 +1,11 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
 
-import orderService from "@/services/admin/order";
+import orderService from "@/services/server/admin/order";
 
-import {
-    handleRouteError,
-    jsonError,
-    validationError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, validationError, respond } from "@/utils/apiResponse";
 
 import { adminOrdersQuerySchema } from "@/validators/order";
 
@@ -40,7 +35,7 @@ export async function GET(request) {
             result.data
         );
 
-        return NextResponse.json({
+        return respond({
             data: data.data,
             pagination: data.pagination,
         });

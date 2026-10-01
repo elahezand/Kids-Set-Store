@@ -1,8 +1,7 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import commentService from "@/services/user/comment";
+import commentService from "@/services/server/user/comment";
 import { authUser } from "@/utils/auth/authGuard";
-import { handleRouteError, jsonError, validationError } from "@/utils/apiResponse";
+import { handleRouteError, jsonError, validationError, respond } from "@/utils/apiResponse";
 import validate from "@/utils/validate";
 import { createCommentSchema } from "@/validators/comment";
 
@@ -36,7 +35,7 @@ export async function POST(request) {
             return jsonError(result.message, result.status);
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 success: true,
                 data: result.data,

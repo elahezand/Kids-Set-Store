@@ -1,12 +1,8 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import ticketService from "@/services/shared/ticket";
+import ticketService from "@/services/server/shared/ticket";
 import { authUser } from "@/utils/auth/authGuard";
 import validateObjectId from "@/utils/validateObjectId";
-import {
-    handleRouteError,
-    jsonError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function POST(request, { params }) {
     try {
@@ -43,7 +39,7 @@ export async function POST(request, { params }) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 message: "answer send successfully",
                 answer: result.data,

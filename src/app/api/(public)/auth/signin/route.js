@@ -1,8 +1,8 @@
 import UserModel from "@/model/user";
+import { respond } from "@/utils/apiResponse";
 import connectToDB from "@/configs/db";
 import { verifyPassword } from "@/utils/auth";
-import { createSession } from "@/services/shared/session";
-import { NextResponse } from "next/server";
+import { createSession } from "@/services/server/shared/session";
 import authSchema from "@/validators/auth";
 import validate from "@/utils/validate";
 import authCookies from "@/utils/auth/cookies";
@@ -16,7 +16,7 @@ export async function POST(req) {
         const result = validate(authSchema, body);
 
         if (!result.success) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: "Invalid data",
@@ -41,7 +41,7 @@ export async function POST(req) {
         }).select("+password");
 
         if (!user) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: "User not found",
@@ -52,7 +52,7 @@ export async function POST(req) {
 
         // accounts created with OTP have no password yet
         if (!user.password) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: "This account has no password. Log in with a one-time code.",
@@ -67,7 +67,7 @@ export async function POST(req) {
         );
 
         if (!isValid) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: "Invalid password",
@@ -81,7 +81,7 @@ export async function POST(req) {
             refreshToken,
         } = await createSession(user, req);
 
-        const response = NextResponse.json(
+        const response = respond(
             {
                 success: true,
                 message: "Logged in successfully",
@@ -119,7 +119,7 @@ export async function POST(req) {
     } catch (err) {
         console.error("Login Error:", err);
 
-        return NextResponse.json(
+        return respond(
             {
                 success: false,
                 message: "Server error",

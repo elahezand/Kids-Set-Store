@@ -1,11 +1,7 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import cartService from "@/services/user/cart";
+import cartService from "@/services/server/user/cart";
 import { authUser } from "@/utils/auth/authGuard";
-import {
-    handleRouteError,
-    jsonError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function DELETE(request, { params }) {
     try {
@@ -31,7 +27,7 @@ export async function DELETE(request, { params }) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data: result.data,
         });

@@ -1,17 +1,12 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 
 import { authAdmin } from "@/utils/auth/authGuard";
 import validateObjectId from "@/utils/validateObjectId";
 import validate from "@/utils/validate";
 
-import productService from "@/services/admin/product";
+import productService from "@/services/server/admin/product";
 
-import {
-    handleRouteError,
-    jsonError,
-    validationError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, validationError, respond } from "@/utils/apiResponse";
 
 import { updateProductSchema } from "@/validators/product";
 
@@ -41,7 +36,7 @@ export async function GET(request, { params }) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             data: result.data,
         });
     } catch (error) {
@@ -89,7 +84,7 @@ export async function PUT(request, { params }) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             message: "Product updated successfully",
             data: serviceResult.data,
         });
@@ -124,7 +119,7 @@ export async function DELETE(request, { params }) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             message: "Product deleted successfully",
         });
     } catch (error) {
@@ -171,7 +166,7 @@ export async function PATCH(request, { params }) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             message: "Product status updated successfully",
             data: serviceResult.data,
         });

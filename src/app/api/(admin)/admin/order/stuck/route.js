@@ -1,14 +1,10 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 
 import { authAdmin } from "@/utils/auth/authGuard";
 
-import orderService from "@/services/admin/order";
+import orderService from "@/services/server/admin/order";
 
-import {
-    handleRouteError,
-    jsonError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function GET(request) {
     try {
@@ -23,7 +19,7 @@ export async function GET(request) {
         const data =
             await orderService.getStuckOrders();
 
-        return NextResponse.json({
+        return respond({
             data: data.data,
             pagination: data.pagination,
         });

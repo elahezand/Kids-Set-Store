@@ -1,16 +1,11 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
 
-import articleService from "@/services/admin/article";
+import articleService from "@/services/server/admin/article";
 
-import {
-    handleRouteError,
-    jsonError,
-    validationError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, validationError, respond } from "@/utils/apiResponse";
 
 import {
     adminArticlesQuerySchema,
@@ -40,7 +35,7 @@ export async function GET(request) {
             result.data
         );
 
-        return NextResponse.json({
+        return respond({
             data: data.data,
             pagination: data.pagination,
         });
@@ -78,7 +73,7 @@ export async function POST(request) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 message: "Article created successfully",
                 data: serviceResult.data,

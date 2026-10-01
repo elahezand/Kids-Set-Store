@@ -1,16 +1,11 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
 
-import notificationService from "@/services/admin/notification";
+import notificationService from "@/services/server/admin/notification";
 
-import {
-    handleRouteError,
-    jsonError,
-    validationError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, validationError, respond } from "@/utils/apiResponse";
 
 import { createNotificationSchema } from "@/validators/notification";
 
@@ -45,7 +40,7 @@ export async function POST(request) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 message: "Notification created successfully",
                 data: serviceResult.data,

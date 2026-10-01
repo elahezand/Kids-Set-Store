@@ -1,15 +1,11 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 
 import { authAdmin } from "@/utils/auth/authGuard";
 import validateObjectId from "@/utils/validateObjectId";
 
-import cartService from "@/services/admin/cart";
+import cartService from "@/services/server/admin/cart";
 
-import {
-    handleRouteError,
-    jsonError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function GET(request, { params }) {
     try {
@@ -36,7 +32,7 @@ export async function GET(request, { params }) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             data: result.data,
         });
     } catch (error) {
@@ -69,7 +65,7 @@ export async function DELETE(request, { params }) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             message: "Cart deleted successfully",
         });
     } catch (error) {

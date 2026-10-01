@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { respond } from "@/utils/apiResponse";
 import User from "@/model/user";
 import { compare } from "bcryptjs";
 import redisClient from "@/configs/redis";
 import connectToDB from "@/configs/db";
-import sessionService from "@/services/shared/session";
+import sessionService from "@/services/server/shared/session";
 import authCookies from "@/utils/auth/cookies";
 
 const OTP_TTL_SECONDS = 60;
@@ -20,7 +20,7 @@ export async function POST(req) {
         const { phone, code } = await req.json();
 
         if (!phone || !code) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: "Phone and code are required",
@@ -34,7 +34,7 @@ export async function POST(req) {
         );
 
         if (!savedOtp) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: "OTP expired",
@@ -57,7 +57,7 @@ export async function POST(req) {
         if (attempts > MAX_OTP_ATTEMPTS) {
             await redisClient.del(getOtpKey(phone));
 
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message:
@@ -73,7 +73,7 @@ export async function POST(req) {
         );
 
         if (!isValid) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: "Invalid OTP",
@@ -91,7 +91,7 @@ export async function POST(req) {
         );
 
         if (!deleted) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: "OTP expired",
@@ -118,7 +118,7 @@ export async function POST(req) {
             req
         );
 
-        const response = NextResponse.json(
+        const response = respond(
             {
                 success: true,
                 message: "Login successful",
@@ -142,7 +142,7 @@ export async function POST(req) {
             err
         );
 
-        return NextResponse.json(
+        return respond(
             {
                 success: false,
                 message: "Server Error",

@@ -1,10 +1,6 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import categoryService from "@/services/public/category";
-import {
-    handleRouteError,
-    jsonError,
-} from "@/utils/apiResponse";
+import categoryService from "@/services/server/public/category";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function GET(request, { params }) {
     try {
@@ -18,7 +14,7 @@ export async function GET(request, { params }) {
             return jsonError("Category not found", 404);
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data,
         });

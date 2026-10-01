@@ -1,9 +1,8 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 import { authAdmin } from "@/utils/auth/authGuard";
 import validateObjectId from "@/utils/validateObjectId";
-import userService from "@/services/admin/user";
-import { handleRouteError, jsonError } from "@/utils/apiResponse";
+import userService from "@/services/server/admin/user";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function DELETE(request, { params }) {
     try {
@@ -24,7 +23,7 @@ export async function DELETE(request, { params }) {
             return jsonError(result.message, result.status);
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             message: "User removed successfully",
         });

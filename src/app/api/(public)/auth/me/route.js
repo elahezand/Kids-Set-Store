@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { respond } from "@/utils/apiResponse";
 
 export async function GET(req) {
     try {
         const user = await req.user;
-        return NextResponse.json(
+        return respond(
             {
                 success: true,
                 data: {
@@ -15,7 +15,7 @@ export async function GET(req) {
     } catch (err) {
         console.error("Get Me Error:", err);
 
-        return NextResponse.json(
+        return respond(
             {
                 success: false,
                 message: "Server Error",

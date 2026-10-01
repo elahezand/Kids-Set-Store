@@ -43,3 +43,28 @@ export const adminShipItemSchema = z.object({
 export const deliveryEstimateSchema = z.object({
   estimatedDeliveryAt: z.coerce.date({ message: "Estimated delivery date is required" }),
 });
+
+/* ---------- checkout (main site cart page + POST /api/user/order) ---------- */
+
+export const shippingAddressSchema = z.object({
+  name: z.string().trim().min(2, "Full name is required").max(80),
+  phone: z.string().trim().regex(/^09\d{9}$/, "Enter a valid phone number (09xxxxxxxxx)"),
+  state: z.string().trim().min(2, "State is required").max(60),
+  city: z.string().trim().min(2, "City is required").max(60),
+  address: z.string().trim().min(5, "Address is required").max(300),
+  postalCode: z.string().trim().regex(/^\d{5,10}$/, "Postal code must be 5-10 digits"),
+});
+
+/* the form on /cart */
+export const checkoutFormSchema = shippingAddressSchema.extend({
+  paymentMethod: z.enum(["zarinpal", "cash"]),
+  useWallet: z.boolean().optional(),
+});
+
+/* POST /api/user/order body */
+export const checkoutSchema = z.object({
+  shippingAddress: shippingAddressSchema,
+  paymentMethod: z.enum(["zarinpal", "cash", "wallet"]),
+  idempotencyKey: z.string().trim().min(8).max(100).optional(),
+  useWallet: z.boolean().optional(),
+});

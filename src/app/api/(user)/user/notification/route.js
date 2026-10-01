@@ -1,29 +1,22 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import notificationService from "@/services/user/notification";
+import notificationService from "@/services/server/user/notification";
 import { authUser } from "@/utils/auth/authGuard";
-import { handleRouteError, jsonError } from "@/utils/apiResponse";
+import { handleRouteError, jsonError, paginated } from "@/utils/apiResponse";
 
-export async function GET() {
+/* GET /api/user/notification?limit=&cursor=  -> paginated envelope */
+export async function GET(request) {
     try {
         await connectToDB();
 
         const user = await authUser();
+        if (!user) return jsonError("Unauthorized", 401);
 
-        if (!user) {
-            return jsonError("Unauthorized", 401);
-        }
+        const query = Object.fromEntries(new URL(request.url).searchParams.entries());
+        const result = await notificationService.getAll(user._id, query);
 
-        const result = await notificationService.getAll(user._id);
+        if (!result.success) return jsonError(result.message, result.status);
 
-        if (!result.success) {
-            return jsonError(result.message, result.status);
-        }
-
-        return NextResponse.json({
-            success: true,
-            data: result.data,
-        });
+        return paginated(result);
     } catch (error) {
         return handleRouteError(error);
     }

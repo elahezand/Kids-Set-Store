@@ -1,11 +1,7 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import productService from "@/services/public/product";
+import productService from "@/services/server/public/product";
 import validate from "@/utils/validate";
-import {
-    handleRouteError,
-    validationError,
-} from "@/utils/apiResponse";
+import { handleRouteError, validationError, respond } from "@/utils/apiResponse";
 import { smartSearchSchema } from "@/validators/product";
 
 export async function POST(request) {
@@ -27,7 +23,7 @@ export async function POST(request) {
             await productService.smartSearch(result.data);
 
         if (!serviceResult.success) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: serviceResult.message,
@@ -36,7 +32,7 @@ export async function POST(request) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data: serviceResult.data,
             reason: serviceResult.reason,

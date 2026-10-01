@@ -1,11 +1,7 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import ticketService from "@/services/user/ticket";
+import ticketService from "@/services/server/user/ticket";
 import { authUser } from "@/utils/auth/authGuard";
-import {
-    handleRouteError,
-    jsonError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function GET(request) {
     try {
@@ -28,7 +24,7 @@ export async function GET(request) {
             query
         );
 
-        return NextResponse.json({
+        return respond({
             success: true,
             ...result,
         });

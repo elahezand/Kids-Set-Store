@@ -1,17 +1,12 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 
 import { authAdmin } from "@/utils/auth/authGuard";
 import validateObjectId from "@/utils/validateObjectId";
 import validate from "@/utils/validate";
 
-import articleService from "@/services/admin/article";
+import articleService from "@/services/server/admin/article";
 
-import {
-    handleRouteError,
-    jsonError,
-    validationError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, validationError, respond } from "@/utils/apiResponse";
 
 import { updateArticleSchema } from "@/validators/article";
 
@@ -51,7 +46,7 @@ export async function GET(request, { params }) {
             return jsonError(result.message, result.status);
         }
 
-        return NextResponse.json({
+        return respond({
             data: result.data,
         });
     } catch (error) {
@@ -91,7 +86,7 @@ export async function PUT(request, { params }) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             message: "Article updated successfully",
             data: serviceResult.data,
         });
@@ -118,7 +113,7 @@ export async function DELETE(request, { params }) {
             return jsonError(result.message, result.status);
         }
 
-        return NextResponse.json({
+        return respond({
             message: "Article deleted successfully",
         });
     } catch (error) {

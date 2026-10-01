@@ -1,8 +1,7 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import walletService from "@/services/user/wallet";
+import walletService from "@/services/server/user/wallet";
 import { authUser } from "@/utils/auth/authGuard";
-import { handleRouteError, jsonError } from "@/utils/apiResponse";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function GET(request) {
     try {
@@ -27,7 +26,7 @@ export async function GET(request) {
             return jsonError(result.message, result.status);
         }
 
-        return NextResponse.json(result);
+        return respond(result);
     } catch (error) {
         return handleRouteError(error);
     }

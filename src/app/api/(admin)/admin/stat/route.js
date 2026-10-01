@@ -1,16 +1,11 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
 
-import statsService from "@/services/public/stats";
+import statsService from "@/services/server/public/stats";
 
-import {
-    handleRouteError,
-    jsonError,
-    validationError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, validationError, respond } from "@/utils/apiResponse";
 
 import { statsTimeseriesSchema } from "@/validators/stats";
 
@@ -43,7 +38,7 @@ export async function GET(request) {
                     result.data.days
                 );
 
-            return NextResponse.json({
+            return respond({
                 data: serviceResult.data,
             });
         }
@@ -51,7 +46,7 @@ export async function GET(request) {
         const serviceResult =
             await statsService.getAdminStats();
 
-        return NextResponse.json({
+        return respond({
             data: serviceResult.data,
         });
     } catch (error) {

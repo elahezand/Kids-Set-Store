@@ -1,11 +1,7 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import cartService from "@/services/user/cart";
+import cartService from "@/services/server/user/cart";
 import { authUser } from "@/utils/auth/authGuard";
-import {
-    handleRouteError,
-    jsonError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 // body khali bashe 500 nashe
 const readBody = async (request) => {
@@ -29,7 +25,7 @@ export async function GET() {
             user._id
         );
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data: result,
         });
@@ -63,7 +59,7 @@ export async function POST(request) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data: result.data,
         });
@@ -97,7 +93,7 @@ export async function PATCH(request) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data: result.data,
         });
@@ -144,7 +140,7 @@ export async function DELETE(request) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data: result.data,
         });

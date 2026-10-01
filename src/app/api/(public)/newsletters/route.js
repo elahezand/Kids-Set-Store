@@ -1,12 +1,7 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import newsletterService from "@/services/public/newsletter";
+import newsletterService from "@/services/server/public/newsletter";
 import validate from "@/utils/validate";
-import {
-    handleRouteError,
-    jsonError,
-    validationError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, validationError, respond } from "@/utils/apiResponse";
 import { newsletterSchema } from "@/validators/newsletter";
 
 export async function POST(request) {
@@ -36,7 +31,7 @@ export async function POST(request) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 success: true,
                 message: "Subscribed successfully",

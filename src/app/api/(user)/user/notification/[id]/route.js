@@ -1,9 +1,8 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import notificationService from "@/services/user/notification";
+import notificationService from "@/services/server/user/notification";
 import { authUser } from "@/utils/auth/authGuard";
 import validateObjectId from "@/utils/validateObjectId";
-import { handleRouteError, jsonError } from "@/utils/apiResponse";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function GET(request, { params }) {
     try {
@@ -30,7 +29,7 @@ export async function GET(request, { params }) {
             return jsonError(result.message, result.status);
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data: result.data,
         });
@@ -64,7 +63,7 @@ export async function PATCH(request, { params }) {
             return jsonError(result.message, result.status);
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data: result.data,
         });
@@ -98,7 +97,7 @@ export async function DELETE(request, { params }) {
             return jsonError(result.message, result.status);
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             message: "Notification removed",
         });

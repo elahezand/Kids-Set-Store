@@ -1,17 +1,12 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 
 import { authAdmin } from "@/utils/auth/authGuard";
 import validateObjectId from "@/utils/validateObjectId";
 import validate from "@/utils/validate";
 
-import orderService from "@/services/admin/order";
+import orderService from "@/services/server/admin/order";
 
-import {
-    handleRouteError,
-    jsonError,
-    validationError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, validationError, respond } from "@/utils/apiResponse";
 
 import { updateAdminOrderSchema } from "@/validators/order";
 
@@ -41,7 +36,7 @@ export async function GET(request, { params }) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             data: result.data,
         });
     } catch (error) {
@@ -89,7 +84,7 @@ export async function PUT(request, { params }) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             message: "Order updated successfully",
             data: serviceResult.data,
         });

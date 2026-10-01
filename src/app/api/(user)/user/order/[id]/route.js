@@ -1,9 +1,8 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import orderService from "@/services/user/order";
+import orderService from "@/services/server/user/order";
 import { authUser } from "@/utils/auth/authGuard";
 import validateObjectId from "@/utils/validateObjectId";
-import { handleRouteError, jsonError } from "@/utils/apiResponse";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function GET(request, { params }) {
     try {
@@ -33,7 +32,7 @@ export async function GET(request, { params }) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data: result.data,
         });
@@ -73,7 +72,7 @@ export async function PATCH(request, { params }) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data: result.data,
         });

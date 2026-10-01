@@ -1,15 +1,10 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 import { updateCategorySchema } from "@/validators/category";
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
 import validateObjectId from "@/utils/validateObjectId";
-import categoryService from "@/services/admin/category";
-import {
-  validationError,
-  jsonError,
-  handleRouteError,
-} from "@/utils/apiResponse";
+import categoryService from "@/services/server/admin/category";
+import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
 export async function PUT(req, { params }) {
   try {
@@ -68,7 +63,7 @@ export async function PUT(req, { params }) {
       );
     }
 
-    return NextResponse.json(
+    return respond(
       {
         message:
           "Category updated successfully",

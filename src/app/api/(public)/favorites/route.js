@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import favoriteService from "@/services/public/favorite";
-import { handleRouteError } from "@/utils/apiResponse";
+import favoriteService from "@/services/server/public/favorite";
+import { handleRouteError, respond } from "@/utils/apiResponse";
 
 export async function GET(request) {
     try {
@@ -15,7 +14,7 @@ export async function GET(request) {
         const data =
             await favoriteService.getPopularProducts(query);
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data,
         });

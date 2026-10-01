@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import orderService from "@/services/public/order";
-import { handleRouteError, jsonError } from "@/utils/apiResponse";
+import orderService from "@/services/server/public/order";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function POST(request) {
     try {
@@ -19,7 +18,7 @@ export async function POST(request) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data: result.data,
         });

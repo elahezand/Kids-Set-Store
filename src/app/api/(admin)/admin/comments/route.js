@@ -1,11 +1,7 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 import { authAdmin } from "@/utils/auth/authGuard";
-import commentService from "@/services/admin/comment";
-import {
-    jsonError,
-    handleRouteError,
-} from "@/utils/apiResponse";
+import commentService from "@/services/server/admin/comment";
+import { jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
 export async function GET(req) {
     try {
@@ -32,7 +28,7 @@ export async function GET(req) {
                 query
             );
 
-        return NextResponse.json(
+        return respond(
             result,
             { status: 200 }
         );

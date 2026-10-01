@@ -108,7 +108,48 @@ const buildListQuery = (query = {}, options = {}) => {
 const listLimit = (query = {}, fallback = 20, max = 100) =>
   Math.min(Math.max(Number(query.limit) || fallback, 1), max);
 
+/**
+ * The ONE way list endpoints read their data: filters (buildListQuery) + limit + cursor.
+ * Returns utils/paginate's shape: { data, pagination: { limit, nextCursor, hasMore } }
+ *
+ *   paginateList(Order, req.query, {
+ *     base: { user: userId },          // always applied
+ *     statuses: ["created", "paid"],   // ?status=
+ *     search: ["title"],               // ?q=
+ *     ids: { userId: "user" },         // ?userId= -> { user: ObjectId }
+ *     filters: { isActive: true },     // extra computed filters
+ *     sort, populate, select,
+ *     defaultLimit: 20, maxLimit: 100,
+ *   })
+ *
+ * Product listing is the exception: it builds its filters with buildProductFilters (utils/helper).
+ */
+const paginateList = (Model, query = {}, options = {}) => {
+  const {
+    defaultLimit = 20,
+    maxLimit = 100,
+    sort = { _id: -1 },
+    populate = null,
+    select = null,
+    filters: extraFilters = {},
+    ...listOptions
+  } = options;
+
+  // lazy: utils/paginate has no dependency on this file, but keep the graph simple
+  const paginate = require("@/utils/paginate");
+
+  return paginate(Model, {
+    limit: listLimit(query, defaultLimit, maxLimit),
+    cursor: query.cursor || null,
+    filters: { ...buildListQuery(query, listOptions), ...extraFilters },
+    sort,
+    populate,
+    select,
+  });
+};
+
 module.exports = {
+  paginateList,
   buildListQuery,
   dateRangeFilter,
   searchFilter,

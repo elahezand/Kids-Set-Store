@@ -1,16 +1,11 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
 
-import cartService from "@/services/admin/cart";
+import cartService from "@/services/server/admin/cart";
 
-import {
-    handleRouteError,
-    jsonError,
-    validationError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, validationError, respond } from "@/utils/apiResponse";
 
 import { adminCartsQuerySchema } from "@/validators/cart";
 
@@ -35,7 +30,7 @@ export async function GET(request) {
 
         const data = await cartService.getAdminCarts(result.data);
 
-        return NextResponse.json({
+        return respond({
             data: data.data,
             pagination: data.pagination,
         });

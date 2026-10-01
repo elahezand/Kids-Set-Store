@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 import {
     updateDepartmentSchema,
@@ -6,12 +5,8 @@ import {
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
 import validateObjectId from "@/utils/validateObjectId";
-import departmentService from "@/services/admin/department";
-import {
-    validationError,
-    jsonError,
-    handleRouteError,
-} from "@/utils/apiResponse";
+import departmentService from "@/services/server/admin/department";
+import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
 // Every handler here: admin + valid id
 
@@ -92,7 +87,7 @@ export async function PUT(req, { params }) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 message:
                     "Department updated successfully",
@@ -133,7 +128,7 @@ export async function DELETE(req, { params }) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 message:
                     "Department removed successfully",

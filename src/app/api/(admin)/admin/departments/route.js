@@ -1,16 +1,11 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 import {
     createDepartmentSchema,
 } from "@/validators/department";
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
-import departmentService from "@/services/admin/department";
-import {
-    validationError,
-    jsonError,
-    handleRouteError,
-} from "@/utils/apiResponse";
+import departmentService from "@/services/server/admin/department";
+import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
 /* GET /api/admin/departments
    All departments, including inactive ones */
@@ -31,8 +26,8 @@ export async function GET() {
         const departments =
             await departmentService.getDepartments();
 
-        return NextResponse.json(
-            { departments },
+        return respond(
+            { data: departments },
             { status: 200 }
         );
     } catch (err) {
@@ -92,7 +87,7 @@ export async function POST(req) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 message:
                     "Department created successfully",

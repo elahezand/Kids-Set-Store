@@ -1,8 +1,8 @@
 import connectToDB from "@/configs/db";
+import { respond } from "@/utils/apiResponse";
 import SubDepartmentModel from "@/model/subDepartment";
 import DepartmentModel from "@/model/department";
 import { authAdmin } from "@/utils/auth/authGuard";
-import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -12,10 +12,10 @@ export async function GET() {
       .populate("department", "title")
       .lean();
 
-    return NextResponse.json({ subDepartments }, { status: 200 });
+    return respond({ subDepartments }, { status: 200 });
   } catch (err) {
     console.log(err);
-    return NextResponse.json({ message: "Unknown Error" }, { status: 500 });
+    return respond({ message: "Unknown Error" }, { status: 500 });
   }
 }
 
@@ -25,7 +25,7 @@ export async function POST(req) {
 
     const admin = await authAdmin();
     if (!admin)
-      return NextResponse.json(
+      return respond(
         { message: "This API is protected" },
         { status: 403 }
       );
@@ -34,20 +34,20 @@ export async function POST(req) {
     const { title, department } = body;
 
     if (!title?.trim())
-      return NextResponse.json(
+      return respond(
         { message: "Title Not Valid :(" },
         { status: 422 }
       );
 
     if (!department)
-      return NextResponse.json(
+      return respond(
         { message: "Department is required" },
         { status: 422 }
       );
 
     const depExists = await DepartmentModel.findById(department);
     if (!depExists)
-      return NextResponse.json(
+      return respond(
         { message: "Department not found" },
         { status: 404 }
       );
@@ -57,12 +57,12 @@ export async function POST(req) {
       department,
     });
 
-    return NextResponse.json(
+    return respond(
       { message: "SubDepartment created Successfully", subDepartment: newSub },
       { status: 201 }
     );
   } catch (err) {
     console.log(err);
-    return NextResponse.json({ message: "Unknown Error" }, { status: 500 });
+    return respond({ message: "Unknown Error" }, { status: 500 });
   }
 }

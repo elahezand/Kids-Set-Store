@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 import {
     updateCouponSchema,
@@ -6,12 +5,8 @@ import {
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
 import validateObjectId from "@/utils/validateObjectId";
-import couponService from "@/services/admin/coupon";
-import {
-    validationError,
-    jsonError,
-    handleRouteError,
-} from "@/utils/apiResponse";
+import couponService from "@/services/server/admin/coupon";
+import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
 // Every handler here: admin + valid id
 
@@ -69,7 +64,7 @@ export async function GET(req, { params }) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 data: result.data,
             },
@@ -131,7 +126,7 @@ export async function PUT(req, { params }) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 message:
                     "Coupon updated successfully",
@@ -172,7 +167,7 @@ export async function DELETE(req, { params }) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 message:
                     "Coupon removed successfully",

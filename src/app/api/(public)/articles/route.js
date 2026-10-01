@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import articleService from "@/services/public/article";
-import { handleRouteError } from "@/utils/apiResponse";
+import articleService from "@/services/server/public/article";
+import { handleRouteError, respond } from "@/utils/apiResponse";
 
 export async function GET(request) {
     try {
@@ -12,7 +11,7 @@ export async function GET(request) {
 
         const result = await articleService.getPublicArticles(query);
 
-        return NextResponse.json({
+        return respond({
             success: true,
             ...result,
         });

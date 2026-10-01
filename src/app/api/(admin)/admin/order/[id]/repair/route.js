@@ -1,15 +1,11 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 
 import { authAdmin } from "@/utils/auth/authGuard";
 import validateObjectId from "@/utils/validateObjectId";
 
-import orderService from "@/services/admin/order";
+import orderService from "@/services/server/admin/order";
 
-import {
-    handleRouteError,
-    jsonError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function POST(request, { params }) {
     try {
@@ -37,7 +33,7 @@ export async function POST(request, { params }) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             message: "Order repaired successfully",
             data: result.data,
         });

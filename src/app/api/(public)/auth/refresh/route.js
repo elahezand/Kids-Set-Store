@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { rotateSession } from "@/services/shared/session";
+import { respond } from "@/utils/apiResponse";
+import { rotateSession } from "@/services/server/shared/session";
 import authCookies from "@/utils/auth/cookies";
 
 export async function POST(req) {
@@ -7,7 +7,7 @@ export async function POST(req) {
         const refreshToken = req.cookies.get("refreshToken")?.value;
 
         if (!refreshToken) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: "Unauthorized",
@@ -22,7 +22,7 @@ export async function POST(req) {
         );
 
         if (!result.ok) {
-            const response = NextResponse.json(
+            const response = respond(
                 {
                     success: false,
                     message: "Session invalid",
@@ -35,7 +35,7 @@ export async function POST(req) {
             return response;
         }
 
-        const response = NextResponse.json(
+        const response = respond(
             {
                 success: true,
                 message: "Token refreshed",
@@ -50,7 +50,7 @@ export async function POST(req) {
     } catch (err) {
         console.error("Refresh error:", err);
 
-        return NextResponse.json(
+        return respond(
             {
                 success: false,
                 message: "Server Error",

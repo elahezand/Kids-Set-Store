@@ -1,14 +1,10 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 
 import { authAdmin } from "@/utils/auth/authGuard";
 
-import orderService from "@/services/admin/order";
+import orderService from "@/services/server/admin/order";
 
-import {
-    handleRouteError,
-    jsonError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function POST(request) {
     try {
@@ -23,7 +19,7 @@ export async function POST(request) {
         const result =
             await orderService.runAutoComplete();
 
-        return NextResponse.json({
+        return respond({
             message: "Auto complete executed successfully",
             data: result.data,
         });

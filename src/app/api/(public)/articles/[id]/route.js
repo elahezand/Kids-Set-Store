@@ -1,11 +1,7 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 import validateObjectId from "@/utils/validateObjectId";
-import articleService from "@/services/public/article";
-import {
-    handleRouteError,
-    jsonError,
-} from "@/utils/apiResponse";
+import articleService from "@/services/server/public/article";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function GET(request, { params }) {
     try {
@@ -23,7 +19,7 @@ export async function GET(request, { params }) {
             return jsonError(result.message, result.status);
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data: result.data,
         });

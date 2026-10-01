@@ -1,8 +1,7 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import couponService from "@/services/user/coupon";
+import couponService from "@/services/server/user/coupon";
 import { authUser } from "@/utils/auth/authGuard";
-import { handleRouteError, jsonError } from "@/utils/apiResponse";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function POST(request) {
     try {
@@ -26,7 +25,7 @@ export async function POST(request) {
             return jsonError(result.message, result.status);
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data: result.data,
         });

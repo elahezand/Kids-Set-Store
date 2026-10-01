@@ -1,11 +1,10 @@
-import { NextResponse } from "next/server";
 import { compare } from "bcryptjs";
 import UserModel from "@/model/user";
 import redisClient from "@/configs/redis";
 import connectToDB from "@/configs/db";
 import { hashPassword } from "@/utils/auth";
 import validate from "@/utils/validate";
-import { validationError } from "@/utils/apiResponse";
+import { validationError, respond } from "@/utils/apiResponse";
 import { resetPasswordSchema } from "@/validators/user";
 
 const MAX_OTP_ATTEMPTS = 5;
@@ -30,7 +29,7 @@ export async function POST(req) {
 
     const savedHash = await redisClient.get(otpKey(phone));
     if (!savedHash) {
-      return NextResponse.json(
+      return respond(
         { success: false, message: "Code expired. Request a new one." },
         { status: 410 }
       );
@@ -42,7 +41,7 @@ export async function POST(req) {
     }
     if (attempts > MAX_OTP_ATTEMPTS) {
       await redisClient.del(otpKey(phone));
-      return NextResponse.json(
+      return respond(
         { success: false, message: "Too many wrong codes. Request a new code." },
         { status: 429 }
       );
@@ -50,7 +49,7 @@ export async function POST(req) {
 
     const isValid = await compare(String(resetCode), savedHash);
     if (!isValid) {
-      return NextResponse.json(
+      return respond(
         { success: false, message: "Invalid reset code" },
         { status: 400 }
       );
@@ -58,7 +57,7 @@ export async function POST(req) {
 
     const user = await UserModel.findOne({ phone }).select("_id");
     if (!user) {
-      return NextResponse.json(
+      return respond(
         { success: false, message: "User not found" },
         { status: 404 }
       );
@@ -70,13 +69,13 @@ export async function POST(req) {
     await redisClient.del(otpKey(phone));
     await redisClient.del(attemptsKey(phone));
 
-    return NextResponse.json(
+    return respond(
       { success: true, message: "Password updated successfully" },
       { status: 200 }
     );
   } catch (err) {
     console.error("Reset password error:", err);
-    return NextResponse.json(
+    return respond(
       { success: false, message: "Unknown error occurred" },
       { status: 500 }
     );

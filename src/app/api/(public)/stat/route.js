@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import statsService from "@/services/public/stats";
-import { handleRouteError } from "@/utils/apiResponse";
+import statsService from "@/services/server/public/stats";
+import { handleRouteError, respond } from "@/utils/apiResponse";
 
 export async function GET() {
     try {
@@ -9,7 +8,7 @@ export async function GET() {
 
         const data = await statsService.getPublicStats();
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data,
         });

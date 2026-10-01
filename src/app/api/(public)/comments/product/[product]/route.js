@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import commentService from "@/services/public/comment";
-import { handleRouteError, jsonError } from "@/utils/apiResponse";
+import commentService from "@/services/server/public/comment";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function GET(request, { params }) {
     try {
@@ -21,7 +20,7 @@ export async function GET(request, { params }) {
             return jsonError(result.message, result.status);
         }
 
-        return NextResponse.json({
+        return respond({
             success: true,
             ...result,
         });

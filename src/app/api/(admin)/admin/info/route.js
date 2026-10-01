@@ -1,16 +1,11 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
 
-import infoService from "@/services/admin/info";
+import infoService from "@/services/server/admin/info";
 
-import {
-    handleRouteError,
-    jsonError,
-    validationError,
-} from "@/utils/apiResponse";
+import { handleRouteError, jsonError, validationError, respond } from "@/utils/apiResponse";
 
 import { infoSchema } from "@/validators/info";
 
@@ -43,7 +38,7 @@ export async function POST(request) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 message: "Info created successfully",
                 data: serviceResult.data,
@@ -84,7 +79,7 @@ export async function PUT(request) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             message: "Info updated successfully",
             data: serviceResult.data,
         });
@@ -112,7 +107,7 @@ export async function DELETE(request) {
             );
         }
 
-        return NextResponse.json({
+        return respond({
             message: "Info deleted successfully",
         });
     } catch (error) {

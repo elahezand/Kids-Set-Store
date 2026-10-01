@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import categoryService from "@/services/public/category";
-import { handleRouteError } from "@/utils/apiResponse";
+import categoryService from "@/services/server/public/category";
+import { handleRouteError, respond } from "@/utils/apiResponse";
 
 export async function GET() {
     try {
@@ -9,7 +8,7 @@ export async function GET() {
 
         const data = await categoryService.getAllCategories();
 
-        return NextResponse.json({
+        return respond({
             success: true,
             data,
         });

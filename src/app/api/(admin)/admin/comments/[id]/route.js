@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 import {
     replyCommentSchema,
@@ -6,12 +5,8 @@ import {
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
 import validateObjectId from "@/utils/validateObjectId";
-import commentService from "@/services/admin/comment";
-import {
-    validationError,
-    jsonError,
-    handleRouteError,
-} from "@/utils/apiResponse";
+import commentService from "@/services/server/admin/comment";
+import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
 export async function POST(req, { params }) {
     try {
@@ -70,7 +65,7 @@ export async function POST(req, { params }) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 message:
                     "Reply added successfully",

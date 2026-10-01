@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 import {
     updateContactSchema,
@@ -7,12 +6,8 @@ import {
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
 import validateObjectId from "@/utils/validateObjectId";
-import contactService from "@/services/admin/contact";
-import {
-    validationError,
-    jsonError,
-    handleRouteError,
-} from "@/utils/apiResponse";
+import contactService from "@/services/server/admin/contact";
+import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
 // Every handler here: admin + valid id
 const guard = async (params) => {
@@ -72,7 +67,7 @@ export async function GET(req, { params }) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 data: result.data,
             },
@@ -137,7 +132,7 @@ export async function POST(req, { params }) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 message:
                     "Answer sent successfully",
@@ -203,7 +198,7 @@ export async function PUT(req, { params }) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 message:
                     "Message updated successfully",
@@ -244,7 +239,7 @@ export async function DELETE(req, { params }) {
             );
         }
 
-        return NextResponse.json(
+        return respond(
             {
                 message:
                     "Message removed successfully",

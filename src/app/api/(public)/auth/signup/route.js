@@ -1,9 +1,9 @@
 import UserModel from "@/model/user";
+import { respond } from "@/utils/apiResponse";
 import connectToDB from "@/configs/db";
 import { hashPassword } from "@/utils/auth";
 import { userValidationSchema } from "@/validators/user";
-import sessionService from "@/services/shared/session";
-import { NextResponse } from "next/server";
+import sessionService from "@/services/server/shared/session";
 import validate from "@/utils/validate";
 import authCookies from "@/utils/auth/cookies";
 
@@ -19,7 +19,7 @@ export async function POST(req) {
         );
 
         if (!result.success) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: "Invalid data",
@@ -45,7 +45,7 @@ export async function POST(req) {
         });
 
         if (isUserExist) {
-            return NextResponse.json(
+            return respond(
                 {
                     success: false,
                     message: "User already exists with this info",
@@ -81,7 +81,7 @@ export async function POST(req) {
             req
         );
 
-        const response = NextResponse.json(
+        const response = respond(
             {
                 success: true,
                 message: "Registered successfully.",
@@ -115,7 +115,7 @@ export async function POST(req) {
     } catch (err) {
         console.error("Register Error:", err);
 
-        return NextResponse.json(
+        return respond(
             {
                 success: false,
                 message: "Server Error",

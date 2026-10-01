@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import productService from "@/services/public/product";
-import { handleRouteError } from "@/utils/apiResponse";
+import productService from "@/services/server/public/product";
+import { handleRouteError, respond } from "@/utils/apiResponse";
 
 export async function GET(request) {
     try {
@@ -12,7 +11,7 @@ export async function GET(request) {
 
         const result = await productService.getAllProducts(query);
 
-        return NextResponse.json({
+        return respond({
             success: true,
             ...result,
         });

@@ -1,16 +1,11 @@
-import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
 import {
     adminContactsQuerySchema,
 } from "@/validators/contact";
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
-import contactService from "@/services/admin/contact";
-import {
-    validationError,
-    jsonError,
-    handleRouteError,
-} from "@/utils/apiResponse";
+import contactService from "@/services/server/admin/contact";
+import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
 /* GET /api/admin/contacts?status=new&cursor=...&limit=... */
 
@@ -51,11 +46,11 @@ export async function GET(req) {
                 result.data
             );
 
-        return NextResponse.json(
+        return respond(
             {
                 data: serviceResult.data,
-                pagination:
-                    serviceResult.pagination,
+                pagination: serviceResult.pagination,
+                meta: serviceResult.meta,
                 unreadCount:
                     serviceResult.unreadCount,
             },

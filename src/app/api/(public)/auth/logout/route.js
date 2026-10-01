@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { revokeSession } from "@/services/shared/session";
+import { respond } from "@/utils/apiResponse";
+import { revokeSession } from "@/services/server/shared/session";
 import { verifyRefreshToken } from "@/utils/auth";
 export async function POST(req) {
     try {
@@ -15,7 +15,7 @@ export async function POST(req) {
             await revokeSession(sid, "logout");
         }
 
-        const response = NextResponse.json(
+        const response = respond(
             {
                 success: true,
                 message: "Logged out",
@@ -43,7 +43,7 @@ export async function POST(req) {
     } catch (err) {
         console.error("Logout error:", err);
 
-        return NextResponse.json(
+        return respond(
             { success: false, message: "Server Error" },
             { status: 500 }
         );
