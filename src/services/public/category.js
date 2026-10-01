@@ -1,65 +1,84 @@
 import Category from "@/model/category";
 
-/* Tree builder */
-const buildTree = (items, parentId = null) => {
-    return items
-        .filter(
-            (category) =>
-                String(category.parentId || null) ===
-                String(parentId)
-        )
-        .map((category) => ({
-            id: category._id.toString(),
-            name: category.name,
-            slug: category.slug,
-            children: buildTree(items, category._id),
-        }));
+// old docs may still have `name` instead of `title`
+const titleOf = (c) => c.title ?? c.name ?? "";
+
+const toNode = (category, children = []) => ({
+    id: String(category._id),
+    title: titleOf(category),
+    name: titleOf(category),
+    slug: category.slug,
+    description: category.description || "",
+    icon: category.icon?.svgCode || null,
+    children,
+});
+
+const buildTree = (items) => {
+    const ids = new Set(items.map((item) => String(item._id)));
+    const byParent = new Map();
+
+    for (const item of items) {
+        const parentId = item.parentId ? String(item.parentId) : null;
+        // parent missing or inactive -> show at root instead of losing it
+        const key = parentId && ids.has(parentId) ? parentId : "root";
+
+        if (!byParent.has(key)) byParent.set(key, []);
+        byParent.get(key).push(item);
+    }
+
+    const visited = new Set();
+    const build = (key) =>
+        (byParent.get(key) || [])
+            .filter((item) => !visited.has(String(item._id)))
+            .map((item) => {
+                visited.add(String(item._id));
+                return toNode(item, build(String(item._id)));
+            });
+
+    return build("root");
 };
 
 const getAllCategories = async () => {
-    const categories = await Category.find({}).lean();
+    const categories = await Category.find({ isActive: { $ne: false } }).lean();
+
+    categories.sort((a, b) => titleOf(a).localeCompare(titleOf(b)));
 
     return buildTree(categories);
 };
+
 
 const withInheritedFilters = async (category) => {
     if (!category) return null;
 
     let allFilters = [...(category.filters || [])];
-    let currentParentId = category.parentId;
+    let currentParentId = category.parent;
+    const visited = new Set([String(category._id)]);
 
-    while (currentParentId) {
-        const parentCategory = await Category.findById(
-            currentParentId
-        )
-            .select("filters parentId")
+    // walk up to the root; `visited` guards against a broken (circular) parent chain
+    while (currentParentId && !visited.has(String(currentParentId))) {
+        visited.add(String(currentParentId));
+
+        const parentCategory = await Category.findById(currentParentId)
+            .select("filters parent")
             .lean();
 
-        if (parentCategory) {
-            if (
-                parentCategory.filters &&
-                parentCategory.filters.length > 0
-            ) {
-                allFilters = [
-                    ...parentCategory.filters,
-                    ...allFilters,
-                ];
-            }
+        if (!parentCategory) break;
 
-            currentParentId = parentCategory.parentId;
-        } else {
-            break;
+        if (parentCategory.filters?.length) {
+            allFilters = [...parentCategory.filters, ...allFilters];
         }
+
+        currentParentId = parentCategory.parent;
     }
 
+    // child filters win over parent filters with the same slug
     const uniqueFilters = Array.from(
-        new Map(
-            allFilters.map((filter) => [filter.slug, filter])
-        ).values()
+        new Map(allFilters.map((filter) => [filter.slug, filter])).values()
     );
 
     return {
         ...category,
+        name: category.title,
         filters: uniqueFilters,
     };
 };
@@ -73,15 +92,23 @@ const getCategoryById = async (id) => {
 };
 
 const getCategoryBySlug = async (slug) => {
-    const category = await Category.findOne({ slug }).lean();
+    if (!slug) return null;
+
+    const category = await Category.findOne({
+        slug: String(slug).trim().toLowerCase(),
+    }).lean();
 
     if (!category) return null;
 
     return withInheritedFilters(category);
 };
 
-export {
+const categoryService = {
     getAllCategories,
     getCategoryById,
     getCategoryBySlug,
 };
+
+export { getAllCategories, getCategoryById, getCategoryBySlug };
+
+export default categoryService;

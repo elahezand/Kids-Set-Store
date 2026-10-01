@@ -35,7 +35,7 @@ const getPopularProducts = async (query = {}) => {
         status: "active",
     })
         .select(
-            "title slug price minPrice images condition shortIdentifier"
+            "title slug price minPrice images variants metrics shortIdentifier"
         )
         .lean();
 
@@ -58,7 +58,7 @@ const getPopularProducts = async (query = {}) => {
 
             return {
                 ...product,
-                favoritesCount: product.favoritesCount,
+                favoritesCount: entry.favoritesCount,
             };
         })
         .filter(Boolean);

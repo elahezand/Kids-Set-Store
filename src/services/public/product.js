@@ -7,30 +7,75 @@ import {
 import logger from "@/utils/logger";
 import { findProductForDetail } from "@/services/shared/product";
 
+/* Fields a product card / list needs (detail page loads everything) */
+const LIST_FIELDS =
+    "title slug images minPrice price variants metrics status categoryPath tags shortIdentifier createdAt";
+
+/* ?sort= values the shop understands. _id is added by paginate as a tie-breaker. */
+const SORTS = {
+    latest: { _id: -1 },
+    price: { minPrice: 1 },
+    "price-desc": { minPrice: -1 },
+    popularity: { "metrics.score": -1 },
+    bestSelling: { "metrics.sold": -1 },
+};
+
+const clampLimit = (value, fallback = 12, max = 50) =>
+    Math.min(Math.max(Number(value) || fallback, 1), max);
+
+// ?value=bestSelling | latest (old links in the footer / home page) maps to a sort
+const resolveSort = (query = {}) =>
+    SORTS[query.sort] || SORTS[query.value] || SORTS.latest;
+
 /* === GET ALL (PUBLIC) === */
 const getAllProducts = async (query = {}) => {
     const filters = await buildProductFilters(query);
 
-    const limit = query.limit
-        ? Number(query.limit)
-        : 99;
-
     return paginate(Product, {
-        limit,
+        limit: clampLimit(query.limit, 12, 99),
         cursor: query.cursor,
         filters,
+        select: LIST_FIELDS,
         populate: [
             {
                 path: "categoryPath",
                 select: "_id title slug",
             },
         ],
-        sort: { _id: -1 },
+        sort: resolveSort(query),
     });
 };
 
+/* Home page sections */
+const getLatestProducts = async (limit = 10) => {
+    const { data } = await getAllProducts({ limit, sort: "latest" });
+    return data;
+};
+
+const getBestSellingProducts = async (limit = 10) => {
+    const { data } = await getAllProducts({ limit, sort: "bestSelling" });
+    return data;
+};
+
+/* Same category, newest first (product page "Related products") */
+const getRelatedProducts = async (product, limit = 5) => {
+    if (!product?._id) return [];
+
+    const categoryIds = (product.categoryPath ?? []).map((c) => c?._id ?? c);
+
+    return Product.find({
+        status: "active",
+        _id: { $ne: product._id },
+        ...(categoryIds.length ? { categoryPath: { $in: categoryIds } } : {}),
+    })
+        .select(LIST_FIELDS)
+        .sort({ _id: -1 })
+        .limit(clampLimit(limit, 5, 20))
+        .lean();
+};
+
 /* === GET BY ID (PUBLIC) === */
-const getProductById = async (id) => {
+const getProductById = async (id, { countView = false } = {}) => {
     if (!isValidObjectId(id)) {
         return {
             success: false,
@@ -47,6 +92,13 @@ const getProductById = async (id) => {
             status: 404,
             message: "Product not found",
         };
+    }
+
+    if (countView) {
+        // fire and forget: a failed counter must not break the page
+        Product.updateOne({ _id: id }, { $inc: { "metrics.views": 1 } }).catch(
+            (err) => logger.error("[product] could not count view:", err)
+        );
     }
 
     return {
@@ -72,14 +124,15 @@ const smartSearch = async ({ prompt, budget }) => {
         status: "active",
     };
 
+    // minPrice = cheapest variant (the field the shop filters on)
     if (budget) {
-        query.price = {
+        query.minPrice = {
             $lte: Number(budget),
         };
     }
 
     const products = await Product.find(query)
-        .select("title price categoryPath")
+        .select("title minPrice categoryPath")
         .populate("categoryPath", "title")
         .sort({ createdAt: -1 })
         .limit(50)
@@ -238,8 +291,22 @@ Available products: ${JSON.stringify(simplifiedPosts)}`;
     }
 };
 
-export {
+const productService = {
     getAllProducts,
+    getLatestProducts,
+    getBestSellingProducts,
+    getRelatedProducts,
     getProductById,
     smartSearch,
 };
+
+export {
+    getAllProducts,
+    getLatestProducts,
+    getBestSellingProducts,
+    getRelatedProducts,
+    getProductById,
+    smartSearch,
+};
+
+export default productService;

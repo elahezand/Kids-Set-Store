@@ -17,7 +17,7 @@ const getUserFavorites = async (userId, query = {}) => {
         populate: {
             path: "productId",
             select:
-                "title slug price minPrice images status metrics condition shortIdentifier",
+                "title slug price minPrice images variants status metrics shortIdentifier",
         },
         sort: { _id: -1 },
     });

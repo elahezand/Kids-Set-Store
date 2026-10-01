@@ -21,7 +21,7 @@ const getByProduct = async (product, query = {}) => {
     };
 
     const parents = await paginate(Comment, {
-        limit: query.limit,
+        limit: Math.min(Math.max(Number(query.limit) || 10, 1), 50),
         cursor: query.cursor,
         filters,
         populate: {
@@ -39,7 +39,10 @@ const getByProduct = async (product, query = {}) => {
               parentId: { $in: parentIds },
               status: "approved",
               deletedAt: null,
-          }).populate("user", PUBLIC_USER_FIELDS)
+          })
+              .sort({ createdAt: 1 })
+              .populate("user", PUBLIC_USER_FIELDS)
+              .lean()
         : [];
 
     const byParent = new Map();
@@ -54,19 +57,13 @@ const getByProduct = async (product, query = {}) => {
         byParent.get(parentId).push(reply);
     }
 
-    const data = parents.data.map((parent) => {
-        const plain =
-            typeof parent.toObject === "function"
-                ? parent.toObject()
-                : parent;
-
-        return {
-            ...plain,
-            replies: byParent.get(String(parent._id)) || [],
-        };
-    });
+    const data = parents.data.map((parent) => ({
+        ...parent,
+        replies: byParent.get(String(parent._id)) || [],
+    }));
 
     return {
+        success: true,
         data,
         pagination: parents.pagination,
     };
