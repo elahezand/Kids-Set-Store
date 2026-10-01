@@ -1,54 +1,83 @@
+import { NextResponse } from "next/server";
+import { compare } from "bcryptjs";
 import UserModel from "@/model/user";
 import redisClient from "@/configs/redis";
 import connectToDB from "@/configs/db";
 import { hashPassword } from "@/utils/auth";
-import { NextResponse } from "next/server";
+import validate from "@/utils/validate";
+import { validationError } from "@/utils/apiResponse";
+import { resetPasswordSchema } from "@/validators/user";
+
+const MAX_OTP_ATTEMPTS = 5;
+const OTP_TTL_SECONDS = 60;
+
+// same keys the /auth/sms/send route writes (the code is stored as a bcrypt hash)
+const otpKey = (phone) => `otp:${phone}`;
+const attemptsKey = (phone) => `otp:attempts:${phone}`;
 
 export async function POST(req) {
   try {
     await connectToDB();
 
-    const body = await req.json();
-    const { password, phone, resetCode } = body;
+    const body = await req.json().catch(() => ({}));
+    const result = validate(resetPasswordSchema, body);
 
-    if (!resetCode) {
+    if (!result.success) {
+      return validationError(result.errors);
+    }
+
+    const { phone, resetCode, password } = result.data;
+
+    const savedHash = await redisClient.get(otpKey(phone));
+    if (!savedHash) {
       return NextResponse.json(
-        { message: "Reset code is required" },
+        { success: false, message: "Code expired. Request a new one." },
+        { status: 410 }
+      );
+    }
+
+    const attempts = await redisClient.incr(attemptsKey(phone));
+    if (attempts === 1) {
+      await redisClient.expire(attemptsKey(phone), OTP_TTL_SECONDS);
+    }
+    if (attempts > MAX_OTP_ATTEMPTS) {
+      await redisClient.del(otpKey(phone));
+      return NextResponse.json(
+        { success: false, message: "Too many wrong codes. Request a new code." },
+        { status: 429 }
+      );
+    }
+
+    const isValid = await compare(String(resetCode), savedHash);
+    if (!isValid) {
+      return NextResponse.json(
+        { success: false, message: "Invalid reset code" },
         { status: 400 }
       );
     }
 
-    // same key the /auth/sms/send route writes (expiry is handled by the TTL)
-    const savedCode = await redisClient.get(`otp:${phone}`);
-    if (!savedCode || String(savedCode) !== String(resetCode)) {
-      return NextResponse.json(
-        { message: "Invalid reset code" },
-        { status: 400 }
-      );
-    }
-
-    const user = await UserModel.findOne({ phone });
+    const user = await UserModel.findOne({ phone }).select("_id");
     if (!user) {
       return NextResponse.json(
-        { message: "User not found" },
+        { success: false, message: "User not found" },
         { status: 404 }
       );
     }
 
     const hashedNewPassword = await hashPassword(password);
-    await UserModel.findByIdAndUpdate(user._id, { password: hashedNewPassword });
+    await UserModel.updateOne({ _id: user._id }, { $set: { password: hashedNewPassword } });
 
-    await redisClient.del(`otp:${phone}`);
+    await redisClient.del(otpKey(phone));
+    await redisClient.del(attemptsKey(phone));
 
     return NextResponse.json(
-      { message: "Password updated successfully" },
+      { success: true, message: "Password updated successfully" },
       { status: 200 }
     );
-
   } catch (err) {
     console.error("Reset password error:", err);
     return NextResponse.json(
-      { message: "Unknown error occurred" },
+      { success: false, message: "Unknown error occurred" },
       { status: 500 }
     );
   }

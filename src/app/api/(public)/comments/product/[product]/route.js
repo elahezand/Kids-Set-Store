@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import connectToDB from "@/configs/db";
-import commentService from "@/services/commentService";
+import commentService from "@/services/public/comment";
 import { handleRouteError, jsonError } from "@/utils/apiResponse";
 
 export async function GET(request, { params }) {

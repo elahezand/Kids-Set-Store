@@ -64,9 +64,10 @@ export async function POST(req) {
                 ? "ADMIN"
                 : "USER";
 
+        // email has a unique+sparse index: leave it out (not null) when empty
         const newUser = await UserModel.create({
             username,
-            email: email || null,
+            ...(email ? { email } : {}),
             phone,
             password: hashedPassword,
             role,

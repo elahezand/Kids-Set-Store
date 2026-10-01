@@ -38,7 +38,7 @@ export async function POST(req) {
                 { email: identifier },
                 { username: identifier },
             ],
-        });
+        }).select("+password");
 
         if (!user) {
             return NextResponse.json(
@@ -47,6 +47,17 @@ export async function POST(req) {
                     message: "User not found",
                 },
                 { status: 404 }
+            );
+        }
+
+        // accounts created with OTP have no password yet
+        if (!user.password) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "This account has no password. Log in with a one-time code.",
+                },
+                { status: 401 }
             );
         }
 
