@@ -1,7 +1,7 @@
 import User from "@/model/user";
 import Order from "@/model/order";
 
-import { countByDay } from "@/services/shared/stats";
+import { countByDay } from "@/services/server/shared/stats";
 
 const getAdminStats = async () => {
     const [totalUsers, totalOrders] =

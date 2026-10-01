@@ -38,7 +38,7 @@ export default function SendTicket() {
             const res = await fetch("/api/departments");
             if (res.ok) {
                 const result = await res.json();
-                setDepartments(result.departments);
+                setDepartments(result.data ?? []);
             }
         };
         getDepartments();

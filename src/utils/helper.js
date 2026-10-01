@@ -57,10 +57,11 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
     // 4. Category Filter
     if (query.category) {
         const categoryDoc = await Category.findOne({
-            slug: String(query.category).trim().toLowerCase(),
+            slug: String(query.category).trim(),
         })
             .select("_id")
             .lean();
+
         filters.categoryPath = categoryDoc ? categoryDoc._id : null;
     } else if (query.categoryId && isValidId(query.categoryId)) {
         filters.categoryPath = new mongoose.Types.ObjectId(query.categoryId);
