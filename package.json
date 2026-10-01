@@ -47,6 +47,7 @@
     "react-intersection-observer": "^10.0.0",
     "react-leaflet": "^5.0.0",
     "recharts": "^2.15.4",
+    "redis": "^5.12.1",
     "slugify": "^1.6.6",
     "sonner": "^2.0.8",
     "sweetalert": "^2.1.2",
@@ -58,8 +59,14 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4.1.18",
+    "@types/jsdom": "^30.0.0",
+    "@types/leaflet": "^1.9.22",
+    "@types/node": "^22.20.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3"
   }
 }
