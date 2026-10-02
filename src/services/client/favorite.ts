@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "./keys";
 import type { ApiSuccess, FavoritePayload, ToggleFavoriteResult } from "@/types";
-import { usePost } from "./query";
+import { useDelete, usePost } from "./query";
 import { getErrorStatus, showErrorToast } from "./errors";
 
 /* Favorites (API: /api/user/favorites — services/server/user/favorite) */
@@ -43,6 +43,19 @@ export const useAddFavorite = ({ onAdded }: { onAdded?: () => void } = {}) => {
         return;
       }
       showErrorToast(error);
+    },
+  });
+};
+
+/** DELETE /user/favorites/:productId (user panel "Remove") */
+export const useRemoveFavorite = () => {
+  const queryClient = useQueryClient();
+
+  return useDelete<ApiSuccess, string>((productId) => `/user/favorites/${productId}`, {
+    errorFallback: "Could not remove the product",
+    onSuccess: () => {
+      toast.success("Removed from favorites");
+      queryClient.invalidateQueries({ queryKey: queryKeys.favorites });
     },
   });
 };

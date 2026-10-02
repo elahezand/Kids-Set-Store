@@ -17,7 +17,7 @@ const ticketSchema = new mongoose.Schema(
 
         subDepartment: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "subDepartment",
+            ref: "SubDepartment",
             required: true,
         },
 

@@ -24,6 +24,7 @@ export default async function FavoritesPage() {
   const user = await getMe();
   if (!user) redirect("/login-register");
   const result = (await favoriteService.getUserFavorites(user._id, { limit: LIMIT })) as FavoritesResult;
+  
 
   return (
     <div className="page-container">

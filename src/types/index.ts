@@ -10,3 +10,5 @@ export type * from "./favorite";
 export type * from "./auth";
 export type * from "./user";
 export type * from "./site";
+export type * from "./ticket";
+export type * from "./dashboard";

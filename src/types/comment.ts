@@ -35,3 +35,15 @@ export interface CreateCommentPayload {
 }
 
 export type CommentFormValues = Omit<CreateCommentPayload, "productId">;
+
+export type CommentStatus = "pending" | "approved" | "rejected" | "spam" | "deleted";
+
+/* GET /api/user/comment item (user panel "my comments") */
+export interface MyComment {
+  _id: Id;
+  body: string;
+  rating: number | null;
+  status: CommentStatus;
+  product?: { _id: Id; title: string } | null;
+  createdAt?: ISODate;
+}

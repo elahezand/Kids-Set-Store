@@ -1,9 +1,24 @@
 import connectToDB from "@/configs/db";
 import commentService from "@/services/server/user/comment";
 import { authUser } from "@/utils/auth/authGuard";
-import { handleRouteError, jsonError, validationError, respond } from "@/utils/apiResponse";
+import { handleRouteError, jsonError, validationError, respond, paginated } from "@/utils/apiResponse";
 import validate from "@/utils/validate";
 import { createCommentSchema } from "@/validators/comment";
+
+/* GET /api/user/comment?status=&limit=&cursor=  -> the user's own reviews */
+export async function GET(request) {
+    try {
+        await connectToDB();
+
+        const user = await authUser();
+        if (!user || user.status === "expired") return jsonError("Unauthorized", 401);
+
+        const query = Object.fromEntries(new URL(request.url).searchParams.entries());
+        return paginated(await commentService.getMine(user._id, query));
+    } catch (error) {
+        return handleRouteError(error);
+    }
+}
 
 export async function POST(request) {
     try {

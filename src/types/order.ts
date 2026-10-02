@@ -68,3 +68,18 @@ export interface CheckoutFormValues extends ShippingAddress {
   paymentMethod: CheckoutPaymentMethod;
   useWallet?: boolean;
 }
+
+/* one line of an order (model/order orderItemSchema) */
+export interface OrderItem {
+  _id: Id;
+  productId: Id;
+  quantity: number;
+  finalPrice: number;
+  productSnapshot: { title: string; image: string | null; slug: string | null };
+  variantSnapshot?: { attributes: Record<string, string> | null; sku: string | null };
+}
+
+/* GET /api/user/order item (user panel order history) */
+export interface OrderListItem extends OrderSummary {
+  items: OrderItem[];
+}

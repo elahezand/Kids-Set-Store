@@ -11,7 +11,7 @@ export async function NewArticle(prevState, formData) {
     try {
         await connectToDB();
         const admin = await authAdmin()
-        if (!admin || admin.role !== "ADMIN") {
+        if (!admin || ![].concat(admin.role).includes("ADMIN")) {
             return createResponse(403, "UnAuthorized");
         }
 

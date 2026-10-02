@@ -2,6 +2,19 @@ import Comment from "@/model/comment";
 import Product from "@/model/product";
 import Order from "@/model/order";
 import { isValidObjectId } from "mongoose";
+import { paginateList } from "@/utils/listQuery";
+
+/* GET /api/user/comment  — the user's own reviews (deleted ones hidden), ?status= */
+const getMine = async (userId, query = {}) =>
+    paginateList(Comment, query, {
+        defaultLimit: 10,
+        maxLimit: 50,
+        base: { user: userId, deletedAt: null },
+        statuses: ["pending", "approved", "rejected"],
+        select: "body rating status product createdAt",
+        populate: { path: "product", select: "title" },
+    });
+
 
 const create = async (userId, data) => {
     const { product, ...rest } = data;
@@ -152,12 +165,14 @@ const deleteOwn = async (userId, id) => {
 };
 
 export {
+    getMine,
     create,
     updateOwn,
     deleteOwn,
 };
 
 export default {
+    getMine,
     create,
     updateOwn,
     deleteOwn,

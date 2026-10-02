@@ -52,7 +52,8 @@ const authAdmin = async () => {
         return user;
     }
 
-    if (user.role !== "ADMIN") {
+    const roles = Array.isArray(user.role) ? user.role : [user.role];
+    if (!roles.includes("ADMIN")) {
         return null;
     }
 

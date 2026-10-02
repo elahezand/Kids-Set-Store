@@ -268,7 +268,7 @@
   }
 
   .page-container {
-    @apply mx-auto w-full px-8 py-14 sm:px-4 sm:py-20 md:py-24 lg:px-12 lg:py-28;
+    @apply mx-auto w-full px-8 py-14 sm:px-4 sm:py-20 md:py-24 lg:px-18 lg:py-32;
   }
 
   .full-bleed {

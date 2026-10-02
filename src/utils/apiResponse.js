@@ -1,18 +1,6 @@
 import { NextResponse } from "next/server";
 
-/*
-  ONE response envelope for every API route:
 
-    success  { success: true,  message?, data?, pagination?, meta? }
-    error    { success: false, message,  errors? }
-
-    pagination = { limit, nextCursor, hasMore }        (utils/paginate)
-    meta       = any extra top-level value a route returned (unreadCount, reason, ...)
-
-  Routes call respond(body, init) instead of NextResponse.json(body, init); respond()
-  reshapes whatever the route built into the envelope above, so old route code keeps
-  working and the shape is guaranteed.
-*/
 
 const ENVELOPE_KEYS = new Set(["success", "message", "data", "pagination", "errors", "meta"]);
 

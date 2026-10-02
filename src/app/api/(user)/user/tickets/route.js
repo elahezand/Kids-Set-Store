@@ -1,33 +1,40 @@
 import connectToDB from "@/configs/db";
 import ticketService from "@/services/server/user/ticket";
 import { authUser } from "@/utils/auth/authGuard";
-import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
+import { fromService, handleRouteError, jsonError, paginated } from "@/utils/apiResponse";
 
+const currentUser = async () => {
+    const user = await authUser();
+    return user && user.status !== "expired" ? user : null;
+};
+
+/* GET /api/user/tickets?q=&limit=&cursor=  -> the user's tickets (newest first) */
 export async function GET(request) {
     try {
         await connectToDB();
 
-        const user = await authUser();
+        const user = await currentUser();
+        if (!user) return jsonError("Unauthorized", 401);
 
-        if (!user) {
-            return jsonError("Unauthorized", 401);
-        }
+        const query = Object.fromEntries(new URL(request.url).searchParams.entries());
+        return paginated(await ticketService.getMyTickets(user._id, query));
+    } catch (error) {
+        return handleRouteError(error);
+    }
+}
 
-        const { searchParams } = new URL(request.url);
+/* POST /api/user/tickets  { title, department, subDepartment, priority, content } */
+export async function POST(request) {
+    try {
+        await connectToDB();
 
-        const query = Object.fromEntries(
-            searchParams.entries()
-        );
+        const user = await currentUser();
+        if (!user) return jsonError("Unauthorized", 401);
 
-        const result = await ticketService.getMyTickets(
-            user._id,
-            query
-        );
+        const body = await request.json().catch(() => ({}));
+        const result = await ticketService.createTicket(user._id, body);
 
-        return respond({
-            success: true,
-            ...result,
-        });
+        return fromService(result, { status: 201, message: "Ticket sent" });
     } catch (error) {
         return handleRouteError(error);
     }
