@@ -13,51 +13,66 @@ function escapeRegex(text) {
     return String(text).replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 }
 
-/* Persian / Arabic text normalization for search:
-   ۰-۹ and ٠-٩ → 0-9, Arabic ي/ك → Persian ی/ک, remove diacritics. */
+/* ═══════════════════════════ SEARCH TEXT ═══════════════════════════ */
+
 function normalizeSearchText(str) {
-    return String(str)
+    return String(str ?? "")
+        .normalize("NFKD")
+        .replace(/[̀-ͯ]/g, "")
         .toLowerCase()
-        .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)))
-        .replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)))
-        .replace(/ي/g, "ی")
-        .replace(/ك/g, "ک")
-        .replace(/[\u064B-\u065F]/g, "")
+        .replace(/[-'’]/g, "")
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
         .trim();
 }
 
-/* ═══════════════════════════ PRODUCT FILTERS ═══════════════════════════ */
+const looseWordRegex = (word) =>
+    new RegExp(word.split("").map(escapeRegex).join("[^a-z0-9]*"), "i");
 
+/* "blue" or "blue,pink" -> exact, case-insensitive match on one or more values */
+const exactAny = (raw) => {
+    const regexes = String(raw)
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .slice(0, 10)
+        .map((value) => new RegExp(`^${escapeRegex(value.slice(0, 50))}$`, "i"));
+
+    if (!regexes.length) return null;
+    return regexes.length === 1 ? regexes[0] : { $in: regexes };
+};
+
+const MAX_SEARCH_WORDS = 5;
+
+/* ═══════════════════════════ PRODUCT FILTERS ═══════════════════════════ */
 async function buildProductFilters(query, { isAdmin = false } = {}) {
     const filters = {};
     const andConditions = [];
 
     // 1. Status
     if (isAdmin) {
-        // admin: one status, or "all" / nothing = every status except deleted
         filters.status =
             query.status && query.status !== "all"
                 ? query.status
                 : { $ne: "deleted" };
     } else {
-        // public users always see only active products
         filters.status = "active";
     }
 
-    // 2. Photos Filter
+    // 2. Photos
     if (query.hasPhoto === "true") {
         filters["images.0"] = { $exists: true };
     }
 
-    // 3. SKU Filter
+    // 3. SKU
     if (query.sku) {
-        filters["variants.sku"] = String(query.sku);
+        filters["variants.sku"] = String(query.sku).trim();
     }
 
-    // 4. Category Filter
+    // 4. Category (slugs are lowercase) — matches the category and everything under it
     if (query.category) {
         const categoryDoc = await Category.findOne({
-            slug: String(query.category).trim(),
+            slug: String(query.category).trim().toLowerCase(),
         })
             .select("_id")
             .lean();
@@ -67,39 +82,32 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
         filters.categoryPath = new mongoose.Types.ObjectId(query.categoryId);
     }
 
-    // 5. Price Range Filter — on Product.minPrice (cheapest variant)
+    // 5. Price — on Product.minPrice (cheapest variant): ?price=min-max or ?min= / ?max=
+    const priceFilter = {};
+
     if (query.price) {
         const priceStr = String(query.price);
         if (priceStr.includes("-")) {
             const [minStr, maxStr] = priceStr.split("-");
-            const min = minStr === "" ? undefined : Number(minStr);
-            const max = maxStr === "" ? undefined : Number(maxStr);
-
-            const priceFilter = {};
-            if (min !== undefined && !isNaN(min)) priceFilter.$gte = min;
-            if (max !== undefined && !isNaN(max)) priceFilter.$lte = max;
-            if (Object.keys(priceFilter).length > 0) filters.minPrice = priceFilter;
-        } else {
-            const p = Number(priceStr);
-            if (!isNaN(p)) filters.minPrice = p;
+            if (minStr !== "" && !isNaN(Number(minStr))) priceFilter.$gte = Number(minStr);
+            if (maxStr !== "" && !isNaN(Number(maxStr))) priceFilter.$lte = Number(maxStr);
+        } else if (!isNaN(Number(priceStr))) {
+            filters.minPrice = Number(priceStr);
         }
     }
-
-    // 5b. ?min= / ?max= (used by the shop filter bar) — same field as ?price=
-    const minPrice = query.min !== undefined && query.min !== "" ? Number(query.min) : NaN;
-    const maxPrice = query.max !== undefined && query.max !== "" ? Number(query.max) : NaN;
-    if (!Number.isNaN(minPrice) || !Number.isNaN(maxPrice)) {
-        const priceFilter = { ...(filters.minPrice && typeof filters.minPrice === "object" ? filters.minPrice : {}) };
-        if (!Number.isNaN(minPrice)) priceFilter.$gte = minPrice;
-        if (!Number.isNaN(maxPrice)) priceFilter.$lte = maxPrice;
-        filters.minPrice = priceFilter;
+    if (query.min !== undefined && query.min !== "" && !isNaN(Number(query.min))) {
+        priceFilter.$gte = Number(query.min);
     }
+    if (query.max !== undefined && query.max !== "" && !isNaN(Number(query.max))) {
+        priceFilter.$lte = Number(query.max);
+    }
+    if (Object.keys(priceFilter).length) filters.minPrice = priceFilter;
 
     // 6. Tags
     if (query.tags) {
         const tagsArray = String(query.tags)
             .split(",")
-            .map((t) => t.trim())
+            .map((t) => t.trim().toLowerCase())
             .filter(Boolean);
         if (tagsArray.length > 0) filters.tags = { $in: tagsArray };
     }
@@ -110,23 +118,23 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
         if (!isNaN(minRating)) filters["metrics.score"] = { $gte: minRating };
     }
 
-    // 8. Variant attributes (color, size)
-    for (const key of ["color", "size"]) {
+    // 8. Variant attributes (size, color) — both on the SAME variant ("blue in 2T", not "blue in 3T + black in 2T")
+    const variantMatch = {};
+    for (const key of ["size", "color"]) {
         if (query[key]) {
-            filters[`variants.attributes.${key}`] = {
-                $regex: new RegExp(`^${escapeRegex(String(query[key]).slice(0, 50))}$`, "i"),
-            };
+            const match = exactAny(query[key]);
+            if (match) variantMatch[`attributes.${key}`] = match;
         }
     }
-
-    // 8b. Material lives in specs (case-insensitive)
-    if (query.material) {
-        filters["specs.material"] = {
-            $regex: new RegExp(`^${escapeRegex(String(query.material).slice(0, 50))}$`, "i"),
-        };
+    if (query.inStock === "true") variantMatch.stock = { $gt: 0 };
+    if (Object.keys(variantMatch).length) {
+        filters.variants = { $elemMatch: variantMatch };
     }
 
-    // 9. Specs (JSON)
+    // 9. Specs — ?material= shortcut and ?filter={"key":"value"} (value can be "a,b" or ["a","b"])
+    const specs = {};
+    if (query.material) specs.material = query.material;
+
     if (query.filter) {
         let parsedFilter;
         try {
@@ -134,35 +142,24 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
         } catch {
             throw new AppError(400, "Invalid 'filter' query parameter: must be valid JSON");
         }
-        for (const [key, value] of Object.entries(parsedFilter || {})) {
-            if (!/^[\w\u0600-\u06FF -]+$/.test(key)) continue;
-            filters[`specs.${key}`] = String(value);
-        }
+        if (parsedFilter && typeof parsedFilter === "object") Object.assign(specs, parsedFilter);
     }
 
-    // 10. Text search (q)
-    if (query.q) {
-        const cleanQuery = normalizeSearchText(query.q).slice(0, 100);
-        if (cleanQuery) {
-            const compactQuery = cleanQuery.replace(/\s+/g, "");
-            const tokens = cleanQuery.split(/\s+/).filter(Boolean);
+    for (const [key, value] of Object.entries(specs)) {
+        if (!/^[a-z0-9_-]{1,40}$/i.test(key)) continue;
+        const match = exactAny(Array.isArray(value) ? value.join(",") : value);
+        if (match) filters[`specs.${key}`] = match;
+    }
 
-            const searchConditions = [
-                { title: { $regex: new RegExp(escapeRegex(cleanQuery), "i") } },
-            ];
-            if (compactQuery !== cleanQuery) {
-                searchConditions.push({
-                    title: { $regex: new RegExp(escapeRegex(compactQuery), "i") },
-                });
-            }
-            if (tokens.length > 1) {
-                searchConditions.push({
-                    $and: tokens.map((token) => ({
-                        title: { $regex: new RegExp(escapeRegex(token), "i") },
-                    })),
-                });
-            }
-            andConditions.push({ $or: searchConditions });
+    // 10. Text search — every word must appear in the title or the tags ("tshirt" finds "T-Shirt")
+    if (query.q) {
+        const allWords = normalizeSearchText(query.q).slice(0, 100).split(" ").filter(Boolean);
+        const longWords = allWords.filter((word) => word.length > 1);
+        const words = (longWords.length ? longWords : allWords).slice(0, MAX_SEARCH_WORDS);
+
+        for (const word of words) {
+            const regex = looseWordRegex(word);
+            andConditions.push({ $or: [{ title: regex }, { tags: regex }] });
         }
     }
 
@@ -173,7 +170,6 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
 
     return filters;
 }
-
 /* ═══════════════════════════ CART ═══════════════════════════ */
 const itemKey = (item) =>
     `${String(item.productId?._id || item.productId || "")}::${String(
@@ -212,7 +208,6 @@ const getSellable = (product, variantId) => {
         return {
             variantId: null,
             price: Number(product.price ?? product.minPrice),
-            // age product.stock ta'rif nashode, mahdudiyat nadarim
             stock: product.stock == null ? Infinity : Number(product.stock),
             snapshot: null,
         };

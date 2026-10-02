@@ -196,13 +196,6 @@ const clearCart = async (userId) => {
     return { success: true };
 };
 
-export {
-    getUserCart,
-    addToCart,
-    removeFromCart,
-    updateCart,
-    clearCart,
-};
 
 export default {
     getUserCart,

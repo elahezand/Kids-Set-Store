@@ -2,9 +2,6 @@
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { checkoutFormSchema } from "@/validators/order";
 import { toast } from "sonner";
 import type {
   AddToCartPayload,
@@ -14,11 +11,9 @@ import type {
   CartPricing,
   CartSkipReason,
   CartView,
-  CheckoutFormValues,
   CheckoutPayload,
   CheckoutResult,
   RemoveCartItemPayload,
-  SavedAddress,
   UpdateCartPayload,
 } from "@/types";
 import { queryKeys } from "./keys";

@@ -7,11 +7,9 @@ import {
 import logger from "@/utils/logger";
 import { findProductForDetail } from "@/services/server/shared/product";
 
-/* Fields a product card / list needs (detail page loads everything) */
 const LIST_FIELDS =
     "title slug images minPrice price variants metrics status categoryPath tags shortIdentifier createdAt";
 
-/* ?sort= values the shop understands. _id is added by paginate as a tie-breaker. */
 const SORTS = {
     latest: { _id: -1 },
     price: { minPrice: 1 },
@@ -23,11 +21,8 @@ const SORTS = {
 const clampLimit = (value, fallback = 12, max = 50) =>
     Math.min(Math.max(Number(value) || fallback, 1), max);
 
-// ?value=bestSelling | latest (old links in the footer / home page) maps to a sort
-const resolveSort = (query = {}) =>
-    SORTS[query.sort] || SORTS[query.value] || SORTS.latest;
+const resolveSort = (query = {}) => SORTS[query.sort] || SORTS.latest;
 
-/* === GET ALL (PUBLIC) === */
 const getAllProducts = async (query = {}) => {
     const filters = await buildProductFilters(query);
 
@@ -46,6 +41,10 @@ const getAllProducts = async (query = {}) => {
     });
 };
 
+const getPopularProducts = async (limit = 10) => {
+    const { data } = await getAllProducts({ limit, sort: "popularity" });
+    return data;
+};
 /* Home page sections */
 const getLatestProducts = async (limit = 10) => {
     const { data } = await getAllProducts({ limit, sort: "latest" });
@@ -297,15 +296,7 @@ const productService = {
     getBestSellingProducts,
     getRelatedProducts,
     getProductById,
-    smartSearch,
-};
-
-export {
-    getAllProducts,
-    getLatestProducts,
-    getBestSellingProducts,
-    getRelatedProducts,
-    getProductById,
+    getPopularProducts,
     smartSearch,
 };
 

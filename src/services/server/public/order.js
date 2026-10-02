@@ -48,7 +48,6 @@ const verify = async (authority) => {
         };
     }
 
-    // Only one request may run the payment + finalize at a time
     const staleBefore = new Date(
         Date.now() - STALE_CLAIM_MS
     );
@@ -57,10 +56,7 @@ const verify = async (authority) => {
         {
             "payment.authority": authority,
             paymentStatus: { $ne: "paid" },
-
-            // Cancelled orders must never be charged/finalized
             status: { $ne: "cancelled" },
-
             $or: [
                 { finalizedAt: null },
                 { finalizedAt: { $lt: staleBefore } },
@@ -88,8 +84,6 @@ const verify = async (authority) => {
         toRial(claimed.pricing.total)
     );
 
-    // Gateway is unreachable → leave payment pending
-    // so the sweeper can retry later.
     if (!result.success && result.unreachable) {
         claimed.finalizedAt = null;
         await claimed.save();
@@ -113,9 +107,7 @@ const verify = async (authority) => {
         };
     }
 
-    // Mark paid BEFORE finalization.
-    // If the server crashes after this point,
-    // the next request can resume the finalization.
+
     claimed.paymentStatus = "paid";
     claimed.payment.refId = result.refId;
     claimed.payment.paidAt = new Date();
@@ -131,10 +123,8 @@ const verify = async (authority) => {
     };
 };
 
-export  {
+const verifyService = {
     verify,
 };
 
-export default {
-    verify,
-};
+export default verifyService

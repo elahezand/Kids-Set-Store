@@ -1,32 +1,31 @@
 import Link from "next/link";
-import { FaChevronRight } from "react-icons/fa";
 
 interface SectionHeaderProps {
   title: string;
+  /** one short line under the title */
+  description?: string;
   href?: string;
   linkLabel?: string;
 }
 
-const SectionHeader = ({ title, href, linkLabel = "See More" }: SectionHeaderProps) => {
+const SectionHeader = ({ title, description, href, linkLabel = "View all" }: SectionHeaderProps) => {
   return (
-    <div className="flex items-center justify-between mb-8 sm:mb-10 lg:mb-12 px-4 sm:px-0">
-      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-light tracking-tight text-gray-900 dark:text-white flex-1">
-        {title}
-      </h2>
+    <div className="mb-6 flex items-end justify-between gap-4 sm:mb-8">
+      <div className="min-w-0">
+        <h2 className="font-shabnam-bold text-2xl leading-tight tracking-tight text-text-dark dark:text-white sm:text-[2rem]">
+          {title}
+        </h2>
+        {description && (
+          <p className="mt-1.5 max-w-[52ch] text-sm text-gray-700 dark:text-gray-500 sm:text-base">{description}</p>
+        )}
+      </div>
 
       {href && (
-        <Link 
-          href={href} 
-          className="group flex items-center gap-2 text-xs sm:text-sm font-light text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-all duration-200 whitespace-nowrap ml-4"
-          prefetch={true}
+        <Link
+          href={href}
+          className="shrink-0 rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-text-dark transition-colors hover:border-sage-600 hover:text-sage-700 dark:border-white/15 dark:text-gray-100 dark:hover:border-sage-400 dark:hover:text-sage-300"
         >
-          <span className="group-hover:translate-x-0.5 transition-transform duration-200">
-            {linkLabel}
-          </span>
-          <FaChevronRight 
-            className="text-xs opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" 
-            aria-hidden="true"
-          />
+          {linkLabel}
         </Link>
       )}
     </div>

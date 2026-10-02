@@ -4,10 +4,8 @@ const createContact = async (data) => {
     return Contact.create(data);
 };
 
-export {
+const contacrService = {
     createContact,
 };
 
-export default {
-    createContact,
-};
+export default contacrService

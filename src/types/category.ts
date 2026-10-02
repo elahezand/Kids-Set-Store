@@ -1,10 +1,8 @@
 import type { Id } from "./api";
 
-/* services/server/public/category getAllCategories() node */
 export interface CategoryNode {
   id: Id;
   title: string;
-  /** alias of title (older UI) */
   name: string;
   slug: string;
   description: string;
@@ -12,10 +10,24 @@ export interface CategoryNode {
   children: CategoryNode[];
 }
 
-/* flat option for a <select> (with depth prefix) */
 export interface CategoryOption {
   slug: string;
   label: string;
+}
+
+export type CategoryFilterType = "select" | "radio" | "boolean" | "text";
+
+export interface CategoryFilterOption {
+  value: string;
+  label: string;
+}
+
+export interface CategoryFilter {
+  name: string;
+  slug: string;
+  type: CategoryFilterType;
+  options: CategoryFilterOption[];
+  required?: boolean;
 }
 
 export interface CategoryDetail {
@@ -24,4 +36,5 @@ export interface CategoryDetail {
   name?: string;
   slug: string;
   description?: string;
+  filters?: CategoryFilter[];
 }

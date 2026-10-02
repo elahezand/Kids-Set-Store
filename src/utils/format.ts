@@ -1,8 +1,4 @@
-/*
-  One place for how money / dates are shown on the site.
-  Prices in the DB are Toman (see toRial() in the order services); the UI labels them
-  with CURRENCY — change it here only.
-*/
+
 export const CURRENCY = "$";
 
 export const formatPrice = (value: number | string | null | undefined): string => {
@@ -23,5 +19,4 @@ export const formatDate = (value: string | number | Date | null | undefined): st
   }).format(date);
 };
 
-/* lean() docs / ObjectIds / Dates -> plain JSON that can cross into client components */
 export const toPlain = <T>(value: T): T => JSON.parse(JSON.stringify(value ?? null));

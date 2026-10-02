@@ -49,7 +49,6 @@ exports.verifyPayment = async (authority, amountInRial) => {
             amount: Math.round(amountInRial),
         });
     } catch (err) {
-        // network problem: unknown, NOT "failed" — the caller keeps the order pending and retries later
         return { success: false, unreachable: true, message: "Payment gateway unreachable" };
     }
 

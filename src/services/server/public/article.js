@@ -130,9 +130,11 @@ const getOtherPublicArticles = async (excludeId, limit = 4) => {
         .lean();
 };
 
-export default {
+const articleService = {
     getPublicArticles,
     getPublicArticleCategories,
     getPublicArticleById,
     getOtherPublicArticles,
 };
+
+export default articleService

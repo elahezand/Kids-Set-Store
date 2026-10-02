@@ -9,7 +9,6 @@ import {
 } from "@/services/server/shared/wallet";
 
 import {
-    paginate,
     calculateCartTotals,
     getCouponProblem,
 } from "@/utils/helper";
@@ -17,33 +16,23 @@ import {
 import { round2 } from "@/utils/pricing";
 import logger from "@/utils/logger";
 
-import { createPayment } from "@/services/server/shared/zarinpal";
+// one place for the gateway url / Rial conversion (with safe defaults in zarinpal.js)
+import {
+    createPayment,
+    paymentUrl as payUrl,
+    tomanToRial as toRial,
+} from "../shared/zarinpal";
 
 import {
     buildOrderIdSearchExpr,
     finalizeOrder,
     revertOrder,
     completeDeliveredOrder,
-} from "@/services/server/shared/order";
-
-import {
-    buildListQuery,
-    listLimit,
-} from "@/utils/listQuery";
+} from "../shared/order";
 
 import { isValidObjectId } from "mongoose";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-
-const START_PAY_URL =
-    process.env.ZARINPAL_PAYMENT_BASE_URL ||
-    "https://payment.zarinpal.com/pg/StartPay/";
-
-const payUrl = (authority) =>
-    `${START_PAY_URL.replace(/\/?$/, "/")}${authority}`;
-
-const toRial = (toman) =>
-    Math.round(Number(toman || 0) * 10);
 
 /* ========================= CHECKOUT ========================= */
 
@@ -54,6 +43,7 @@ const checkout = async (
     idempotencyKey = null,
     useWallet = false
 ) => {
+    // same key twice (double click / retry) -> return the order already created
     if (idempotencyKey) {
         const existing = await Order.findOne({
             user: userId,
@@ -73,6 +63,7 @@ const checkout = async (
         }
     }
 
+    // lock the cart: a second checkout at the same time finds no "active" cart
     const cart = await Cart.findOneAndUpdate(
         {
             user: userId,
@@ -110,6 +101,36 @@ const checkout = async (
                 error
             )
         );
+
+    /*
+      Undo everything a failed checkout already did:
+      cancel the unpaid order, give the cart back, return the wallet money.
+    */
+    const rollback = async (reason) => {
+        if (createdOrder) {
+            await Order.updateOne(
+                { _id: createdOrder._id, paymentStatus: { $ne: "paid" } },
+                { $set: { status: "cancelled", paymentStatus: "failed" } }
+            ).catch((error) =>
+                logger.error(
+                    `[checkout] could not cancel order ${createdOrder._id}:`,
+                    error
+                )
+            );
+        }
+
+        await unlockCart();
+
+        if (walletSpent > 0 && createdOrder) {
+            await refundToWallet(
+                userId,
+                createdOrder._id,
+                walletSpent,
+                reason
+            );
+            walletSpent = 0;
+        }
+    };
 
     try {
         const coupon =
@@ -211,11 +232,9 @@ const checkout = async (
         let paymentUrl = null;
 
         /* ========================= WALLET ========================= */
+        // takes what it can from the wallet; the rest is paid below (ZarinPal / cash)
 
         if (walletPlanned > 0) {
-            order.finalizedAt = new Date();
-            await order.save();
-
             const charged = await spendFromWallet(
                 userId,
                 order._id,
@@ -236,6 +255,7 @@ const checkout = async (
         }
 
         /* ========================= FULL WALLET PAYMENT ========================= */
+        // nothing left to pay -> the order is paid and finalized right now
 
         if (
             order.pricing.total === 0 &&
@@ -243,7 +263,7 @@ const checkout = async (
         ) {
             order.paymentMethod = "wallet";
             order.paymentStatus = "paid";
-
+            order.finalizedAt = new Date();
             order.payment = {
                 authority: null,
                 refId: null,
@@ -265,6 +285,7 @@ const checkout = async (
         }
 
         /* ========================= ZARINPAL ========================= */
+        // finalizedAt stays null: verify() sets it after ZarinPal confirms the payment
 
         if (
             (paymentMethod === "wallet" ||
@@ -278,10 +299,7 @@ const checkout = async (
             );
 
             if (!payment?.data?.authority) {
-                order.status = "cancelled";
-                order.paymentStatus = "failed";
-
-                await order.save();
+                await rollback("payment init failed");
 
                 return {
                     success: false,
@@ -294,6 +312,8 @@ const checkout = async (
 
             order.payment = {
                 authority: payment.data.authority,
+                refId: null,
+                paidAt: null,
             };
 
             paymentUrl = payUrl(payment.data.authority);
@@ -302,6 +322,7 @@ const checkout = async (
         }
 
         /* ========================= CASH ========================= */
+        // paid on delivery -> finalize now (stock reserved, coupon counted)
 
         if (paymentMethod === "cash") {
             order.finalizedAt =
@@ -321,17 +342,7 @@ const checkout = async (
             },
         };
     } catch (error) {
-        await unlockCart();
-
-        if (walletSpent > 0 && createdOrder) {
-            await refundToWallet(
-                userId,
-                createdOrder._id,
-                walletSpent,
-                "checkout failed"
-            );
-        }
-
+        await rollback("checkout failed");
         throw error;
     }
 };
@@ -538,15 +549,6 @@ const confirmDelivery = async (orderId, userId) => {
         success: true,
         data: order,
     };
-};
-
-export {
-    checkout,
-    getMyOrders,
-    getOrderById,
-    updateOrderByOwner,
-    cancelOrder,
-    confirmDelivery,
 };
 
 export default {

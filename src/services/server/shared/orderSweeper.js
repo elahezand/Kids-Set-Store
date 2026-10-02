@@ -26,7 +26,7 @@ const completeHalfFinishedOrders = async () => {
     const orders = await Order.find({
         finalizedAt: { $ne: null },
         status: { $nin: ["cancelled"] },
-        items: { stockReserved: false }
+        "items.stockReserved": false,
     }).limit(BATCH);
 
     let fixed = 0;

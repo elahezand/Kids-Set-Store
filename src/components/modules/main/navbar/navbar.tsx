@@ -6,8 +6,8 @@ import CartCount from "@/components/modules/main/navbar/cart";
 import MobileMenu from "@/components/modules/main/navbar/mobileMenu";
 import ThemeToggle from "@/components/modules/ui/themeToggle";
 import { getMe } from "@/utils/auth/authGuard";
-import { getAllCategories } from "@/services/server/public/category";
 import type { CategoryNode } from "@/types";
+import categoryService from "@/services/server/public/category";
 import favoriteService from "@/services/server/user/favorite";
 
 const categoryHref = (category: CategoryNode) =>
@@ -26,7 +26,7 @@ const Navbar = async () => {
 
   const [user, tree] = await Promise.all([
     getMe(),
-    getAllCategories() as Promise<CategoryNode[]>,
+    categoryService.getAllCategories() as Promise<CategoryNode[]>,
   ]);
 
   // same service as GET /api/user/favorites/count

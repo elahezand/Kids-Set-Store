@@ -7,9 +7,10 @@ import FilterSection from "@/components/template/main/products/filterSection";
 import ProductList from "@/components/template/main/products/productList";
 import { listKey, toQuery } from "@/utils/searchParams";
 import { toInitialPage } from "@/utils/initialPage";
+import { toPlain } from "@/utils/format";
 import type { CategoryDetail, CategoryNode, ListingQuery, PageProps, Pagination, ProductDoc } from "@/types";
 
-const DEFAULT_LIMIT = 12;
+const DEFAULT_LIMIT = 15;
 
 type ListingResult = { data: ProductDoc[]; pagination: Pagination };
 
@@ -47,12 +48,12 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const title = category?.title || (query.q ? `Search: ${query.q}` : "Products");
 
   return (
-    <div className="page-container">
+    <div className="p-12">
       <Breadcrumb route="products" title={title} />
 
       <h1 className="section-title mb-8 capitalize">{title}</h1>
 
-      <FilterSection categories={tree} />
+      <FilterSection categories={tree} categoryFilters={toPlain(category?.filters ?? [])} />
 
       <ProductList
         key={listKey(query)}

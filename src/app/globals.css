@@ -1,3 +1,8 @@
+/* =========================================================================
+   Kids clothing & shoes storefront — "Blueberry & Bubblegum" theme (Tailwind v4)
+   Class names and token names are unchanged, so existing JSX keeps working.
+   ========================================================================= */
+
 /* 1. Tailwind ------------------------------------------------------------ */
 @import "tailwindcss";
 
@@ -5,123 +10,166 @@
 
 /* 2. Design tokens ------------------------------------------------------- */
 @theme {
-  /* Brand — coral (accent) */
-  --color-coral: #ff8c61;
-  --color-coral-50: #fff0eb;
-  --color-coral-100: #ffded1;
-  --color-coral-200: #ffc0a8;
-  --color-coral-300: #ff8c61;
-  --color-coral-400: #ff6b33;
-  --color-coral-500: #f54300;
-  --color-coral-600: #c23500;
-  --color-coral-700: #942800;
-  --color-coral-800: #661c00;
-  --color-coral-900: #421200;
+  /* -----------------------------------------------------------------------
 
-  /* Brand — sage (primary) */
-  --color-sage: #7bc89c;
-  --color-sage-50: #f0f9f4;
-  --color-sage-100: #def2e7;
-  --color-sage-200: #c0e7d1;
-  --color-sage-300: #97d8b3;
-  --color-sage-400: #7bc89c;
-  --color-sage-500: #43b272;
-  --color-sage-600: #358d5b;
-  --color-sage-700: #286b45;
-  --color-sage-800: #1c4a30;
-  --color-sage-900: #12301f;
+  /* Primary — "blueberry" (token name: sage). 600+ is AA with white text. */
+  --color-sage: #7a80f6;
+  --color-sage-50: #f0f2ff;
+  --color-sage-100: #e2e6ff;
+  --color-sage-200: #c9d0ff;
+  --color-sage-300: #a3acfc;
+  --color-sage-400: #7a80f6;
+  --color-sage-500: #5b5bec;
+  --color-sage-600: #4a43d6;
+  --color-sage-700: #3c35b0;
+  --color-sage-800: #322e8c;
+  --color-sage-900: #1f1d57;
 
-  --color-mint: #a8e6cf;
-  --color-mint-50: #effbf6;
-  --color-mint-100: #daf6ec;
-  --color-mint-200: #a8e6cf;
-  --color-mint-300: #8ce3c3;
-  --color-mint-400: #5bd7a9;
-  --color-mint-500: #30c58e;
-  --color-mint-600: #269c70;
-  --color-mint-700: #1d7756;
-  --color-mint-800: #14523b;
-  --color-mint-900: #0d3526;
+  /* Accent — "bubblegum" raspberry pink (token name: coral). 600+ with white text. */
+  --color-coral: #ff94b8;
+  --color-coral-50: #fff0f5;
+  --color-coral-100: #ffe1ec;
+  --color-coral-200: #ffc2d8;
+  --color-coral-300: #ff94b8;
+  --color-coral-400: #ff5f94;
+  --color-coral-500: #f43f7a;
+  --color-coral-600: #d42463;
+  --color-coral-700: #ae1a51;
+  --color-coral-800: #861543;
+  --color-coral-900: #5a0f2e;
 
-  --color-peach: #ffd3b6;
-  --color-peach-50: #fff3eb;
-  --color-peach-100: #ffe3d1;
-  --color-peach-200: #ffd3b6;
-  --color-peach-300: #ffa970;
-  --color-peach-400: #ff8433;
-  --color-peach-500: #f56100;
-  --color-peach-600: #c24d00;
-  --color-peach-700: #943b00;
-  --color-peach-800: #662900;
-  --color-peach-900: #421a00;
+  /* Supporting — "pistachio" fresh green (token name: mint) */
+  --color-mint: #9be3c4;
+  --color-mint-50: #edfcf5;
+  --color-mint-100: #d3f8e7;
+  --color-mint-200: #9be3c4;
+  --color-mint-300: #6dd4aa;
+  --color-mint-400: #3fbf8c;
+  --color-mint-500: #22a374;
+  --color-mint-600: #17845e;
+  --color-mint-700: #14694d;
+  --color-mint-800: #12533e;
+  --color-mint-900: #0b3428;
 
-  --color-danger: #e74c3c;
-  --color-danger-light: #f86565;
-  --color-danger-50: #feeeec;
-  --color-danger-100: #fcd8d4;
-  --color-danger-200: #f9b5ae;
-  --color-danger-300: #f5867a;
-  --color-danger-400: #e74c3c;
-  --color-danger-500: #e42511;
-  --color-danger-600: #b41d0e;
-  --color-danger-700: #89160a;
-  --color-danger-800: #5f0f07;
-  --color-danger-900: #3e0a05;
+  /* Supporting — "apricot" warm orange (token name: peach) */
+  --color-peach: #ffd2a8;
+  --color-peach-50: #fff7ed;
+  --color-peach-100: #ffecd5;
+  --color-peach-200: #ffd2a8;
+  --color-peach-300: #ffb170;
+  --color-peach-400: #ff8a3d;
+  --color-peach-500: #f76b15;
+  --color-peach-600: #d0530c;
+  --color-peach-700: #a5400d;
+  --color-peach-800: #7c3110;
+  --color-peach-900: #4f1f0b;
 
-  --color-success: #7bc89c;
-  --color-success-light: #e6ffed;
+  /* Sky — "new arrival", boys' collection, info */
+  --color-sky-50: #eff8ff;
+  --color-sky-100: #dbeefe;
+  --color-sky-200: #bfe2fe;
+  --color-sky-300: #93cffd;
+  --color-sky-400: #60b4fa;
+  --color-sky-500: #3b96f6;
+  --color-sky-600: #2578ea;
+  --color-sky-700: #1d62d1;
+  --color-sky-800: #1e50a8;
+  --color-sky-900: #1e4584;
 
-  /* Neutrals */
-  --color-gray-50: #f9f9f9;
-  --color-gray-100: #f3f3f3;
-  --color-gray-200: #ebebeb;
-  --color-gray-300: #dfdfdf;
-  --color-gray-400: #d9d9d9;
-  --color-gray-500: #b3b3b3;
-  --color-gray-600: #8c8c8c;
-  --color-gray-700: #676767;
-  --color-gray-800: #414042;
-  --color-gray-900: #232222;
+  /* Sun — highlights, ratings, promo strips */
+  --color-sun-50: #fffbea;
+  --color-sun-100: #fff3c4;
+  --color-sun-200: #ffe68a;
+  --color-sun-300: #ffd54f;
+  --color-sun-400: #ffc425;
+  --color-sun-500: #f5a70b;
+  --color-sun-600: #d98106;
+  --color-sun-700: #b45c09;
+  --color-sun-800: #92470e;
+  --color-sun-900: #783b0f;
 
-  /* Dark surfaces (panels & dark mode) */
-  --color-ink-700: #2e323a;
-  --color-ink-800: #1f2228;
-  --color-ink-900: #16181c;
-  --color-ink-950: #0f1113;
+  /* Status — red kept clearly apart from the pink accent */
+  --color-danger: #e5484d;
+  --color-danger-light: #f87171;
+  --color-danger-50: #fef1f1;
+  --color-danger-100: #fde0e0;
+  --color-danger-200: #fbc5c6;
+  --color-danger-300: #f69a9c;
+  --color-danger-400: #ec6b6f;
+  --color-danger-500: #e5484d;
+  --color-danger-600: #c62f35;
+  --color-danger-700: #a1252a;
+  --color-danger-800: #741c20;
+  --color-danger-900: #4a1215;
 
-  --color-text: #444444;
-  --color-text-dark: #232222;
+  --color-success: #22a374;
+  --color-success-light: #edfcf5;
 
-  /* Typography */
+  /* Neutrals — cool lavender-grey, matches the blueberry brand colour */
+  --color-gray-50: #f8f8fc;
+  --color-gray-100: #f1f1f7;
+  --color-gray-200: #e6e6ef;
+  --color-gray-300: #d6d6e2;
+  --color-gray-400: #b9b9c9;
+  --color-gray-500: #9393a7;
+  --color-gray-600: #6e6e84;
+  --color-gray-700: #55556a;
+  --color-gray-800: #3a3a4d;
+  --color-gray-900: #22222f;
+
+  /* Dark surfaces — deep blueberry night instead of plain black */
+  --color-ink-700: #2a2a3d;
+  --color-ink-800: #1c1c2b;
+  --color-ink-900: #14141f;
+  --color-ink-950: #0e0e16;
+
+  --color-text: #3a3a4d;
+  --color-text-dark: #1b1b2e;
+
+  /* Typography — one family, real weights (no faux bold) */
   --font-sans: shabnam, ui-sans-serif, system-ui, sans-serif;
   --font-shabnam: shabnam, sans-serif;
-  --font-shabnam-bold: shabnam-Bold, sans-serif;
+  --font-shabnam-bold: shabnam, sans-serif; /* kept for old class names */
 
   /* Layout */
   --container-container: 1240px;
   --breakpoint-xs: 420px;
 
-  /* Elevation */
-  --shadow-card: 0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.06);
-  --shadow-float: 0 12px 32px -8px rgb(16 24 40 / 0.18);
+  /* Elevation — warm-tinted shadows instead of flat grey */
+  --shadow-card: 0 1px 2px rgb(34 34 60 / 0.04), 0 2px 6px rgb(34 34 60 / 0.06);
+  --shadow-float: 0 16px 40px -12px rgb(34 34 60 / 0.22);
+  --shadow-pop: 0 6px 0 0 var(--color-sage-700);
 
   /* Animations */
   --animate-fade-in: fade-in 0.2s ease-out;
   --animate-scale-in: scale-in 0.2s ease-out;
+  --animate-wiggle: wiggle 0.5s ease-in-out;
 }
+
 .dark [data-sonner-toaster][data-sonner-theme] {
-  --normal-bg: #1f2937;
-  --normal-text: #fff;
-  --normal-border: #374151;
+  --normal-bg: var(--color-ink-800);
+  --normal-text: var(--color-gray-100);
+  --normal-border: rgb(255 255 255 / 0.1);
 }
 
 /* 3. Base ---------------------------------------------------------------- */
+/* Both files live under one family name, so font-medium / font-semibold /
+   font-bold pick the real file instead of the browser faking bold. */
 @font-face {
   font-family: shabnam;
   src: url("/fonts/shabnam/Shabnam-Medium.woff") format("woff");
+  font-weight: 100 500;
   font-display: swap;
 }
 
+@font-face {
+  font-family: shabnam;
+  src: url("/fonts/shabnam/Shabnam-Bold.woff") format("woff");
+  font-weight: 600 900;
+  font-display: swap;
+}
+
+/* Backwards compatibility for anything using font-family: shabnam-Bold */
 @font-face {
   font-family: shabnam-Bold;
   src: url("/fonts/shabnam/Shabnam-Bold.woff") format("woff");
@@ -132,12 +180,15 @@
   html,
   body {
     max-width: 100vw;
+    /* NOTE: for a Persian storefront, prefer removing this and setting
+       <html dir="rtl" lang="fa"> in the root layout. */
     direction: ltr;
   }
 
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 6rem;
+    -webkit-tap-highlight-color: transparent;
   }
 
   img,
@@ -151,17 +202,20 @@
   h1,
   h2,
   h3 {
+    @apply font-bold text-text-dark dark:text-white;
     text-wrap: balance;
+    line-height: 1.35;
   }
 
   p {
     text-wrap: pretty;
+    line-height: 1.85;
   }
 
   :where(a, button, [role="button"], input, select, textarea, summary):focus-visible {
     outline: 2px solid var(--color-sage-500);
     outline-offset: 2px;
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
   }
 
   body {
@@ -185,7 +239,7 @@
   }
 
   ::selection {
-    @apply bg-sage-200 text-sage-900;
+    @apply bg-coral-200 text-sage-900;
   }
 
   /* Scrollbar */
@@ -193,20 +247,20 @@
     width: 10px;
   }
 
-  body::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-coral-300;
+  body::-webkit-scrollbar-track {
+    @apply bg-gray-50 dark:bg-ink-950;
   }
 
-  html.dark body::-webkit-scrollbar-thumb {
-    @apply bg-sage-600;
+  body::-webkit-scrollbar-thumb {
+    @apply rounded-full border-2 border-solid border-gray-50 bg-coral-300 dark:border-ink-950 dark:bg-sage-600;
   }
 }
 
 /* 4. Components ---------------------------------------------------------- */
 @layer components {
-
+  /* Layout ---------------------------------------------------------------- */
   .section-y {
-    @apply py-16 sm:py-20 md:py-28 lg:py-32;
+    @apply py-14 sm:py-20 md:py-24 lg:py-28;
   }
 
   .container-x {
@@ -214,7 +268,7 @@
   }
 
   .page-container {
-    @apply mx-auto w-full max-w-container px-4 py-16 sm:px-6 sm:py-20 md:py-28 lg:px-8 lg:py-32;
+    @apply mx-auto w-full px-8 py-14 sm:px-4 sm:py-20 md:py-24 lg:px-12 lg:py-28;
   }
 
   .full-bleed {
@@ -226,42 +280,54 @@
   }
 
   .card-hover {
-    @apply transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-float;
+    @apply transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-float motion-reduce:hover:translate-y-0;
   }
 
+  /* Section heading: soft wavy underline instead of a hard 2px rule */
   .section-head {
-    @apply mb-8 flex flex-wrap items-center justify-between gap-3 border-b-2 border-sage-400 pb-4 dark:border-sage-600 sm:mb-10;
+    @apply relative mb-8 flex flex-wrap items-end justify-between gap-3 pb-5 sm:mb-10;
+  }
+
+  .section-head::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 8px;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='8' viewBox='0 0 24 8'%3e%3cpath d='M0 4 Q6 0 12 4 T24 4' fill='none' stroke='%23a3acfc' stroke-width='2'/%3e%3c/svg%3e");
+    background-repeat: repeat-x;
+    opacity: 0.9;
   }
 
   .section-title {
-    @apply text-lg font-bold text-text dark:text-gray-100 sm:text-xl;
+    @apply text-xl font-bold text-text-dark dark:text-white sm:text-2xl;
   }
 
   .section-link {
-    @apply flex items-center gap-1.5 text-sm font-semibold text-coral-400 transition-colors hover:text-coral-500 sm:text-base;
+    @apply flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold text-coral-600 transition-colors hover:bg-coral-50 hover:text-coral-700 dark:text-coral-300 dark:hover:bg-coral-500/10 sm:text-base;
   }
 
   /* Auth pages (login/register, forgot password) share this shell */
   .auth-shell {
-    @apply relative z-1 mx-auto grid w-full max-w-[1100px] grid-cols-1 items-center gap-0 overflow-hidden rounded-3xl border-2 border-mint-200 bg-white shadow-float dark:border-sage-700 dark:bg-ink-800 md:grid-cols-2;
+    @apply relative z-1 mx-auto grid w-full max-w-[1100px] grid-cols-1 items-center gap-0 overflow-hidden rounded-[2rem] border border-mint-200 bg-white shadow-float dark:border-sage-800 dark:bg-ink-800 md:grid-cols-2;
   }
 
   .auth-card {
-    @apply mx-auto grid w-full max-w-[420px] gap-4 rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-card dark:border-white/10 dark:bg-ink-900 sm:gap-5 sm:p-8;
+    @apply mx-auto grid w-full max-w-[420px] gap-4 rounded-3xl border border-gray-200 bg-white p-6 text-center shadow-card dark:border-white/10 dark:bg-ink-900 sm:gap-5 sm:p-8;
   }
 
   /* Buttons --------------------------------------------------------------- */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-all duration-150 select-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition-all duration-150 select-none active:scale-[0.97];
     @apply focus-visible:outline-none focus-visible:ring-4 disabled:pointer-events-none disabled:opacity-60;
   }
 
   .btn-sm {
-    @apply gap-1.5 rounded-md px-2.5 py-1.5 text-xs;
+    @apply gap-1.5 rounded-lg px-3 py-1.5 text-xs;
   }
 
   .btn-lg {
-    @apply px-5 py-3 text-base;
+    @apply rounded-2xl px-6 py-3.5 text-base;
   }
 
   .btn-icon {
@@ -272,16 +338,17 @@
     @apply bg-sage-600 text-white shadow-card hover:bg-sage-700 focus-visible:ring-sage-500/25;
   }
 
+  /* Coral 600 keeps white text readable (AA); 500 was too light */
   .btn-accent {
-    @apply bg-coral-500 text-white shadow-card hover:bg-coral-600 focus-visible:ring-coral-400/30;
+    @apply bg-coral-600 text-white shadow-card hover:bg-coral-700 focus-visible:ring-coral-400/30;
   }
 
   .btn-danger {
-    @apply bg-danger-500 text-white shadow-card hover:bg-danger-600 focus-visible:ring-danger-400/30;
+    @apply bg-danger-600 text-white shadow-card hover:bg-danger-700 focus-visible:ring-danger-400/30;
   }
 
   .btn-secondary {
-    @apply border border-gray-300 bg-white text-gray-800 shadow-card hover:bg-gray-50 focus-visible:ring-gray-400/25;
+    @apply border border-gray-300 bg-white text-gray-800 shadow-card hover:border-gray-400 hover:bg-gray-50 focus-visible:ring-gray-400/25;
     @apply dark:border-white/10 dark:bg-ink-800 dark:text-gray-100 dark:hover:bg-ink-700;
   }
 
@@ -299,16 +366,32 @@
     @apply dark:bg-sage-500/10 dark:text-sage-300 dark:hover:bg-sage-500/20;
   }
 
+  /* Chunky "toy" button for the one main CTA (e.g. Add to cart) */
+  .btn-pop {
+    @apply bg-sage-500 text-white focus-visible:ring-sage-500/30;
+    box-shadow: 0 4px 0 0 var(--color-sage-700);
+    transform: translateY(-2px);
+  }
+
+  .btn-pop:hover {
+    @apply bg-sage-600;
+  }
+
+  .btn-pop:active {
+    box-shadow: 0 1px 0 0 var(--color-sage-700);
+    transform: translateY(1px);
+  }
+
   /* Forms ----------------------------------------------------------------- */
   .label {
     @apply mb-1.5 block text-sm font-medium text-gray-800 dark:text-gray-300;
   }
 
   .input {
-    @apply block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-card outline-none transition;
-    @apply placeholder:text-gray-600 focus:border-sage-500 focus:ring-4 focus:ring-sage-500/15;
-    @apply disabled:cursor-not-allowed disabled:opacity-60;
-    @apply dark:border-white/10 dark:bg-ink-900 dark:text-gray-100 dark:placeholder:text-gray-600;
+    @apply block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-card outline-none transition;
+    @apply placeholder:text-gray-600 hover:border-gray-400 focus:border-sage-500 focus:ring-4 focus:ring-sage-500/15;
+    @apply disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-70;
+    @apply dark:border-white/10 dark:bg-ink-900 dark:text-gray-100 dark:placeholder:text-gray-500;
   }
 
   textarea.input {
@@ -317,13 +400,13 @@
 
   select.input {
     @apply appearance-none bg-no-repeat pr-10;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%238c8c8c' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236e6e84' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 0.6rem center;
     background-size: 1.25rem;
   }
 
   input[type="file"].input {
-    @apply cursor-pointer p-1.5 file:mr-3 file:rounded-md file:border-0 file:bg-sage-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-sage-700 hover:file:bg-sage-100;
+    @apply cursor-pointer p-1.5 file:mr-3 file:rounded-lg file:border-0 file:bg-sage-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-sage-700 hover:file:bg-sage-100;
     @apply dark:file:bg-sage-500/10 dark:file:text-sage-300;
   }
 
@@ -332,7 +415,7 @@
   }
 
   .field-error {
-    @apply mt-1.5 block text-xs font-medium text-danger-500;
+    @apply mt-1.5 block text-xs font-medium text-danger-600 dark:text-danger-300;
   }
 
   .field-hint {
@@ -341,9 +424,9 @@
 
   /* Custom checkbox (storefront forms) */
   .checkbox {
-    @apply relative size-5 shrink-0 cursor-pointer appearance-none rounded border border-coral-300 bg-white outline-none transition;
-    @apply hover:ring-4 hover:ring-gray-200 focus-visible:ring-4 focus-visible:ring-gray-200 checked:border-coral-400 checked:bg-coral-400;
-    @apply dark:bg-ink-800 dark:hover:ring-white/10;
+    @apply relative size-5 shrink-0 cursor-pointer appearance-none rounded-md border-2 border-gray-300 bg-white outline-none transition;
+    @apply hover:border-coral-300 focus-visible:ring-4 focus-visible:ring-coral-200 checked:border-coral-500 checked:bg-coral-500;
+    @apply dark:border-white/20 dark:bg-ink-800;
   }
 
   .checkbox:checked::after {
@@ -373,6 +456,101 @@
     @apply p-5;
   }
 
+  /* Storefront: product card ---------------------------------------------- */
+  .product-card {
+    @apply relative flex flex-col overflow-hidden rounded-3xl bg-white transition-shadow duration-300 hover:shadow-float dark:bg-ink-800;
+  }
+
+  /* Soft pastel "stage" behind the product photo */
+  .product-card-media {
+    @apply relative aspect-[4/5] overflow-hidden rounded-3xl bg-coral-50 dark:bg-white/5;
+  }
+
+  .product-card-media img {
+    @apply transition-transform duration-500;
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .product-card:hover .product-card-media img {
+      transform: scale(1.05);
+    }
+  }
+
+  .product-card:nth-child(4n + 2) .product-card-media {
+    @apply bg-sage-50 dark:bg-white/5;
+  }
+
+  .product-card:nth-child(4n + 3) .product-card-media {
+    @apply bg-sky-50 dark:bg-white/5;
+  }
+
+  .product-card:nth-child(4n + 4) .product-card-media {
+    @apply bg-sun-50 dark:bg-white/5;
+  }
+
+  .product-card-body {
+    @apply flex flex-1 flex-col gap-1.5 px-2 pt-3 pb-4;
+  }
+
+  .product-card-title {
+    @apply line-clamp-2 text-sm font-medium text-gray-900 dark:text-gray-100 sm:text-base;
+  }
+
+  /* Prices */
+  .price {
+    @apply text-base font-bold text-text-dark tabular-nums dark:text-white sm:text-lg;
+  }
+
+  .price-old {
+    @apply text-sm text-gray-600 tabular-nums line-through decoration-coral-400/70 dark:text-gray-500;
+  }
+
+  .discount-tag {
+    @apply absolute top-3 left-3 z-10 rounded-full bg-coral-600 px-2.5 py-1 text-xs font-bold text-white shadow-card;
+  }
+
+  /* Filter / category chips */
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800 transition-colors hover:border-sage-300 hover:bg-sage-50;
+    @apply dark:border-white/10 dark:bg-ink-800 dark:text-gray-200 dark:hover:bg-white/5;
+  }
+
+  .chip-active,
+  .chip[aria-pressed="true"] {
+    @apply border-sage-600 bg-sage-600 text-white hover:border-sage-700 hover:bg-sage-700;
+  }
+
+  /* Size picker: <label class="size-option"><input type="radio" class="sr-only">3-4Y</label> */
+  .size-option {
+    @apply inline-flex min-w-12 cursor-pointer items-center justify-center rounded-xl border-2 border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 tabular-nums transition;
+    @apply hover:border-sage-400 has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-sage-500/20;
+    @apply has-[:checked]:border-sage-600 has-[:checked]:bg-sage-50 has-[:checked]:text-sage-800;
+    @apply has-[:disabled]:cursor-not-allowed has-[:disabled]:border-dashed has-[:disabled]:text-gray-500 has-[:disabled]:line-through;
+    @apply dark:border-white/10 dark:bg-ink-800 dark:text-gray-200 dark:has-[:checked]:bg-sage-500/15 dark:has-[:checked]:text-sage-200;
+  }
+
+  /* Color swatch: <label class="swatch" style="--swatch:#ffb3c7"><input type="radio" class="sr-only"></label> */
+  .swatch {
+    @apply relative inline-block size-8 cursor-pointer rounded-full ring-2 ring-white ring-offset-2 ring-offset-gray-200 transition;
+    @apply has-[:checked]:ring-offset-sage-600 has-[:focus-visible]:ring-offset-sage-500;
+    @apply dark:ring-ink-800 dark:ring-offset-white/20;
+    background: var(--swatch, var(--color-gray-300));
+  }
+
+  /* Quantity stepper wrapper */
+  .qty {
+    @apply inline-flex items-center overflow-hidden rounded-xl border border-gray-300 bg-white dark:border-white/10 dark:bg-ink-900;
+  }
+
+  .qty > button {
+    @apply grid size-10 place-items-center text-lg text-gray-700 transition-colors hover:bg-gray-100 disabled:opacity-40 dark:text-gray-300 dark:hover:bg-white/5;
+  }
+
+  .qty > input,
+  .qty > span {
+    @apply w-10 border-0 bg-transparent text-center text-sm font-semibold tabular-nums outline-none;
+  }
+
   /* Tables ---------------------------------------------------------------- */
   .table-wrap {
     @apply w-full overflow-x-auto;
@@ -383,7 +561,7 @@
   }
 
   .data-table thead th {
-    @apply bg-gray-50 px-4 py-3 text-xs font-semibold tracking-wide text-gray-700 uppercase dark:bg-white/[0.03] dark:text-gray-500;
+    @apply bg-gray-50 px-4 py-3 text-xs font-semibold text-gray-700 dark:bg-white/[0.03] dark:text-gray-400;
   }
 
   .data-table tbody td {
@@ -408,24 +586,47 @@
   }
 
   .badge-warning {
-    @apply bg-peach-50 text-peach-700 ring-peach-500/20 dark:bg-peach-500/10 dark:text-peach-300 dark:ring-peach-400/20;
+    @apply bg-sun-50 text-sun-800 ring-sun-500/25 dark:bg-sun-500/10 dark:text-sun-300 dark:ring-sun-400/20;
   }
 
   .badge-accent {
-    @apply bg-coral-50 text-coral-600 ring-coral-500/20 dark:bg-coral-500/10 dark:text-coral-300 dark:ring-coral-400/20;
+    @apply bg-coral-50 text-coral-700 ring-coral-500/20 dark:bg-coral-500/10 dark:text-coral-300 dark:ring-coral-400/20;
   }
 
   .badge-neutral {
     @apply bg-gray-100 text-gray-700 ring-gray-500/20 dark:bg-white/5 dark:text-gray-400 dark:ring-white/10;
   }
 
+  /* "New arrival" */
+  .badge-new {
+    @apply bg-sky-50 text-sky-700 ring-sky-500/20 dark:bg-sky-500/10 dark:text-sky-300 dark:ring-sky-400/20;
+  }
+
   /* Feedback -------------------------------------------------------------- */
   .spinner {
-    @apply inline-block size-10 animate-spin rounded-full border-4 border-sage-400 border-r-transparent;
+    @apply inline-block size-10 animate-spin rounded-full border-4 border-sage-300 border-r-coral-400;
   }
 
   .skeleton {
-    @apply animate-pulse rounded-lg bg-gray-200 dark:bg-white/10;
+    @apply animate-pulse rounded-xl bg-gray-200 dark:bg-white/10;
+  }
+
+  /* Decorative ------------------------------------------------------------ */
+  /* Subtle confetti-dot texture for hero / promo strips */
+  .bg-playful {
+    background-color: var(--color-gray-50);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgb(255 148 184 / 0.35) 1.5px, transparent 0),
+      radial-gradient(circle at 1px 1px, rgb(122 128 246 / 0.35) 1.5px, transparent 0);
+    background-size: 28px 28px, 28px 28px;
+    background-position: 0 0, 14px 14px;
+  }
+
+  html.dark .bg-playful {
+    background-color: var(--color-ink-800);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgb(255 148 184 / 0.12) 1.5px, transparent 0),
+      radial-gradient(circle at 1px 1px, rgb(122 128 246 / 0.12) 1.5px, transparent 0);
   }
 }
 
@@ -435,7 +636,19 @@
    (Slide images are sized in JSX with next/image `fill` + object-cover/contain.) */
 @layer components {
   .swiper-slide {
-    border-radius: 10px;
+    border-radius: 1rem;
+  }
+
+  .swiper-pagination-bullet {
+    background: var(--color-gray-400) !important;
+    opacity: 1 !important;
+    transition: width 0.2s, background-color 0.2s;
+  }
+
+  .swiper-pagination-bullet-active {
+    width: 22px !important;
+    border-radius: 999px !important;
+    background: var(--color-coral-500) !important;
   }
 
   .gallery-slider-2 {
@@ -444,23 +657,25 @@
   }
 
   .gallery-slider-2 .swiper-slide {
-    opacity: 0.4;
-    transition: opacity 0.2s;
+    opacity: 0.45;
+    cursor: pointer;
+    transition: opacity 0.2s, box-shadow 0.2s;
   }
 
   .gallery-slider-2 .swiper-slide-thumb-active {
     opacity: 1;
+    box-shadow: 0 0 0 2px var(--color-sage-500);
   }
 }
 
 /* SweetAlert */
 .swal-overlay {
   background-color: rgb(15 17 19 / 0.45);
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(3px);
 }
 
 .swal-modal {
-  border-radius: 1rem;
+  border-radius: 1.5rem;
   background: #fff;
   font-family: var(--font-sans);
 }
@@ -468,12 +683,13 @@
 .swal-title {
   color: var(--color-gray-900);
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .swal-text {
   color: var(--color-gray-700);
   text-align: center;
+  line-height: 1.8;
 }
 
 .swal-footer {
@@ -481,9 +697,10 @@
 }
 
 .swal-button {
-  border-radius: 0.5rem;
-  padding: 0.6rem 1.25rem;
-  font-weight: 500;
+  border-radius: 0.75rem;
+  padding: 0.65rem 1.4rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
   box-shadow: none !important;
 }
 
@@ -496,6 +713,10 @@
   background-color: var(--color-sage-700) !important;
 }
 
+.swal-button--danger {
+  background-color: var(--color-danger-600) !important;
+}
+
 .swal-button--cancel {
   background-color: var(--color-gray-100);
   color: var(--color-gray-800);
@@ -503,7 +724,7 @@
 
 .swal-content__input,
 .swal-content__textarea {
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   border-color: var(--color-gray-300);
   color: var(--color-gray-900);
 }
@@ -512,6 +733,7 @@
 .swal-content__textarea:focus {
   outline: none;
   border-color: var(--color-sage-500);
+  box-shadow: 0 0 0 4px rgb(91 91 236 / 0.18);
 }
 
 html.dark .swal-modal {
@@ -519,11 +741,11 @@ html.dark .swal-modal {
 }
 
 html.dark .swal-title {
-  color: #f3f3f3;
+  color: var(--color-gray-100);
 }
 
 html.dark .swal-text {
-  color: var(--color-gray-500);
+  color: var(--color-gray-400);
 }
 
 /* Leaflet */
@@ -536,17 +758,17 @@ html.dark .swal-text {
   min-height: 260px;
   padding: 1rem;
   outline: none;
-  line-height: 1.75;
+  line-height: 1.85;
 }
 
 .rich-editor .ProseMirror ul {
   list-style: disc;
-  padding-left: 1.5rem;
+  padding-inline-start: 1.5rem;
 }
 
 .rich-editor .ProseMirror ol {
   list-style: decimal;
-  padding-left: 1.5rem;
+  padding-inline-start: 1.5rem;
 }
 
 .rich-editor .ProseMirror h2 {
@@ -577,6 +799,23 @@ html.dark .swal-text {
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
+  }
+}
+
+/* Small playful nudge — e.g. cart icon when an item is added */
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+  75% {
+    transform: rotate(-4deg);
   }
 }
 
@@ -626,11 +865,10 @@ html.dark .swal-text {
   }
 }
 
-
 @keyframes reveal-up {
   from {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(24px);
   }
   to {
     opacity: 1;
@@ -641,7 +879,7 @@ html.dark .swal-text {
 @keyframes reveal-left {
   from {
     opacity: 0;
-    transform: translateX(-28px);
+    transform: translateX(-24px);
   }
   to {
     opacity: 1;
@@ -652,7 +890,7 @@ html.dark .swal-text {
 @keyframes reveal-right {
   from {
     opacity: 0;
-    transform: translateX(28px);
+    transform: translateX(24px);
   }
   to {
     opacity: 1;
@@ -672,9 +910,9 @@ html.dark .swal-text {
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     [data-aos] {
-      animation: reveal-up 0.8s ease-out both;
+      animation: reveal-up 0.7s ease-out both;
       animation-timeline: view();
-      animation-range: entry 0% cover 22%;
+      animation-range: entry 0% cover 20%;
     }
 
     [data-aos^="fade-left"],
@@ -690,7 +928,15 @@ html.dark .swal-text {
 }
 
 .marquee-track {
-  animation: marquee 28s linear infinite;
+  animation: marquee 32s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+[dir="rtl"] .marquee-track {
+  animation-direction: reverse;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -707,3 +953,7 @@ html.dark .swal-text {
     scroll-behavior: auto !important;
   }
 }
+
+ .home-section {
+    @apply mx-auto w-full max-w-container px-4 py-30 sm:px-6 sm:py-14 lg:px-8;
+  }

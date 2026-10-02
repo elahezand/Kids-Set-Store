@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Breadcrumb from "@/components/modules/main/breadCrumb";
 import Image from "next/image";
 import connectToDB from "@/configs/db";
-import { getInfo } from "@/services/server/public/info";
+import infoService from "@/services/server/public/info";
 
 export const metadata: Metadata = {
     title: "Terms & Rules | SET KIDS",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 const page = async () => {
     await connectToDB();
-    const info = (await getInfo().catch(() => null)) as SiteInfo | null;
+    const info = (await infoService.getInfo().catch(() => null)) as SiteInfo | null;
 
     return (
         <div className="page-container">

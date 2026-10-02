@@ -1,24 +1,23 @@
 import type { Pagination } from "./api";
 import type { ProductCard } from "./product";
 
-/* Shop listing (/products, GET /api/products) — query keys buildProductFilters understands */
 
 export type ListingSort = "latest" | "price" | "price-desc" | "popularity" | "bestSelling";
 
 export interface ListingQuery {
   q?: string;
-  category?: string; // category slug
+  category?: string;
   min?: string;
   max?: string;
-  price?: string; // "min-max"
+  price?: string;
   color?: string;
   size?: string;
   material?: string;
+  filter?: string;
+  inStock?: string;
   rating?: string;
-  tags?: string; // comma separated
+  tags?: string; 
   sort?: ListingSort;
-  /** old links: ?value=bestSelling */
-  value?: string;
   limit?: string;
   cursor?: string;
 }

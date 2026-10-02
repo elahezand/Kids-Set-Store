@@ -39,7 +39,6 @@ const buildTree = (items) => {
 };
 
 const getAllCategories = async () =>
-    // cached in Redis for 10 minutes; admin category writes clear it
     remember(CACHE_KEYS.categories, 600, loadCategoryTree);
 
 const loadCategoryTree = async () => {
@@ -51,18 +50,19 @@ const loadCategoryTree = async () => {
 };
 
 
+/* Category + filters inherited from every ancestor (child filters win on the same slug) */
 const withInheritedFilters = async (category) => {
     if (!category) return null;
 
     let allFilters = [...(category.filters || [])];
-    let currentParentId = category.parent;
+    let currentParentId = category.parentId;        
     const visited = new Set([String(category._id)]);
 
     while (currentParentId && !visited.has(String(currentParentId))) {
         visited.add(String(currentParentId));
 
         const parentCategory = await Category.findById(currentParentId)
-            .select("filters parent")
+            .select("filters parentId")
             .lean();
 
         if (!parentCategory) break;
@@ -71,10 +71,9 @@ const withInheritedFilters = async (category) => {
             allFilters = [...parentCategory.filters, ...allFilters];
         }
 
-        currentParentId = parentCategory.parent;
+        currentParentId = parentCategory.parentId;
     }
 
-    // child filters win over parent filters with the same slug
     const uniqueFilters = Array.from(
         new Map(allFilters.map((filter) => [filter.slug, filter])).values()
     );
@@ -112,6 +111,5 @@ const categoryService = {
     getCategoryBySlug,
 };
 
-export { getAllCategories, getCategoryById, getCategoryBySlug };
 
 export default categoryService;

@@ -1,14 +1,12 @@
 import Info from "@/model/info";
 import { remember, CACHE_KEYS } from "@/utils/cache";
+import constants from "node:constants";
 
-// cached in Redis for 10 minutes; admin info writes clear it
 const getInfo = async () =>
     remember(CACHE_KEYS.info, 600, () => Info.findOne({ key: "main" }).lean());
 
-export {
+const infoService = {
     getInfo,
 };
 
-export default {
-    getInfo,
-};
+export default infoService;

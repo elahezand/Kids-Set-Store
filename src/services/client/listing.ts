@@ -7,11 +7,6 @@ import type { ArticleListQuery, ArticleSummary, FavoriteEntry, ListingQuery, Pag
 import { queryKeys } from "./keys";
 import { useInfiniteGet } from "./query";
 
-/*
-  URL-driven lists (products, articles, favorites).
-  Filters live in the URL (shareable, back button works); the server page reads them and
-  renders page 1. Further pages come from the API (useInfiniteGet).
-*/
 
 /** read / change the filter params in the URL */
 export const useQueryParams = <TKey extends string = string>() => {
@@ -24,7 +19,8 @@ export const useQueryParams = <TKey extends string = string>() => {
 
   const update = (changes: Partial<Record<TKey, string | null | undefined>>, drop: string[] = []) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.delete("cursor"); // old links
+    params.delete("cursor")
+
     for (const key of drop) params.delete(key);
 
     for (const [key, value] of Object.entries(changes) as [string, string | null | undefined][]) {

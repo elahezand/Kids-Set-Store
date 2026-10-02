@@ -19,10 +19,8 @@ const subscribe = async (email) => {
     };
 };
 
-export  {
+const subscribeService = {
     subscribe,
 };
 
-export default {
-    subscribe,
-};
+export default subscribeService

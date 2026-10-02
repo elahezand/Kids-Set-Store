@@ -1,15 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { HiSearch, HiX } from "react-icons/hi";
 import { useQueryParams } from "@/services/client/listing";
 import { CURRENCY } from "@/utils/format";
-import type { CategoryNode, CategoryOption, ListingFilterKey, ListingSort, SelectOption } from "@/types";
-
-/* Every control writes a query param buildProductFilters (utils/helper) understands */
+import type { CategoryFilter, CategoryNode, CategoryOption, ListingFilterKey, ListingSort, SelectOption } from "@/types";
 const MAX_PRICE = 400;
-const MATERIALS = ["Cotton", "Leather", "Wool", "Velvet", "Suede", "Linen", "Cashmere", "Polyester"];
-const COLORS = ["Blue", "Red", "Brown", "Gray", "Black", "Pink", "Metallic", "White", "Green", "Cream", "Camel"];
+const VARIANT_SLUGS = ["size", "color"];
+
 const SORTS: SelectOption<ListingSort>[] = [
   { value: "latest", label: "Latest" },
   { value: "popularity", label: "Top rated" },
@@ -17,33 +15,71 @@ const SORTS: SelectOption<ListingSort>[] = [
   { value: "price", label: "Price: low to high" },
   { value: "price-desc", label: "Price: high to low" },
 ];
-const FILTER_KEYS: ListingFilterKey[] = ["q", "category", "max", "sort", "color", "material", "value"];
+const isVariantFilter = (filter: CategoryFilter) => VARIANT_SLUGS.includes(filter.slug);
 
-// flat list for the <select>: "Kids", "— Boys", "— — T-shirts"
 const flatten = (nodes: CategoryNode[] = [], depth = 0): CategoryOption[] =>
   nodes.flatMap((node) => [
     { slug: node.slug, label: `${"— ".repeat(depth)}${node.title}` },
     ...flatten(node.children, depth + 1),
   ]);
 
+const parseSpecs = (raw: string | null): Record<string, string> => {
+  if (!raw) return {};
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+};
+
 const controlClass =
   "w-full rounded-xl border-2 border-coral-300 bg-white px-4 py-2.5 text-sm text-text outline-none transition-all focus:border-sage-400 dark:bg-ink-800 dark:text-gray-100 sm:text-base";
 
-export default function FilterSection({ categories = [] }: { categories?: CategoryNode[] }) {
-  const { get, update, clear, has, isPending, searchParams } = useQueryParams<ListingFilterKey>();
+interface FilterSectionProps {
+  categories?: CategoryNode[];
+  categoryFilters?: CategoryFilter[];
+}
+
+export default function FilterSection({ categories = [], categoryFilters = [] }: FilterSectionProps) {
+  const { get, update, clear, isPending, searchParams } = useQueryParams<ListingFilterKey>();
 
   const [search, setSearch] = useState(get("q"));
   const [maxPrice, setMaxPrice] = useState(get("max") || String(MAX_PRICE));
 
-  // keep inputs in sync with back / forward navigation
   useEffect(() => {
     setSearch(searchParams.get("q") ?? "");
     setMaxPrice(searchParams.get("max") || String(MAX_PRICE));
   }, [searchParams]);
 
-  // ?value= is the old name of ?sort=
-  const set = (changes: Partial<Record<ListingFilterKey, string>>) => update(changes, ["value"]);
+  const specs = useMemo(() => parseSpecs(searchParams.get("filter")), [searchParams]);
+
+  const set = (changes: Partial<Record<ListingFilterKey, string>>, drop: string[] = []) =>
+    update(changes, drop);
+
   const commitPrice = () => set({ max: maxPrice === String(MAX_PRICE) ? "" : maxPrice });
+
+  const changeCategory = (slug: string) =>
+    set({ category: slug, size: "", color: "", material: "", filter: "" });
+
+  const valueOf = (filter: CategoryFilter) =>
+    isVariantFilter(filter) ? get(filter.slug as ListingFilterKey) : specs[filter.slug] ?? "";
+
+  const setFilterValue = (filter: CategoryFilter, value: string) => {
+    if (isVariantFilter(filter)) {
+      set({ [filter.slug]: value } as Partial<Record<ListingFilterKey, string>>);
+      return;
+    }
+
+    const next = { ...specs };
+    if (value) next[filter.slug] = value;
+    else delete next[filter.slug];
+
+    set({ filter: Object.keys(next).length ? JSON.stringify(next) : "" }, ["material"]);
+  };
+
+  const choiceFilters = categoryFilters.filter((f) => f.type === "select" || f.type === "radio");
+  const booleanFilters = categoryFilters.filter((f) => f.type === "boolean");
 
   return (
     <div
@@ -75,8 +111,9 @@ export default function FilterSection({ categories = [] }: { categories?: Catego
         </button>
       </form>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <select aria-label="Category" value={get("category")} onChange={(e) => set({ category: e.target.value })} className={controlClass}>
+      {/* always available */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <select aria-label="Category" value={get("category")} onChange={(e) => changeCategory(e.target.value)} className={controlClass}>
           <option value="">All categories</option>
           {flatten(categories).map((option) => (
             <option key={option.slug} value={option.slug}>
@@ -87,7 +124,7 @@ export default function FilterSection({ categories = [] }: { categories?: Catego
 
         <select
           aria-label="Sort"
-          value={get("sort") || (get("value") === "bestSelling" ? "bestSelling" : "")}
+          value={get("sort")}
           onChange={(e) => set({ sort: e.target.value })}
           className={controlClass}
         >
@@ -95,24 +132,6 @@ export default function FilterSection({ categories = [] }: { categories?: Catego
           {SORTS.map((sort) => (
             <option key={sort.value} value={sort.value}>
               {sort.label}
-            </option>
-          ))}
-        </select>
-
-        <select aria-label="Color" value={get("color")} onChange={(e) => set({ color: e.target.value })} className={controlClass}>
-          <option value="">Any color</option>
-          {COLORS.map((color) => (
-            <option key={color} value={color}>
-              {color}
-            </option>
-          ))}
-        </select>
-
-        <select aria-label="Material" value={get("material")} onChange={(e) => set({ material: e.target.value })} className={controlClass}>
-          <option value="">Any material</option>
-          {MATERIALS.map((material) => (
-            <option key={material} value={material}>
-              {material}
             </option>
           ))}
         </select>
@@ -128,15 +147,72 @@ export default function FilterSection({ categories = [] }: { categories?: Catego
             step="5"
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
-            // only hit the server when the user lets go of the slider
             onPointerUp={commitPrice}
             onKeyUp={commitPrice}
             className="w-full accent-coral-300"
           />
         </label>
+
+        <label className={`${controlClass} flex cursor-pointer items-center gap-2`}>
+          <input
+            type="checkbox"
+            className="checkbox"
+            checked={get("inStock") === "true"}
+            onChange={(e) => set({ inStock: e.target.checked ? "true" : "" })}
+          />
+          In stock only
+        </label>
       </div>
 
-      {has(FILTER_KEYS) && (
+      {/* from the selected category */}
+      {(choiceFilters.length > 0 || booleanFilters.length > 0) && (
+        <div className="mt-3 border-t border-white/60 pt-3 dark:border-white/10">
+          {choiceFilters.length > 0 && (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {choiceFilters.map((filter) => (
+                <select
+                  key={filter.slug}
+                  aria-label={filter.name}
+                  value={valueOf(filter)}
+                  onChange={(e) => setFilterValue(filter, e.target.value)}
+                  className={controlClass}
+                >
+                  <option value="">{`Any ${filter.name.toLowerCase()}`}</option>
+                  {filter.options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              ))}
+            </div>
+          )}
+
+          {booleanFilters.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {booleanFilters.map((filter) => {
+                const active = valueOf(filter) === "true";
+                return (
+                  <button
+                    key={filter.slug}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setFilterValue(filter, active ? "" : "true")}
+                    className={`rounded-full border-2 px-4 py-1.5 text-sm font-medium transition-colors ${active
+                      ? "border-sage-600 bg-sage-600 text-white"
+                      : "border-coral-300 bg-white text-text hover:border-sage-400 dark:bg-ink-800 dark:text-gray-100"
+                      }`}
+                  >
+                    {filter.name}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {searchParams.toString() !== "" && (
         <button
           type="button"
           onClick={() => {

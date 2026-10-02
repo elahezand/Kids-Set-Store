@@ -7,7 +7,7 @@ import Breadcrumb from "@/components/modules/main/breadCrumb";
 import Form from "@/components/template/main/contact-us/Form";
 import MapLoader from "./mapLoader";
 import connectToDB from "@/configs/db";
-import { getInfo } from "@/services/server/public/info";
+import  infoService  from "@/services/server/public/info";
 
 export const metadata: Metadata = {
     title: "Contact Us | SET KIDS",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 const ContactPage = async () => {
     await connectToDB();
     // same service as GET /api/info
-    const info = (await getInfo().catch(() => null)) as SiteInfo | null;
+    const info = (await infoService.getInfo().catch(() => null)) as SiteInfo | null;
 
     const details = [
         info?.address && { Icon: LuMapPin, text: info.address },

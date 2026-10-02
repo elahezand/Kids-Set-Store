@@ -9,8 +9,7 @@ import { toInitialPage } from "@/utils/initialPage";
 import { firstParam, listKey } from "@/utils/searchParams";
 import type { ArticleCategoryOption, ArticleSummary, PageProps, Pagination } from "@/types";
 
-const DEFAULT_LIMIT = 15; // must be <= articleListQuerySchema max
-
+const DEFAULT_LIMIT = 15;
 type ArticlesResult = { data: ArticleSummary[]; pagination: Pagination };
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
@@ -44,9 +43,7 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
   return (
     <div className="page-container">
       <Breadcrumb route="articles" title="Articles" />
-
       <ArticlesSearch categories={categories} />
-
       <ArticlesList
         key={listKey({ q, category })}
         query={{ q, category }}

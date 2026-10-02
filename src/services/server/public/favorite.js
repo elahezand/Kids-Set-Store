@@ -63,11 +63,8 @@ const getPopularProducts = async (query = {}) => {
         })
         .filter(Boolean);
 };
-
-export {
+const favoriteService = {
     getPopularProducts,
 };
 
-export default {
-    getPopularProducts,
-};
+export default favoriteService

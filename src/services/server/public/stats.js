@@ -65,8 +65,6 @@ const computePublicStats = async () => {
     };
 };
 
-export { getPublicStats };
+const statService = { getPublicStats };
 
-export default {
-    getPublicStats,
-};
+export default statService

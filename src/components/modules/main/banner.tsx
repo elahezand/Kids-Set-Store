@@ -74,7 +74,7 @@ function Banner() {
                             {/* متن */}
                             <div className="flex flex-col items-start justify-center pt-10 md:pt-0">
                                 <span
-                                    className={`text-xs font-semibold uppercase tracking-[0.22em] text-gray-600 dark:text-gray-500 ${reveal} group-[.swiper-slide-active]:delay-100`}
+                                    className={`text-sm font-semibold text-coral-500 dark:text-coral-300 ${reveal} group-[.swiper-slide-active]:delay-100`}
                                 >
                                     {slide.kicker}
                                 </span>

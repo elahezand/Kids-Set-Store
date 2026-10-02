@@ -1,7 +1,7 @@
 import ShowFooter from "@/app/(main)/showFooter";
 import Navbar from "@/components/modules/main/navbar/navbar";
 import connectToDB from "@/configs/db";
-import { getInfo } from "@/services/server/public/info";
+import infoService from "@/services/server/public/info";
 import { toPlain } from "@/utils/format";
 import type { ReactNode } from "react";
 import type { SiteInfo } from "@/types";
@@ -10,7 +10,7 @@ import type { SiteInfo } from "@/types";
 const loadInfo = async (): Promise<SiteInfo | null> => {
     try {
         await connectToDB();
-        return toPlain((await getInfo()) as SiteInfo | null);
+        return toPlain((await infoService.getInfo()) as SiteInfo | null);
     } catch (error) {
         console.error("[layout] could not load site info:", error);
         return null;

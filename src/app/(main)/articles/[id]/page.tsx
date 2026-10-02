@@ -51,26 +51,21 @@ const toDate = (value: string | Date | null | undefined): Date | null => {
 
 const getParam = async (params: ArticlePageProps["params"]) => (await params).id;
 
-// cache() => generateMetadata and Page share ONE db query per request
 const getArticle = cache(async (idOrSlug: string): Promise<ArticleDetail | null> => {
     if (!idOrSlug) return null;
-
     await connectToDB();
 
     const result = (await articleService.getPublicArticleById(idOrSlug)) as ServiceResult<ArticleDetail>;
-
     return result?.success ? result.data ?? null : null;
 });
 
 const getOtherArticles = async (excludeId: string): Promise<ArticleSummary[]> => {
     try {
         await connectToDB();
-
+        
         const items = (await articleService.getOtherPublicArticles(excludeId, 4)) as ArticleSummary[];
-
         return Array.isArray(items) ? items : [];
     } catch {
-        // the sidebar must never take the whole page down
         return [];
     }
 };
