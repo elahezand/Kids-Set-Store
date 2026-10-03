@@ -8,7 +8,7 @@ import type { z } from "zod";
 import { ticketValidationSchema } from "@/validators/ticket";
 import { useCreateTicket, useDepartments } from "@/services/client/panel";
 import { TICKET_PRIORITY } from "@/utils/panelView";
-import type { TicketPriority } from "@/types";
+import type { TicketPriority } from "@/types/ticket";
 
 type TicketInput = z.input<typeof ticketValidationSchema>;
 type TicketOutput = z.output<typeof ticketValidationSchema>;
@@ -55,7 +55,9 @@ export default function SendTicket() {
           <p className="mt-0.5 text-xs text-gray-700 dark:text-gray-500">Our support team usually replies within 24 hours.</p>
         </div>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="card-body grid gap-5 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+
+      {/* phones: one column; sm and up: two columns (message + button take the full row) */}
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="card-body grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="ticket-department" className="label">
             Department
@@ -124,7 +126,7 @@ export default function SendTicket() {
           {error("priority")}
         </div>
 
-        <div className="sm:col-span-2 xl:col-span-1 2xl:col-span-2">
+        <div className="sm:col-span-2">
           <label htmlFor="ticket-content" className="label">
             Message
           </label>
@@ -138,7 +140,7 @@ export default function SendTicket() {
           {error("content")}
         </div>
 
-        <div className="flex justify-end sm:col-span-2 xl:col-span-1 2xl:col-span-2">
+        <div className="flex justify-end sm:col-span-2">
           <button type="submit" className="btn btn-primary w-full sm:w-auto" disabled={isPending}>
             <LuSend className="size-4" />
             {isPending ? "Sending…" : "Send ticket"}

@@ -6,24 +6,21 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type {
   ApiSuccess,
-  CreateTicketPayload,
-  Department,
   MyComment,
+  CommentStatusFilter,
   OrderListItem,
+  OrderStatusFilter,
   Paginated,
-  PanelNotification,
   SessionUser,
-  TicketReplyPayload,
-  TicketSummary,
+
 } from "@/types";
 import { queryKeys } from "./keys";
 import { useDelete, useGet, useInfiniteGet, usePatch, usePost } from "./query";
+import { CreateTicketPayload, TicketSummary, TicketReplyPayload, TicketStatusFilter } from "@/types/ticket";
+import { Department } from "@/types/ticket";
+import { PanelNotification } from "@/types/dashboard";
 
-/*
-  User panel (/p-user) client services.
-  Lists start from the first page the server page rendered (initialPage) and load the
-  next pages from the same API route with the cursor — same flow as the main site.
-*/
+
 
 const flattenPages = <TItem>(pages?: Array<Paginated<TItem>>) =>
   pages?.flatMap((page) => page.data ?? []) ?? [];
@@ -40,15 +37,31 @@ const useCursorList = <TItem>(
   return { ...result, items };
 };
 
+/* list params: "all" is not sent, the API shows everything when there is no status */
+const statusParams = (limit: number, status: string) =>
+  status === "all" ? { limit } : { limit, status };
+
 /* ---------- orders: GET /api/user/order (services/server/user/order getMyOrders) ---------- */
 
-export const useMyOrders = (initialPage: Paginated<OrderListItem>, limit: number) =>
-  useCursorList("/user/order", queryKeys.myOrders({ limit }), { limit }, initialPage, "Could not load orders");
+export const useMyOrders = (
+  initialPage: Paginated<OrderListItem>,
+  limit: number,
+  status: OrderStatusFilter = "all"
+) => {
+  const params = statusParams(limit, status);
+  return useCursorList("/user/order", queryKeys.myOrders(params), params, initialPage, "Could not load orders");
+};
 
 /* ---------- comments: /api/user/comment (services/server/user/comment) ---------- */
 
-export const useMyComments = (initialPage: Paginated<MyComment>, limit: number) =>
-  useCursorList("/user/comment", queryKeys.myComments({ limit }), { limit }, initialPage, "Could not load comments");
+export const useMyComments = (
+  initialPage: Paginated<MyComment>,
+  limit: number,
+  status: CommentStatusFilter = "all"
+) => {
+  const params = statusParams(limit, status);
+  return useCursorList("/user/comment", queryKeys.myComments(params), params, initialPage, "Could not load comments");
+};
 
 export const useDeleteMyComment = () => {
   const queryClient = useQueryClient();
@@ -66,8 +79,14 @@ export const useDeleteMyComment = () => {
 
 /* ---------- tickets: /api/user/tickets (services/server/user/ticket) ---------- */
 
-export const useMyTickets = (initialPage: Paginated<TicketSummary>, limit: number) =>
-  useCursorList("/user/tickets", queryKeys.myTickets({ limit }), { limit }, initialPage, "Could not load tickets");
+export const useMyTickets = (
+  initialPage: Paginated<TicketSummary>,
+  limit: number,
+  status: TicketStatusFilter = "all"
+) => {
+  const params = statusParams(limit, status);
+  return useCursorList("/user/tickets", queryKeys.myTickets(params), params, initialPage, "Could not load tickets");
+};
 
 export const useDepartments = () =>
   useGet<ApiSuccess<Department[]>>("/user/departments", undefined, {

@@ -1,38 +1,34 @@
 "use client";
 
-import { useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa6";
-import { useAddFavorite, useToggleFavorite } from "@/services/client/favorite";
+import { useFavoriteIds, useToggleFavorite } from "@/services/client/favorite";
 
 interface AddToFavoriteProps {
   productId: string;
-  /** known on the product page (logged-in user) -> the button toggles */
   initialFavorited?: boolean;
   compact?: boolean;
 }
 
+
 export default function AddToFavoriteList({ productId, initialFavorited, compact = false }: AddToFavoriteProps) {
-  const canToggle = typeof initialFavorited === "boolean";
-  const [isFavorited, setIsFavorited] = useState(Boolean(initialFavorited));
+  const { ids, isLoaded } = useFavoriteIds();
+  const toggle = useToggleFavorite();
 
-  const toggle = useToggleFavorite({ onChange: setIsFavorited });
-  const add = useAddFavorite({ onAdded: () => setIsFavorited(true) });
-
-  const isPending = toggle.isPending || add.isPending;
+  // ids not loaded yet -> trust what the server page said
+  const isFavorited = isLoaded || initialFavorited === undefined ? ids.has(productId) : initialFavorited;
 
   const handleClick = () => {
-    if (isPending || !productId) return;
-    if (canToggle) toggle.mutate({ productId });
-    else if (!isFavorited) add.mutate({ productId });
+    if (toggle.isPending || !productId) return;
+    toggle.mutate({ productId });
   };
 
-  const label = isFavorited ? "In your favorites" : "Add to favorites";
+  const label = isFavorited ? "Remove from favorites" : "Add to favorites";
 
   return (
     <button
       type="button"
       onClick={handleClick}
-      disabled={isPending}
+      disabled={toggle.isPending}
       aria-pressed={isFavorited}
       aria-label={label}
       title={label}

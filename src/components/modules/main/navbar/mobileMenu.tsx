@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaRegHeart } from "react-icons/fa";
 import { LuChevronDown, LuX, LuMenu, LuChevronRight } from "react-icons/lu";
 import CartCount from "@/components/modules/main/navbar/cart";
+import FavoriteCount from "./favoritesCount";
 import ThemeToggle from "@/components/modules/ui/themeToggle";
 import type { CategoryNode } from "@/types";
 
@@ -104,12 +104,11 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
                     <div className="flex items-center gap-3 text-xl text-gray-800 dark:text-gray-300">
                         <ThemeToggle />
                         <CartCount isLoggedIn={isLoggedIn} />
-                        <Link href="/favorites" className="relative" aria-label="Favorites">
-                            <FaRegHeart />
-                            <span className="absolute -right-2 -top-2 flex size-4 items-center justify-center rounded-full bg-coral-400 text-[10px] leading-none text-white">
-                                {favoriteCount || 0}
-                            </span>
-                        </Link>
+                        <FavoriteCount
+                            isLoggedIn={isLoggedIn}
+                            initialCount={favoriteCount}
+                            badgeClassName="-right-2 -top-2 bg-coral-400"
+                        />
                         <button
                             type="button"
                             onClick={() => setOpen(false)}
@@ -278,7 +277,6 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
                     )}
                 </nav>
 
-                {/* پاورقی کشو */}
                 <div className="shrink-0 border-t border-gray-200 p-4 dark:border-white/10">
                     {username ? (
                         <Link href="/p-user" className="btn btn-lg btn-primary w-full">

@@ -15,6 +15,7 @@ export interface ListingQuery {
   material?: string;
   filter?: string;
   inStock?: string;
+  onSale?: string;
   rating?: string;
   tags?: string; 
   sort?: ListingSort;

@@ -4,31 +4,35 @@ import Link from "next/link";
 import { LuShoppingBag } from "react-icons/lu";
 import EmptyState from "@/components/modules/ui/emptyState";
 import LoadMore from "@/components/modules/main/loadMore";
+import StatusTabs from "@/components/modules/panel/statusTabs";
 import OrderRow from "@/components/template/p-user/orders/orderRow";
 import { useMyOrders } from "@/services/client/panel";
 import { formatDate, formatPrice } from "@/utils/format";
-import { ORDER_STATUS, PAYMENT_STATUS, orderItemsCount, shortId } from "@/utils/panelView";
-import type { OrderListItem, Paginated } from "@/types";
+import { ORDER_STATUS, ORDER_TABS, PAYMENT_STATUS, orderItemsCount, shortId } from "@/utils/panelView";
+import type { OrderListItem, OrderStatusFilter, Paginated } from "@/types";
 
 interface OrdersListProps {
   initialPage: Paginated<OrderListItem>;
   limit: number;
+  status: OrderStatusFilter;
 }
 
-/* order history: table on md+, cards on phones; "Load more" uses the cursor */
-export default function OrdersList({ initialPage, limit }: OrdersListProps) {
-  const { items: orders, fetchNextPage, hasNextPage, isFetchingNextPage } = useMyOrders(initialPage, limit);
+export default function OrdersList({ initialPage, limit, status }: OrdersListProps) {
+  const { items: orders, fetchNextPage, hasNextPage, isFetchingNextPage } = useMyOrders(initialPage, limit, status);
 
   return (
     <section className="card overflow-hidden">
       <div className="card-header">
         <h2 className="card-title">Order history</h2>
+        <StatusTabs tabs={ORDER_TABS} value={status} />
       </div>
 
       {orders.length === 0 ? (
         <EmptyState
-          title="No orders yet"
-          description="Your orders will appear here."
+          title={status === "all" ? "No orders yet" : "No orders here"}
+          description={
+            status === "all" ? "Your orders will appear here." : `You have no ${ORDER_STATUS[status].label.toLowerCase()} orders.`
+          }
           icon={LuShoppingBag}
           action={
             <Link href="/products" className="btn btn-primary btn-sm">

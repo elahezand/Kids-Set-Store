@@ -8,9 +8,11 @@ import Modal from "@/components/modules/ui/modal";
 import Stars from "@/components/modules/ui/stars";
 import ConfirmDialog from "@/components/modules/ui/confirmDialog";
 import LoadMore from "@/components/modules/main/loadMore";
+import StatusTabs from "@/components/modules/panel/statusTabs";
 import { useDeleteMyComment, useMyComments } from "@/services/client/panel";
 import { formatDate } from "@/utils/format";
-import type { CommentStatus, MyComment, Paginated } from "@/types";
+import { COMMENT_TABS } from "@/utils/panelView";
+import type { CommentStatus, CommentStatusFilter, MyComment, Paginated } from "@/types";
 
 const STATUS: Record<CommentStatus, { label: string; badge: string }> = {
   approved: { label: "Approved", badge: "badge-success" },
@@ -23,10 +25,11 @@ const STATUS: Record<CommentStatus, { label: string; badge: string }> = {
 interface CommentsListProps {
   initialPage: Paginated<MyComment>;
   limit: number;
+  status: CommentStatusFilter;
 }
 
-export default function CommentsList({ initialPage, limit }: CommentsListProps) {
-  const { items: comments, fetchNextPage, hasNextPage, isFetchingNextPage } = useMyComments(initialPage, limit);
+export default function CommentsList({ initialPage, limit, status }: CommentsListProps) {
+  const { items: comments, fetchNextPage, hasNextPage, isFetchingNextPage } = useMyComments(initialPage, limit, status);
   const [viewing, setViewing] = useState<MyComment | null>(null);
   const [deleting, setDeleting] = useState<MyComment | null>(null);
 
@@ -65,12 +68,15 @@ export default function CommentsList({ initialPage, limit }: CommentsListProps) 
     <section className="card overflow-hidden">
       <div className="card-header">
         <h2 className="card-title">My comments</h2>
+        <StatusTabs tabs={COMMENT_TABS} value={status} />
       </div>
 
       {comments.length === 0 ? (
         <EmptyState
-          title="No comments yet"
-          description="Reviews you write on products will show up here."
+          title={status === "all" ? "No comments yet" : "No comments here"}
+          description={
+            status === "all" ? "Reviews you write on products will show up here." : `You have no ${status} comments.`
+          }
           icon={LuMessageSquare}
         />
       ) : (

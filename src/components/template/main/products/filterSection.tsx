@@ -83,8 +83,7 @@ export default function FilterSection({ categories = [], categoryFilters = [] }:
 
   return (
     <div
-      className={`mb-8 rounded-2xl bg-mint-200 p-4 shadow-card transition-opacity dark:bg-ink-800/60 ${isPending ? "opacity-70" : ""}`}
-      aria-busy={isPending}
+      className={`mb-8 rounded-2xl border border-sage-100 bg-sage-50 p-4 shadow-card transition-opacity dark:border-white/10 dark:bg-ink-800/60 ${isPending ? "opacity-70" : ""}`} aria-busy={isPending}
     >
       <form
         role="search"
@@ -153,20 +152,33 @@ export default function FilterSection({ categories = [], categoryFilters = [] }:
           />
         </label>
 
-        <label className={`${controlClass} flex cursor-pointer items-center gap-2`}>
-          <input
-            type="checkbox"
-            className="checkbox"
-            checked={get("inStock") === "true"}
-            onChange={(e) => set({ inStock: e.target.checked ? "true" : "" })}
-          />
-          In stock only
-        </label>
+        {/* two small toggles share one grid cell */}
+        <div className="grid grid-cols-2 gap-3">
+          <label className={`${controlClass} flex cursor-pointer items-center gap-2`}>
+            <input
+              type="checkbox"
+              className="checkbox"
+              checked={get("inStock") === "true"}
+              onChange={(e) => set({ inStock: e.target.checked ? "true" : "" })}
+            />
+            In stock
+          </label>
+
+          <label className={`${controlClass} flex cursor-pointer items-center gap-2`}>
+            <input
+              type="checkbox"
+              className="checkbox"
+              checked={get("onSale") === "true"}
+              onChange={(e) => set({ onSale: e.target.checked ? "true" : "" })}
+            />
+            On sale
+          </label>
+        </div>
       </div>
 
       {/* from the selected category */}
       {(choiceFilters.length > 0 || booleanFilters.length > 0) && (
-        <div className="mt-3 border-t border-white/60 pt-3 dark:border-white/10">
+        <div className="mt-3 border-t border-sage-100 pt-3 dark:border-white/10">
           {choiceFilters.length > 0 && (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {choiceFilters.map((filter) => (

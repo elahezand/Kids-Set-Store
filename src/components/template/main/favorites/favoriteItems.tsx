@@ -40,7 +40,6 @@ export default function FavoriteItems({ initialPage, limit = 20 }: FavoriteItems
           <Product key={item._id} {...item} />
         ))}
       </div>
-
       <LoadMore
         hasMore={Boolean(hasNextPage)}
         isLoading={isFetchingNextPage}

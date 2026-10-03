@@ -1,15 +1,5 @@
 const mongoose = require("mongoose");
 
-/*
-  Cursor pagination shared by every service.
-
-  - sort can have several keys ({ minPrice: 1, _id: -1 }); _id is always added as the
-    last key so the order is stable even when many docs share the same price / score.
-  - nextCursor is an opaque string (base64 of the last doc's sort values). Clients only
-    send it back, they never build it themselves.
-  - an old-style cursor (a plain ObjectId / value) still works for single-key sorts.
-*/
-
 const MAX_LIMIT = 99;
 const DEFAULT_LIMIT = 21;
 

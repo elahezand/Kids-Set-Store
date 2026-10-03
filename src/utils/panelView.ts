@@ -1,4 +1,12 @@
-import type { OrderListItem, OrderStatus, PaymentStatus, TicketPriority } from "@/types";
+import type {
+  CommentStatusFilter,
+  OrderListItem,
+  OrderStatus,
+  OrderStatusFilter,
+  PaymentStatus,
+  TicketPriority,
+  TicketStatusFilter,
+} from "@/types";
 
 /* labels + badge colors used by the user panel (one place, no copies in components) */
 
@@ -36,3 +44,29 @@ export const orderItemsCount = (order: Pick<OrderListItem, "items">) =>
 
 export const DEFAULT_AVATAR =
   "/images/user-profile-flat-illustration-avatar-person-icon-gender-neutral-silhouette-profile-picture-free-vector.jpg";
+
+/* ---------- status tabs (?status=) — used by the server pages AND the client lists ---------- */
+
+type Tab<T> = { value: T; label: string };
+
+export const TICKET_TABS: ReadonlyArray<Tab<TicketStatusFilter>> = [
+  { value: "all", label: "All" },
+  { value: "waiting", label: "Waiting" },
+  { value: "answered", label: "Answered" },
+];
+
+export const COMMENT_TABS: ReadonlyArray<Tab<CommentStatusFilter>> = [
+  { value: "all", label: "All" },
+  { value: "pending", label: "Pending" },
+  { value: "approved", label: "Approved" },
+  { value: "rejected", label: "Rejected" },
+];
+
+/* "All" + one tab per order status (labels from ORDER_STATUS) */
+export const ORDER_TABS: ReadonlyArray<Tab<OrderStatusFilter>> = [
+  { value: "all", label: "All" },
+  ...(Object.keys(ORDER_STATUS) as OrderStatus[]).map((value) => ({ value, label: ORDER_STATUS[value].label })),
+];
+
+/** the allowed ?status= values of a tab list */
+export const tabValues = <T>(tabs: ReadonlyArray<Tab<T>>): T[] => tabs.map((tab) => tab.value);

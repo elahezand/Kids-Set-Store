@@ -6,24 +6,25 @@ import { paginateList } from "@/utils/listQuery";
 import { ticketValidationSchema } from "@/validators/ticket";
 import { getTicketThread } from "@/services/server/shared/ticket";
 
-/* GET /api/user/tickets  (?q= searches the subject) */
-const getMyTickets = async (userId, query = {}) =>
+/* ?status=answered | waiting  ->  isAnswer true | false  (anything else = all) */
+const TICKET_STATUS = { answered: true, waiting: false };
+
+const getMyTickets = async (userId, { status, ...query } = {}) =>
     paginateList(Ticket, query, {
         defaultLimit: 10,
         maxLimit: 50,
         base: { user: userId, parent: null },
+        filters: Object.hasOwn(TICKET_STATUS, status) ? { isAnswer: TICKET_STATUS[status] } : {},
         search: ["title"],
         select: "title priority isAnswer department subDepartment createdAt",
         populate: [
-            { path: "department", select: "title" },
-            { path: "subDepartment", select: "title" },
+            { path: "department", select: "title", model: Department },
+            { path: "subDepartment", select: "title", model: SubDepartment },
         ],
     });
 
-/* GET /api/user/tickets/:id  (only the owner) */
 const getMyTicket = (ticketId, userId) => getTicketThread(ticketId, { ownerId: userId });
 
-/* GET /api/user/departments  -> [{ _id, title, subDepartments: [{ _id, title }] }] */
 const getDepartments = async () => {
     const [departments, subDepartments] = await Promise.all([
         Department.find({ isActive: { $ne: false } }).sort({ order: 1, title: 1 }).select("title").lean(),
@@ -88,6 +89,5 @@ const createTicket = async (userId, body) => {
     return { success: true, data: ticket.toJSON() };
 };
 
-export { getMyTickets, getMyTicket, getDepartments, createTicket };
 
 export default { getMyTickets, getMyTicket, getDepartments, createTicket };

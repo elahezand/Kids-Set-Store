@@ -118,7 +118,7 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
         if (!isNaN(minRating)) filters["metrics.score"] = { $gte: minRating };
     }
 
-    // 8. Variant attributes (size, color) — both on the SAME variant ("blue in 2T", not "blue in 3T + black in 2T")
+    // 8. Variant attributes (size, color, stock, discount) — all on the SAME variant ("blue in 2T", not "blue in 3T + black in 2T")
     const variantMatch = {};
     for (const key of ["size", "color"]) {
         if (query[key]) {
@@ -127,6 +127,8 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
         }
     }
     if (query.inStock === "true") variantMatch.stock = { $gt: 0 };
+    // ?onSale=true -> at least one variant has a discount (the same variant as size / color above)
+    if (query.onSale === "true") variantMatch.discount = { $gt: 0 };
     if (Object.keys(variantMatch).length) {
         filters.variants = { $elemMatch: variantMatch };
     }

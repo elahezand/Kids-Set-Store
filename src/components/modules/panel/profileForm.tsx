@@ -20,7 +20,6 @@ interface ProfileFormProps {
 
 const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
 
-// Account details form — shared by admin "detail-account" and user "detail-profile"
 export default function ProfileForm({ userData }: ProfileFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -45,14 +44,12 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
 
   const { mutate, isPending } = useUpdateProfile({
     onSaved: () => {
-      // keep the saved values as the new defaults, empty the password fields
       reset((values) => ({ ...values, password: "", newPassword: "", confirmPassword: "" }));
       if (fileInputRef.current) fileInputRef.current.value = "";
       setPreview(null);
     },
   });
 
-  // free the preview blob url
   useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);
@@ -105,77 +102,79 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="grid gap-6 lg:grid-cols-3">
-      <section className="card p-5 text-center sm:p-6 lg:col-span-1 lg:self-start">
-        <Image
-          width={112}
-          height={112}
-          src={preview || userData?.profilePicture || DEFAULT_AVATAR}
-          alt=""
-          unoptimized={Boolean(preview)}
-          className="mx-auto size-24 rounded-full object-cover ring-4 ring-sage-100 sm:size-28 dark:ring-white/10"
-        />
-        <p className="mt-4 truncate font-semibold text-gray-900 dark:text-gray-100">{userData?.username}</p>
-        <p className="truncate text-sm text-gray-700 dark:text-gray-500">{userData?.email || userData?.phone}</p>
-        <span className="badge badge-success mt-3">{roleLabel(userData?.role)}</span>
-        <div className="mt-6 text-left">
-          <label htmlFor="avatar" className="label">
-            Profile picture
-          </label>
-          <input
-            id="avatar"
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            ref={fileInputRef}
-            onChange={onAvatarChange}
-            className="input"
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-6">
+      <section className="card p-5 sm:p-6">
+        <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-center sm:text-left">
+          <Image
+            width={112}
+            height={112}
+            src={preview || userData?.profilePicture || DEFAULT_AVATAR}
+            alt=""
+            unoptimized={Boolean(preview)}
+            className="size-24 shrink-0 rounded-full object-cover ring-4 ring-sage-100 sm:size-28 dark:ring-white/10"
           />
-          {avatarError ? (
-            <span className="field-error">{avatarError}</span>
-          ) : (
-            <span className="field-hint">JPG, PNG or WEBP, up to 2 MB. Square images look best.</span>
-          )}
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-semibold text-gray-900 dark:text-gray-100">{userData?.username}</p>
+            <p className="truncate text-sm text-gray-700 dark:text-gray-500">{userData?.email || userData?.phone}</p>
+            <span className="badge badge-success mt-2">{roleLabel(userData?.role)}</span>
+          </div>
+          <div className="w-full text-left sm:w-72">
+            <label htmlFor="avatar" className="label">
+              Profile picture
+            </label>
+            <input
+              id="avatar"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              ref={fileInputRef}
+              onChange={onAvatarChange}
+              className="input"
+            />
+            {avatarError ? (
+              <span className="field-error">{avatarError}</span>
+            ) : (
+              <span className="field-hint">JPG, PNG or WEBP, up to 2 MB.</span>
+            )}
+          </div>
         </div>
       </section>
 
-      <div className="min-w-0 space-y-6 lg:col-span-2">
-        <section className="card">
-          <div className="card-header">
-            <h2 className="card-title">Personal information</h2>
-          </div>
-          <div className="card-body grid gap-5 sm:grid-cols-2">
-            {field("username", "Username", "text", "name")}
-            {field("email", "Email (optional)", "email", "email")}
-            {field("phone", "Phone", "tel", "tel")}
-          </div>
-        </section>
-
-        <section className="card">
-          <div className="card-header">
-            <div>
-              <h2 className="card-title">Change password</h2>
-              <p className="mt-0.5 text-xs text-gray-700 dark:text-gray-500">
-                Leave empty to keep your current password. If you only sign in with an SMS code, skip
-                &quot;Current password&quot;.
-              </p>
-            </div>
-          </div>
-          <div className="card-body grid gap-5 md:grid-cols-3">
-            {field("password", "Current password", "password", "current-password")}
-            {field("newPassword", "New password", "password", "new-password")}
-            {field("confirmPassword", "Confirm password", "password", "new-password")}
-          </div>
-        </section>
-
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={isPending || (!isDirty && !preview)}
-            className="btn btn-primary btn-lg w-full sm:w-auto"
-          >
-            {isPending ? "Saving…" : "Save changes"}
-          </button>
+      <section className="card">
+        <div className="card-header">
+          <h2 className="card-title">Personal information</h2>
         </div>
+        <div className="card-body grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {field("username", "Username", "text", "name")}
+          {field("email", "Email (optional)", "email", "email")}
+          {field("phone", "Phone", "tel", "tel")}
+        </div>
+      </section>
+
+      <section className="card">
+        <div className="card-header">
+          <div>
+            <h2 className="card-title">Change password</h2>
+            <p className="mt-0.5 text-xs text-gray-700 dark:text-gray-500">
+              Leave empty to keep your current password. If you only sign in with an SMS code, skip
+              &quot;Current password&quot;.
+            </p>
+          </div>
+        </div>
+        <div className="card-body grid gap-5 md:grid-cols-3">
+          {field("password", "Current password", "password", "current-password")}
+          {field("newPassword", "New password", "password", "new-password")}
+          {field("confirmPassword", "Confirm password", "password", "new-password")}
+        </div>
+      </section>
+
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          disabled={isPending || (!isDirty && !preview)}
+          className="btn btn-primary btn-lg w-full sm:w-auto"
+        >
+          {isPending ? "Saving…" : "Save changes"}
+        </button>
       </div>
     </form>
   );

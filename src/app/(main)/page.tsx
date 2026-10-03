@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Banner from "@/components/modules/main/banner";
+import SaleCord from "@/components/modules/main/saleCord";
 import PromoText from "@/components/template/main/index/promoText";
 import SectionSkeleton from "@/components/template/main/index/sectionSkeleton";
 import TrustStrip from "@/components/modules/main/trustStrip";
@@ -27,14 +28,14 @@ export const metadata: Metadata = {
   },
 };
 
-/*
-  The static parts (banner, promo band) render immediately; every data section streams
-  in on its own behind a skeleton (see homeSections.tsx).
-*/
+
 export default function Home() {
   return (
     <div className="min-h-screen">
-      <Banner />
+      <div className="relative">
+        <Banner />
+        <SaleCord />
+      </div>
       <TrustStrip />
       <Suspense fallback={<SectionSkeleton />}>
         <LatestSection />

@@ -30,29 +30,3 @@ export async function GET(request) {
     }
 }
 
-export async function POST(request) {
-    try {
-        await connectToDB();
-
-        const user = await authUser();
-
-        if (!user) {
-            return jsonError("Unauthorized", 401);
-        }
-
-        const body = await request.json();
-
-        const result = await favoriteService.addFavorite(
-            user._id,
-            body.productId
-        );
-
-        if (!result.success) {
-            return jsonError(result.message, result.status);
-        }
-
-        return respond(result, { status: 201 });
-    } catch (error) {
-        return handleRouteError(error);
-    }
-}

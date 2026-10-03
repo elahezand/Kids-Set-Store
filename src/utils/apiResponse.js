@@ -56,13 +56,11 @@ export const paginated = (result, { meta, message } = {}) =>
 export const jsonError = (message, status = 400, errors) =>
   respond({ success: false, message, errors }, { status });
 
-/** service results look like { success, status, message, data } */
 export const fromService = (result, { status = 200, message } = {}) =>
   result?.success === false
     ? jsonError(result.message, result.status || 400, result.details)
     : respond({ success: true, message: message ?? result?.message, data: result?.data }, { status });
 
-/* FormData -> plain object.*/
 export const formDataToObject = (formData, { skipEmpty = false } = {}) => {
   const result = {};
 
@@ -91,7 +89,6 @@ export const validationError = (errorsOrZodError) => {
 };
 
 export const handleRouteError = (err, label = "API") => {
-  // Mongo duplicate key -> e.g. "title already exists"
   if (err?.code === 11000) {
     const field = Object.keys(err.keyValue || {})[0];
     return jsonError(field ? `${field} already exists` : "Already exists", 409);

@@ -1,6 +1,5 @@
 import type { Id, ISODate } from "./api";
 
-/* model/ticket.js, model/department.js, model/subDepartment.js */
 
 /** 1 = low, 2 = medium, 3 = high */
 export type TicketPriority = 1 | 2 | 3;
@@ -23,6 +22,9 @@ export interface TicketAuthor {
   email?: string;
   role?: Array<"USER" | "ADMIN"> | string;
 }
+
+/* ?status= on /p-user/tickets and GET /api/user/tickets */
+export type TicketStatusFilter = "all" | "waiting" | "answered";
 
 /* list item: GET /api/user/tickets */
 export interface TicketSummary {

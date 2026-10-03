@@ -83,7 +83,6 @@ export const useFavoriteListing = (initialPage: Paginated<FavoriteEntry>, limit 
     errorFallback: "Could not load favorites",
   });
 
-  // a favorite whose product was deleted / hidden has no usable product
   const products = useMemo(
     () =>
       toProductCards(

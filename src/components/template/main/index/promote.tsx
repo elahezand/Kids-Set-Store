@@ -44,8 +44,9 @@ const buildStats = (stats: PublicStats | null) => [
   { value: stats ? compact(stats.successfulDeals) : "-", label: "Completed orders" },
 ];
 
+/* same purple background as ClubArt (was peach / yellow) */
 const StatsArt = ({ stats }: { stats: PublicStats | null }) => (
-  <div className="flex h-full min-h-[300px] w-full items-center justify-center bg-peach-100 p-8 dark:bg-peach-900/30">
+  <div className="flex h-full min-h-[300px] w-full items-center justify-center bg-sage-100 p-8 dark:bg-sage-900/40">
     <div className="grid w-full max-w-[340px] grid-cols-2 gap-3 sm:gap-4">
       {buildStats(stats).map((s) => (
         <div
@@ -64,17 +65,19 @@ const Promote = ({ stats = null }: { stats?: PublicStats | null }) => {
   return (
     <div className="m-12">
       <div className="flex w-full flex-col gap-6 sm:gap-8">
+        {/* ───── Set Kids Club ───── */}
         <div
-          className="flex w-full flex-col items-stretch justify-between gap-0 overflow-hidden rounded-3xl shadow-card md:flex-row-reverse"
+          className="flex w-full flex-col items-stretch justify-between gap-0 overflow-hidden rounded-3xl border border-sage-100 shadow-card md:flex-row-reverse dark:border-white/10"
           data-aos="fade-up-right"
         >
           <div className="w-full md:w-1/2">
             <ClubArt />
           </div>
 
-          <div className="relative flex h-[260px] w-full items-end bg-mint-100 p-6 text-left dark:bg-ink-800 sm:h-[320px] sm:p-8 md:h-auto md:w-1/2">
-            <div className="w-full max-w-[280px] rounded-2xl bg-white p-4 text-center shadow-float dark:bg-ink-900 sm:p-5">
-              <span className="block w-full text-base font-bold text-text-dark dark:text-gray-100 sm:text-lg md:text-xl">
+          {/* blueberry -> bubblegum, same pair as the navbar + buttons */}
+          <div className="relative flex h-[260px] w-full items-end bg-gradient-to-br from-sage-100 via-sage-50 to-coral-50 p-6 text-left dark:bg-none dark:bg-ink-800 sm:h-[320px] sm:p-8 md:h-auto md:w-1/2">
+            <div className="w-full max-w-[280px] rounded-2xl bg-white p-4 text-center shadow-float ring-1 ring-sage-100 dark:bg-ink-900 dark:ring-white/10 sm:p-5">
+              <span className="block w-full text-base font-bold text-sage-700 dark:text-gray-100 sm:text-lg md:text-xl">
                 Set Kids Club
               </span>
               <p className="mt-2 w-full text-sm text-gray-700 dark:text-gray-400 sm:text-base">
@@ -86,14 +89,14 @@ const Promote = ({ stats = null }: { stats?: PublicStats | null }) => {
 
         {/* ───── چرا ما ───── */}
         <div
-          className="flex w-full flex-col items-stretch justify-between gap-0 overflow-hidden rounded-3xl shadow-card md:flex-row-reverse"
+          className="flex w-full flex-col items-stretch justify-between gap-0 overflow-hidden rounded-3xl border border-sage-100 shadow-card md:flex-row-reverse dark:border-white/10"
           data-aos="fade-up-left"
         >
-          <div className="flex w-full flex-col justify-center gap-4 bg-peach-50 p-6 dark:bg-ink-800 sm:p-8 md:w-1/2">
-            <div className="rounded-2xl bg-white p-4 dark:bg-ink-900 sm:p-5">
-              <p className="text-lg font-bold text-text-dark dark:text-gray-100 sm:text-xl md:text-2xl">Why Set Kids?</p>
+          <div className="flex w-full flex-col justify-center gap-4 bg-gradient-to-bl from-coral-50 via-sage-50 to-sage-100 p-6 dark:bg-none dark:bg-ink-800 sm:p-8 md:w-1/2">
+            <div className="rounded-2xl bg-white p-4 ring-1 ring-sage-100 dark:bg-ink-900 dark:ring-white/10 sm:p-5">
+              <p className="text-lg font-bold text-sage-700 dark:text-gray-100 sm:text-xl md:text-2xl">Why Set Kids?</p>
             </div>
-            <div className="max-h-[220px] overflow-y-auto rounded-2xl bg-white p-4 text-sm leading-7 text-gray-700 dark:bg-ink-900 dark:text-gray-300 sm:p-5 sm:text-base">
+            <div className="max-h-[220px] overflow-y-auto rounded-2xl bg-white p-4 text-sm leading-7 text-gray-700 ring-1 ring-sage-100 dark:bg-ink-900 dark:text-gray-300 dark:ring-white/10 sm:p-5 sm:text-base">
               With years of experience and feedback from parents, Set Kids offers a wide range of stylish and
               comfortable children&apos;s clothing. Our mission is to make shopping easier for families by providing
               trendy, high-quality outfits at affordable prices.
@@ -102,7 +105,7 @@ const Promote = ({ stats = null }: { stats?: PublicStats | null }) => {
               <Link href="/about" className="btn btn-primary">
                 About us
               </Link>
-              <Link href="/products" className="btn btn-secondary">
+              <Link href="/products" className="btn btn-accent">
                 Store
               </Link>
             </div>

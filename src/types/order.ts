@@ -83,3 +83,6 @@ export interface OrderItem {
 export interface OrderListItem extends OrderSummary {
   items: OrderItem[];
 }
+
+/* ?status= on /p-user/orders and GET /api/user/order ("all" = no filter) */
+export type OrderStatusFilter = "all" | OrderStatus;

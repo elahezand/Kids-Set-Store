@@ -5,7 +5,8 @@ export const queryKeys = {
   products: (filters: object) => ["products", filters] as const,
   articles: (filters: object) => ["articles", filters] as const,
   favorites: ["favorites"] as const,
-  /* user panel */
+  favoriteCount: ["favorites", "count"] as const,
+  favoriteIds: ["favorites", "ids"] as const,
   myOrders: (filters: object = {}) => ["my-orders", filters] as const,
   myComments: (filters: object = {}) => ["my-comments", filters] as const,
   myTickets: (filters: object = {}) => ["my-tickets", filters] as const,

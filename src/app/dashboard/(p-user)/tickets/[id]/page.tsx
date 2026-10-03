@@ -17,7 +17,6 @@ export default async function UserTicketPage({ params }: { params: Promise<{ id:
   if (!user) return null;
 
   const { id } = await params;
-  // only the owner gets it; anything else is a 404
   const result = (await ticketService.getMyTicket(id, user._id)) as { success: boolean; data?: TicketDetail };
   if (!result.success || !result.data) notFound();
 

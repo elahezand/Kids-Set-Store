@@ -38,6 +38,9 @@ export type CommentFormValues = Omit<CreateCommentPayload, "productId">;
 
 export type CommentStatus = "pending" | "approved" | "rejected" | "spam" | "deleted";
 
+/* ?status= on /p-user/comments and GET /api/user/comment ("all" = no filter) */
+export type CommentStatusFilter = "all" | "pending" | "approved" | "rejected";
+
 /* GET /api/user/comment item (user panel "my comments") */
 export interface MyComment {
   _id: Id;

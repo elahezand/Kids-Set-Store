@@ -28,7 +28,6 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     title: category ? `${category.title} | SET KIDS` : "All Products | SET KIDS",
     description:
       category?.description || (category ? `Explore our ${category.title} collection.` : "Browse our full collection of kids clothing."),
-    // filtered / paginated variants should not compete with the main list
     ...(filtered && { robots: { index: false, follow: true } }),
   };
 }

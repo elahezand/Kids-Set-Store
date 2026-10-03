@@ -1,8 +1,3 @@
-/* =========================================================================
-   Kids clothing & shoes storefront — "Blueberry & Bubblegum" theme (Tailwind v4)
-   Class names and token names are unchanged, so existing JSX keeps working.
-   ========================================================================= */
-
 /* 1. Tailwind ------------------------------------------------------------ */
 @import "tailwindcss";
 
@@ -129,7 +124,8 @@
   /* Typography — one family, real weights (no faux bold) */
   --font-sans: shabnam, ui-sans-serif, system-ui, sans-serif;
   --font-shabnam: shabnam, sans-serif;
-  --font-shabnam-bold: shabnam, sans-serif; /* kept for old class names */
+  --font-shabnam-bold: shabnam, sans-serif;
+  /* kept for old class names */
 
   /* Layout */
   --container-container: 1240px;
@@ -144,7 +140,9 @@
   --animate-fade-in: fade-in 0.2s ease-out;
   --animate-scale-in: scale-in 0.2s ease-out;
   --animate-wiggle: wiggle 0.5s ease-in-out;
+  --animate-sway: sway 3.2s ease-in-out infinite;
 }
+
 
 .dark [data-sonner-toaster][data-sonner-theme] {
   --normal-bg: var(--color-ink-800);
@@ -177,6 +175,7 @@
 }
 
 @layer base {
+
   html,
   body {
     max-width: 100vw;
@@ -258,6 +257,7 @@
 
 /* 4. Components ---------------------------------------------------------- */
 @layer components {
+
   /* Layout ---------------------------------------------------------------- */
   .section-y {
     @apply py-14 sm:py-20 md:py-24 lg:py-28;
@@ -280,7 +280,7 @@
   }
 
   .card-hover {
-    @apply transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-float motion-reduce:hover:translate-y-0;
+    @apply transition-[transform, box-shadow] duration-300 hover:-translate-y-1 hover:shadow-float motion-reduce:hover:translate-y-0;
   }
 
   /* Section heading: soft wavy underline instead of a hard 2px rule */
@@ -542,12 +542,12 @@
     @apply inline-flex items-center overflow-hidden rounded-xl border border-gray-300 bg-white dark:border-white/10 dark:bg-ink-900;
   }
 
-  .qty > button {
+  .qty>button {
     @apply grid size-10 place-items-center text-lg text-gray-700 transition-colors hover:bg-gray-100 disabled:opacity-40 dark:text-gray-300 dark:hover:bg-white/5;
   }
 
-  .qty > input,
-  .qty > span {
+  .qty>input,
+  .qty>span {
     @apply w-10 border-0 bg-transparent text-center text-sm font-semibold tabular-nums outline-none;
   }
 
@@ -777,7 +777,7 @@ html.dark .swal-text {
   margin: 0.75rem 0;
 }
 
-.rich-editor .ProseMirror p + p {
+.rich-editor .ProseMirror p+p {
   margin-top: 0.5rem;
 }
 
@@ -786,8 +786,22 @@ html.dark .swal-text {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
+  }
+}
+
+/* hanging sale cord on the home banner — swings gently from its top */
+@keyframes sway {
+
+  0%,
+  100% {
+    transform: rotate(3deg);
+  }
+
+  50% {
+    transform: rotate(-3deg);
   }
 }
 
@@ -796,6 +810,7 @@ html.dark .swal-text {
     opacity: 0;
     transform: scale(0.96) translateY(4px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -804,16 +819,20 @@ html.dark .swal-text {
 
 /* Small playful nudge — e.g. cart icon when an item is added */
 @keyframes wiggle {
+
   0%,
   100% {
     transform: rotate(0);
   }
+
   25% {
     transform: rotate(-10deg);
   }
+
   50% {
     transform: rotate(8deg);
   }
+
   75% {
     transform: rotate(-4deg);
   }
@@ -870,6 +889,7 @@ html.dark .swal-text {
     opacity: 0;
     transform: translateY(24px);
   }
+
   to {
     opacity: 1;
     transform: none;
@@ -881,6 +901,7 @@ html.dark .swal-text {
     opacity: 0;
     transform: translateX(-24px);
   }
+
   to {
     opacity: 1;
     transform: none;
@@ -892,6 +913,7 @@ html.dark .swal-text {
     opacity: 0;
     transform: translateX(24px);
   }
+
   to {
     opacity: 1;
     transform: none;
@@ -902,6 +924,7 @@ html.dark .swal-text {
   from {
     transform: translateX(0);
   }
+
   to {
     transform: translateX(-50%);
   }
@@ -954,6 +977,6 @@ html.dark .swal-text {
   }
 }
 
- .home-section {
-    @apply mx-auto w-full max-w-container px-4 py-30 sm:px-6 sm:py-14 lg:px-8;
-  }
+.home-section {
+  @apply mx-auto w-full max-w-container px-4 py-30 sm:px-6 sm:py-14 lg:px-8;
+}

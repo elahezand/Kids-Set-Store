@@ -127,6 +127,22 @@ const getFavoriteCount = async (userId) => {
     };
 };
 
+/* GET /api/user/favorites/ids -> every product id the user liked (the hearts on cards read it) */
+const FAVORITE_IDS_LIMIT = 1000;
+
+const getFavoriteIds = async (userId) => {
+    const favorites = await Favorite.find({ user: userId })
+        .sort({ _id: -1 })
+        .limit(FAVORITE_IDS_LIMIT)
+        .select("productId")
+        .lean();
+
+    return {
+        success: true,
+        data: favorites.map((favorite) => String(favorite.productId)),
+    };
+};
+
 const checkFavorites = async (userId, productIds) => {
     const idsArray = Array.isArray(productIds)
         ? productIds
@@ -165,6 +181,7 @@ export {
     toggleFavorite,
     isFavorited,
     getFavoriteCount,
+    getFavoriteIds,
     checkFavorites,
 };
 
@@ -175,5 +192,6 @@ export default {
     toggleFavorite,
     isFavorited,
     getFavoriteCount,
+    getFavoriteIds,
     checkFavorites,
 };
