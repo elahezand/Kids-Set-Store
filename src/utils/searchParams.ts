@@ -1,6 +1,5 @@
 import type { SearchParams } from "@/types";
 
-/* ?a=1&a=2 gives an array -> keep the first value, trimmed */
 export const firstParam = (value: string | string[] | undefined, max = 100): string => {
   const str = Array.isArray(value) ? value[0] : value;
   return typeof str === "string" ? str.trim().slice(0, max) : "";

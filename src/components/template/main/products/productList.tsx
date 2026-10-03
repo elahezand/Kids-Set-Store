@@ -1,7 +1,7 @@
 "use client";
 
-import Product from "@/components/modules/main/product";
 import LoadMore from "@/components/modules/main/loadMore";
+import ProductCard from "@/components/modules/main/productCard";
 import { useProductListing } from "@/services/client/listing";
 import type { ListingQuery, Paginated, ProductDoc } from "@/types";
 
@@ -25,7 +25,7 @@ export default function ProductList({ query, initialPage, limit = 12 }: ProductL
     <>
       <div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
         {products.map((item) => (
-          <Product key={item._id} {...item} />
+          <ProductCard key={item._id} {...item} />
         ))}
       </div>
 

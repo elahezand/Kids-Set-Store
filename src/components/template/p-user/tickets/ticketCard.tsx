@@ -1,17 +1,17 @@
 import Link from "next/link";
 import { LuChevronRight } from "react-icons/lu";
+import { ROUTES } from "@/utils/constants";
 import { formatDate } from "@/utils/format";
 import { TICKET_PRIORITY, ticketState } from "@/utils/panelView";
 import type { TicketSummary } from "@/types";
 
-// Single ticket row (dashboard + tickets list)
 export default function TicketCard({ _id, title, createdAt, department, isAnswer, priority }: TicketSummary) {
   const state = ticketState(isAnswer);
   const level = TICKET_PRIORITY[priority];
 
   return (
     <Link
-      href={`/p-user/tickets/${_id}`}
+      href={ROUTES.dashboard.ticket(String(_id))}
       className="group flex items-center justify-between gap-3 px-4 py-4 transition-colors hover:bg-gray-50 sm:gap-4 sm:px-5 dark:hover:bg-white/[0.02]"
     >
       <div className="min-w-0">

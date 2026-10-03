@@ -1,5 +1,3 @@
-/* Envelope every API route returns (utils/apiResponse) */
-
 export interface Pagination {
   limit: number | null;
   nextCursor: string | null;
@@ -25,17 +23,12 @@ export interface ApiFailure {
   errors?: FieldError[];
 }
 
-export type ApiResponse<TData = unknown, TMeta = Record<string, unknown>> =
-  | ApiSuccess<TData, TMeta>
-  | ApiFailure;
+export type ApiResponse<TData = unknown, TMeta = Record<string, unknown>> = ApiSuccess<TData, TMeta> | ApiFailure;
 
-/* list endpoints: data is an array and pagination is always present */
-export interface Paginated<TItem, TMeta = Record<string, unknown>>
-  extends ApiSuccess<TItem[], TMeta> {
+export interface Paginated<TItem, TMeta = Record<string, unknown>> extends ApiSuccess<TItem[], TMeta> {
   pagination: Pagination;
 }
 
-/* what server services return before the route wraps it */
 export interface ServiceResult<TData = unknown> {
   success: boolean;
   status?: number;
@@ -43,7 +36,6 @@ export interface ServiceResult<TData = unknown> {
   data?: TData;
 }
 
-/* Next.js App Router page props */
 export type SearchParams = Record<string, string | string[] | undefined>;
 
 export interface PageProps<TParams extends Record<string, string> = Record<string, string>> {

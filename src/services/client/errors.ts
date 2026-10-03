@@ -1,14 +1,16 @@
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
+import type { AuthError } from "@/services/client/http";
 import type { ApiFailure } from "@/types";
-import type { AuthError } from "./http";
 
-/* Message to show for any error thrown by services/client (reads the API envelope) */
 export const getErrorMessage = (error: unknown, fallback = "Something went wrong"): string => {
   if (isAxiosError<ApiFailure>(error)) {
     const body = error.response?.data;
     if (body?.errors?.length) {
-      return body.errors.map((item) => item.message).filter(Boolean).join(" | ");
+      return body.errors
+        .map((item) => item.message)
+        .filter(Boolean)
+        .join(" | ");
     }
     if (body?.message) return body.message;
   }

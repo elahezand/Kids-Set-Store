@@ -17,29 +17,40 @@ Required env vars: `MONGO_URL`, `ACCESS_TOKEN`, `REFRESH_TOKEN`, `NEXT_PUBLIC_AP
 
 ```
 src/
-├─ app/                        routes only (no business logic)
-│  ├─ (main)/                  storefront pages
-│  ├─ (p-admin)/p-admin/       admin panel pages
-│  ├─ (p-user)/p-user/         user panel pages
+├─ app/                          routes only (no business logic)
+│  ├─ (main)/                    storefront pages
+│  ├─ dashboard/
+│  │  ├─ (p-user)/               user dashboard  → /dashboard/...
+│  │  └─ admin/                  admin panel     → /dashboard/admin/...
 │  └─ api/
-│     ├─ (public)/             no login needed
-│     ├─ (user)/user/          logged-in user
-│     └─ (admin)/admin/        admin only
+│     ├─ (public)/               no login needed
+│     ├─ (user)/user/            logged-in user
+│     └─ (admin)/admin/          admin only
 ├─ components/
-│  ├─ modules/                 reusable building blocks (ui/, panel/, main/)
-│  └─ template/                page-specific sections, one folder per route
-├─ configs/                    db.js (mongoose connection), redis.js (key/value store)
-├─ model/                      mongoose models (CommonJS)
-├─ services/                   business logic, called by api routes
-│  ├─ admin/  public/  user/   one file per domain, same name as the model
-│  └─ shared/                  used by several scopes (order, cart, wallet, session, ...)
-├─ validators/                 zod schemas, one file per domain
-├─ utils/
-│  ├─ auth/                    index (tokens), authGuard, cookies
-│  ├─ hooks/  context/  providers/  actions/   client hooks, server actions
-│  └─ apiResponse, helper, paginate, pricing, notify, logger, AppError, ...
-└─ data/                       static json
+│  ├─ modules/                   reusable building blocks
+│  │  ├─ main/                   storefront: navbar/, footer/, article/, productCard, breadcrumb, ...
+│  │  ├─ panel/                  dashboard shell: sidebar, topbar, pageHeader, statCard, ...
+│  │  └─ ui/                     generic UI: modal, confirmDialog, emptyState, stars, pageLoader, ...
+│  └─ template/                  page-specific sections, one folder per route
+│     ├─ main/                   index (home), products, product, cart, articles, contact-us, ...
+│     ├─ p-user/                 user dashboard sections
+│     └─ p-admin/                admin panel sections
+├─ configs/                      db.js (mongoose connection), redis.js
+├─ model/                        mongoose models
+├─ services/
+│  ├─ client/                    browser: React Query hooks over /api (cart, favorite, auth, panel, ...)
+│  └─ server/                    business logic used by api routes and server pages
+│     └─ admin/ public/ user/ shared/
+├─ types/                        shared TypeScript types (import from "@/types")
+├─ validators/                   zod schemas, one file per domain
+└─ utils/
+   ├─ constants.ts               ROUTES, SITE_URL, DEFAULT_AVATAR, PLACEHOLDER_IMAGE
+   ├─ auth/  providers/  hooks/  actions/
+   └─ format, productView, articleView, panelView, share, searchParams, ...
 ```
+
+Main site and user dashboard are written in TypeScript (`.ts` / `.tsx`); the API, models and
+server services are JavaScript.
 
 **Naming rule:** one domain = one name everywhere:
 `model/product.js` → `services/{admin,public,user}/product.js` → `validators/product.js`
@@ -49,7 +60,10 @@ src/
 
 ## Conventions
 
-- Imports always use the `@/` alias (= `src/`), never `../../..`.
+- Imports always use the `@/` alias (= `src/`), never relative paths.
+- Internal links use `ROUTES` from `@/utils/constants` instead of hard-coded strings.
+- File names are camelCase (`productCard.tsx`), components are PascalCase (`ProductCard`).
+- Formatting: Prettier (`.prettierrc.json`) — `npx prettier --write "src/**/*.{ts,tsx}"`.
 - API route pattern: `connectToDB()` → auth guard → `validate(schema, body)` → service → `NextResponse`.
 - Services return `{ success, status?, message?, data? }`; routes turn that into HTTP.
 - Dashboard tables use `paginatePage` (`?page=`), lists with "load more" use cursor `paginate`.
@@ -74,4 +88,3 @@ src/
 
 Dark mode uses the `dark` class on `<html>` (`dark:` variant).
 
-See `MIGRATION_NOTES.md` for what changed in the restructure and what is still open.

@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { FaRegHeart } from "react-icons/fa";
-import Product from "@/components/modules/main/product";
 import LoadMore from "@/components/modules/main/loadMore";
+import ProductCard from "@/components/modules/main/productCard";
 import { useFavoriteListing } from "@/services/client/listing";
+import { ROUTES } from "@/utils/constants";
 import type { FavoriteEntry, Paginated } from "@/types";
 
 interface FavoriteItemsProps {
@@ -26,7 +27,7 @@ export default function FavoriteItems({ initialPage, limit = 20 }: FavoriteItems
         <span className="mb-8 block text-gray-600 dark:text-gray-400">
           You will find lots of interesting products in the shop.
         </span>
-        <Link href="/products" className="btn btn-accent">
+        <Link href={ROUTES.products} className="btn btn-accent">
           Back to shop
         </Link>
       </div>
@@ -37,7 +38,7 @@ export default function FavoriteItems({ initialPage, limit = 20 }: FavoriteItems
     <>
       <div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
         {products.map((item) => (
-          <Product key={item._id} {...item} />
+          <ProductCard key={item._id} {...item} />
         ))}
       </div>
       <LoadMore

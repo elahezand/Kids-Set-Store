@@ -1,7 +1,8 @@
 import Link from "next/link";
-import CommentForm from "@/components/template/main/product/commentForm";
+import CommentForm from "@/components/template/main/product/comments/commentForm";
 import CommentsList from "@/components/template/main/product/comments/commentsList";
 import commentService from "@/services/server/public/comment";
+import { ROUTES } from "@/utils/constants";
 import { toPlain } from "@/utils/format";
 import type { Paginated, ProductComment } from "@/types";
 
@@ -13,7 +14,6 @@ interface CommentsProps {
   isLoggedIn?: boolean;
 }
 
-/* First page from the server service; "Load more" calls GET /api/comments/product/:id */
 const Comments = async ({ productId, total = 0, isLoggedIn = false }: CommentsProps) => {
   const result = await commentService.getByProduct(productId, { limit: PAGE_SIZE });
 
@@ -46,7 +46,7 @@ const Comments = async ({ productId, total = 0, isLoggedIn = false }: CommentsPr
           ) : (
             <div className="card card-body text-center">
               <p className="mb-4 text-text dark:text-gray-100">Log in to write a review.</p>
-              <Link href="/login-register" className="btn btn-primary mx-auto w-max">
+              <Link href={ROUTES.login} className="btn btn-primary mx-auto w-max">
                 Log in / Sign up
               </Link>
             </div>

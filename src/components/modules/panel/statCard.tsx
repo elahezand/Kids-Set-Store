@@ -1,6 +1,6 @@
 import Link from "next/link";
-import type { IconType } from "react-icons";
 import { LuTrendingUp } from "react-icons/lu";
+import type { IconType } from "react-icons";
 
 const tones = {
   sage: "bg-sage-50 text-sage-600 dark:bg-sage-500/10 dark:text-sage-300",
@@ -15,14 +15,22 @@ interface StatCardProps {
   icon?: IconType;
   tone?: keyof typeof tones;
   hint?: string;
-  /** whole card becomes a link (user dashboard) */
   href?: string;
 }
 
-export default function StatCard({ title, value, icon: Icon = LuTrendingUp, tone = "sage", hint, href }: StatCardProps) {
+export default function StatCard({
+  title,
+  value,
+  icon: Icon = LuTrendingUp,
+  tone = "sage",
+  hint,
+  href,
+}: StatCardProps) {
   const body = (
     <>
-      <span className={`flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-12 ${tones[tone] ?? tones.sage}`}>
+      <span
+        className={`flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-12 ${tones[tone] ?? tones.sage}`}
+      >
         <Icon className="size-5 sm:size-6" />
       </span>
       <div className="min-w-0">

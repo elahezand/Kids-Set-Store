@@ -1,14 +1,13 @@
-import type { Metadata } from "next";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import TicketsList from "@/components/template/p-user/tickets/ticketsList";
 import SendTicket from "@/components/template/p-user/tickets/sendTicket";
+import TicketsList from "@/components/template/p-user/tickets/ticketsList";
 import ticketService from "@/services/server/user/ticket";
 import { getPanelSession } from "@/utils/auth/panelUser";
 import { toInitialPage } from "@/utils/initialPage";
 import { pickStatus } from "@/utils/panelStatus";
-import { TICKET_TABS, tabValues } from "@/utils/panelView";
-import type { PageProps, Pagination } from "@/types";
-import { TicketSummary } from "@/types/ticket";
+import { tabValues, TICKET_TABS } from "@/utils/panelView";
+import type { Metadata } from "next";
+import type { PageProps, Pagination, TicketSummary } from "@/types";
 
 export const metadata: Metadata = { title: "Support tickets" };
 

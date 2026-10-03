@@ -2,13 +2,13 @@
 
 import { useEffect } from "react";
 import { LuSend } from "react-icons/lu";
-import { useForm, type FieldPath } from "react-hook-form";
+import { type FieldPath, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { z } from "zod";
-import { ticketValidationSchema } from "@/validators/ticket";
 import { useCreateTicket, useDepartments } from "@/services/client/panel";
 import { TICKET_PRIORITY } from "@/utils/panelView";
-import type { TicketPriority } from "@/types/ticket";
+import { ticketValidationSchema } from "@/validators/ticket";
+import type { z } from "zod";
+import type { TicketPriority } from "@/types";
 
 type TicketInput = z.input<typeof ticketValidationSchema>;
 type TicketOutput = z.output<typeof ticketValidationSchema>;
@@ -34,15 +34,13 @@ export default function SendTicket() {
   const departmentId = watch("department");
   const subDepartments = departments.find((item) => String(item._id) === departmentId)?.subDepartments ?? [];
 
-  // a new department -> the old sub-department no longer fits
   useEffect(() => {
     setValue("subDepartment", "");
   }, [departmentId, setValue]);
 
   const { mutate, isPending } = useCreateTicket({ onCreated: () => reset(EMPTY) });
 
-  const onSubmit = (values: TicketOutput) =>
-    mutate({ ...values, priority: values.priority as TicketPriority });
+  const onSubmit = (values: TicketOutput) => mutate({ ...values, priority: values.priority as TicketPriority });
 
   const error = (name: FieldPath<TicketInput>) =>
     errors[name]?.message ? <span className="field-error">{String(errors[name]?.message)}</span> : null;
@@ -52,11 +50,12 @@ export default function SendTicket() {
       <div className="card-header">
         <div>
           <h2 className="card-title">Open a new ticket</h2>
-          <p className="mt-0.5 text-xs text-gray-700 dark:text-gray-500">Our support team usually replies within 24 hours.</p>
+          <p className="mt-0.5 text-xs text-gray-700 dark:text-gray-500">
+            Our support team usually replies within 24 hours.
+          </p>
         </div>
       </div>
 
-      {/* phones: one column; sm and up: two columns (message + button take the full row) */}
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="card-body grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="ticket-department" className="label">

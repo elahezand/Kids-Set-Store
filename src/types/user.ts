@@ -3,7 +3,6 @@ import type { SavedAddress } from "./order";
 
 export type UserRole = "USER" | "ADMIN";
 
-/* the logged-in user as the site needs it (never includes password) */
 export interface SessionUser {
   _id: Id;
   username: string;
@@ -16,7 +15,6 @@ export interface SessionUser {
   createdAt?: ISODate;
 }
 
-/* profile form (panels) — validators/user profileValidationSchema */
 export interface ProfileFormValues {
   username: string;
   email: string;

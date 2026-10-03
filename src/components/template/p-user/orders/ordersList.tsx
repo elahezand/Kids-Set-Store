@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { LuShoppingBag } from "react-icons/lu";
-import EmptyState from "@/components/modules/ui/emptyState";
 import LoadMore from "@/components/modules/main/loadMore";
 import StatusTabs from "@/components/modules/panel/statusTabs";
+import EmptyState from "@/components/modules/ui/emptyState";
 import OrderRow from "@/components/template/p-user/orders/orderRow";
 import { useMyOrders } from "@/services/client/panel";
+import { ROUTES } from "@/utils/constants";
 import { formatDate, formatPrice } from "@/utils/format";
-import { ORDER_STATUS, ORDER_TABS, PAYMENT_STATUS, orderItemsCount, shortId } from "@/utils/panelView";
+import { ORDER_STATUS, ORDER_TABS, orderItemsCount, PAYMENT_STATUS, shortId } from "@/utils/panelView";
 import type { OrderListItem, OrderStatusFilter, Paginated } from "@/types";
 
 interface OrdersListProps {
@@ -31,18 +32,19 @@ export default function OrdersList({ initialPage, limit, status }: OrdersListPro
         <EmptyState
           title={status === "all" ? "No orders yet" : "No orders here"}
           description={
-            status === "all" ? "Your orders will appear here." : `You have no ${ORDER_STATUS[status].label.toLowerCase()} orders.`
+            status === "all"
+              ? "Your orders will appear here."
+              : `You have no ${ORDER_STATUS[status].label.toLowerCase()} orders.`
           }
           icon={LuShoppingBag}
           action={
-            <Link href="/products" className="btn btn-primary btn-sm">
+            <Link href={ROUTES.products} className="btn btn-primary btn-sm">
               Start shopping
             </Link>
           }
         />
       ) : (
         <>
-          {/* phones */}
           <ul className="divide-y divide-gray-200 md:hidden dark:divide-white/5">
             {orders.map((order) => (
               <li key={String(order._id)}>
@@ -51,7 +53,6 @@ export default function OrdersList({ initialPage, limit, status }: OrdersListPro
             ))}
           </ul>
 
-          {/* tablets / desktop */}
           <div className="table-wrap hidden md:block">
             <table className="data-table">
               <thead>

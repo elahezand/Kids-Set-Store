@@ -1,18 +1,19 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LuArrowLeft } from "react-icons/lu";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import TicketThread from "@/components/modules/panel/ticketThread";
 import TicketReplyForm from "@/components/modules/panel/ticketReplyForm";
+import TicketThread from "@/components/modules/panel/ticketThread";
 import ticketService from "@/services/server/user/ticket";
 import { getPanelSession } from "@/utils/auth/panelUser";
+import { ROUTES } from "@/utils/constants";
 import { toPlain } from "@/utils/format";
-import { TicketDetail } from "@/types/ticket";
+import type { Metadata } from "next";
+import type { PageProps, TicketDetail } from "@/types";
 
 export const metadata: Metadata = { title: "Ticket details" };
 
-export default async function UserTicketPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function TicketPage({ params }: PageProps<{ id: string }>) {
   const { user } = await getPanelSession();
   if (!user) return null;
 
@@ -25,7 +26,7 @@ export default async function UserTicketPage({ params }: { params: Promise<{ id:
       <PageHeader
         title="Ticket details"
         actions={
-          <Link href="/p-user/tickets" className="btn btn-secondary">
+          <Link href={ROUTES.dashboard.tickets} className="btn btn-secondary">
             <LuArrowLeft className="size-4" /> Back to tickets
           </Link>
         }

@@ -1,13 +1,36 @@
-import type { ReactNode } from "react";
-import ClientLayout from "@/app/(main)/clientLayout";
+import ShowFooter from "@/components/modules/main/footer/showFooter";
+import Navbar from "@/components/modules/main/navbar/navbar";
 import AosInit from "@/components/modules/ui/aosInit";
+import connectToDB from "@/configs/db";
+import infoService from "@/services/server/public/info";
+import { toPlain } from "@/utils/format";
+import type { ReactNode } from "react";
+import type { SiteInfo } from "@/types";
 
-/* Main site shell. The cart lives on the server (services/server/user/cart). */
-export default function MainLayout({ children }: { children: ReactNode }) {
+const loadSiteInfo = async (): Promise<SiteInfo | null> => {
+  try {
+    await connectToDB();
+    return toPlain((await infoService.getInfo()) as SiteInfo | null);
+  } catch (error) {
+    console.error("[layout] could not load site info:", error);
+    return null;
+  }
+};
+
+export default async function MainLayout({ children }: { children: ReactNode }) {
+  const info = await loadSiteInfo();
+
   return (
     <>
       <AosInit />
-      <ClientLayout>{children}</ClientLayout>
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
+      <Navbar />
+      <main id="main-content" className="min-h-[60vh] pt-[86px]">
+        {children}
+      </main>
+      <ShowFooter info={info} />
     </>
   );
 }

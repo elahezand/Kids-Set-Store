@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
 import PageHeader from "@/components/modules/panel/pageHeader";
 import FavoritesGrid from "@/components/template/p-user/favorites/favoritesGrid";
 import favoriteService from "@/services/server/user/favorite";
 import { getPanelSession } from "@/utils/auth/panelUser";
 import { toInitialPage } from "@/utils/initialPage";
+import type { Metadata } from "next";
 import type { FavoriteEntry, Pagination } from "@/types";
 
 export const metadata: Metadata = { title: "Favorites" };

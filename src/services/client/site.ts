@@ -1,10 +1,8 @@
 "use client";
 
 import { toast } from "sonner";
+import { usePost } from "@/services/client/query";
 import type { ApiSuccess, ContactPayload, NewsletterPayload } from "@/types";
-import { usePost } from "./query";
-
-/* Contact form + newsletter (API: /api/contacts, /api/newsletters) */
 
 export const useSendContact = ({ onSent }: { onSent?: () => void } = {}) =>
   usePost<ApiSuccess, ContactPayload>("/contacts", {

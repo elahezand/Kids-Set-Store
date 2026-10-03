@@ -1,4 +1,3 @@
-/* model/info.js (site contact info) */
 export interface SiteInfo {
   phone: string;
   email: string;
@@ -11,7 +10,6 @@ export interface SiteInfo {
   };
 }
 
-/* services/server/public/stats */
 export interface PublicStats {
   activeProducts: number;
   activeUsers: number;
@@ -20,7 +18,6 @@ export interface PublicStats {
   averageRating: number;
 }
 
-/* POST /api/contacts */
 export interface ContactPayload {
   name: string;
   email: string;
@@ -28,7 +25,6 @@ export interface ContactPayload {
   body: string;
 }
 
-/* POST /api/newsletters */
 export interface NewsletterPayload {
   email: string;
 }

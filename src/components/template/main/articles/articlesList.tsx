@@ -1,6 +1,6 @@
 "use client";
 
-import Article from "@/components/template/main/index/articles/article";
+import Article from "@/components/modules/main/article/articleCard";
 import LoadMore from "@/components/modules/main/loadMore";
 import { useArticleListing } from "@/services/client/listing";
 import type { ArticleListQuery, ArticleSummary, Paginated } from "@/types";

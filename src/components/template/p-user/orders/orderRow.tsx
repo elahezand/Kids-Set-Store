@@ -1,8 +1,7 @@
 import { formatDate, formatPrice } from "@/utils/format";
-import { ORDER_STATUS, PAYMENT_STATUS, orderItemsCount, shortId } from "@/utils/panelView";
+import { ORDER_STATUS, orderItemsCount, PAYMENT_STATUS, shortId } from "@/utils/panelView";
 import type { OrderListItem } from "@/types";
 
-/* one order as a compact card — used on phones and in the dashboard "Recent orders" */
 export default function OrderRow({ order }: { order: OrderListItem }) {
   const status = ORDER_STATUS[order.status] ?? ORDER_STATUS.created;
   const payment = PAYMENT_STATUS[order.paymentStatus] ?? PAYMENT_STATUS.pending;

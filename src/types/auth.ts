@@ -1,5 +1,5 @@
 export interface SignInPayload {
-  identifier: string; // phone or email
+  identifier: string;
   password: string;
   remember?: boolean;
 }
@@ -16,7 +16,7 @@ export interface SendOtpPayload {
 }
 
 export interface SendOtpResult {
-  remainingTime: string; // "mm:ss"
+  remainingTime: string;
 }
 
 export interface VerifyOtpPayload {

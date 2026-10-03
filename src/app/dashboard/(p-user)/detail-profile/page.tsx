@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
 import PageHeader from "@/components/modules/panel/pageHeader";
 import ProfileForm from "@/components/modules/panel/profileForm";
 import { getPanelSession } from "@/utils/auth/panelUser";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Profile" };
 

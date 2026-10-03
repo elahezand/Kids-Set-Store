@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import Breadcrumb from "@/components/modules/main/breadCrumb";
-import Table from "@/components/template/main/cart/table";
+import Breadcrumb from "@/components/modules/main/breadcrumb";
+import CartTable from "@/components/template/main/cart/cartTable";
 import connectToDB from "@/configs/db";
-import { getMe } from "@/utils/auth/authGuard";
 import cartService from "@/services/server/user/cart";
+import { getMe } from "@/utils/auth/authGuard";
+import { ROUTES } from "@/utils/constants";
 import { toPlain } from "@/utils/format";
+import type { Metadata } from "next";
 import type { CartView, SavedAddress, SessionUser } from "@/types";
 
 export const metadata: Metadata = {
@@ -18,7 +19,7 @@ export default async function CartPage() {
   await connectToDB();
 
   const user = (await getMe()) as SessionUser | null;
-  if (!user) redirect("/login-register");
+  if (!user) redirect(ROUTES.login);
 
   const cart = (await cartService.getUserCart(user._id)) as CartView;
 
@@ -34,7 +35,7 @@ export default async function CartPage() {
     <div className="page-container">
       <Breadcrumb route="cart" title="Cart" />
       <div className="flex w-full flex-col items-start gap-8 lg:flex-row">
-        <Table
+        <CartTable
           initialCart={toPlain(cart)}
           addresses={toPlain(addresses)}
           defaultPhone={user.phone ?? ""}

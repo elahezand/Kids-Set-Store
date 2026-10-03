@@ -1,4 +1,3 @@
-import type { IconType } from "react-icons";
 import {
   LuBadgePercent,
   LuHeart,
@@ -11,6 +10,7 @@ import {
   LuUserCog,
   LuUsers,
 } from "react-icons/lu";
+import type { IconType } from "react-icons";
 
 export type PanelVariant = "admin" | "user";
 
@@ -18,7 +18,6 @@ export interface PanelLink {
   href: string;
   label: string;
   icon: IconType;
-  /** only active on that exact path */
   exact?: boolean;
 }
 
@@ -28,7 +27,6 @@ export interface PanelNav {
   links: PanelLink[];
 }
 
-// Sidebar navigation for each panel
 export const panelNav: Record<PanelVariant, PanelNav> = {
   admin: {
     title: "Admin Panel",

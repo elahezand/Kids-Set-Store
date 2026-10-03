@@ -8,8 +8,6 @@ import type {
   TicketStatusFilter,
 } from "@/types";
 
-/* labels + badge colors used by the user panel (one place, no copies in components) */
-
 type Badge = { label: string; badge: string };
 
 export const ORDER_STATUS: Record<OrderStatus, Badge> = {
@@ -36,16 +34,10 @@ export const TICKET_PRIORITY: Record<TicketPriority, Badge> = {
 export const ticketState = (isAnswer: boolean): Badge =>
   isAnswer ? { label: "Answered", badge: "badge-success" } : { label: "Waiting", badge: "badge-accent" };
 
-/** "#A1B2C3" — last 6 chars of the id */
 export const shortId = (id: string) => `#${String(id).slice(-6).toUpperCase()}`;
 
 export const orderItemsCount = (order: Pick<OrderListItem, "items">) =>
   order.items?.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) ?? 0;
-
-export const DEFAULT_AVATAR =
-  "/images/user-profile-flat-illustration-avatar-person-icon-gender-neutral-silhouette-profile-picture-free-vector.jpg";
-
-/* ---------- status tabs (?status=) — used by the server pages AND the client lists ---------- */
 
 type Tab<T> = { value: T; label: string };
 
@@ -62,11 +54,9 @@ export const COMMENT_TABS: ReadonlyArray<Tab<CommentStatusFilter>> = [
   { value: "rejected", label: "Rejected" },
 ];
 
-/* "All" + one tab per order status (labels from ORDER_STATUS) */
 export const ORDER_TABS: ReadonlyArray<Tab<OrderStatusFilter>> = [
   { value: "all", label: "All" },
   ...(Object.keys(ORDER_STATUS) as OrderStatus[]).map((value) => ({ value, label: ORDER_STATUS[value].label })),
 ];
 
-/** the allowed ?status= values of a tab list */
 export const tabValues = <T>(tabs: ReadonlyArray<Tab<T>>): T[] => tabs.map((tab) => tab.value);

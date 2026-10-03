@@ -1,11 +1,6 @@
 import { Suspense } from "react";
-import type { Metadata } from "next";
-import Banner from "@/components/modules/main/banner";
-import SaleCord from "@/components/modules/main/saleCord";
-import PromoText from "@/components/template/main/index/promoText";
-import SectionSkeleton from "@/components/template/main/index/sectionSkeleton";
-import TrustStrip from "@/components/modules/main/trustStrip";
 import GrowthChart from "@/components/template/main/index/growthChart";
+import Hero from "@/components/template/main/index/hero/hero";
 import {
   ArticlesSection,
   BestSellersSection,
@@ -14,8 +9,12 @@ import {
   MostLovedSection,
   PromoteSection,
 } from "@/components/template/main/index/homeSections";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "";
+import PromoText from "@/components/template/main/index/promoText";
+import SaleCord from "@/components/template/main/index/saleCord";
+import SectionSkeleton from "@/components/template/main/index/sectionSkeleton";
+import TrustStrip from "@/components/template/main/index/trustStrip";
+import { SITE_URL } from "@/utils/constants";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "SET KIDS | Kids Clothing Store",
@@ -28,12 +27,11 @@ export const metadata: Metadata = {
   },
 };
 
-
 export default function Home() {
   return (
     <div className="min-h-screen">
       <div className="relative">
-        <Banner />
+        <Hero />
         <SaleCord />
       </div>
       <TrustStrip />

@@ -1,5 +1,5 @@
 import Link from "next/link";
-
+import { ROUTES } from "@/utils/constants";
 
 const MAX_AGE = 14;
 const TICKS = Array.from({ length: MAX_AGE * 4 + 1 }, (_, i) => i / 4);
@@ -23,15 +23,13 @@ export default function GrowthChart() {
             </p>
           </div>
 
-          <Link href="/products" className="btn btn-lg btn-primary w-max shrink-0 rounded-full px-7">
+          <Link href={ROUTES.products} className="btn btn-lg btn-primary w-max shrink-0 rounded-full px-7">
             Shop all sizes
           </Link>
         </div>
 
-        {/* the tape */}
         <div className="mt-10 sm:mt-12" aria-hidden="true">
           <div className="relative overflow-hidden rounded-2xl bg-white pb-8 pl-6 pr-5 text-sage-700 shadow-card ring-1 ring-sage-100 dark:bg-ink-900 dark:text-sage-300 dark:ring-white/10 sm:pb-10 sm:pl-8 sm:pr-6">
-            {/* soft tab at the start of the tape */}
             <span className="absolute inset-y-0 left-0 w-3 bg-coral-200 dark:bg-coral-400/60 sm:w-4" />
 
             <div className="flex items-start justify-between">
@@ -39,7 +37,9 @@ export default function GrowthChart() {
                 <span key={age} className="relative flex w-px flex-col items-center">
                   <span className={`w-px rounded-full bg-sage-300 dark:bg-sage-600 ${tickHeight(age)}`} />
                   {age % 2 === 0 && (
-                    <span className="absolute top-8 text-sm font-semibold leading-none sm:top-10 sm:text-base">{age}</span>
+                    <span className="absolute top-8 text-sm font-semibold leading-none sm:top-10 sm:text-base">
+                      {age}
+                    </span>
                   )}
                 </span>
               ))}

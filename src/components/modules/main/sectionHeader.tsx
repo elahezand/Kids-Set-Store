@@ -2,7 +2,6 @@ import Link from "next/link";
 
 interface SectionHeaderProps {
   title: string;
-  /** one short line under the title */
   description?: string;
   href?: string;
   linkLabel?: string;

@@ -1,19 +1,18 @@
-import Latest from "@/components/template/main/index/latest";
-import ProductSlider from "@/components/template/main/index/bestSelling";
+import ArticlesSlider from "@/components/template/main/index/articlesSlider";
 import Categories from "@/components/template/main/index/categories";
-import Articles from "@/components/template/main/index/articles/articles";
-import Promote from "@/components/template/main/index/promote";
+import Latest from "@/components/template/main/index/latest";
+import ProductSlider from "@/components/template/main/index/productSlider";
+import Promote from "@/components/template/main/index/promote/promote";
 import connectToDB from "@/configs/db";
-import productService from "@/services/server/public/product";
 import articleService from "@/services/server/public/article";
 import categoryService from "@/services/server/public/category";
-import statService from "@/services/server/public/stats"
-import { toProductCards } from "@/utils/productView";
+import productService from "@/services/server/public/product";
+import statService from "@/services/server/public/stats";
 import { toPlain } from "@/utils/format";
+import { toProductCards } from "@/utils/productView";
 import type { ArticleSummary, CategoryNode, ProductDoc, PublicStats } from "@/types";
 
-
-export const HOME_LIMIT = 10;
+const HOME_LIMIT = 10;
 
 async function load<T>(label: string, query: () => Promise<unknown>, fallback: T): Promise<T> {
   try {
@@ -31,7 +30,11 @@ export async function LatestSection() {
 }
 
 export async function BestSellersSection() {
-  const products = await load<ProductDoc[]>("best sellers", () => productService.getBestSellingProducts(HOME_LIMIT), []);
+  const products = await load<ProductDoc[]>(
+    "best sellers",
+    () => productService.getBestSellingProducts(HOME_LIMIT),
+    []
+  );
   if (!products.length) return null;
 
   return <ProductSlider title="Best Sellers" href="/products?sort=bestSelling" products={toProductCards(products)} />;
@@ -57,7 +60,7 @@ export async function ArticlesSection() {
   );
   if (!result.data?.length) return null;
 
-  return <Articles articles={toPlain(result.data)} />;
+  return <ArticlesSlider articles={toPlain(result.data)} />;
 }
 
 export async function PromoteSection() {

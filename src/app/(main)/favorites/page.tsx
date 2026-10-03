@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import Breadcrumb from "@/components/modules/main/breadCrumb";
+import Breadcrumb from "@/components/modules/main/breadcrumb";
 import FavoriteItems from "@/components/template/main/favorites/favoriteItems";
 import connectToDB from "@/configs/db";
-import { getMe } from "@/utils/auth/authGuard";
 import favoriteService from "@/services/server/user/favorite";
+import { getMe } from "@/utils/auth/authGuard";
+import { ROUTES } from "@/utils/constants";
 import { toInitialPage } from "@/utils/initialPage";
+import type { Metadata } from "next";
 import type { FavoriteEntry, Pagination } from "@/types";
 
 export const metadata: Metadata = {
@@ -22,9 +23,8 @@ export default async function FavoritesPage() {
   await connectToDB();
 
   const user = await getMe();
-  if (!user) redirect("/login-register");
+  if (!user) redirect(ROUTES.login);
   const result = (await favoriteService.getUserFavorites(user._id, { limit: LIMIT })) as FavoritesResult;
-  
 
   return (
     <div className="page-container">

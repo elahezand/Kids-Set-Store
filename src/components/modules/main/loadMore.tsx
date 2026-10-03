@@ -6,14 +6,11 @@ interface LoadMoreProps {
   hasMore: boolean;
   isLoading: boolean;
   onLoadMore: () => void;
-  /** items on screen, for the "seen all" line */
   count: number;
-  /** page size: the "seen all" line only shows when more than one page was loaded */
   limit: number;
   noun?: string;
 }
 
-/* "Load more" button + end-of-list line, shared by every infinite list */
 export default function LoadMore({ hasMore, isLoading, onLoadMore, count, limit, noun = "items" }: LoadMoreProps) {
   if (hasMore) {
     return (

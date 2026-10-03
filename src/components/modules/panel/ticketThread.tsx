@@ -1,14 +1,14 @@
 import { formatDate } from "@/utils/format";
 import { TICKET_PRIORITY, ticketState } from "@/utils/panelView";
 import { isAdmin, roleLabel } from "@/utils/role";
-import { TicketDetail } from "@/types/ticket";
+import type { TicketDetail } from "@/types";
+
 interface TicketThreadProps {
   ticket: TicketDetail | null;
 }
 
 const initials = (name?: string) => (name || "?").trim().slice(0, 1).toUpperCase();
 
-// Conversation view of a ticket and its replies (used by both panels)
 export default function TicketThread({ ticket }: TicketThreadProps) {
   if (!ticket) return null;
 
@@ -44,10 +44,11 @@ export default function TicketThread({ ticket }: TicketThreadProps) {
             >
               <span
                 aria-hidden="true"
-                className={`flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold sm:size-9 ${fromSupport
+                className={`flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold sm:size-9 ${
+                  fromSupport
                     ? "bg-sage-600 text-white"
                     : "bg-coral-100 text-coral-600 dark:bg-coral-500/15 dark:text-coral-300"
-                  }`}
+                }`}
               >
                 {initials(name)}
               </span>
@@ -64,10 +65,11 @@ export default function TicketThread({ ticket }: TicketThreadProps) {
                   <time dateTime={item.createdAt}>{formatDate(item.createdAt)}</time>
                 </div>
                 <p
-                  className={`rounded-2xl px-4 py-3 text-left text-sm leading-6 break-words whitespace-pre-line shadow-card ${fromSupport
+                  className={`rounded-2xl px-4 py-3 text-left text-sm leading-6 break-words whitespace-pre-line shadow-card ${
+                    fromSupport
                       ? "rounded-br-sm bg-sage-600 text-white"
                       : "rounded-bl-sm border border-gray-200 bg-white text-gray-800 dark:border-white/10 dark:bg-ink-900 dark:text-gray-200"
-                    }`}
+                  }`}
                 >
                   {item.content}
                 </p>

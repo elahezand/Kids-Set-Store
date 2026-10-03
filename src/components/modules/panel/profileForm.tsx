@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { useForm, type FieldPath } from "react-hook-form";
+import { type FieldPath, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { z } from "zod";
-import { profileValidationSchema } from "@/validators/user";
 import { useUpdateProfile } from "@/services/client/panel";
-import { DEFAULT_AVATAR } from "@/utils/panelView";
+import { DEFAULT_AVATAR } from "@/utils/constants";
 import { roleLabel } from "@/utils/role";
+import { profileValidationSchema } from "@/validators/user";
+import type { z } from "zod";
 import type { SessionUser } from "@/types";
 
 type ProfileInput = z.input<typeof profileValidationSchema>;
@@ -155,8 +155,8 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
           <div>
             <h2 className="card-title">Change password</h2>
             <p className="mt-0.5 text-xs text-gray-700 dark:text-gray-500">
-              Leave empty to keep your current password. If you only sign in with an SMS code, skip
-              &quot;Current password&quot;.
+              Leave empty to keep your current password. If you only sign in with an SMS code, skip &quot;Current
+              password&quot;.
             </p>
           </div>
         </div>

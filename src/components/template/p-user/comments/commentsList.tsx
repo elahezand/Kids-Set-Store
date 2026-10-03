@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { LuEye, LuMessageSquare, LuTrash2 } from "react-icons/lu";
+import LoadMore from "@/components/modules/main/loadMore";
+import StatusTabs from "@/components/modules/panel/statusTabs";
+import ConfirmDialog from "@/components/modules/ui/confirmDialog";
 import EmptyState from "@/components/modules/ui/emptyState";
 import Modal from "@/components/modules/ui/modal";
 import Stars from "@/components/modules/ui/stars";
-import ConfirmDialog from "@/components/modules/ui/confirmDialog";
-import LoadMore from "@/components/modules/main/loadMore";
-import StatusTabs from "@/components/modules/panel/statusTabs";
 import { useDeleteMyComment, useMyComments } from "@/services/client/panel";
+import { ROUTES } from "@/utils/constants";
 import { formatDate } from "@/utils/format";
 import { COMMENT_TABS } from "@/utils/panelView";
 import type { CommentStatus, CommentStatusFilter, MyComment, Paginated } from "@/types";
@@ -38,7 +39,7 @@ export default function CommentsList({ initialPage, limit, status }: CommentsLis
   const productLink = (comment: MyComment) =>
     comment.product ? (
       <Link
-        href={`/products/${comment.product._id}`}
+        href={ROUTES.product(String(comment.product._id))}
         className="font-medium text-gray-900 hover:text-sage-700 dark:text-gray-100 dark:hover:text-sage-300"
       >
         {comment.product.title}
@@ -81,7 +82,6 @@ export default function CommentsList({ initialPage, limit, status }: CommentsLis
         />
       ) : (
         <>
-          {/* phones */}
           <ul className="divide-y divide-gray-200 md:hidden dark:divide-white/5">
             {comments.map((comment) => {
               const status = STATUS[comment.status] ?? STATUS.pending;
@@ -103,7 +103,6 @@ export default function CommentsList({ initialPage, limit, status }: CommentsLis
             })}
           </ul>
 
-          {/* tablets / desktop */}
           <div className="table-wrap hidden md:block">
             <table className="data-table">
               <thead>
@@ -168,9 +167,7 @@ export default function CommentsList({ initialPage, limit, status }: CommentsLis
         danger
         loading={remove.isPending}
         onClose={() => setDeleting(null)}
-        onConfirm={() =>
-          deleting && remove.mutate(String(deleting._id), { onSuccess: () => setDeleting(null) })
-        }
+        onConfirm={() => deleting && remove.mutate(String(deleting._id), { onSuccess: () => setDeleting(null) })}
       />
     </section>
   );

@@ -6,8 +6,8 @@ import Link from "next/link";
 import { LuBell, LuMenu } from "react-icons/lu";
 import ThemeToggle from "@/components/modules/ui/themeToggle";
 import { useMarkNotificationSeen, useNotifications } from "@/services/client/panel";
+import { DEFAULT_AVATAR } from "@/utils/constants";
 import { formatDate } from "@/utils/format";
-import { DEFAULT_AVATAR } from "@/utils/panelView";
 import { roleLabel } from "@/utils/role";
 import type { SessionUser } from "@/types";
 
@@ -35,7 +35,12 @@ export default function Topbar({ user, onMenuClick }: TopbarProps) {
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-gray-200 bg-white/85 px-4 backdrop-blur-md sm:px-6 dark:border-white/10 dark:bg-ink-900/85">
-      <button type="button" onClick={onMenuClick} className="btn btn-ghost btn-icon -ml-2 lg:hidden" aria-label="Open menu">
+      <button
+        type="button"
+        onClick={onMenuClick}
+        className="btn btn-ghost btn-icon -ml-2 lg:hidden"
+        aria-label="Open menu"
+      >
         <LuMenu className="size-5" />
       </button>
 
@@ -59,7 +64,6 @@ export default function Topbar({ user, onMenuClick }: TopbarProps) {
           </button>
 
           {showNotifications && (
-            /* phones: full width under the bar; sm+: dropdown under the bell */
             <div className="card fixed inset-x-3 top-[4.25rem] animate-scale-in overflow-hidden shadow-float sm:absolute sm:inset-x-auto sm:top-auto sm:right-0 sm:mt-2 sm:w-80">
               <div className="card-header py-3">
                 <p className="card-title text-sm">Notifications</p>
@@ -71,7 +75,9 @@ export default function Topbar({ user, onMenuClick }: TopbarProps) {
                       <>
                         <span className="flex items-start gap-2">
                           {!item.see && <span className="mt-1.5 size-2 shrink-0 rounded-full bg-coral-400" />}
-                          <span className={item.see ? "text-gray-600 dark:text-gray-500" : "font-medium"}>{item.msg}</span>
+                          <span className={item.see ? "text-gray-600 dark:text-gray-500" : "font-medium"}>
+                            {item.msg}
+                          </span>
                         </span>
                         <span className="mt-1 block text-xs text-gray-600">{formatDate(item.createdAt)}</span>
                       </>
@@ -83,11 +89,19 @@ export default function Topbar({ user, onMenuClick }: TopbarProps) {
                     return (
                       <li key={item._id} className="text-sm text-gray-800 dark:text-gray-300">
                         {item.link ? (
-                          <Link href={item.link} onClick={onOpen} className="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5">
+                          <Link
+                            href={item.link}
+                            onClick={onOpen}
+                            className="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5"
+                          >
                             {content}
                           </Link>
                         ) : (
-                          <button type="button" onClick={onOpen} className="block w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-white/5">
+                          <button
+                            type="button"
+                            onClick={onOpen}
+                            className="block w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-white/5"
+                          >
                             {content}
                           </button>
                         )}
@@ -96,7 +110,9 @@ export default function Topbar({ user, onMenuClick }: TopbarProps) {
                   })}
                 </ul>
               ) : (
-                <p className="px-4 py-8 text-center text-sm text-gray-700 dark:text-gray-500">You&apos;re all caught up.</p>
+                <p className="px-4 py-8 text-center text-sm text-gray-700 dark:text-gray-500">
+                  You&apos;re all caught up.
+                </p>
               )}
             </div>
           )}

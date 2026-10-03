@@ -1,12 +1,11 @@
 "use client";
 
-import Comment from "@/components/modules/main/comment";
+import CommentItem from "@/components/template/main/product/comments/commentItem";
 import { useProductComments } from "@/services/client/comment";
 import type { Paginated, ProductComment } from "@/types";
 
 interface CommentsListProps {
   productId: string;
-  /** first page, rendered on the server with the same service as the API route */
   initialPage: Paginated<ProductComment>;
   limit?: number;
 }
@@ -23,7 +22,7 @@ export default function CommentsList({ productId, initialPage, limit = 5 }: Comm
     <>
       <div>
         {comments.map((comment) => (
-          <Comment key={String(comment._id)} {...comment} />
+          <CommentItem key={String(comment._id)} {...comment} />
         ))}
       </div>
 

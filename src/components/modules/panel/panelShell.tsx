@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import Sidebar from "@/components/modules/panel/sidebar";
 import Topbar from "@/components/modules/panel/topbar";
 import type { PanelVariant } from "@/components/modules/panel/navLinks";
@@ -12,7 +12,6 @@ interface PanelShellProps {
   children: ReactNode;
 }
 
-// Shared layout for the admin & user panels: sidebar + topbar + content area
 export default function PanelShell({ variant = "user", user, children }: PanelShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 

@@ -6,7 +6,6 @@ interface PageHeaderProps {
   actions?: ReactNode;
 }
 
-// Title row at the top of every panel page
 export default function PageHeader({ title, description, actions }: PageHeaderProps) {
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">

@@ -1,7 +1,6 @@
 import type { OrderListItem } from "./order";
 import type { TicketSummary } from "./ticket";
 
-/* services/server/user/dashboard getDashboard -> /p-user */
 export interface DashboardCounts {
   orders: number;
   tickets: number;
@@ -15,11 +14,9 @@ export interface UserDashboard {
   recentOrders: OrderListItem[];
 }
 
-/* GET /api/user/notification item (model/notification) — panel topbar bell */
 export interface PanelNotification {
   _id: string;
   msg: string;
-  /** 0 = unread, 1 = seen */
   see: number;
   link?: string | null;
   createdAt?: string;

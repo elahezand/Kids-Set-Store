@@ -1,7 +1,5 @@
 import type { Id } from "./api";
 
-/* model/product.js -> what the UI uses (utils/productView) */
-
 export type VariantAttributes = Record<string, string>;
 
 export interface ProductVariant {
@@ -9,7 +7,7 @@ export interface ProductVariant {
   sku: string | null;
   attributes: VariantAttributes;
   price: number;
-  discount: number; // percent 0-100
+  discount: number;
   finalPrice: number;
   stock: number;
 }
@@ -20,7 +18,6 @@ export interface ProductCategoryRef {
   slug: string;
 }
 
-/* product page */
 export interface ProductView {
   _id: Id;
   name: string;
@@ -29,7 +26,7 @@ export interface ProductView {
   images: string[];
   price: number;
   originalPrice: number | null;
-  score: number; // 0-5 (rounded)
+  score: number;
   reviewsCount: number;
   shortDescription: string;
   longDescription: string;
@@ -42,21 +39,11 @@ export interface ProductView {
   inStock: boolean;
 }
 
-/* product card (lists, sliders, favorites) */
-export type ProductCard = Pick<
+export type ProductCardData = Pick<
   ProductView,
-  | "_id"
-  | "name"
-  | "img"
-  | "price"
-  | "originalPrice"
-  | "score"
-  | "variantsCount"
-  | "defaultVariantId"
-  | "inStock"
+  "_id" | "name" | "img" | "price" | "originalPrice" | "score" | "variantsCount" | "defaultVariantId" | "inStock"
 >;
 
-/* raw lean() product as the server services return it (only the fields the UI reads) */
 export interface ProductDoc {
   _id: unknown;
   title: string;

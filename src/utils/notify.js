@@ -6,8 +6,8 @@ const getNotificationModel = () => require("@/model/notification");
 
 /** Where a user sees a notification in the main site / panel */
 const LINKS = Object.freeze({
-    userOrders: "/p-user/orders",
-    userTickets: "/p-user/tickets",
+    userOrders: "/dashboard/orders",
+    userTickets: "/dashboard/tickets",
     adminOrders: "/p-admin",
 });
 

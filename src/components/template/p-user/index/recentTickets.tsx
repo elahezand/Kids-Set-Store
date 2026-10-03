@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LuArrowRight, LuTicket } from "react-icons/lu";
 import EmptyState from "@/components/modules/ui/emptyState";
 import TicketCard from "@/components/template/p-user/tickets/ticketCard";
+import { ROUTES } from "@/utils/constants";
 import type { TicketSummary } from "@/types";
 
 export default function RecentTickets({ tickets }: { tickets: TicketSummary[] }) {
@@ -9,7 +10,7 @@ export default function RecentTickets({ tickets }: { tickets: TicketSummary[] })
     <section className="card overflow-hidden">
       <div className="card-header">
         <h2 className="card-title">Recent tickets</h2>
-        <Link href="/p-user/tickets" className="btn btn-ghost btn-sm">
+        <Link href={ROUTES.dashboard.tickets} className="btn btn-ghost btn-sm">
           All tickets <LuArrowRight className="size-3.5" />
         </Link>
       </div>

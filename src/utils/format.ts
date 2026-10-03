@@ -1,4 +1,3 @@
-
 export const CURRENCY = "$";
 
 export const formatPrice = (value: number | string | null | undefined): string => {

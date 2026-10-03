@@ -1,21 +1,23 @@
 "use client";
 
 import {
+  type QueryKey,
   useInfiniteQuery,
   useMutation,
-  useQuery,
-  type QueryKey,
   type UseMutationOptions,
+  useQuery,
   type UseQueryOptions,
 } from "@tanstack/react-query";
+import { showErrorToast } from "@/services/client/errors";
+import http, { type AxiosRequestConfig } from "@/services/client/http";
 import type { ApiSuccess, Paginated } from "@/types";
-import http, { type AxiosRequestConfig } from "./http";
-import { showErrorToast } from "./errors";
 
 type HttpMethod = "post" | "patch" | "put" | "delete";
 
-export interface GetOptions<TResponse>
-  extends Omit<UseQueryOptions<TResponse, Error, TResponse, QueryKey>, "queryKey" | "queryFn"> {
+export interface GetOptions<TResponse> extends Omit<
+  UseQueryOptions<TResponse, Error, TResponse, QueryKey>,
+  "queryKey" | "queryFn"
+> {
   queryKey?: QueryKey;
   axiosConfig?: AxiosRequestConfig;
   silentError?: boolean;
@@ -58,7 +60,6 @@ export interface InfiniteOptions<TItem> {
   initialPage?: Paginated<TItem>;
 }
 
-/* cursor lists: every page is the paginated envelope */
 export const useInfiniteGet = <TItem>(
   url: string,
   params: Record<string, unknown> = {},
@@ -82,15 +83,17 @@ export const useInfiniteGet = <TItem>(
     },
     initialPageParam: null as string | null,
     getNextPageParam: (lastPage: Paginated<TItem>) =>
-      lastPage.pagination?.hasMore ? lastPage.pagination.nextCursor ?? undefined : undefined,
+      lastPage.pagination?.hasMore ? (lastPage.pagination.nextCursor ?? undefined) : undefined,
     ...(initialPage ? { initialData: { pages: [initialPage], pageParams: [null] } } : {}),
     staleTime: 5 * 60 * 1000,
     ...rest,
   });
 };
 
-export interface MutationOptions<TResponse, TVariables>
-  extends Omit<UseMutationOptions<TResponse, unknown, TVariables>, "mutationFn"> {
+export interface MutationOptions<TResponse, TVariables> extends Omit<
+  UseMutationOptions<TResponse, unknown, TVariables>,
+  "mutationFn"
+> {
   axiosConfig?: AxiosRequestConfig;
   errorFallback?: string;
 }
@@ -110,9 +113,7 @@ const createMutationHook =
         if (method === "delete") {
           const { data } = await http.delete<TResponse>(target, {
             ...axiosConfig,
-            ...(typeof url !== "function" && variables && typeof variables === "object"
-              ? { data: variables }
-              : {}),
+            ...(typeof url !== "function" && variables && typeof variables === "object" ? { data: variables } : {}),
           });
           return data;
         }

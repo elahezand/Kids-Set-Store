@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LuLogOut, LuStore, LuX } from "react-icons/lu";
-import ConfirmDialog from "@/components/modules/ui/confirmDialog";
 import { isLinkActive, panelNav, type PanelVariant } from "@/components/modules/panel/navLinks";
+import ConfirmDialog from "@/components/modules/ui/confirmDialog";
 import { useLogout } from "@/services/client/panel";
 
 interface SidebarProps {
@@ -20,7 +20,6 @@ export default function Sidebar({ variant = "user", open = false, onClose }: Sid
   const [confirmLogout, setConfirmLogout] = useState(false);
   const logout = useLogout();
 
-  // mobile drawer: Esc closes it and the page behind does not scroll
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => event.key === "Escape" && onClose();
@@ -35,7 +34,6 @@ export default function Sidebar({ variant = "user", open = false, onClose }: Sid
 
   return (
     <>
-      {/* mobile overlay */}
       <div
         onClick={onClose}
         aria-hidden="true"
@@ -46,7 +44,6 @@ export default function Sidebar({ variant = "user", open = false, onClose }: Sid
         aria-label="Panel navigation"
         className={`fixed inset-y-0 left-0 z-50 flex w-[min(18rem,85vw)] flex-col border-r border-gray-200 bg-white transition-transform duration-300 dark:border-white/10 dark:bg-ink-950 lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
-        {/* brand */}
         <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-gray-200 px-5 dark:border-white/10">
           <Link href={nav.home} onClick={onClose} className="flex items-center gap-2.5">
             <span className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-sage-400 to-sage-600 text-sm font-bold text-white shadow-card">
@@ -62,7 +59,6 @@ export default function Sidebar({ variant = "user", open = false, onClose }: Sid
           </button>
         </div>
 
-        {/* links */}
         <nav className="flex-1 overflow-y-auto px-3 py-5">
           <p className="mb-2 px-3 text-[11px] font-semibold tracking-wider text-gray-600 uppercase">Menu</p>
           <ul className="space-y-1">
@@ -93,7 +89,6 @@ export default function Sidebar({ variant = "user", open = false, onClose }: Sid
           </ul>
         </nav>
 
-        {/* footer */}
         <div className="space-y-1 border-t border-gray-200 p-3 dark:border-white/10">
           <Link
             href="/"

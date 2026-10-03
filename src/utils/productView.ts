@@ -1,12 +1,12 @@
+import { PLACEHOLDER_IMAGE } from "@/utils/constants";
 import type {
-  ProductCard,
+  ProductCardData,
   ProductCategoryRef,
   ProductDoc,
   ProductVariant,
   ProductView,
   VariantAttributes,
 } from "@/types";
-export const PLACEHOLDER_IMAGE = "/placeholder.png";
 
 type VariantDoc = NonNullable<ProductDoc["variants"]>[number];
 
@@ -16,9 +16,7 @@ const toId = (value: unknown): string | null => {
   return withId._id ? String(withId._id) : String(value);
 };
 
-const toPlainRecord = (
-  value: VariantAttributes | Map<string, string> | undefined | null
-): Record<string, string> => {
+const toPlainRecord = (value: VariantAttributes | Map<string, string> | undefined | null): Record<string, string> => {
   if (!value) return {};
   if (value instanceof Map) return Object.fromEntries(value);
   return { ...value };
@@ -46,16 +44,9 @@ export const toProductView = (product: ProductDoc | null | undefined): ProductVi
 
   const defaultVariant = variants.find((v) => v.stock > 0) ?? variants[0] ?? null;
 
-  const price =
-    product.minPrice ||
-    defaultVariant?.finalPrice ||
-    defaultVariant?.price ||
-    product.price ||
-    0;
+  const price = product.minPrice || defaultVariant?.finalPrice || defaultVariant?.price || product.price || 0;
 
-  // "was" price of a discounted variant that sells at the shown price
-  const originalPrice =
-    variants.find((v) => v.finalPrice === price && v.price > v.finalPrice)?.price ?? null;
+  const originalPrice = variants.find((v) => v.finalPrice === price && v.price > v.finalPrice)?.price ?? null;
 
   const categories: ProductCategoryRef[] = (product.categoryPath ?? [])
     .filter(isCategoryRef)
@@ -83,16 +74,14 @@ export const toProductView = (product: ProductDoc | null | undefined): ProductVi
   };
 };
 
-/* What a product card needs (keeps the payload sent to the client small) */
-export const toProductCard = (product: ProductDoc | null | undefined): ProductCard | null => {
+export const toProductCard = (product: ProductDoc | null | undefined): ProductCardData | null => {
   const view = toProductView(product);
   if (!view) return null;
 
-  const { _id, name, img, price, originalPrice, score, variantsCount, defaultVariantId, inStock } =
-    view;
+  const { _id, name, img, price, originalPrice, score, variantsCount, defaultVariantId, inStock } = view;
 
   return { _id, name, img, price, originalPrice, score, variantsCount, defaultVariantId, inStock };
 };
 
-export const toProductCards = (products: ProductDoc[] = []): ProductCard[] =>
-  products.map(toProductCard).filter((card): card is ProductCard => card !== null);
+export const toProductCards = (products: ProductDoc[] = []): ProductCardData[] =>
+  products.map(toProductCard).filter((card): card is ProductCardData => card !== null);

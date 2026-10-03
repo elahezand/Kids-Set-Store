@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { showErrorToast } from "@/services/client/errors";
+import { queryKeys } from "@/services/client/keys";
+import { useDelete, useGet, usePatch, usePost } from "@/services/client/query";
+import { ROUTES } from "@/utils/constants";
 import type {
   AddToCartPayload,
   ApiSuccess,
@@ -16,14 +20,9 @@ import type {
   RemoveCartItemPayload,
   UpdateCartPayload,
 } from "@/types";
-import { queryKeys } from "./keys";
-import { useDelete, useGet, usePatch, usePost } from "./query";
-import { showErrorToast } from "./errors";
-
 
 type CartResponse = ApiSuccess<CartView>;
 
-/** put the cart a mutation returned straight into the cache (no refetch) */
 const useSetCart = () => {
   const queryClient = useQueryClient();
   return (response?: CartResponse) => {
@@ -46,7 +45,6 @@ export const useCart = ({
     staleTime: 30 * 1000,
   });
 
-/** pieces in the cart (badge) */
 export const countCartItems = (cart?: CartView | null) =>
   (cart?.items ?? []).reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
 
@@ -87,7 +85,6 @@ export const useRemoveCartItem = () => {
   });
 };
 
-
 export const useCheckout = ({ onFailed }: { onFailed?: () => void } = {}) => {
   const queryClient = useQueryClient();
 
@@ -103,7 +100,7 @@ export const useCheckout = ({ onFailed }: { onFailed?: () => void } = {}) => {
       }
 
       toast.success("Order placed successfully!");
-      window.location.href = "/p-user/orders";
+      window.location.href = ROUTES.dashboard.orders;
     },
     onError: (error) => {
       onFailed?.();
@@ -113,28 +110,22 @@ export const useCheckout = ({ onFailed }: { onFailed?: () => void } = {}) => {
   });
 };
 
-
-/* ---------- checkout form state (cart page) ---------- */
-
 const newIdempotencyKey = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()
     : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-/** one key per checkout attempt -> a double click never creates two orders */
 export const useIdempotencyKey = () => {
   const [key, setKey] = useState<string>(newIdempotencyKey);
   return { key, renew: () => setKey(newIdempotencyKey()) };
 };
 
-/** what the buyer will pay after the optional wallet part */
 export const getPayable = (pricing: CartPricing | undefined, walletBalance: number, useWallet: boolean) => {
   const total = pricing?.total ?? 0;
   const walletToUse = useWallet ? Math.min(walletBalance, total) : 0;
   return { walletToUse, payable: Math.max(total - walletToUse, 0) };
 };
 
-/** body for useUpdateCart when one line changes quantity */
 export const withQuantity = (items: CartItem[], target: CartItem, quantity: number): CartItemInput[] => {
   const key = (item: CartItem) => `${item.productId?._id ?? item.productId}::${item.variantId ?? ""}`;
   const targetKey = key(target);
@@ -146,7 +137,6 @@ export const withQuantity = (items: CartItem[], target: CartItem, quantity: numb
   }));
 };
 
-/** id DELETE /user/cart expects: variantId, or productId for products without variants */
 export const cartItemId = (item: CartItem) => String(item.variantId || item.productId?._id || item.productId);
 
 export const CART_SKIP_MESSAGES: Record<CartSkipReason, string> = {

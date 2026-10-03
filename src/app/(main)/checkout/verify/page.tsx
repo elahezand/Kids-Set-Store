@@ -3,6 +3,7 @@ import { IoCheckmarkCircle, IoCloseCircle, IoTimeOutline } from "react-icons/io5
 import connectToDB from "@/configs/db";
 import orderService from "@/services/server/public/order";
 import { getMe } from "@/utils/auth/authGuard";
+import { ROUTES } from "@/utils/constants";
 import { formatPrice, toPlain } from "@/utils/format";
 import { firstParam } from "@/utils/searchParams";
 import type { Metadata } from "next";
@@ -58,7 +59,6 @@ export default async function VerifyPaymentPage({ searchParams }: PageProps) {
     }
   }
 
-  // only the owner sees the order details
   const user = order ? await getMe() : null;
   const isOwner = Boolean(user && order && String(order.user) === String(user._id));
 
@@ -95,10 +95,10 @@ export default async function VerifyPaymentPage({ searchParams }: PageProps) {
         )}
 
         <div className="flex flex-wrap justify-center gap-3">
-          <Link href="/p-user/orders" className="btn btn-primary">
+          <Link href={ROUTES.dashboard.orders} className="btn btn-primary">
             My orders
           </Link>
-          <Link href="/products" className="btn btn-secondary">
+          <Link href={ROUTES.products} className="btn btn-secondary">
             Continue shopping
           </Link>
         </div>

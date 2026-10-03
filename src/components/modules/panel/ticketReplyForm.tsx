@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { LuSend } from "react-icons/lu";
 import { useTicketReply } from "@/services/client/panel";

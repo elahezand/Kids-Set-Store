@@ -280,7 +280,7 @@
   }
 
   .card-hover {
-    @apply transition-[transform, box-shadow] duration-300 hover:-translate-y-1 hover:shadow-float motion-reduce:hover:translate-y-0;
+    @apply transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-float motion-reduce:hover:translate-y-0;
   }
 
   /* Section heading: soft wavy underline instead of a hard 2px rule */

@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
-import connectToDB from "@/configs/db";
-import productService from "@/services/server/public/product";
-import categoryService from "@/services/server/public/category";
-import Breadcrumb from "@/components/modules/main/breadCrumb";
+import Breadcrumb from "@/components/modules/main/breadcrumb";
 import FilterSection from "@/components/template/main/products/filterSection";
 import ProductList from "@/components/template/main/products/productList";
-import { listKey, toQuery } from "@/utils/searchParams";
-import { toInitialPage } from "@/utils/initialPage";
+import connectToDB from "@/configs/db";
+import categoryService from "@/services/server/public/category";
+import productService from "@/services/server/public/product";
 import { toPlain } from "@/utils/format";
+import { toInitialPage } from "@/utils/initialPage";
+import { listKey, toQuery } from "@/utils/searchParams";
+import type { Metadata } from "next";
 import type { CategoryDetail, CategoryNode, ListingQuery, PageProps, Pagination, ProductDoc } from "@/types";
 
 const DEFAULT_LIMIT = 15;
@@ -27,7 +27,8 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   return {
     title: category ? `${category.title} | SET KIDS` : "All Products | SET KIDS",
     description:
-      category?.description || (category ? `Explore our ${category.title} collection.` : "Browse our full collection of kids clothing."),
+      category?.description ||
+      (category ? `Explore our ${category.title} collection.` : "Browse our full collection of kids clothing."),
     ...(filtered && { robots: { index: false, follow: true } }),
   };
 }
@@ -47,7 +48,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const title = category?.title || (query.q ? `Search: ${query.q}` : "Products");
 
   return (
-    <div className="p-12">
+    <div className="page-container">
       <Breadcrumb route="products" title={title} />
 
       <h1 className="section-title mb-8 capitalize">{title}</h1>

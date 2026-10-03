@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
+import Breadcrumb from "@/components/modules/main/breadcrumb";
 import ArticlesList from "@/components/template/main/articles/articlesList";
 import ArticlesSearch from "@/components/template/main/articles/articlesSearch";
-import Breadcrumb from "@/components/modules/main/breadCrumb";
 import connectToDB from "@/configs/db";
-import { articleListQuerySchema } from "@/validators/article";
 import articleService from "@/services/server/public/article";
 import { toInitialPage } from "@/utils/initialPage";
 import { firstParam, listKey } from "@/utils/searchParams";
+import { articleListQuerySchema } from "@/validators/article";
+import type { Metadata } from "next";
 import type { ArticleCategoryOption, ArticleSummary, PageProps, Pagination } from "@/types";
 
 const DEFAULT_LIMIT = 15;
@@ -34,7 +34,6 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
   const parsed = articleListQuerySchema.safeParse({ limit: firstParam(params.limit, 10) || DEFAULT_LIMIT });
   const limit: number = parsed.success ? parsed.data.limit : DEFAULT_LIMIT;
 
-  // same service as GET /api/articles
   const [result, categories] = await Promise.all([
     articleService.getPublicArticles({ limit, category, q }) as Promise<ArticlesResult>,
     articleService.getPublicArticleCategories() as Promise<ArticleCategoryOption[]>,

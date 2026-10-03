@@ -1,8 +1,6 @@
 import type { Id } from "./api";
 import type { VariantAttributes } from "./product";
 
-/* services/server/shared/cart buildCartView() -> GET /api/user/cart data */
-
 export interface CartProductInfo {
   _id: Id;
   title: string;
@@ -61,7 +59,6 @@ export interface CartView {
   couponRemoved: string | null;
 }
 
-/* request bodies */
 export interface CartItemInput {
   productId: Id;
   variantId: Id | null;
@@ -72,12 +69,8 @@ export interface AddToCartPayload {
   items: CartItemInput[];
 }
 
-export type UpdateCartPayload =
-  | { items: CartItemInput[] }
-  | { couponCode: string }
-  | { removeCoupon: true };
+export type UpdateCartPayload = { items: CartItemInput[] } | { couponCode: string } | { removeCoupon: true };
 
 export interface RemoveCartItemPayload {
-  /** variantId, or productId when the item has no variant */
   itemId: Id;
 }

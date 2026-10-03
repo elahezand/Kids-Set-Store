@@ -3,11 +3,8 @@
 import { useMemo, useState } from "react";
 import type { ProductVariant, ProductView } from "@/types";
 
-/* Variant choice on the product page (size / color / ...) */
-
 export type AttributeOptions = Array<[attribute: string, values: string[]]>;
 
-/** [["color", ["red", "blue"]], ["size", ["2Y", "4Y"]]] from every variant */
 export const getAttributeOptions = (variants: ProductVariant[] = []): AttributeOptions => {
   const options = new Map<string, Set<string>>();
 
@@ -22,7 +19,6 @@ export const getAttributeOptions = (variants: ProductVariant[] = []): AttributeO
   return [...options.entries()].map(([name, values]) => [name, [...values]]);
 };
 
-/** the variant with the new value that keeps most of the current choices */
 export const pickVariant = (
   variants: ProductVariant[],
   current: ProductVariant | null,
@@ -41,7 +37,6 @@ export const pickVariant = (
   return candidates.reduce((best, v) => (similarity(v) > similarity(best) ? v : best));
 };
 
-/** is there any variant in stock with attribute = value */
 export const isValueAvailable = (variants: ProductVariant[], attribute: string, value: string) =>
   variants.some((v) => String(v.attributes?.[attribute]) === value && (v.stock ?? 0) > 0);
 
@@ -59,7 +54,6 @@ export const useVariantSelection = (product: ProductView) => {
     if (next) setSelected(next);
   };
 
-  // a product without variants is sellable (the server has no stock limit for it)
   const inStock = selected ? (selected.stock ?? 0) > 0 : variants.length === 0;
   const price = selected?.finalPrice ?? selected?.price ?? product.price;
   const originalPrice = selected && selected.price > price ? selected.price : null;

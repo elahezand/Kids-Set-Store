@@ -3,16 +3,6 @@
 import axios, { AxiosError, type AxiosRequestConfig, type InternalAxiosRequestConfig } from "axios";
 import { toast } from "sonner";
 
-/*
-  Browser HTTP client for the main site. Every client service (services/client/*) goes
-  through it. On a 401 it refreshes the access token once (POST /auth/refresh) and
-  retries the request.
-
-  per-request options:
-    skipRefresh  - public auth routes: a 401 is a real answer, do not refresh
-    silentAuth   - do not toast "Please log in" when the refresh fails (background calls)
-*/
-
 declare module "axios" {
   interface AxiosRequestConfig {
     skipRefresh?: boolean;
@@ -22,7 +12,6 @@ declare module "axios" {
 
 type RetriableConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
-/** error raised after the refresh failed; the user already saw a toast */
 export interface AuthError extends Error {
   _authToastShown?: boolean;
 }
@@ -36,11 +25,9 @@ let refreshPromise: Promise<unknown> | null = null;
 
 const refreshAccessToken = () => {
   if (!refreshPromise) {
-    refreshPromise = http
-      .post("/auth/refresh", {}, { skipRefresh: true })
-      .finally(() => {
-        refreshPromise = null;
-      });
+    refreshPromise = http.post("/auth/refresh", {}, { skipRefresh: true }).finally(() => {
+      refreshPromise = null;
+    });
   }
   return refreshPromise;
 };
@@ -73,6 +60,4 @@ http.interceptors.response.use(
 
 export type { AxiosRequestConfig };
 
-// old name used by the panels
-export const api = http;
 export default http;

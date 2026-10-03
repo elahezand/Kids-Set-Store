@@ -9,12 +9,10 @@ interface AddToFavoriteProps {
   compact?: boolean;
 }
 
-
-export default function AddToFavoriteList({ productId, initialFavorited, compact = false }: AddToFavoriteProps) {
+export default function AddToFavorite({ productId, initialFavorited, compact = false }: AddToFavoriteProps) {
   const { ids, isLoaded } = useFavoriteIds();
   const toggle = useToggleFavorite();
 
-  // ids not loaded yet -> trust what the server page said
   const isFavorited = isLoaded || initialFavorited === undefined ? ids.has(productId) : initialFavorited;
 
   const handleClick = () => {

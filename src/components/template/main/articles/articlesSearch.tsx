@@ -13,7 +13,6 @@ export default function ArticlesSearch({ categories = [] }: { categories?: Artic
   const urlQ = get("q");
   const [value, setValue] = useState(urlQ);
 
-  // keep the input in sync with the URL (back/forward, clear, shared links)
   useEffect(() => setValue(urlQ), [urlQ]);
 
   return (

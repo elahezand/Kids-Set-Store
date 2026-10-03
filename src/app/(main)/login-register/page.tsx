@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
-import type { Metadata } from "next";
 import AuthForms from "@/components/template/main/login-register/authForms";
 import { getMe } from "@/utils/auth/authGuard";
+import { ROUTES } from "@/utils/constants";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Log in / Sign up | SET KIDS",
@@ -9,6 +10,6 @@ export const metadata: Metadata = {
 };
 
 export default async function LoginRegisterPage() {
-  if (await getMe()) redirect("/p-user");
+  if (await getMe()) redirect(ROUTES.dashboard.home);
   return <AuthForms />;
 }

@@ -1,14 +1,13 @@
 "use client";
 
 import { LuTicket } from "react-icons/lu";
-import EmptyState from "@/components/modules/ui/emptyState";
 import LoadMore from "@/components/modules/main/loadMore";
 import StatusTabs from "@/components/modules/panel/statusTabs";
+import EmptyState from "@/components/modules/ui/emptyState";
 import TicketCard from "@/components/template/p-user/tickets/ticketCard";
 import { useMyTickets } from "@/services/client/panel";
 import { TICKET_TABS } from "@/utils/panelView";
-import type { Paginated } from "@/types";
-import { TicketStatusFilter, TicketSummary } from "@/types/ticket";
+import type { Paginated, TicketStatusFilter, TicketSummary } from "@/types";
 
 const EMPTY_TEXT: Record<TicketStatusFilter, string> = {
   all: "Use the form to open your first ticket.",

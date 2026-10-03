@@ -9,7 +9,6 @@ export interface CommentUser {
   profilePicture?: string | null;
 }
 
-/* GET /api/comments/product/:product item (replies are nested one level) */
 export interface ProductComment {
   _id: Id;
   user?: CommentUser | null;
@@ -24,7 +23,6 @@ export interface ProductComment {
   replies?: ProductComment[];
 }
 
-/* POST /api/user/comment */
 export interface CreateCommentPayload {
   productId: Id;
   rating: number;
@@ -38,10 +36,8 @@ export type CommentFormValues = Omit<CreateCommentPayload, "productId">;
 
 export type CommentStatus = "pending" | "approved" | "rejected" | "spam" | "deleted";
 
-/* ?status= on /p-user/comments and GET /api/user/comment ("all" = no filter) */
 export type CommentStatusFilter = "all" | "pending" | "approved" | "rejected";
 
-/* GET /api/user/comment item (user panel "my comments") */
 export interface MyComment {
   _id: Id;
   body: string;

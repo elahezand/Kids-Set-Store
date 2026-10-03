@@ -1,6 +1,6 @@
+import { LuInbox } from "react-icons/lu";
 import type { ReactNode } from "react";
 import type { IconType } from "react-icons";
-import { LuInbox } from "react-icons/lu";
 
 interface EmptyStateProps {
   title?: string;

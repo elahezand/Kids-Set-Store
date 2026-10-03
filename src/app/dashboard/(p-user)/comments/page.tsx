@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import PageHeader from "@/components/modules/panel/pageHeader";
 import CommentsList from "@/components/template/p-user/comments/commentsList";
 import commentService from "@/services/server/user/comment";
@@ -6,6 +5,7 @@ import { getPanelSession } from "@/utils/auth/panelUser";
 import { toInitialPage } from "@/utils/initialPage";
 import { pickStatus } from "@/utils/panelStatus";
 import { COMMENT_TABS, tabValues } from "@/utils/panelView";
+import type { Metadata } from "next";
 import type { MyComment, PageProps, Pagination } from "@/types";
 
 export const metadata: Metadata = { title: "Comments" };

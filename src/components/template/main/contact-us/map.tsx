@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { Map as LeafletMap } from "leaflet";
-import "leaflet/dist/leaflet.css";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-
+import "leaflet/dist/leaflet.css";
+import type { Map as LeafletMap } from "leaflet";
 
 const POSITION: [number, number] = [51.505, -0.09];
 const ZOOM = 13;
@@ -25,7 +24,6 @@ export default function Map() {
     (async () => {
       const L = (await import("leaflet")).default;
 
-      // unmounted while leaflet was loading (StrictMode) -> do nothing
       if (cancelled || !containerRef.current) return;
 
       map = L.map(container, { center: POSITION, zoom: ZOOM, scrollWheelZoom: false });
@@ -34,7 +32,6 @@ export default function Map() {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
-      // bundlers hash the image urls -> give leaflet the real ones
       const icon = L.icon({
         iconUrl: markerIcon.src,
         iconRetinaUrl: markerIcon2x.src,
@@ -47,7 +44,6 @@ export default function Map() {
 
       L.marker(POSITION, { icon }).addTo(map).bindPopup("SET-KIDS");
 
-      // the container may get its final size after layout (grid / flex)
       resize = new ResizeObserver(() => map?.invalidateSize());
       resize.observe(container);
     })();

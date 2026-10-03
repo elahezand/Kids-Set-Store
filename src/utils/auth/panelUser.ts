@@ -9,7 +9,6 @@ export interface PanelSession {
   expired: boolean;
 }
 
-/* one auth lookup per request, shared by the /p-user layout and its pages */
 export const getPanelSession = cache(async (): Promise<PanelSession> => {
   await connectToDB();
   const user = await authUser();

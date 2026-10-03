@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { usePost } from "@/services/client/query";
+import { ROUTES } from "@/utils/constants";
 import type {
   ApiSuccess,
   ResetPasswordPayload,
@@ -12,8 +14,6 @@ import type {
   SignUpPayload,
   VerifyOtpPayload,
 } from "@/types";
-import { usePost } from "./query";
-
 
 type UserResponse = ApiSuccess<{ user: SessionUser }>;
 
@@ -68,7 +68,7 @@ export const useResetPassword = () => {
     errorFallback: "Failed to reset password",
     onSuccess: () => {
       toast.success("Password reset successfully!");
-      router.replace("/login-register");
+      router.replace(ROUTES.login);
     },
   });
 };

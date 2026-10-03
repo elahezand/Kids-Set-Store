@@ -1,17 +1,17 @@
 import { cache } from "react";
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Breadcrumb from "@/components/modules/main/breadcrumb";
+import Comments from "@/components/template/main/product/comments/comments";
+import ProductContent from "@/components/template/main/product/productContent";
+import RelatedProducts from "@/components/template/main/product/relatedProducts";
 import connectToDB from "@/configs/db";
-import productService from "@/services/server/public/product";
 import commentService from "@/services/server/public/comment";
+import productService from "@/services/server/public/product";
 import favoriteService from "@/services/server/user/favorite";
 import { getMe } from "@/utils/auth/authGuard";
-import Breadcrumb from "@/components/modules/main/breadCrumb";
-import ProductContent from "@/components/template/main/product/productContent";
-import Comments from "@/components/template/main/product/comments/comments";
-import MoreProducts from "@/components/template/main/product/moreProducts";
-import { toProductCards, toProductView } from "@/utils/productView";
 import { toPlain } from "@/utils/format";
+import { toProductCards, toProductView } from "@/utils/productView";
+import type { Metadata } from "next";
 import type { PageProps, ProductDoc, ServiceResult } from "@/types";
 
 type ProductPageProps = PageProps<{ id: string }>;
@@ -19,12 +19,10 @@ type ProductPageProps = PageProps<{ id: string }>;
 const RELATED_LIMIT = 8;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "";
 
-// cache() => generateMetadata and the page share ONE query (and one view count) per request
 const getProduct = cache(async (id: string): Promise<ProductDoc | null> => {
   await connectToDB();
-  // same service as GET /api/products/:id (only "active" products)
   const result = (await productService.getProductById(id, { countView: true })) as ServiceResult<ProductDoc>;
-  return result.success ? result.data ?? null : null;
+  return result.success ? (result.data ?? null) : null;
 });
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
@@ -59,7 +57,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
     getMe(),
   ]);
 
-  // known favorite state => the heart toggles (logged-in users only)
   const isFavorited: boolean | undefined = user
     ? Boolean((await favoriteService.isFavorited(user._id, product._id)).data?.isFavorited)
     : undefined;
@@ -101,7 +98,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <Comments productId={view._id} total={commentsCount} isLoggedIn={Boolean(user)} />
         </section>
 
-        <MoreProducts related={toProductCards(related)} />
+        <RelatedProducts related={toProductCards(related)} />
       </div>
     </div>
   );

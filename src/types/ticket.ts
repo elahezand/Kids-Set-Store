@@ -1,7 +1,5 @@
 import type { Id, ISODate } from "./api";
 
-
-/** 1 = low, 2 = medium, 3 = high */
 export type TicketPriority = 1 | 2 | 3;
 
 export interface SubDepartment {
@@ -9,7 +7,6 @@ export interface SubDepartment {
   title: string;
 }
 
-/* GET /api/user/departments (each department carries its sub-departments) */
 export interface Department {
   _id: Id;
   title: string;
@@ -23,10 +20,8 @@ export interface TicketAuthor {
   role?: Array<"USER" | "ADMIN"> | string;
 }
 
-/* ?status= on /p-user/tickets and GET /api/user/tickets */
 export type TicketStatusFilter = "all" | "waiting" | "answered";
 
-/* list item: GET /api/user/tickets */
 export interface TicketSummary {
   _id: Id;
   title: string;
@@ -44,12 +39,10 @@ export interface TicketMessage {
   createdAt?: ISODate;
 }
 
-/* GET /api/user/tickets/:id  (first message + replies) */
 export interface TicketDetail extends TicketSummary, TicketMessage {
   children: TicketMessage[];
 }
 
-/* POST /api/user/tickets */
 export interface CreateTicketPayload {
   title: string;
   department: Id;
@@ -58,7 +51,6 @@ export interface CreateTicketPayload {
   content: string;
 }
 
-/* POST /api/user/tickets/:id/answer */
 export interface TicketReplyPayload {
   content: string;
 }

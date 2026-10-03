@@ -12,7 +12,6 @@ export interface ArticleCategoryRef {
   slug: string;
 }
 
-/* list item (GET /api/articles, content not included) */
 export interface ArticleSummary {
   _id: Id;
   title: string;
@@ -35,15 +34,14 @@ export interface ArticleCategoryOption {
   slug: string;
 }
 
-export interface ArticleShareLinks {
+export interface ShareTarget {
   url: string;
   title: string;
-  image: string;
+  image?: string;
 }
 
-/* GET /api/articles query */
 export interface ArticleListQuery {
   q?: string;
-  category?: string; // category slug
+  category?: string;
   limit?: number | string;
 }

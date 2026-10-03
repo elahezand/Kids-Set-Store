@@ -7,14 +7,12 @@ interface ConfirmDialogProps {
   title: string;
   description?: string;
   confirmLabel?: string;
-  /** red confirm button for destructive actions */
   danger?: boolean;
   loading?: boolean;
   onConfirm: () => void;
   onClose: () => void;
 }
 
-/* small "are you sure?" dialog (replaces sweetalert in the panels) */
 export default function ConfirmDialog({
   open,
   title,

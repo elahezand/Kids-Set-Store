@@ -9,7 +9,6 @@ export interface ToggleFavoriteResult {
   isFavorited: boolean;
 }
 
-/* GET /api/user/favorites item (productId is populated, null when the product was deleted) */
 export interface FavoriteEntry {
   _id: Id;
   user: Id;

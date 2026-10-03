@@ -4,26 +4,26 @@ import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { queryKeys } from "@/services/client/keys";
+import { useDelete, useGet, useInfiniteGet, usePatch, usePost } from "@/services/client/query";
+import { ROUTES } from "@/utils/constants";
 import type {
   ApiSuccess,
-  MyComment,
   CommentStatusFilter,
+  CreateTicketPayload,
+  Department,
+  MyComment,
   OrderListItem,
   OrderStatusFilter,
   Paginated,
+  PanelNotification,
   SessionUser,
-
+  TicketReplyPayload,
+  TicketStatusFilter,
+  TicketSummary,
 } from "@/types";
-import { queryKeys } from "./keys";
-import { useDelete, useGet, useInfiniteGet, usePatch, usePost } from "./query";
-import { CreateTicketPayload, TicketSummary, TicketReplyPayload, TicketStatusFilter } from "@/types/ticket";
-import { Department } from "@/types/ticket";
-import { PanelNotification } from "@/types/dashboard";
 
-
-
-const flattenPages = <TItem>(pages?: Array<Paginated<TItem>>) =>
-  pages?.flatMap((page) => page.data ?? []) ?? [];
+const flattenPages = <TItem>(pages?: Array<Paginated<TItem>>) => pages?.flatMap((page) => page.data ?? []) ?? [];
 
 const useCursorList = <TItem>(
   url: string,
@@ -37,11 +37,7 @@ const useCursorList = <TItem>(
   return { ...result, items };
 };
 
-/* list params: "all" is not sent, the API shows everything when there is no status */
-const statusParams = (limit: number, status: string) =>
-  status === "all" ? { limit } : { limit, status };
-
-/* ---------- orders: GET /api/user/order (services/server/user/order getMyOrders) ---------- */
+const statusParams = (limit: number, status: string) => (status === "all" ? { limit } : { limit, status });
 
 export const useMyOrders = (
   initialPage: Paginated<OrderListItem>,
@@ -51,8 +47,6 @@ export const useMyOrders = (
   const params = statusParams(limit, status);
   return useCursorList("/user/order", queryKeys.myOrders(params), params, initialPage, "Could not load orders");
 };
-
-/* ---------- comments: /api/user/comment (services/server/user/comment) ---------- */
 
 export const useMyComments = (
   initialPage: Paginated<MyComment>,
@@ -76,8 +70,6 @@ export const useDeleteMyComment = () => {
     },
   });
 };
-
-/* ---------- tickets: /api/user/tickets (services/server/user/ticket) ---------- */
 
 export const useMyTickets = (
   initialPage: Paginated<TicketSummary>,
@@ -123,8 +115,6 @@ export const useTicketReply = (ticketId: string, { onSent }: { onSent?: () => vo
   });
 };
 
-/* ---------- profile: PATCH /api/user/profile (services/server/user/profile) ---------- */
-
 export const useUpdateProfile = ({ onSaved }: { onSaved?: () => void } = {}) => {
   const router = useRouter();
 
@@ -138,26 +128,26 @@ export const useUpdateProfile = ({ onSaved }: { onSaved?: () => void } = {}) => 
   });
 };
 
-/* ---------- notifications: /api/user/notification (topbar bell) ---------- */
-
 export const useNotifications = (limit = 8) =>
-  useGet<Paginated<PanelNotification>>("/user/notification", { limit }, {
-    queryKey: queryKeys.notifications,
-    silentError: true,
-    staleTime: 60 * 1000,
-    axiosConfig: { silentAuth: true },
-  });
+  useGet<Paginated<PanelNotification>>(
+    "/user/notification",
+    { limit },
+    {
+      queryKey: queryKeys.notifications,
+      silentError: true,
+      staleTime: 60 * 1000,
+      axiosConfig: { silentAuth: true },
+    }
+  );
 
 export const useMarkNotificationSeen = () => {
   const queryClient = useQueryClient();
 
   return usePatch<ApiSuccess, string>((id) => `/user/notification/${id}`, {
-    onError: () => undefined, // background action, no toast
+    onError: () => undefined,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.notifications }),
   });
 };
-
-/* ---------- session: POST /api/auth/logout ---------- */
 
 export const useLogout = () => {
   const router = useRouter();
@@ -169,7 +159,7 @@ export const useLogout = () => {
     onSuccess: () => {
       queryClient.clear();
       toast.success("Logged out");
-      router.replace("/login-register");
+      router.replace(ROUTES.login);
       router.refresh();
     },
   });

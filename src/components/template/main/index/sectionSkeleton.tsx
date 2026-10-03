@@ -1,7 +1,4 @@
-/* Placeholder shown while a home section streams in (same size as the real one -> no layout jump) */
-
 interface SectionSkeletonProps {
-  /** product grid / slider (cards) or a plain block (categories, stats) */
   variant?: "cards" | "block";
   count?: number;
 }

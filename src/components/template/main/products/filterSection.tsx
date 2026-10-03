@@ -4,7 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import { HiSearch, HiX } from "react-icons/hi";
 import { useQueryParams } from "@/services/client/listing";
 import { CURRENCY } from "@/utils/format";
-import type { CategoryFilter, CategoryNode, CategoryOption, ListingFilterKey, ListingSort, SelectOption } from "@/types";
+import type {
+  CategoryFilter,
+  CategoryNode,
+  CategoryOption,
+  ListingFilterKey,
+  ListingSort,
+  SelectOption,
+} from "@/types";
+
 const MAX_PRICE = 400;
 const VARIANT_SLUGS = ["size", "color"];
 
@@ -54,16 +62,14 @@ export default function FilterSection({ categories = [], categoryFilters = [] }:
 
   const specs = useMemo(() => parseSpecs(searchParams.get("filter")), [searchParams]);
 
-  const set = (changes: Partial<Record<ListingFilterKey, string>>, drop: string[] = []) =>
-    update(changes, drop);
+  const set = (changes: Partial<Record<ListingFilterKey, string>>, drop: string[] = []) => update(changes, drop);
 
   const commitPrice = () => set({ max: maxPrice === String(MAX_PRICE) ? "" : maxPrice });
 
-  const changeCategory = (slug: string) =>
-    set({ category: slug, size: "", color: "", material: "", filter: "" });
+  const changeCategory = (slug: string) => set({ category: slug, size: "", color: "", material: "", filter: "" });
 
   const valueOf = (filter: CategoryFilter) =>
-    isVariantFilter(filter) ? get(filter.slug as ListingFilterKey) : specs[filter.slug] ?? "";
+    isVariantFilter(filter) ? get(filter.slug as ListingFilterKey) : (specs[filter.slug] ?? "");
 
   const setFilterValue = (filter: CategoryFilter, value: string) => {
     if (isVariantFilter(filter)) {
@@ -83,7 +89,8 @@ export default function FilterSection({ categories = [], categoryFilters = [] }:
 
   return (
     <div
-      className={`mb-8 rounded-2xl border border-sage-100 bg-sage-50 p-4 shadow-card transition-opacity dark:border-white/10 dark:bg-ink-800/60 ${isPending ? "opacity-70" : ""}`} aria-busy={isPending}
+      className={`mb-8 rounded-2xl border border-sage-100 bg-sage-50 p-4 shadow-card transition-opacity dark:border-white/10 dark:bg-ink-800/60 ${isPending ? "opacity-70" : ""}`}
+      aria-busy={isPending}
     >
       <form
         role="search"
@@ -110,9 +117,13 @@ export default function FilterSection({ categories = [], categoryFilters = [] }:
         </button>
       </form>
 
-      {/* always available */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <select aria-label="Category" value={get("category")} onChange={(e) => changeCategory(e.target.value)} className={controlClass}>
+        <select
+          aria-label="Category"
+          value={get("category")}
+          onChange={(e) => changeCategory(e.target.value)}
+          className={controlClass}
+        >
           <option value="">All categories</option>
           {flatten(categories).map((option) => (
             <option key={option.slug} value={option.slug}>
@@ -152,7 +163,6 @@ export default function FilterSection({ categories = [], categoryFilters = [] }:
           />
         </label>
 
-        {/* two small toggles share one grid cell */}
         <div className="grid grid-cols-2 gap-3">
           <label className={`${controlClass} flex cursor-pointer items-center gap-2`}>
             <input
@@ -176,7 +186,6 @@ export default function FilterSection({ categories = [], categoryFilters = [] }:
         </div>
       </div>
 
-      {/* from the selected category */}
       {(choiceFilters.length > 0 || booleanFilters.length > 0) && (
         <div className="mt-3 border-t border-sage-100 pt-3 dark:border-white/10">
           {choiceFilters.length > 0 && (
@@ -210,10 +219,11 @@ export default function FilterSection({ categories = [], categoryFilters = [] }:
                     type="button"
                     aria-pressed={active}
                     onClick={() => setFilterValue(filter, active ? "" : "true")}
-                    className={`rounded-full border-2 px-4 py-1.5 text-sm font-medium transition-colors ${active
-                      ? "border-sage-600 bg-sage-600 text-white"
-                      : "border-coral-300 bg-white text-text hover:border-sage-400 dark:bg-ink-800 dark:text-gray-100"
-                      }`}
+                    className={`rounded-full border-2 px-4 py-1.5 text-sm font-medium transition-colors ${
+                      active
+                        ? "border-sage-600 bg-sage-600 text-white"
+                        : "border-coral-300 bg-white text-text hover:border-sage-400 dark:bg-ink-800 dark:text-gray-100"
+                    }`}
                   >
                     {filter.name}
                   </button>
