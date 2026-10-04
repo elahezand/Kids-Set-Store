@@ -32,7 +32,7 @@ export default function AddToFavorite({ productId, initialFavorited, compact = f
       title={label}
       className={
         compact
-          ? "flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 text-lg text-coral-300 transition hover:bg-white disabled:cursor-wait disabled:opacity-60"
+          ? "flex size-9 items-center justify-center rounded-full bg-white text-base text-coral-500 shadow-card transition hover:scale-110 disabled:cursor-wait disabled:opacity-60 dark:bg-ink-800 dark:text-coral-300"
           : "flex h-12 w-12 items-center justify-center rounded-xl border border-gray-300 text-xl text-coral-300 transition hover:border-coral-300 hover:bg-coral-300/10 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-300 dark:border-white/20"
       }
     >

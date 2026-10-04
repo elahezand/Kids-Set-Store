@@ -10,6 +10,7 @@ import type { ProductCardData } from "@/types";
 interface ProductSliderProps {
   products?: ProductCardData[];
   title?: string;
+  eyebrow?: string;
   href?: string;
 }
 
@@ -18,6 +19,7 @@ const MAX_SLIDES_PER_VIEW = 5;
 export default function ProductSlider({
   products = [],
   title = "Best Sellers",
+  eyebrow,
   href = "/products?sort=bestSelling",
 }: ProductSliderProps) {
   if (!products.length) return null;
@@ -26,7 +28,7 @@ export default function ProductSlider({
 
   return (
     <div className="page-container">
-      <SectionHeader title={title} href={href} />
+      <SectionHeader eyebrow={eyebrow} title={title} href={href} />
       <Swiper
         slidesPerView={1}
         spaceBetween={10}

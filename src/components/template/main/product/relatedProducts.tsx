@@ -17,7 +17,7 @@ const RelatedProducts = ({ related = [] }: { related?: ProductCardData[] }) => {
 
   return (
     <section data-aos="fade-right" className="border-t border-gray-200 pt-10 dark:border-white/10">
-      <SectionHeader title="Related Products" href={ROUTES.products} />
+      <SectionHeader eyebrow="You may also like" title="Related Products" href={ROUTES.products} />
       <Swiper slidesPerView={2} spaceBetween={16} breakpoints={BREAKPOINTS} rewind className="mySwiper">
         {related.map((item) => (
           <SwiperSlide key={item._id} className="!h-auto py-1">

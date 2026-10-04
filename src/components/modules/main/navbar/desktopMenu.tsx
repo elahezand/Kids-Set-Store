@@ -7,7 +7,7 @@ import type { CategoryNode } from "@/types";
 const userLinks: MenuLink[] = [{ href: ROUTES.dashboard.home, label: "Dashboard" }, ...ACCOUNT_LINKS];
 
 const topLinkClass =
-  "flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium text-white transition-colors hover:bg-white/15 group-hover:bg-white/15 group-focus-within:bg-white/15 xl:px-3.5";
+  "flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium text-current transition-colors hover:bg-current/10 group-hover:bg-current/10 group-focus-within:bg-current/10 xl:px-3.5";
 
 const openOnHover =
   "invisible opacity-0 transition duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100";
@@ -15,7 +15,7 @@ const openOnHover =
 const Arrow = () => (
   <IoIosArrowDown
     aria-hidden="true"
-    className="size-3.5 text-coral-200 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180"
+    className="size-3.5 text-coral-400 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180"
   />
 );
 
@@ -76,7 +76,7 @@ function CategoryItem({ category }: { category: CategoryNode }) {
       </Link>
 
       {hasChildren && (
-        <div className={`absolute inset-x-0 top-[50px] z-[1000] pt-2 ${openOnHover}`}>
+        <div className={`absolute inset-x-0 top-[calc(100%-20px)] z-[1000] pt-2 ${openOnHover}`}>
           <div className="max-h-[70vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-float dark:bg-ink-800">
             <div className="mb-4 flex items-center justify-between gap-4 border-b border-gray-100 pb-3 dark:border-white/10">
               <p className="text-base font-bold text-gray-900 dark:text-gray-100">{category.name}</p>
@@ -154,7 +154,7 @@ export default function DesktopMenu({ tree, username }: DesktopMenuProps) {
         <li className="ml-1">
           <Link
             href={ROUTES.login}
-            className="btn btn-sm whitespace-nowrap rounded-full border-2 border-coral-300 px-4 py-1.5 text-white transition-colors hover:bg-coral-300"
+            className="btn btn-sm whitespace-nowrap rounded-full border-2 border-coral-400 px-4 py-1.5 text-current transition-colors hover:border-coral-500 hover:bg-coral-500 hover:text-white"
           >
             Sign up / Log in
           </Link>

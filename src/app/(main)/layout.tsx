@@ -27,7 +27,7 @@ export default async function MainLayout({ children }: { children: ReactNode }) 
         Skip to content
       </a>
       <Navbar />
-      <main id="main-content" className="min-h-[60vh] pt-[86px]">
+      <main id="main-content" className="min-h-[60vh] pt-24">
         {children}
       </main>
       <ShowFooter info={info} />

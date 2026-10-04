@@ -5,85 +5,83 @@
 
 /* 2. Design tokens ------------------------------------------------------- */
 @theme {
-  /* -----------------------------------------------------------------------
+  /* Primary — navy (token name: sage). 500+ is AA with white text. */
+  --color-sage: #5f88cc;
+  --color-sage-50: #eef3fb;
+  --color-sage-100: #dce6f6;
+  --color-sage-200: #b9cdec;
+  --color-sage-300: #8eaedf;
+  --color-sage-400: #5f88cc;
+  --color-sage-500: #3a67b5;
+  --color-sage-600: #2a5199;
+  --color-sage-700: #213f7a;
+  --color-sage-800: #1b3262;
+  --color-sage-900: #132341;
 
-  /* Primary — "blueberry" (token name: sage). 600+ is AA with white text. */
-  --color-sage: #7a80f6;
-  --color-sage-50: #f0f2ff;
-  --color-sage-100: #e2e6ff;
-  --color-sage-200: #c9d0ff;
-  --color-sage-300: #a3acfc;
-  --color-sage-400: #7a80f6;
-  --color-sage-500: #5b5bec;
-  --color-sage-600: #4a43d6;
-  --color-sage-700: #3c35b0;
-  --color-sage-800: #322e8c;
-  --color-sage-900: #1f1d57;
-
-  /* Accent — "bubblegum" raspberry pink (token name: coral). 600+ with white text. */
-  --color-coral: #ff94b8;
-  --color-coral-50: #fff0f5;
+  /* Accent — candy pink (token name: coral). 600+ with white text. */
+  --color-coral: #ff9ec4;
+  --color-coral-50: #fff1f6;
   --color-coral-100: #ffe1ec;
-  --color-coral-200: #ffc2d8;
-  --color-coral-300: #ff94b8;
-  --color-coral-400: #ff5f94;
-  --color-coral-500: #f43f7a;
-  --color-coral-600: #d42463;
-  --color-coral-700: #ae1a51;
-  --color-coral-800: #861543;
-  --color-coral-900: #5a0f2e;
+  --color-coral-200: #ffc4da;
+  --color-coral-300: #ff9ec4;
+  --color-coral-400: #ff76a8;
+  --color-coral-500: #f2558e;
+  --color-coral-600: #c8336b;
+  --color-coral-700: #a52958;
+  --color-coral-800: #7f2145;
+  --color-coral-900: #55162e;
 
-  /* Supporting — "pistachio" fresh green (token name: mint) */
-  --color-mint: #9be3c4;
-  --color-mint-50: #edfcf5;
-  --color-mint-100: #d3f8e7;
-  --color-mint-200: #9be3c4;
-  --color-mint-300: #6dd4aa;
-  --color-mint-400: #3fbf8c;
-  --color-mint-500: #22a374;
-  --color-mint-600: #17845e;
-  --color-mint-700: #14694d;
-  --color-mint-800: #12533e;
-  --color-mint-900: #0b3428;
+  /* Supporting — fresh mint */
+  --color-mint: #a8ecd2;
+  --color-mint-50: #edfcf6;
+  --color-mint-100: #d2f7e8;
+  --color-mint-200: #a8ecd2;
+  --color-mint-300: #6fdcb5;
+  --color-mint-400: #34c79a;
+  --color-mint-500: #1fa97f;
+  --color-mint-600: #178a68;
+  --color-mint-700: #156e54;
+  --color-mint-800: #135744;
+  --color-mint-900: #0c372c;
 
-  /* Supporting — "apricot" warm orange (token name: peach) */
-  --color-peach: #ffd2a8;
-  --color-peach-50: #fff7ed;
-  --color-peach-100: #ffecd5;
-  --color-peach-200: #ffd2a8;
-  --color-peach-300: #ffb170;
-  --color-peach-400: #ff8a3d;
-  --color-peach-500: #f76b15;
-  --color-peach-600: #d0530c;
-  --color-peach-700: #a5400d;
-  --color-peach-800: #7c3110;
-  --color-peach-900: #4f1f0b;
+  /* Supporting — apricot */
+  --color-peach: #ffd9b3;
+  --color-peach-50: #fff7ee;
+  --color-peach-100: #ffecd7;
+  --color-peach-200: #ffd9b3;
+  --color-peach-300: #ffc28a;
+  --color-peach-400: #ffb36b;
+  --color-peach-500: #f7913d;
+  --color-peach-600: #d6731f;
+  --color-peach-700: #aa5816;
+  --color-peach-800: #804315;
+  --color-peach-900: #522b0f;
 
-  /* Sky — "new arrival", boys' collection, info */
-  --color-sky-50: #eff8ff;
-  --color-sky-100: #dbeefe;
-  --color-sky-200: #bfe2fe;
-  --color-sky-300: #93cffd;
-  --color-sky-400: #60b4fa;
-  --color-sky-500: #3b96f6;
-  --color-sky-600: #2578ea;
-  --color-sky-700: #1d62d1;
-  --color-sky-800: #1e50a8;
-  --color-sky-900: #1e4584;
+  /* Sky — light blue */
+  --color-sky-50: #eefaff;
+  --color-sky-100: #d8f2fd;
+  --color-sky-200: #b3e5fb;
+  --color-sky-300: #84d4f6;
+  --color-sky-400: #5ec2f0;
+  --color-sky-500: #2fa6e0;
+  --color-sky-600: #1d86bf;
+  --color-sky-700: #1a6b99;
+  --color-sky-800: #19577b;
+  --color-sky-900: #133b54;
 
-  /* Sun — highlights, ratings, promo strips */
-  --color-sun-50: #fffbea;
-  --color-sun-100: #fff3c4;
-  --color-sun-200: #ffe68a;
-  --color-sun-300: #ffd54f;
-  --color-sun-400: #ffc425;
-  --color-sun-500: #f5a70b;
-  --color-sun-600: #d98106;
-  --color-sun-700: #b45c09;
-  --color-sun-800: #92470e;
-  --color-sun-900: #783b0f;
+  /* Sun — butter yellow */
+  --color-sun-50: #fffbe8;
+  --color-sun-100: #fff3c2;
+  --color-sun-200: #ffe78a;
+  --color-sun-300: #ffdc5c;
+  --color-sun-400: #ffd23f;
+  --color-sun-500: #f0b81a;
+  --color-sun-600: #cc930c;
+  --color-sun-700: #a2700d;
+  --color-sun-800: #7f5711;
+  --color-sun-900: #523810;
 
-  /* Status — red kept clearly apart from the pink accent */
+  /* Status */
   --color-danger: #e5484d;
   --color-danger-light: #f87171;
   --color-danger-50: #fef1f1;
@@ -97,43 +95,42 @@
   --color-danger-800: #741c20;
   --color-danger-900: #4a1215;
 
-  --color-success: #22a374;
-  --color-success-light: #edfcf5;
+  --color-success: #178a68;
+  --color-success-light: #edfcf6;
 
-  /* Neutrals — cool lavender-grey, matches the blueberry brand colour */
-  --color-gray-50: #f8f8fc;
-  --color-gray-100: #f1f1f7;
-  --color-gray-200: #e6e6ef;
-  --color-gray-300: #d6d6e2;
-  --color-gray-400: #b9b9c9;
-  --color-gray-500: #9393a7;
-  --color-gray-600: #6e6e84;
-  --color-gray-700: #55556a;
-  --color-gray-800: #3a3a4d;
-  --color-gray-900: #22222f;
+  /* Neutrals — clean cool grey */
+  --color-gray-50: #f7f8fa;
+  --color-gray-100: #eff1f5;
+  --color-gray-200: #e3e7ee;
+  --color-gray-300: #cfd5df;
+  --color-gray-400: #a9b2c1;
+  --color-gray-500: #7e889a;
+  --color-gray-600: #5c6577;
+  --color-gray-700: #444c5c;
+  --color-gray-800: #2e3441;
+  --color-gray-900: #1c212b;
 
-  /* Dark surfaces — deep blueberry night instead of plain black */
-  --color-ink-700: #2a2a3d;
-  --color-ink-800: #1c1c2b;
-  --color-ink-900: #14141f;
-  --color-ink-950: #0e0e16;
+  /* Dark surfaces — deep navy night */
+  --color-ink-700: #232a3a;
+  --color-ink-800: #1a2030;
+  --color-ink-900: #131826;
+  --color-ink-950: #0d111b;
 
-  --color-text: #3a3a4d;
-  --color-text-dark: #1b1b2e;
+  --color-text: #2e3441;
+  --color-text-dark: #141925;
 
-  /* Typography — one family, real weights (no faux bold) */
+  /* Typography */
   --font-sans: shabnam, ui-sans-serif, system-ui, sans-serif;
   --font-shabnam: shabnam, sans-serif;
   --font-shabnam-bold: shabnam, sans-serif;
-  /* kept for old class names */
 
   /* Layout */
   --container-container: 1240px;
   --breakpoint-xs: 420px;
 
-  /* Elevation — warm-tinted shadows instead of flat grey */
-  --shadow-card: 0 1px 2px rgb(34 34 60 / 0.04), 0 2px 6px rgb(34 34 60 / 0.06);
-  --shadow-float: 0 16px 40px -12px rgb(34 34 60 / 0.22);
+  /* Elevation */
+  --shadow-card: 0 1px 2px rgb(20 25 37 / 0.04), 0 2px 6px rgb(20 25 37 / 0.06);
+  --shadow-float: 0 16px 40px -12px rgb(20 25 37 / 0.2);
   --shadow-pop: 0 6px 0 0 var(--color-sage-700);
 
   /* Animations */
@@ -142,7 +139,6 @@
   --animate-wiggle: wiggle 0.5s ease-in-out;
   --animate-sway: sway 3.2s ease-in-out infinite;
 }
-
 
 .dark [data-sonner-toaster][data-sonner-theme] {
   --normal-bg: var(--color-ink-800);
@@ -294,7 +290,7 @@
     inset-inline: 0;
     bottom: 0;
     height: 8px;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='8' viewBox='0 0 24 8'%3e%3cpath d='M0 4 Q6 0 12 4 T24 4' fill='none' stroke='%23a3acfc' stroke-width='2'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='8' viewBox='0 0 24 8'%3e%3cpath d='M0 4 Q6 0 12 4 T24 4' fill='none' stroke='%238eaedf' stroke-width='2'/%3e%3c/svg%3e");
     background-repeat: repeat-x;
     opacity: 0.9;
   }
@@ -400,7 +396,7 @@
 
   select.input {
     @apply appearance-none bg-no-repeat pr-10;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236e6e84' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%235c6577' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 0.6rem center;
     background-size: 1.25rem;
   }
@@ -458,12 +454,12 @@
 
   /* Storefront: product card ---------------------------------------------- */
   .product-card {
-    @apply relative flex flex-col overflow-hidden rounded-3xl bg-white transition-shadow duration-300 hover:shadow-float dark:bg-ink-800;
+    @apply relative flex flex-col overflow-hidden rounded-2xl bg-white transition-shadow duration-300 hover:shadow-float dark:bg-ink-800;
   }
 
   /* Soft pastel "stage" behind the product photo */
   .product-card-media {
-    @apply relative aspect-[4/5] overflow-hidden rounded-3xl bg-coral-50 dark:bg-white/5;
+    @apply relative aspect-square overflow-hidden rounded-2xl bg-coral-50 dark:bg-white/5;
   }
 
   .product-card-media img {
@@ -476,29 +472,17 @@
     }
   }
 
-  .product-card:nth-child(4n + 2) .product-card-media {
-    @apply bg-sage-50 dark:bg-white/5;
-  }
-
-  .product-card:nth-child(4n + 3) .product-card-media {
-    @apply bg-sky-50 dark:bg-white/5;
-  }
-
-  .product-card:nth-child(4n + 4) .product-card-media {
-    @apply bg-sun-50 dark:bg-white/5;
-  }
-
   .product-card-body {
-    @apply flex flex-1 flex-col gap-1.5 px-2 pt-3 pb-4;
+    @apply flex flex-1 flex-col gap-1 px-2 pt-2.5 pb-3;
   }
 
   .product-card-title {
-    @apply line-clamp-2 text-sm font-medium text-gray-900 dark:text-gray-100 sm:text-base;
+    @apply line-clamp-1 text-sm font-medium text-gray-900 dark:text-gray-100;
   }
 
   /* Prices */
   .price {
-    @apply text-base font-bold text-text-dark tabular-nums dark:text-white sm:text-lg;
+    @apply text-base font-bold text-text-dark tabular-nums dark:text-white;
   }
 
   .price-old {
@@ -506,7 +490,7 @@
   }
 
   .discount-tag {
-    @apply absolute top-3 left-3 z-10 rounded-full bg-coral-600 px-2.5 py-1 text-xs font-bold text-white shadow-card;
+    @apply absolute top-2.5 left-2.5 z-10 rounded-full bg-coral-600 px-2 py-0.5 text-xs font-bold text-white shadow-card;
   }
 
   /* Filter / category chips */
@@ -616,8 +600,8 @@
   .bg-playful {
     background-color: var(--color-gray-50);
     background-image:
-      radial-gradient(circle at 1px 1px, rgb(255 148 184 / 0.35) 1.5px, transparent 0),
-      radial-gradient(circle at 1px 1px, rgb(122 128 246 / 0.35) 1.5px, transparent 0);
+      radial-gradient(circle at 1px 1px, rgb(255 158 196 / 0.35) 1.5px, transparent 0),
+      radial-gradient(circle at 1px 1px, rgb(95 136 204 / 0.35) 1.5px, transparent 0);
     background-size: 28px 28px, 28px 28px;
     background-position: 0 0, 14px 14px;
   }
@@ -625,8 +609,8 @@
   html.dark .bg-playful {
     background-color: var(--color-ink-800);
     background-image:
-      radial-gradient(circle at 1px 1px, rgb(255 148 184 / 0.12) 1.5px, transparent 0),
-      radial-gradient(circle at 1px 1px, rgb(122 128 246 / 0.12) 1.5px, transparent 0);
+      radial-gradient(circle at 1px 1px, rgb(255 158 196 / 0.12) 1.5px, transparent 0),
+      radial-gradient(circle at 1px 1px, rgb(95 136 204 / 0.12) 1.5px, transparent 0);
   }
 }
 
@@ -635,6 +619,9 @@
 /* Swiper — kept inside a layer so Tailwind utilities on slides/images always win.
    (Slide images are sized in JSX with next/image `fill` + object-cover/contain.) */
 @layer components {
+  .swiper{
+    padding: 1rem 0rem;
+  }
   .swiper-slide {
     border-radius: 1rem;
   }
@@ -670,7 +657,7 @@
 
 /* SweetAlert */
 .swal-overlay {
-  background-color: rgb(15 17 19 / 0.45);
+  background-color: rgb(13 17 27 / 0.45);
   backdrop-filter: blur(3px);
 }
 
@@ -733,7 +720,7 @@
 .swal-content__textarea:focus {
   outline: none;
   border-color: var(--color-sage-500);
-  box-shadow: 0 0 0 4px rgb(91 91 236 / 0.18);
+  box-shadow: 0 0 0 4px rgb(58 103 181 / 0.18);
 }
 
 html.dark .swal-modal {

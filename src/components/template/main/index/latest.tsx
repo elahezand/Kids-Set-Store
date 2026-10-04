@@ -6,7 +6,7 @@ import type { ProductCardData } from "@/types";
 const Latest = ({ products = [] }: { products?: ProductCardData[] }) => {
   return (
     <div className="page-container">
-      <SectionHeader title="New Arrivals" href={`${ROUTES.products}?sort=latest`} />
+      <SectionHeader eyebrow="Just in" title="New Arrivals" href={`${ROUTES.products}?sort=latest`} />
       {products.length ? (
         <div
           className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-6 xl:grid-cols-5"

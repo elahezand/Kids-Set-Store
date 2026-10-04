@@ -1,20 +1,32 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import { CiSearch } from "react-icons/ci";
+import Link from "next/link";
+import { FaStar } from "react-icons/fa";
+import { LuPlus, LuSlidersHorizontal } from "react-icons/lu";
 import AddToFavorite from "@/components/modules/main/addToFavorite";
-import Stars from "@/components/modules/ui/stars";
-import Tilt from "@/components/modules/ui/tilt";
 import { useAddToCart } from "@/services/client/cart";
 import { PLACEHOLDER_IMAGE, ROUTES } from "@/utils/constants";
 import { formatPrice } from "@/utils/format";
 import type { ProductCardData } from "@/types";
 
+const MEDIA_TINTS = [
+  "bg-coral-50 dark:bg-white/5",
+  "bg-sky-50 dark:bg-white/5",
+  "bg-sun-50 dark:bg-white/5",
+  "bg-sage-50 dark:bg-white/5",
+];
+
+const tintFor = (id: string) => MEDIA_TINTS[id.charCodeAt(id.length - 1) % MEDIA_TINTS.length];
+
+const roundButton =
+  "flex size-9 shrink-0 items-center justify-center rounded-full bg-sage-600 text-white shadow-card transition hover:bg-sage-700 active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 dark:disabled:bg-white/10";
+
 export default function ProductCard({
   _id,
   name,
   img,
+  hoverImg = null,
   price,
   originalPrice,
   score = 0,
@@ -26,73 +38,89 @@ export default function ProductCard({
   const needsChoice = variantsCount > 1;
   const { mutate: addToCart, isPending } = useAddToCart();
 
+  const hasDiscount = originalPrice !== null && originalPrice > price;
+  const discount = hasDiscount ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
+
   const handleAdd = () => {
     if (isPending || !inStock) return;
     addToCart({ items: [{ productId: _id, variantId: defaultVariantId, quantity: 1 }] });
   };
 
-  const actionClass =
-    "invisible absolute bottom-0 left-1/2 z-[3] w-max -translate-x-1/2 translate-y-1/2 whitespace-nowrap rounded-md border border-white bg-transparent px-3 py-1 text-sm text-white opacity-0 transition-all duration-300 group-hover:visible group-hover:bottom-1/2 group-hover:opacity-100 hover:bg-coral-300 disabled:cursor-not-allowed";
-
   return (
-    <Tilt className="h-full">
-      <div className="group relative flex h-full w-full flex-col rounded-2xl bg-white p-2 text-text shadow-card dark:bg-ink-800 dark:text-gray-100">
-        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl">
+    <article className="product-card group h-full">
+      <Link href={href} className={`product-card-media block ${tintFor(_id)}`} aria-label={name}>
+        <Image
+          fill
+          src={img || PLACEHOLDER_IMAGE}
+          alt={name}
+          sizes="(min-width: 1280px) 20vw, (min-width: 768px) 25vw, 50vw"
+          className="object-cover"
+        />
+        {hoverImg && (
           <Image
             fill
-            src={img || PLACEHOLDER_IMAGE}
-            alt={name}
+            src={hoverImg}
+            alt=""
             sizes="(min-width: 1280px) 20vw, (min-width: 768px) 25vw, 50vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
           />
+        )}
 
-          {!inStock && (
-            <span className="absolute left-2 top-2 z-[4] rounded-full bg-gray-900/80 px-2.5 py-1 text-xs text-white">
-              Out of stock
-            </span>
-          )}
+        {discount > 0 && <span className="discount-tag">-{discount}%</span>}
 
-          <div className="pointer-events-none absolute inset-0 z-[2] rounded-xl bg-black/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        {!inStock && (
+          <span className="absolute inset-x-3 bottom-3 z-10 rounded-full bg-white/90 py-1 text-center text-xs font-semibold text-gray-700 backdrop-blur dark:bg-ink-900/80 dark:text-gray-300">
+            Out of stock
+          </span>
+        )}
+      </Link>
 
-          <div className="invisible absolute right-2 top-2 z-[3] flex flex-col items-end gap-2 text-white opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
-            <Link
-              href={href}
-              aria-label={`View ${name}`}
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 text-xl text-coral-300"
-            >
-              <CiSearch />
-            </Link>
-            <AddToFavorite productId={_id} compact />
-          </div>
+      <div className="absolute top-2.5 right-2.5 z-10">
+        <AddToFavorite productId={_id} compact />
+      </div>
 
-          {needsChoice ? (
-            <Link href={href} className={actionClass}>
-              Choose options
-            </Link>
-          ) : (
-            <button type="button" onClick={handleAdd} disabled={isPending || !inStock} className={actionClass}>
-              {!inStock ? "Out of stock" : isPending ? "Adding..." : "Add to cart"}
-            </button>
-          )}
-        </div>
-
-        <div className="flex flex-col items-center justify-center gap-1 px-1 py-2.5 text-center">
-          <Link href={href} className="line-clamp-1 text-[13px] sm:text-sm">
+      <div className="product-card-body">
+        <div className="flex items-center justify-between gap-2">
+          <Link href={href} className="product-card-title min-w-0 hover:text-sage-700 dark:hover:text-sage-300">
             {name}
           </Link>
 
-          {score > 0 && <Stars score={score} className="text-sage-400" />}
-
-          <div className="flex items-baseline gap-2">
-            <span className="text-[13px] text-text dark:text-gray-100 sm:text-sm md:text-base">
-              {formatPrice(price)}
+          {score > 0 && (
+            <span className="flex shrink-0 items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
+              <FaStar className="text-sun-400" aria-hidden="true" />
+              <span>
+                <span className="sr-only">Rated </span>
+                {score}
+                <span className="sr-only"> out of 5</span>
+              </span>
             </span>
-            {originalPrice !== null && originalPrice > price && (
-              <span className="text-xs text-gray-400 line-through">{formatPrice(originalPrice)}</span>
-            )}
+          )}
+        </div>
+
+        <div className="mt-auto flex items-center justify-between gap-2">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
+            <span className="price">{formatPrice(price)}</span>
+            {hasDiscount && <span className="price-old">{formatPrice(originalPrice)}</span>}
           </div>
+
+          {needsChoice ? (
+            <Link href={href} className={roundButton} aria-label={`Choose options for ${name}`} title="Choose options">
+              <LuSlidersHorizontal className="size-4" />
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={handleAdd}
+              disabled={isPending || !inStock}
+              className={roundButton}
+              aria-label={inStock ? `Add ${name} to cart` : `${name} is out of stock`}
+              title={inStock ? "Add to cart" : "Out of stock"}
+            >
+              <LuPlus className={`size-5 ${isPending ? "animate-spin" : ""}`} />
+            </button>
+          )}
         </div>
       </div>
-    </Tilt>
+    </article>
   );
 }

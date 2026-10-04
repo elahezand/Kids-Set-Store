@@ -8,14 +8,14 @@ import SectionHeader from "@/components/modules/main/sectionHeader";
 import { ROUTES } from "@/utils/constants";
 import type { ArticleSummary } from "@/types";
 
-const MAX_SLIDES_PER_VIEW = 3;
+const MAX_SLIDES_PER_VIEW = 4;
 
 const ArticlesSlider = ({ articles = [] }: { articles?: ArticleSummary[] }) => {
   const canLoop = articles.length > MAX_SLIDES_PER_VIEW;
 
   return (
     <div className="page-container">
-      <SectionHeader title="Our Articles" href={ROUTES.articles} />
+      <SectionHeader eyebrow="From the journal" title="Our Articles" href={ROUTES.articles} />
       {articles.length ? (
         <Swiper
           modules={[Autoplay]}
@@ -29,7 +29,7 @@ const ArticlesSlider = ({ articles = [] }: { articles?: ArticleSummary[] }) => {
           autoplay={{ delay: 2500, disableOnInteraction: false, pauseOnMouseEnter: true }}
           loop={canLoop}
           rewind={!canLoop}
-          className="articles-swiper"
+          className="!py-4"
         >
           {articles.map((item) => (
             <SwiperSlide key={item._id}>

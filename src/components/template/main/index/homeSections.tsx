@@ -12,7 +12,7 @@ import { toPlain } from "@/utils/format";
 import { toProductCards } from "@/utils/productView";
 import type { ArticleSummary, CategoryNode, ProductDoc, PublicStats } from "@/types";
 
-const HOME_LIMIT = 10;
+const HOME_LIMIT = 15;
 
 async function load<T>(label: string, query: () => Promise<unknown>, fallback: T): Promise<T> {
   try {
@@ -37,7 +37,14 @@ export async function BestSellersSection() {
   );
   if (!products.length) return null;
 
-  return <ProductSlider title="Best Sellers" href="/products?sort=bestSelling" products={toProductCards(products)} />;
+  return (
+    <ProductSlider
+      eyebrow="Popular right now"
+      title="Best Sellers"
+      href="/products?sort=bestSelling"
+      products={toProductCards(products)}
+    />
+  );
 }
 
 export async function CategoriesSection() {
@@ -49,7 +56,14 @@ export async function MostLovedSection() {
   const products = await load<ProductDoc[]>("most loved", () => productService.getPopularProducts(HOME_LIMIT), []);
   if (!products.length) return null;
 
-  return <ProductSlider title="Most Loved" href="/products?sort=popularity" products={toProductCards(products)} />;
+  return (
+    <ProductSlider
+      eyebrow="Top rated"
+      title="Most Loved"
+      href="/products?sort=popularity"
+      products={toProductCards(products)}
+    />
+  );
 }
 
 export async function ArticlesSection() {

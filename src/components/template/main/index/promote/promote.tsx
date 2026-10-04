@@ -1,8 +1,33 @@
 import Link from "next/link";
 import ClubCard3D from "@/components/template/main/index/promote/clubCard3D";
-import StatsTiles3D from "@/components/template/main/index/promote/statsTiles3D";
 import { ROUTES } from "@/utils/constants";
 import type { PublicStats } from "@/types";
+const compact = (n: number) => (n >= 1000 ? `${Math.floor(n / 100) / 10}k+` : `${n}`);
+
+const buildStats = (stats: PublicStats | null) => [
+  { value: stats ? compact(stats.activeUsers) : "-", label: "Happy families" },
+  { value: stats ? compact(stats.activeProducts) : "-", label: "Styles in store" },
+  { value: stats?.averageRating ? String(stats.averageRating) : "-", label: "Average rating" },
+  { value: stats ? compact(stats.successfulDeals) : "-", label: "Completed orders" },
+];
+
+const StatsArt = ({ stats }: { stats: PublicStats | null }) => (
+  <div className="flex h-full min-h-[300px] w-full items-center justify-center bg-sage-100 p-8 dark:bg-sage-900/40">
+    <div className="grid w-full max-w-[340px] grid-cols-2 gap-3 sm:gap-4">
+      {buildStats(stats).map((s) => (
+        <div
+          key={s.label}
+          className="rounded-2xl bg-white p-4 text-center shadow-card transition-transform duration-300 hover:-translate-y-1 dark:bg-ink-800"
+        >
+          <span className="block font-shabnam-bold text-3xl leading-none text-sage-600 dark:text-sage-300">
+            {s.value}
+          </span>
+          <span className="mt-1.5 block text-xs text-gray-700 dark:text-gray-400 sm:text-sm">{s.label}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const Promote = ({ stats = null }: { stats?: PublicStats | null }) => {
   return (
@@ -52,7 +77,7 @@ const Promote = ({ stats = null }: { stats?: PublicStats | null }) => {
           </div>
 
           <div className="w-full md:w-1/2">
-            <StatsTiles3D stats={stats} />
+            <StatsArt stats={stats} />
           </div>
         </div>
       </div>

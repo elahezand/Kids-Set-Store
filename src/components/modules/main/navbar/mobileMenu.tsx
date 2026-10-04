@@ -56,7 +56,7 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
         aria-label="Open menu"
         aria-expanded={open}
         aria-controls="mobile-menu"
-        className="flex size-10 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/15"
+        className="flex size-10 items-center justify-center rounded-lg text-current transition-colors hover:bg-current/10"
       >
         <LuMenu className="size-6" />
       </button>
