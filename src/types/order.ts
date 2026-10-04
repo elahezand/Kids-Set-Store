@@ -75,3 +75,37 @@ export interface OrderListItem extends OrderSummary {
 }
 
 export type OrderStatusFilter = "all" | OrderStatus;
+
+/* ---------- admin ---------- */
+
+export interface AdminOrderItem extends OrderItem {
+  price?: number;
+  fulfillment?: {
+    status: "pending" | "shipped";
+    trackingCode: string | null;
+    shippedAt: ISODate | null;
+    estimatedDeliveryAt: ISODate | null;
+  };
+}
+
+export interface AdminOrder extends Omit<OrderListItem, "user" | "items"> {
+  user: { _id: Id; username?: string; phone?: string } | Id | null;
+  items: AdminOrderItem[];
+  shippingAddress?: ShippingAddress;
+  coupon?: { code: string } | null;
+  isCashOverdue?: boolean;
+  shippedAt?: ISODate | null;
+  deliveredAt?: ISODate | null;
+}
+
+export interface UpdateOrderPayload {
+  status?: OrderStatus;
+  paymentStatus?: PaymentStatus;
+}
+
+export interface ShipItemPayload {
+  orderId: Id;
+  itemId: Id;
+  trackingCode: string;
+  estimatedDeliveryAt?: string;
+}

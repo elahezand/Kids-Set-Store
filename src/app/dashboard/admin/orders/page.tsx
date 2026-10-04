@@ -1,35 +1,32 @@
-import type { Metadata } from "next";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import OrdersList from "@/components/template/p-user/orders/ordersList";
-import orderService from "@/services/server/user/order";
-import { getPanelSession } from "@/utils/auth/panelUser";
+import OrdersTable from "@/components/template/p-admin/orders/ordersTable";
+import orderService from "@/services/server/admin/order";
+import { adminListParams, filtersKey, readAdminFilters } from "@/utils/adminFilters";
 import { toInitialPage } from "@/utils/initialPage";
-import { pickStatus } from "@/utils/panelStatus";
 import { ORDER_TABS, tabValues } from "@/utils/panelView";
-import type { OrderListItem, PageProps, Pagination } from "@/types";
+import type { Metadata } from "next";
+import type { AdminOrder, PageProps, Pagination } from "@/types";
 
 export const metadata: Metadata = { title: "Orders" };
 
-const LIMIT = 10;
+const LIMIT = 15;
 
-export default async function OrdersPage({ searchParams }: PageProps) {
-  const { user } = await getPanelSession();
-  if (!user) return null;
+export default async function AdminOrdersPage({ searchParams }: PageProps) {
+  const filters = readAdminFilters(await searchParams, tabValues(ORDER_TABS));
+  const params = adminListParams.orders(LIMIT, filters);
 
-  const status = pickStatus(await searchParams, tabValues(ORDER_TABS));
-
-  const result = (await orderService.getMyOrders(user._id, {
-    limit: LIMIT,
-    ...(status !== "all" && { status }),
-  })) as {
-    data: OrderListItem[];
-    pagination: Pagination;
-  };
+  const result = (await orderService.getAllOrders(params)) as { data: AdminOrder[]; pagination: Pagination };
 
   return (
     <>
-      <PageHeader title="Orders" description="Track your purchases and their status." />
-      <OrdersList key={status} status={status} initialPage={toInitialPage(result, LIMIT)} limit={LIMIT} />
+      <PageHeader title="Orders" description="Follow every order from payment to delivery." />
+      <OrdersTable
+        key={filtersKey(filters)}
+        filters={filters}
+        params={params}
+        initialPage={toInitialPage(result, LIMIT)}
+        limit={LIMIT}
+      />
     </>
   );
 }

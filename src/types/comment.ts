@@ -46,3 +46,29 @@ export interface MyComment {
   product?: { _id: Id; title: string } | null;
   createdAt?: ISODate;
 }
+
+/* ---------- admin ---------- */
+
+export type AdminCommentStatusFilter = "all" | Exclude<CommentStatus, "deleted">;
+
+export interface AdminComment {
+  _id: Id;
+  body: string;
+  rating: number | null;
+  status: CommentStatus;
+  user?: { _id: Id; username?: string; phone?: string } | null;
+  product?: { _id: Id; title: string; images?: string[] } | null;
+  moderation?: { rejectReason?: string | null } | null;
+  createdAt?: ISODate;
+}
+
+export interface ModerateCommentPayload {
+  id: Id;
+  status: "approved" | "rejected" | "spam";
+  reason?: string;
+}
+
+export interface ReplyCommentPayload {
+  id: Id;
+  body: string;
+}

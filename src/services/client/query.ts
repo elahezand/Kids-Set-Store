@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   type QueryKey,
   useInfiniteQuery,
@@ -88,6 +89,21 @@ export const useInfiniteGet = <TItem>(
     staleTime: 5 * 60 * 1000,
     ...rest,
   });
+};
+
+const flattenPages = <TItem>(pages?: Array<Paginated<TItem>>) => pages?.flatMap((page) => page.data ?? []) ?? [];
+
+/** "Load more" list seeded with the page the server already rendered: returns the flat `items` too. */
+export const useCursorList = <TItem>(
+  url: string,
+  key: readonly unknown[],
+  params: Record<string, unknown>,
+  initialPage: Paginated<TItem>,
+  errorFallback: string
+) => {
+  const result = useInfiniteGet<TItem>(url, params, { queryKey: key, initialPage, errorFallback });
+  const items = useMemo(() => flattenPages(result.data?.pages), [result.data]);
+  return { ...result, items };
 };
 
 export interface MutationOptions<TResponse, TVariables> extends Omit<

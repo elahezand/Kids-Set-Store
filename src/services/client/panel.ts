@@ -1,11 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { queryKeys } from "@/services/client/keys";
-import { useDelete, useGet, useInfiniteGet, usePatch, usePost } from "@/services/client/query";
+import { useCursorList, useDelete, useGet, usePatch, usePost } from "@/services/client/query";
 import { ROUTES } from "@/utils/constants";
 import type {
   ApiSuccess,
@@ -22,20 +21,6 @@ import type {
   TicketStatusFilter,
   TicketSummary,
 } from "@/types";
-
-const flattenPages = <TItem>(pages?: Array<Paginated<TItem>>) => pages?.flatMap((page) => page.data ?? []) ?? [];
-
-const useCursorList = <TItem>(
-  url: string,
-  key: readonly unknown[],
-  params: Record<string, unknown>,
-  initialPage: Paginated<TItem>,
-  errorFallback: string
-) => {
-  const result = useInfiniteGet<TItem>(url, params, { queryKey: key, initialPage, errorFallback });
-  const items = useMemo(() => flattenPages(result.data?.pages), [result.data]);
-  return { ...result, items };
-};
 
 const statusParams = (limit: number, status: string) => (status === "all" ? { limit } : { limit, status });
 

@@ -23,3 +23,16 @@ export interface ProfileFormValues {
   newPassword?: string;
   confirmPassword?: string;
 }
+
+/* ---------- admin ---------- */
+
+export type UserRoleFilter = "all" | UserRole;
+
+export interface AdminUser extends SessionUser {
+  joinedAt?: ISODate;
+  lastLoginAt?: ISODate | null;
+  lastDevice?: string | null;
+  activeSessions?: number;
+  ordersCount?: number;
+  isBanned?: boolean;
+}

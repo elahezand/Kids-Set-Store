@@ -42,7 +42,7 @@ export interface ProductView {
 export type ProductCardData = Pick<
   ProductView,
   "_id" | "name" | "img" | "price" | "originalPrice" | "score" | "variantsCount" | "defaultVariantId" | "inStock"
->;
+> & { hoverImg: string | null };
 
 export interface ProductDoc {
   _id: unknown;
@@ -66,4 +66,53 @@ export interface ProductDoc {
   specs?: Record<string, string> | Map<string, string>;
   categoryPath?: Array<unknown>;
   status?: string;
+}
+
+/* ---------- admin ---------- */
+
+export type ProductStatus = "draft" | "active" | "inactive";
+export type ProductStatusFilter = "all" | ProductStatus;
+
+export interface AdminProduct {
+  _id: Id;
+  title: string;
+  slug?: string | null;
+  description: string;
+  images: string[];
+  minPrice?: number;
+  status: ProductStatus | "deleted" | string;
+  tags?: string[];
+  specs?: Record<string, string>;
+  categoryPath?: Array<{ _id: Id; title?: string; name?: string } | Id>;
+  variants: Array<{
+    _id?: Id;
+    sku: string;
+    attributes: VariantAttributes;
+    price: number;
+    discount?: number;
+    finalPrice?: number;
+    stock?: number;
+  }>;
+  metrics?: { views?: number; sold?: number; score?: number; reviewsCount?: number };
+  createdAt?: string;
+}
+
+/* body of POST / PUT /api/admin/products (validators/product createProductSchema) */
+export interface ProductPayload {
+  title: string;
+  description: string;
+  categoryPath: Id[];
+  images?: string[];
+  tags: string[];
+  specs: Record<string, string>;
+  status?: ProductStatus;
+  variants: Array<{
+    _id?: Id;
+    attributes: VariantAttributes;
+    sku: string;
+    price: number;
+    discount: number;
+    finalPrice: number;
+    stock: number;
+  }>;
 }

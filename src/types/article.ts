@@ -45,3 +45,26 @@ export interface ArticleListQuery {
   category?: string;
   limit?: number | string;
 }
+
+/* ---------- admin ---------- */
+
+export type ArticleStatusFilter = "all" | "published" | "draft";
+
+export interface AdminArticle extends ArticleSummary {
+  isPublished: boolean;
+}
+
+export interface AdminArticleDetail extends AdminArticle {
+  content: string;
+}
+
+/* body of POST / PUT /api/admin/article (validators/article createArticleSchema) */
+export interface ArticlePayload {
+  title: string;
+  slug?: string;
+  excerpt: string;
+  content: string;
+  category: Id | null;
+  cover: string | null;
+  isPublished: boolean;
+}

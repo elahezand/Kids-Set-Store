@@ -78,9 +78,20 @@ export const toProductCard = (product: ProductDoc | null | undefined): ProductCa
   const view = toProductView(product);
   if (!view) return null;
 
-  const { _id, name, img, price, originalPrice, score, variantsCount, defaultVariantId, inStock } = view;
+  const { _id, name, img, images, price, originalPrice, score, variantsCount, defaultVariantId, inStock } = view;
 
-  return { _id, name, img, price, originalPrice, score, variantsCount, defaultVariantId, inStock };
+  return {
+    _id,
+    name,
+    img,
+    hoverImg: images[1] ?? null,
+    price,
+    originalPrice,
+    score,
+    variantsCount,
+    defaultVariantId,
+    inStock,
+  };
 };
 
 export const toProductCards = (products: ProductDoc[] = []): ProductCardData[] =>

@@ -10,6 +10,7 @@ import {
   LuUserCog,
   LuUsers,
 } from "react-icons/lu";
+import { ROUTES } from "@/utils/constants";
 import type { IconType } from "react-icons";
 
 export type PanelVariant = "admin" | "user";
@@ -30,28 +31,29 @@ export interface PanelNav {
 export const panelNav: Record<PanelVariant, PanelNav> = {
   admin: {
     title: "Admin Panel",
-    home: "/dashboard/admin",
+    home: ROUTES.admin.home,
     links: [
-      { href: "/dashboard/admin", label: "Dashboard", icon: LuLayoutDashboard, exact: true },
-      { href: "/dashboard/admin/products", label: "Products", icon: LuPackage },
-      { href: "/dashboard/admin/users", label: "Users", icon: LuUsers },
-      { href: "/dashboard/admin/comments", label: "Comments", icon: LuMessageSquare },
-      { href: "/dashboard/admin/articles", label: "Articles", icon: LuNewspaper },
-      { href: "/dashboard/admin/tickets", label: "Tickets", icon: LuTicket },
-      { href: "/dashboard/admin/discounts", label: "Discounts", icon: LuBadgePercent },
-      { href: "/dashboard/admin/detail-account", label: "Account", icon: LuUserCog },
+      { href: ROUTES.admin.home, label: "Dashboard", icon: LuLayoutDashboard, exact: true },
+      { href: ROUTES.admin.orders, label: "Orders", icon: LuShoppingBag },
+      { href: ROUTES.admin.products, label: "Products", icon: LuPackage },
+      { href: ROUTES.admin.users, label: "Users", icon: LuUsers },
+      { href: ROUTES.admin.comments, label: "Comments", icon: LuMessageSquare },
+      { href: ROUTES.admin.articles, label: "Articles", icon: LuNewspaper },
+      { href: ROUTES.admin.tickets, label: "Tickets", icon: LuTicket },
+      { href: ROUTES.admin.discounts, label: "Discounts", icon: LuBadgePercent },
+      { href: ROUTES.admin.account, label: "Account", icon: LuUserCog },
     ],
   },
   user: {
     title: "My Account",
-    home: "/dashboard",
+    home: ROUTES.dashboard.home,
     links: [
-      { href: "/dashboard", label: "Dashboard", icon: LuLayoutDashboard, exact: true },
-      { href: "/dashboard/orders", label: "Orders", icon: LuShoppingBag },
-      { href: "/dashboard/tickets", label: "Tickets", icon: LuTicket },
-      { href: "/dashboard/comments", label: "Comments", icon: LuMessageSquare },
-      { href: "/dashboard/favorites", label: "Favorites", icon: LuHeart },
-      { href: "/dashboard/detail-profile", label: "Profile", icon: LuUserCog },
+      { href: ROUTES.dashboard.home, label: "Dashboard", icon: LuLayoutDashboard, exact: true },
+      { href: ROUTES.dashboard.orders, label: "Orders", icon: LuShoppingBag },
+      { href: ROUTES.dashboard.tickets, label: "Tickets", icon: LuTicket },
+      { href: ROUTES.dashboard.comments, label: "Comments", icon: LuMessageSquare },
+      { href: ROUTES.dashboard.favorites, label: "Favorites", icon: LuHeart },
+      { href: ROUTES.dashboard.profile, label: "Profile", icon: LuUserCog },
     ],
   },
 };

@@ -12,16 +12,12 @@ import Stars from "@/components/modules/ui/stars";
 import { useDeleteMyComment, useMyComments } from "@/services/client/panel";
 import { ROUTES } from "@/utils/constants";
 import { formatDate } from "@/utils/format";
-import { COMMENT_TABS } from "@/utils/panelView";
-import type { CommentStatus, CommentStatusFilter, MyComment, Paginated } from "@/types";
+import { COMMENT_STATUS as STATUS, COMMENT_TABS } from "@/utils/panelView";
+import type { CommentStatusFilter, MyComment, Paginated } from "@/types";
 
-const STATUS: Record<CommentStatus, { label: string; badge: string }> = {
-  approved: { label: "Approved", badge: "badge-success" },
-  pending: { label: "Pending", badge: "badge-warning" },
-  rejected: { label: "Rejected", badge: "badge-danger" },
-  spam: { label: "Rejected", badge: "badge-danger" },
-  deleted: { label: "Deleted", badge: "badge-neutral" },
-};
+// customers see "spam" as a normal rejection
+const statusOf = (comment: MyComment) =>
+  STATUS[comment.status === "spam" ? "rejected" : comment.status] ?? STATUS.pending;
 
 interface CommentsListProps {
   initialPage: Paginated<MyComment>;
@@ -84,7 +80,7 @@ export default function CommentsList({ initialPage, limit, status }: CommentsLis
         <>
           <ul className="divide-y divide-gray-200 md:hidden dark:divide-white/5">
             {comments.map((comment) => {
-              const status = STATUS[comment.status] ?? STATUS.pending;
+              const status = statusOf(comment);
               return (
                 <li key={String(comment._id)} className="space-y-2 px-4 py-4">
                   <div className="flex items-start justify-between gap-3">
@@ -116,7 +112,7 @@ export default function CommentsList({ initialPage, limit, status }: CommentsLis
               </thead>
               <tbody>
                 {comments.map((comment) => {
-                  const status = STATUS[comment.status] ?? STATUS.pending;
+                  const status = statusOf(comment);
                   return (
                     <tr key={String(comment._id)}>
                       <td className="max-w-[260px] truncate">{productLink(comment)}</td>

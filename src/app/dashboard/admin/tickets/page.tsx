@@ -1,42 +1,32 @@
-import type { Metadata } from "next";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import TicketsList from "@/components/template/p-user/tickets/ticketsList";
-import SendTicket from "@/components/template/p-user/tickets/sendTicket";
-import ticketService from "@/services/server/user/ticket";
-import { getPanelSession } from "@/utils/auth/panelUser";
+import TicketsTable from "@/components/template/p-admin/tickets/ticketsTable";
+import ticketService from "@/services/server/admin/ticket";
+import { adminListParams, filtersKey, readAdminFilters } from "@/utils/adminFilters";
 import { toInitialPage } from "@/utils/initialPage";
-import { pickStatus } from "@/utils/panelStatus";
-import { TICKET_TABS, tabValues } from "@/utils/panelView";
-import type { PageProps, Pagination } from "@/types";
-import { TicketSummary } from "@/types/ticket";
+import { tabValues, TICKET_TABS } from "@/utils/panelView";
+import type { Metadata } from "next";
+import type { AdminTicket, PageProps, Pagination } from "@/types";
 
 export const metadata: Metadata = { title: "Support tickets" };
 
-const LIMIT = 10;
+const LIMIT = 15;
 
-export default async function TicketsPage({ searchParams }: PageProps) {
-  const { user } = await getPanelSession();
-  if (!user) return null;
+export default async function AdminTicketsPage({ searchParams }: PageProps) {
+  const filters = readAdminFilters(await searchParams, tabValues(TICKET_TABS));
+  const params = adminListParams.tickets(LIMIT, filters);
 
-  const status = pickStatus(await searchParams, tabValues(TICKET_TABS));
-
-  const result = (await ticketService.getMyTickets(user._id, { limit: LIMIT, status })) as {
-    data: TicketSummary[];
-    pagination: Pagination;
-  };
+  const result = (await ticketService.getAllTickets(params)) as { data: AdminTicket[]; pagination: Pagination };
 
   return (
     <>
-      <PageHeader title="Support tickets" description="Ask questions and follow up on your requests." />
-
-      <div className="grid items-start gap-6 xl:grid-cols-5">
-        <div className="xl:order-2 xl:col-span-2">
-          <SendTicket />
-        </div>
-        <div className="min-w-0 xl:order-1 xl:col-span-3">
-          <TicketsList key={status} status={status} initialPage={toInitialPage(result, LIMIT)} limit={LIMIT} />
-        </div>
-      </div>
+      <PageHeader title="Support tickets" description="Answer customer questions. Waiting tickets need a reply." />
+      <TicketsTable
+        key={filtersKey(filters)}
+        filters={filters}
+        params={params}
+        initialPage={toInitialPage(result, LIMIT)}
+        limit={LIMIT}
+      />
     </>
   );
 }

@@ -1,36 +1,32 @@
-import type { Metadata } from "next";
 import PageHeader from "@/components/modules/panel/pageHeader";
-import CommentsList from "@/components/template/p-user/comments/commentsList";
-import commentService from "@/services/server/user/comment";
-import { getPanelSession } from "@/utils/auth/panelUser";
+import CommentsTable from "@/components/template/p-admin/comments/commentsTable";
+import commentService from "@/services/server/admin/comment";
+import { adminListParams, filtersKey, readAdminFilters } from "@/utils/adminFilters";
 import { toInitialPage } from "@/utils/initialPage";
-import { pickStatus } from "@/utils/panelStatus";
-import { COMMENT_TABS, tabValues } from "@/utils/panelView";
-import type { MyComment, PageProps, Pagination } from "@/types";
+import { ADMIN_COMMENT_TABS, tabValues } from "@/utils/panelView";
+import type { Metadata } from "next";
+import type { AdminComment, PageProps, Pagination } from "@/types";
 
 export const metadata: Metadata = { title: "Comments" };
 
-const LIMIT = 10;
+const LIMIT = 15;
 
-export default async function CommentsPage({ searchParams }: PageProps) {
-  const { user } = await getPanelSession();
-  if (!user) return null;
+export default async function AdminCommentsPage({ searchParams }: PageProps) {
+  const filters = readAdminFilters(await searchParams, tabValues(ADMIN_COMMENT_TABS));
+  const params = adminListParams.comments(LIMIT, filters);
 
-  // ?status=approved -> "approved"; missing / unknown -> "all" (no filter)
-  const status = pickStatus(await searchParams, tabValues(COMMENT_TABS));
-
-  const result = (await commentService.getMine(user._id, {
-    limit: LIMIT,
-    ...(status !== "all" && { status }),
-  })) as {
-    data: MyComment[];
-    pagination: Pagination;
-  };
+  const result = (await commentService.getAdmin(params)) as { data: AdminComment[]; pagination: Pagination };
 
   return (
     <>
-      <PageHeader title="Comments" description="Reviews you've written on products." />
-      <CommentsList key={status} status={status} initialPage={toInitialPage(result, LIMIT)} limit={LIMIT} />
+      <PageHeader title="Comments" description="Review what customers write before it goes live, and reply to them." />
+      <CommentsTable
+        key={filtersKey(filters)}
+        filters={filters}
+        params={params}
+        initialPage={toInitialPage(result, LIMIT)}
+        limit={LIMIT}
+      />
     </>
   );
 }

@@ -11,4 +11,16 @@ export const queryKeys = {
   myTickets: (filters: object = {}) => ["my-tickets", filters] as const,
   departments: ["departments"] as const,
   notifications: ["notifications"] as const,
+  admin: {
+    all: ["admin"] as const,
+    stats: (days: number) => ["admin", "stats", days] as const,
+    orders: (filters: object = {}) => ["admin", "orders", filters] as const,
+    products: (filters: object = {}) => ["admin", "products", filters] as const,
+    users: (filters: object = {}) => ["admin", "users", filters] as const,
+    comments: (filters: object = {}) => ["admin", "comments", filters] as const,
+    articles: (filters: object = {}) => ["admin", "articles", filters] as const,
+    tickets: (filters: object = {}) => ["admin", "tickets", filters] as const,
+    coupons: (filters: object = {}) => ["admin", "coupons", filters] as const,
+    categoryFilters: (slug: string) => ["admin", "category-filters", slug] as const,
+  },
 };

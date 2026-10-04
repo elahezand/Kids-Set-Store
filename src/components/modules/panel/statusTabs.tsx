@@ -10,10 +10,12 @@ export interface StatusTab<T extends string> {
 interface StatusTabsProps<T extends string> {
   tabs: ReadonlyArray<StatusTab<T>>;
   value: T;
+  /** query param the tabs write to (default `status`) */
+  param?: string;
 }
 
-export default function StatusTabs<T extends string>({ tabs, value }: StatusTabsProps<T>) {
-  const { update, isPending } = useQueryParams<"status">();
+export default function StatusTabs<T extends string>({ tabs, value, param = "status" }: StatusTabsProps<T>) {
+  const { update, isPending } = useQueryParams<string>();
 
   return (
     <div className="-mx-1 max-w-full overflow-x-auto px-1">
@@ -27,7 +29,7 @@ export default function StatusTabs<T extends string>({ tabs, value }: StatusTabs
               role="tab"
               aria-selected={active}
               disabled={isPending}
-              onClick={() => update({ status: tab.value === "all" ? null : tab.value })}
+              onClick={() => update({ [param]: tab.value === "all" ? null : tab.value })}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors sm:text-sm ${
                 active
                   ? "bg-white text-sage-700 shadow-card dark:bg-ink-800 dark:text-sage-300"

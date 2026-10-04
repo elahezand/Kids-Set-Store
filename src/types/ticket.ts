@@ -54,3 +54,9 @@ export interface CreateTicketPayload {
 export interface TicketReplyPayload {
   content: string;
 }
+
+/* ---------- admin ---------- */
+
+export interface AdminTicket extends TicketSummary {
+  user?: { _id: Id; username?: string; phone?: string; email?: string } | null;
+}
