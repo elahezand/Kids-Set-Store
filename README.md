@@ -38,18 +38,18 @@ src/
 ├─ configs/                      db.js (mongoose connection), redis.js
 ├─ model/                        mongoose models
 ├─ services/
-│  ├─ client/                    browser: React Query hooks over /api (cart, favorite, auth, panel, ...)
+│  ├─ client/                    browser: React Query hooks over /api (cart, favorite, auth, panel, admin, ...)
 │  └─ server/                    business logic used by api routes and server pages
 │     └─ admin/ public/ user/ shared/
 ├─ types/                        shared TypeScript types (import from "@/types")
 ├─ validators/                   zod schemas, one file per domain
 └─ utils/
-   ├─ constants.ts               ROUTES, SITE_URL, DEFAULT_AVATAR, PLACEHOLDER_IMAGE
+   ├─ constants.ts               ROUTES (incl. ROUTES.admin), SITE_URL, DEFAULT_AVATAR, PLACEHOLDER_IMAGE
    ├─ auth/  providers/  hooks/  actions/
-   └─ format, productView, articleView, panelView, share, searchParams, ...
+   └─ format, productView, articleView, panelView, adminFilters, productForm, share, searchParams, ...
 ```
 
-Main site and user dashboard are written in TypeScript (`.ts` / `.tsx`); the API, models and
+Main site and both dashboards (user + admin) are written in TypeScript (`.ts` / `.tsx`); the API, models and
 server services are JavaScript.
 
 **Naming rule:** one domain = one name everywhere:
@@ -66,7 +66,15 @@ server services are JavaScript.
 - Formatting: Prettier (`.prettierrc.json`) — `npx prettier --write "src/**/*.{ts,tsx}"`.
 - API route pattern: `connectToDB()` → auth guard → `validate(schema, body)` → service → `NextResponse`.
 - Services return `{ success, status?, message?, data? }`; routes turn that into HTTP.
-- Dashboard tables use `paginatePage` (`?page=`), lists with "load more" use cursor `paginate`.
+- Every list (storefront, user panel, admin panel) uses the cursor `paginate` + a "Load more" button.
+  Panel pages render the first page on the server (service → `toInitialPage`) and the client list
+  continues it through the matching `/api` route (`useCursorList`).
+- Admin tables: `?status=` (or `?role=`) tabs + `?q=` search, read with `readAdminFilters` and turned into
+  API params with `adminListParams.<list>` — the server page and the client list share that object.
+- Admin changes go through `services/client/admin.ts` (toast → invalidate `queryKeys.admin.*` → `router.refresh()`).
+- Images (product photos, article covers) are uploaded to `POST /api/admin/upload` first; the returned paths
+  are then sent as JSON to the product / article API.
+- Route guards must reject expired sessions too: `if (!user || user.status === "expired")`.
 - Dynamic route folder names must match what the handler reads (`[productId]` ↔ `const { productId } = await params`).
 
 ## Styling
