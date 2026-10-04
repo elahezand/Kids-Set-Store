@@ -9,7 +9,7 @@ export async function PATCH(request, { params }) {
         await connectToDB();
 
         const admin = await authAdmin();
-        if (!admin) return jsonError("Unauthorized", 401);
+        if (!admin || admin.status === "expired") return jsonError("Unauthorized", 401);
 
         const { id } = await params;
 

@@ -8,7 +8,7 @@ export async function GET() {
         await connectToDB();
 
         const admin = await authAdmin();
-        if (!admin) return jsonError("Unauthorized", 401);
+        if (!admin || admin.status === "expired") return jsonError("Unauthorized", 401);
 
         const result = await userService.getAdmins();
 

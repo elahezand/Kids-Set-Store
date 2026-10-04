@@ -1,41 +1,28 @@
 import connectToDB from "@/configs/db";
 import { authAdmin } from "@/utils/auth/authGuard";
+import validate from "@/utils/validate";
 import commentService from "@/services/server/admin/comment";
-import { jsonError, handleRouteError, respond } from "@/utils/apiResponse";
+import { adminCommentsQuerySchema } from "@/validators/comment";
+import { handleRouteError, jsonError, paginated, validationError } from "@/utils/apiResponse";
 
+/* GET /api/admin/comments?status=&productId=&userId=&q=&limit=&cursor= */
 export async function GET(req) {
     try {
         await connectToDB();
 
         const admin = await authAdmin();
 
-        if (!admin) {
-            return jsonError(
-                "Admin access required",
-                401
-            );
+        if (!admin || admin.status === "expired") {
+            return jsonError("Admin access required", 401);
         }
 
-        const { searchParams } =
-            new URL(req.url);
+        const { searchParams } = new URL(req.url);
+        const result = validate(adminCommentsQuerySchema, Object.fromEntries(searchParams.entries()));
 
-        const query = Object.fromEntries(
-            searchParams.entries()
-        );
+        if (!result.success) return validationError(result.errors);
 
-        const result =
-            await commentService.getAdmin(
-                query
-            );
-
-        return respond(
-            result,
-            { status: 200 }
-        );
+        return paginated(await commentService.getAdmin(result.data));
     } catch (err) {
-        return handleRouteError(
-            err,
-            "GET /api/admin/comments"
-        );
+        return handleRouteError(err, "GET /api/admin/comments");
     }
 }

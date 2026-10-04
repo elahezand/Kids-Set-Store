@@ -10,6 +10,14 @@ export const ticketValidationSchema = z.object({
     content: z.string().trim().min(5, "Message is too short").max(5000, "Message is too long"),
 });
 
+/* GET /api/admin/tickets */
+export const adminTicketsQuerySchema = z.object({
+    status: z.enum(["waiting", "answered"]).optional().catch(undefined),
+    q: z.string().trim().max(100).optional(),
+    limit: z.coerce.number().int().min(1).max(50).catch(15),
+    cursor: z.string().trim().min(1).optional().catch(undefined),
+});
+
 /* POST /api/user/tickets/:id/answer */
 export const ticketReplySchema = z.object({
     content: z.string().trim().min(3, "Message is too short").max(5000, "Message is too long"),

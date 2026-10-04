@@ -12,7 +12,7 @@ export async function PUT(req, { params }) {
 
     const admin = await authAdmin();
 
-    if (!admin) {
+    if (!admin || admin.status === "expired") {
       return jsonError(
         "Admin access required",
         401

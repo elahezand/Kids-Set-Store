@@ -11,6 +11,7 @@ import {
     completeDeliveredOrder,
     refreshExpectedDelivery,
     setItemDeliveryEstimate,
+    assertShippable,
 } from "@/services/server/shared/order";
 
 import {
@@ -105,6 +106,7 @@ const getAllOrders = async (query = {}) => {
         limit,
         cursor: query.cursor,
         filters,
+        populate: { path: "user", select: "username phone" },
         sort: {
             _id: -1,
         },
@@ -166,14 +168,8 @@ const adminShipItem = async (
         };
     }
 
-    if (!item.needsAdminShipment) {
-        return {
-            success: false,
-            status: 403,
-            message:
-                "This item belongs to a seller — only they can mark it as shipped",
-        };
-    }
+    // throws AppError(400) for "created" / "cancelled" orders
+    assertShippable(order);
 
     markItemShipped(
         item,

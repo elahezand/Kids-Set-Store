@@ -9,7 +9,7 @@ export async function GET(request) {
         await connectToDB();
 
         const user = await authUser();
-        if (!user) return jsonError("Unauthorized", 401);
+        if (!user || user.status === "expired") return jsonError("Unauthorized", 401);
 
         const query = Object.fromEntries(new URL(request.url).searchParams.entries());
         const result = await notificationService.getAll(user._id, query);

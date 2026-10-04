@@ -1,82 +1,90 @@
 import connectToDB from "@/configs/db";
-import {
-    replyCommentSchema,
-} from "@/validators/comment";
+import { deleteCommentSchema, moderateCommentSchema, replyCommentSchema } from "@/validators/comment";
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
 import validateObjectId from "@/utils/validateObjectId";
 import commentService from "@/services/server/admin/comment";
-import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
+import { fromService, handleRouteError, jsonError, validationError } from "@/utils/apiResponse";
 
+// Every handler here: admin + valid id
+const guard = async (params) => {
+    const admin = await authAdmin();
+
+    if (!admin || admin.status === "expired") {
+        return { error: jsonError("Admin access required", 401) };
+    }
+
+    const { id } = await params;
+
+    if (!validateObjectId(id)) {
+        return { error: jsonError("Comment not found", 404) };
+    }
+
+    return { admin, id };
+};
+
+const readBody = (req) => req.json().catch(() => null);
+
+/* POST /api/admin/comments/:id  { body } — reply to a review (approves it when pending) */
 export async function POST(req, { params }) {
     try {
         await connectToDB();
-        const admin = await authAdmin();
 
-        if (!admin) {
-            return jsonError(
-                "Admin access required",
-                401
-            );
-        }
+        const { admin, id, error } = await guard(params);
+        if (error) return error;
 
-        const { id } = await params;
+        const body = await readBody(req);
+        if (!body) return jsonError("Invalid JSON body", 400);
 
-        if (!validateObjectId(id)) {
-            return jsonError(
-                "Comment not found",
-                404
-            );
-        }
+        const result = validate(replyCommentSchema, body);
+        if (!result.success) return validationError(result.errors);
 
-        const body = await req.json().catch(
-            () => null
-        );
-
-        if (!body) {
-            return jsonError(
-                "Invalid JSON body",
-                400
-            );
-        }
-
-        const result = validate(
-            replyCommentSchema,
-            body
-        );
-
-        if (!result.success) {
-            return validationError(
-                result.errors
-            );
-        }
-
-        const resultService =
-            await commentService.replyToComment(
-                admin._id,
-                id,
-                result.data.body
-            );
-
-        if (!resultService.success) {
-            return jsonError(
-                resultService.message,
-                resultService.status
-            );
-        }
-
-        return respond(
-            {
-                message:
-                    "Reply added successfully",
-                data: resultService.data,
-            },
-            { status: 201 }
-        );
+        return fromService(await commentService.replyToComment(admin._id, id, result.data.body), {
+            status: 201,
+            message: "Reply added successfully",
+        });
     } catch (err) {
-        return handleRouteError(
-            err,
-            "POST /api/admin/comments/:id"
-        );
+        return handleRouteError(err, "POST /api/admin/comments/:id");
+    }
+}
+
+/* PUT /api/admin/comments/:id  { status, reason? } — approve / reject / spam */
+export async function PUT(req, { params }) {
+    try {
+        await connectToDB();
+
+        const { admin, id, error } = await guard(params);
+        if (error) return error;
+
+        const body = await readBody(req);
+        if (!body) return jsonError("Invalid JSON body", 400);
+
+        const result = validate(moderateCommentSchema, body);
+        if (!result.success) return validationError(result.errors);
+
+        return fromService(await commentService.moderate(id, admin._id, result.data), {
+            message: "Comment status updated",
+        });
+    } catch (err) {
+        return handleRouteError(err, "PUT /api/admin/comments/:id");
+    }
+}
+
+/* DELETE /api/admin/comments/:id  { reason? } — soft delete */
+export async function DELETE(req, { params }) {
+    try {
+        await connectToDB();
+
+        const { admin, id, error } = await guard(params);
+        if (error) return error;
+
+        const result = validate(deleteCommentSchema, (await readBody(req)) ?? {});
+        if (!result.success) return validationError(result.errors);
+
+        return fromService(await commentService.adminDelete(id, admin._id, result.data.reason), {
+            message: "Comment deleted",
+        });
+    } catch (err) {
+        return handleRouteError(err, "DELETE /api/admin/comments/:id");
     }
 }

@@ -18,7 +18,7 @@ export async function GET(request) {
 
         const admin = await authAdmin();
 
-        if (!admin) {
+        if (!admin || admin.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 
@@ -49,7 +49,7 @@ export async function POST(request) {
         await connectToDB();
         const admin = await authAdmin();
 
-        if (!admin) {
+        if (!admin || admin.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 

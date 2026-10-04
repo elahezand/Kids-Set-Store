@@ -10,7 +10,7 @@ export async function DELETE(request, { params }) {
 
         const user = await authUser();
 
-        if (!user) {
+        if (!user || user.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 

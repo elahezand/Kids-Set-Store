@@ -8,7 +8,7 @@ import productService from "@/services/server/admin/product";
 
 import { handleRouteError, jsonError, validationError, respond } from "@/utils/apiResponse";
 
-import { updateProductSchema } from "@/validators/product";
+import { changeProductStatusSchema, updateProductSchema } from "@/validators/product";
 
 export async function GET(request, { params }) {
     try {
@@ -16,7 +16,7 @@ export async function GET(request, { params }) {
 
         const admin = await authAdmin();
 
-        if (!admin) {
+        if (!admin || admin.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 
@@ -50,7 +50,7 @@ export async function PUT(request, { params }) {
 
         const admin = await authAdmin();
 
-        if (!admin) {
+        if (!admin || admin.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 
@@ -99,7 +99,7 @@ export async function DELETE(request, { params }) {
 
         const admin = await authAdmin();
 
-        if (!admin) {
+        if (!admin || admin.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 
@@ -132,7 +132,7 @@ export async function PATCH(request, { params }) {
 
         const admin = await authAdmin();
 
-        if (!admin) {
+        if (!admin || admin.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 

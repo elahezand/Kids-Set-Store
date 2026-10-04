@@ -17,7 +17,7 @@ export async function GET() {
         await connectToDB();
 
         const user = await authUser();
-        if (!user) {
+        if (!user || user.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 
@@ -40,7 +40,7 @@ export async function POST(request) {
 
         const user = await authUser();
 
-        if (!user) {
+        if (!user || user.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 
@@ -75,7 +75,7 @@ export async function PATCH(request) {
 
         const user = await authUser();
 
-        if (!user) {
+        if (!user || user.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 
@@ -109,7 +109,7 @@ export async function DELETE(request) {
 
         const user = await authUser();
 
-        if (!user) {
+        if (!user || user.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 

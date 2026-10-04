@@ -4,7 +4,8 @@ import { paginateList } from "@/utils/listQuery";
 /* GET /api/admin/comments?status=&productId=&userId=&q=&limit=&cursor= (reviews only, not replies) */
 const getAdmin = async (query = {}) =>
     paginateList(Comment, query, {
-        base: { parentId: null },
+        // deleted reviews are hidden unless ?status=deleted asks for them
+        base: { parentId: null, status: { $ne: "deleted" } },
         statuses: ["pending", "approved", "rejected", "spam", "deleted"],
         search: ["body"],
         ids: { productId: "product", userId: "user" },
@@ -84,7 +85,7 @@ const moderate = async (id, adminId, data) => {
         data.status === "spam"
     ) {
         update["moderation.rejectReason"] =
-            data.rejectReason || null;
+            data.reason || data.rejectReason || null;
     }
 
     if (data.status === "deleted") {
@@ -129,7 +130,7 @@ const adminDelete = async (id, adminId, reason) => {
             moderation: {
                 moderatedBy: adminId,
                 moderatedAt: now,
-                reason,
+                rejectReason: reason || null,
             },
         },
         { new: true }

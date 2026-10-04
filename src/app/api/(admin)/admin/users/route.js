@@ -1,19 +1,23 @@
 import connectToDB from "@/configs/db";
 import { authAdmin } from "@/utils/auth/authGuard";
 import userService from "@/services/server/admin/user";
-import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
+import validate from "@/utils/validate";
+import { adminUsersQuerySchema, createUserSchema } from "@/validators/user";
+import { handleRouteError, jsonError, respond, validationError } from "@/utils/apiResponse";
 
 export async function GET(request) {
     try {
         await connectToDB();
 
         const admin = await authAdmin();
-        if (!admin) return jsonError("Unauthorized", 401);
+        if (!admin || admin.status === "expired") return jsonError("Unauthorized", 401);
 
         const { searchParams } = new URL(request.url);
-        const query = Object.fromEntries(searchParams.entries());
+        const query = validate(adminUsersQuerySchema, Object.fromEntries(searchParams.entries()));
 
-        const result = await userService.getAllUsers(query);
+        if (!query.success) return validationError(query.errors);
+
+        const result = await userService.getAllUsers(query.data);
 
         return respond({
             success: true,
@@ -30,7 +34,7 @@ export async function POST(request) {
         await connectToDB();
 
         const admin = await authAdmin();
-        if (!admin) return jsonError("Unauthorized", 401);
+        if (!admin || admin.status === "expired") return jsonError("Unauthorized", 401);
 
         const body = await request.json();
         const result = validate(createUserSchema, body);

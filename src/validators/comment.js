@@ -66,6 +66,7 @@ export const adminCommentsQuerySchema = z.object({
     .catch(undefined),
   productId: objectId("Invalid product").optional().catch(undefined),
   userId: objectId("Invalid user").optional().catch(undefined),
+  q: z.string().trim().max(100).optional(),
   limit: limit(20),
   cursor,
 });
@@ -80,6 +81,11 @@ export const moderateCommentSchema = z
     (data) => ["approved", "spam"].includes(data.status) || Boolean(data.reason),
     { message: "A reason is required", path: ["reason"] }
   );
+
+/* DELETE /api/admin/comments/:id */
+export const deleteCommentSchema = z.object({
+  reason: z.string().trim().max(500).optional(),
+});
 
 /* POST /api/admin/comments/:id: reply to a review */
 export const replyCommentSchema = z.object({

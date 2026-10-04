@@ -14,7 +14,7 @@ export async function GET(request) {
         await connectToDB();
 
         const user = await currentUser();
-        if (!user) return jsonError("Unauthorized", 401);
+        if (!user || user.status === "expired") return jsonError("Unauthorized", 401);
 
         const query = Object.fromEntries(new URL(request.url).searchParams.entries());
         return paginated(await ticketService.getMyTickets(user._id, query));
@@ -29,7 +29,7 @@ export async function POST(request) {
         await connectToDB();
 
         const user = await currentUser();
-        if (!user) return jsonError("Unauthorized", 401);
+        if (!user || user.status === "expired") return jsonError("Unauthorized", 401);
 
         const body = await request.json().catch(() => ({}));
         const result = await ticketService.createTicket(user._id, body);

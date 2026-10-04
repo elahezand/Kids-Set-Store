@@ -59,6 +59,7 @@ export const updateCouponSchema = z
 /* GET /api/admin/coupon */
 export const adminCouponsQuerySchema = z.object({
   search: z.string().trim().max(60).optional(),
+  q: z.string().trim().max(60).optional(),
   type: z.enum(["fixed", "percent"]).optional().catch(undefined),
   isActive: z.enum(["true", "false", "all"]).optional().catch(undefined),
   limit: z.coerce.number().int().min(1).max(50).catch(20),

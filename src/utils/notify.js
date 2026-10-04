@@ -8,7 +8,7 @@ const getNotificationModel = () => require("@/model/notification");
 const LINKS = Object.freeze({
     userOrders: "/dashboard/orders",
     userTickets: "/dashboard/tickets",
-    adminOrders: "/p-admin",
+    adminOrders: "/dashboard/admin/orders",
 });
 
 const notifyUser = async (userId, msg, { type = "manual", link = null } = {}) => {

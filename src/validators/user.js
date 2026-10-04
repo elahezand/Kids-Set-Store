@@ -43,6 +43,20 @@ export const resetPasswordSchema = z.object({
   password: strongPasswordSchema,
 });
 
+/* POST /api/admin/users — admin adds a user by phone (they sign in with an SMS code) */
+export const createUserSchema = z.object({
+  phone: phoneSchema,
+  role: z.array(z.enum(["USER", "ADMIN"])).optional(),
+});
+
+/* GET /api/admin/users?role=ADMIN|USER&q=&limit=&cursor= */
+export const adminUsersQuerySchema = z.object({
+  role: z.enum(["ADMIN", "USER"]).optional().catch(undefined),
+  q: z.string().trim().max(100).optional(),
+  limit: z.coerce.number().int().min(1).max(50).catch(20),
+  cursor: z.string().trim().min(1).optional().catch(undefined),
+});
+
 // Admin "edit user" modal — basic contact details only
 export const userUpdateSchema = z.object({
   username: z.string().min(2, "Username is too short"),

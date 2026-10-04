@@ -1,6 +1,6 @@
 const Order = require("@/model/order");
 const User = require("@/model/user");
-const { notifyUser } = require("@/utils/notify");
+const { notifyUser, NOTIFY_LINKS } = require("@/utils/notify");
 const logger = require("@/utils/logger");
 const { verifyPayment } = require("./zarinpal");
 const { walletSpentOn } = require("@/services/server/shared/wallet");
@@ -114,7 +114,7 @@ const flagOverdueCashOrders = async () => {
             await notifyUser(
                 admin._id,
                 `Cash order #${shortId} was shipped ${days} days ago and is still unconfirmed — mark it delivered or cancel it`,
-                { type: "cod_overdue", link: "/p-admin" }
+                { type: "cod_overdue", link: NOTIFY_LINKS.adminOrders }
             );
         }
 

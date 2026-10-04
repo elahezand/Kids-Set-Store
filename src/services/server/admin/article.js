@@ -1,5 +1,19 @@
 import Article from "@/model/article";
 import { paginateList } from "@/utils/listQuery";
+import slugify from "@/utils/slugify";
+
+/* slug typed by the admin, or one made from the title ("-2", "-3"... when it is taken) */
+const resolveSlug = async (title, wanted, excludeId = null) => {
+    const base = slugify(wanted || title) || `article-${Date.now()}`;
+    const taken = async (slug) =>
+        Article.exists({ slug, ...(excludeId ? { _id: { $ne: excludeId } } : {}) });
+
+    if (wanted) return (await taken(base)) ? null : base;
+
+    let slug = base;
+    for (let i = 2; await taken(slug); i++) slug = `${base}-${i}`;
+    return slug;
+};
 
 const getAllArticlesAdmin = async (query = {}) => {
     const filters = {};
@@ -14,7 +28,11 @@ const getAllArticlesAdmin = async (query = {}) => {
         defaultLimit: 15,
         search: ["title"],
         filters,
-        populate: { path: "category", select: "title slug" },
+        select: "-content",
+        populate: [
+            { path: "category", select: "title slug" },
+            { path: "author", select: "username" },
+        ],
         sort: { createdAt: -1 },
     });
 };
@@ -40,11 +58,9 @@ const getArticleByIdAdmin = async (id) => {
 };
 
 const createArticle = async (authorId, data) => {
-    const existing = await Article.findOne({
-        slug: data.slug,
-    });
+    const slug = await resolveSlug(data.title, data.slug);
 
-    if (existing) {
+    if (!slug) {
         return {
             success: false,
             status: 409,
@@ -55,6 +71,7 @@ const createArticle = async (authorId, data) => {
     try {
         const article = await Article.create({
             ...data,
+            slug,
             author: authorId,
         });
 
@@ -77,18 +94,17 @@ const createArticle = async (authorId, data) => {
 
 const updateArticle = async (id, data) => {
     if (data.slug) {
-        const existing = await Article.findOne({
-            slug: data.slug,
-            _id: { $ne: id },
-        });
+        const slug = await resolveSlug(data.title, data.slug, id);
 
-        if (existing) {
+        if (!slug) {
             return {
                 success: false,
                 status: 409,
                 message: "An article with this slug already exists",
             };
         }
+
+        data = { ...data, slug };
     }
 
     try {

@@ -3,19 +3,21 @@ import connectToDB from "@/configs/db";
 import { authAdmin } from "@/utils/auth/authGuard";
 import validate from "@/utils/validate";
 
-import statsService from "@/services/server/public/stats";
+import statsService from "@/services/server/admin/stats";
 
-import { handleRouteError, jsonError, validationError, respond } from "@/utils/apiResponse";
+import { fromService, handleRouteError, jsonError, validationError } from "@/utils/apiResponse";
 
 import { statsTimeseriesSchema } from "@/validators/stats";
 
+/* GET /api/admin/stat            -> dashboard counters + recent orders / tickets
+   GET /api/admin/stat?days=30    -> orders, revenue and new users per day */
 export async function GET(request) {
     try {
         await connectToDB();
 
         const admin = await authAdmin();
 
-        if (!admin) {
+        if (!admin || admin.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 
@@ -24,31 +26,16 @@ export async function GET(request) {
         const days = searchParams.get("days");
 
         if (days !== null) {
-            const result = validate(
-                statsTimeseriesSchema,
-                { days }
-            );
+            const result = validate(statsTimeseriesSchema, { days });
 
             if (!result.success) {
                 return validationError(result.errors);
             }
 
-            const serviceResult =
-                await statsService.getAdminStatsTimeseries(
-                    result.data.days
-                );
-
-            return respond({
-                data: serviceResult.data,
-            });
+            return fromService(await statsService.getStatsTimeseries(result.data.days));
         }
 
-        const serviceResult =
-            await statsService.getAdminStats();
-
-        return respond({
-            data: serviceResult.data,
-        });
+        return fromService(await statsService.getDashboard());
     } catch (error) {
         return handleRouteError(error);
     }

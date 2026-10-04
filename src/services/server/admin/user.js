@@ -48,9 +48,9 @@ const getAllUsers = async (query = {}) => {
         search: ["name", "username", "phone", "email"],
     });
 
-    if (query.role && query.role !== "all") {
-        filters.role = query.role;
-    }
+    // every admin is also a USER -> the "users" tab means "not an admin"
+    if (query.role === "ADMIN") filters.role = "ADMIN";
+    if (query.role === "USER") filters.role = { $ne: "ADMIN" };
 
     const result = await paginate(User, {
         limit: listLimit(query, 20, 50),
@@ -64,7 +64,7 @@ const getAllUsers = async (query = {}) => {
 
     if (!userIds.length) return result;
 
-    const [sessions, orderCounts] = await Promise.all([
+    const [sessions, orderCounts, bans] = await Promise.all([
         Session.find({ user: { $in: userIds } })
             .select("user userAgent ip lastUsedAt createdAt revokedAt")
             .sort({ lastUsedAt: -1 })
@@ -79,7 +79,13 @@ const getAllUsers = async (query = {}) => {
                 },
             },
         ]),
+
+        Ban.find({ phone: { $in: result.data.map((u) => u.phone) } })
+            .select("phone")
+            .lean(),
     ]);
+
+    const bannedPhones = new Set(bans.map((ban) => ban.phone));
 
     const lastSession = {};
 
@@ -118,6 +124,7 @@ const getAllUsers = async (query = {}) => {
             ).length,
 
             ordersCount: orders[String(user._id)] || 0,
+            isBanned: bannedPhones.has(user.phone),
         };
     });
 

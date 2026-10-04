@@ -11,7 +11,7 @@ export async function POST(req) {
 
         const admin = await authAdmin();
 
-        if (!admin) {
+        if (!admin || admin.status === "expired") {
             return jsonError(
                 "Admin access required",
                 401

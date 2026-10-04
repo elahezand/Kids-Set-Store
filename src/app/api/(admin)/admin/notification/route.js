@@ -15,7 +15,7 @@ export async function POST(request) {
 
         const admin = await authAdmin();
 
-        if (!admin) {
+        if (!admin || admin.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 

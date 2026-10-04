@@ -11,7 +11,7 @@ export async function GET(request) {
 
         const user = await authUser();
 
-        if (!user) {
+        if (!user || user.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 
@@ -38,7 +38,7 @@ export async function POST(request) {
 
         const user = await authUser();
 
-        if (!user) {
+        if (!user || user.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 

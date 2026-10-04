@@ -13,7 +13,7 @@ import { validationError, jsonError, handleRouteError, respond } from "@/utils/a
 const guard = async (params) => {
     const admin = await authAdmin();
 
-    if (!admin) {
+    if (!admin || admin.status === "expired") {
         return {
             error: jsonError(
                 "Admin access required",

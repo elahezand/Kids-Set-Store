@@ -13,7 +13,7 @@ import { updateArticleSchema } from "@/validators/article";
 const guard = async (id) => {
     const admin = await authAdmin();
 
-    if (!admin) {
+    if (!admin || admin.status === "expired") {
         return {
             error: jsonError("Unauthorized", 401),
         };

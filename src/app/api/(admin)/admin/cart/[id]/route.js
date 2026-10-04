@@ -13,7 +13,7 @@ export async function GET(request, { params }) {
 
         const admin = await authAdmin();
 
-        if (!admin) {
+        if (!admin || admin.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 
@@ -46,7 +46,7 @@ export async function DELETE(request, { params }) {
 
         const admin = await authAdmin();
 
-        if (!admin) {
+        if (!admin || admin.status === "expired") {
             return jsonError("Unauthorized", 401);
         }
 
