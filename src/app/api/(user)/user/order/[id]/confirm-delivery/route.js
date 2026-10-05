@@ -34,6 +34,7 @@ export async function PATCH(request, { params }) {
 
         return respond({
             success: true,
+            message: result.message,
             data: result.data,
         });
     } catch (error) {

@@ -94,7 +94,6 @@ const verify = async (authority) => {
         };
     }
 
-    // Payment failed
     if (!result.success) {
         claimed.finalizedAt = null;
         claimed.paymentStatus = "failed";
@@ -106,7 +105,6 @@ const verify = async (authority) => {
             data: claimed,
         };
     }
-
 
     claimed.paymentStatus = "paid";
     claimed.payment.refId = result.refId;

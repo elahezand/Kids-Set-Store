@@ -68,8 +68,6 @@ export interface ProductDoc {
   status?: string;
 }
 
-/* ---------- admin ---------- */
-
 export type ProductStatus = "draft" | "active" | "inactive";
 export type ProductStatusFilter = "all" | ProductStatus;
 
@@ -97,7 +95,6 @@ export interface AdminProduct {
   createdAt?: string;
 }
 
-/* body of POST / PUT /api/admin/products (validators/product createProductSchema) */
 export interface ProductPayload {
   title: string;
   description: string;

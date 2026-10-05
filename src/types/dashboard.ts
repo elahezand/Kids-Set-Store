@@ -22,8 +22,6 @@ export interface PanelNotification {
   createdAt?: string;
 }
 
-/* ---------- admin ---------- */
-
 export interface AdminDashboardCounts {
   users: number;
   products: number;

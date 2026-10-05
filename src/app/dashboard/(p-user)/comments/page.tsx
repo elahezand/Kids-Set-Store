@@ -3,8 +3,8 @@ import CommentsList from "@/components/template/p-user/comments/commentsList";
 import commentService from "@/services/server/user/comment";
 import { getPanelSession } from "@/utils/auth/panelUser";
 import { toInitialPage } from "@/utils/initialPage";
-import { pickStatus } from "@/utils/panelStatus";
 import { COMMENT_TABS, tabValues } from "@/utils/panelView";
+import { pickStatus } from "@/utils/searchParams";
 import type { Metadata } from "next";
 import type { MyComment, PageProps, Pagination } from "@/types";
 

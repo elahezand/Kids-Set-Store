@@ -51,7 +51,7 @@ export default function Hero() {
 
   return (
     <section aria-labelledby="hero-heading" className="full-bleed overflow-hidden bg-white dark:bg-ink-900">
-      <div className="container-x grid min-h-[640px] grid-rows-[auto_1fr] items-center gap-4 md:min-h-[560px] md:grid-cols-2 md:grid-rows-1 md:gap-10 lg:min-h-[620px]">
+      <div className="home-container grid min-h-[640px] grid-rows-[auto_1fr] items-center gap-4 md:min-h-[560px] md:grid-cols-2 md:grid-rows-1 md:gap-10 lg:min-h-[620px]">
         <div className="relative z-10 flex flex-col items-start pt-10 md:pt-0">
           <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm font-semibold text-coral-600 shadow-card ring-1 ring-coral-100 dark:bg-ink-800 dark:text-coral-300 dark:ring-white/10">
             <span className="size-2 rounded-full bg-sage-400" aria-hidden="true" />

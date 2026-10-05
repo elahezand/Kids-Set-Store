@@ -6,7 +6,6 @@ import { paginateList } from "@/utils/listQuery";
 import { ticketValidationSchema } from "@/validators/ticket";
 import { getTicketThread } from "@/services/server/shared/ticket";
 
-/* ?status=answered | waiting  ->  isAnswer true | false  (anything else = all) */
 const TICKET_STATUS = { answered: true, waiting: false };
 
 const getMyTickets = async (userId, { status, ...query } = {}) =>
@@ -48,7 +47,6 @@ const getDepartments = async () => {
     };
 };
 
-/* POST /api/user/tickets */
 const createTicket = async (userId, body) => {
     const parsed = ticketValidationSchema.safeParse(body);
     if (!parsed.success) {
@@ -88,6 +86,5 @@ const createTicket = async (userId, body) => {
 
     return { success: true, data: ticket.toJSON() };
 };
-
 
 export default { getMyTickets, getMyTicket, getDepartments, createTicket };

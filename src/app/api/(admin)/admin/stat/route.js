@@ -9,8 +9,6 @@ import { fromService, handleRouteError, jsonError, validationError } from "@/uti
 
 import { statsTimeseriesSchema } from "@/validators/stats";
 
-/* GET /api/admin/stat            -> dashboard counters + recent orders / tickets
-   GET /api/admin/stat?days=30    -> orders, revenue and new users per day */
 export async function GET(request) {
     try {
         await connectToDB();

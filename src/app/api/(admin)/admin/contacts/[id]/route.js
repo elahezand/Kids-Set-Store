@@ -9,7 +9,6 @@ import validateObjectId from "@/utils/validateObjectId";
 import contactService from "@/services/server/admin/contact";
 import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
-// Every handler here: admin + valid id
 const guard = async (params) => {
     const admin = await authAdmin();
 
@@ -38,9 +37,6 @@ const guard = async (params) => {
         id,
     };
 };
-
-/* GET /api/admin/contacts/:id
-   Opening a new message marks it as read */
 
 export async function GET(req, { params }) {
     try {
@@ -80,9 +76,6 @@ export async function GET(req, { params }) {
         );
     }
 }
-
-/* POST /api/admin/contacts/:id
-   Answer the message: { answer } */
 
 export async function POST(req, { params }) {
     try {
@@ -148,8 +141,6 @@ export async function POST(req, { params }) {
     }
 }
 
-/* PUT /api/admin/contacts/:id */
-
 export async function PUT(req, { params }) {
     try {
         await connectToDB();
@@ -213,8 +204,6 @@ export async function PUT(req, { params }) {
         );
     }
 }
-
-/* DELETE /api/admin/contacts/:id */
 
 export async function DELETE(req, { params }) {
     try {

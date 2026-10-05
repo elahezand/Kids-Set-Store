@@ -6,7 +6,6 @@ import { paginate } from "@/utils/paginate";
 import { buildListQuery, listLimit } from "@/utils/listQuery";
 import { revokeAllUserSessions } from "@/services/server/shared/session";
 
-/** "Chrome on Windows" out of a raw user-agent string */
 const describeDevice = (userAgent = "") => {
     const browser =
         /Edg\//.test(userAgent)
@@ -39,10 +38,6 @@ const describeDevice = (userAgent = "") => {
     return [browser, os].filter(Boolean).join(" on ");
 };
 
-/*
- * Users for the admin table: joined date, last login (newest session),
- * the device used and how many orders they placed.
- */
 const getAllUsers = async (query = {}) => {
     const filters = buildListQuery(query, {
         search: ["name", "username", "phone", "email"],
@@ -134,7 +129,6 @@ const getAllUsers = async (query = {}) => {
     };
 };
 
-// Get admins
 const getAdmins = async () => {
     const admins = await User.find({ role: "ADMIN" })
         .select("username phone")
@@ -144,7 +138,6 @@ const getAdmins = async () => {
     return { success: true, data: admins };
 };
 
-// Create new user
 const postNewUser = async (data) => {
     const { phone, role } = data;
 
@@ -188,7 +181,6 @@ const postNewUser = async (data) => {
     };
 };
 
-// Ban / unban user
 const toggleBan = async (targetUserId) => {
     const user = await User.findById(targetUserId);
 
@@ -230,7 +222,6 @@ const toggleBan = async (targetUserId) => {
     };
 };
 
-// Toggle admin role
 const toggleRole = async (targetUserId, adminId) => {
     if (String(targetUserId) === String(adminId)) {
         return {
@@ -276,7 +267,6 @@ const toggleRole = async (targetUserId, adminId) => {
     };
 };
 
-// Remove user
 const removeUser = async (targetUserId, adminId) => {
     if (String(targetUserId) === String(adminId)) {
         return {

@@ -4,7 +4,6 @@ import Order from "@/model/order";
 import { isValidObjectId } from "mongoose";
 import { paginateList } from "@/utils/listQuery";
 
-/* GET /api/user/comment  — the user's own reviews (deleted ones hidden), ?status= */
 const getMine = async (userId, query = {}) =>
     paginateList(Comment, query, {
         defaultLimit: 10,
@@ -14,7 +13,6 @@ const getMine = async (userId, query = {}) =>
         select: "body rating status product createdAt",
         populate: { path: "product", select: "title" },
     });
-
 
 const create = async (userId, data) => {
     const { product, ...rest } = data;

@@ -31,7 +31,7 @@ export default function PromoText() {
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-28 -right-16 size-80 rounded-full bg-sky-400/20 blur-3xl"
       />
-      <div className="container-x relative grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+      <div className="home-container relative grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
         <div data-aos="fade-right">
           <h2
             id="promo-heading"

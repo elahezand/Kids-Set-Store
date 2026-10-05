@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import AuthShell from "@/components/modules/main/authShell";
 import { useResetPassword, useSendOtp } from "@/services/client/auth";
-import { OTP_RESEND_SECONDS, otpCodeSchema, phoneSchema } from "@/utils/authSchemas";
+import { OTP_RESEND_SECONDS, otpCodeSchema, phoneSchema } from "@/validators/authForm";
 import { ROUTES } from "@/utils/constants";
 import { strongPasswordSchema } from "@/validators/user";
 import type { SendOtpPayload } from "@/types";

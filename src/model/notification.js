@@ -24,6 +24,7 @@ const notificationSchema = new mongoose.Schema(
         "product_approved",
         "product_rejected",
         "cod_overdue",
+        "cod_received",
         "order_shipped",
         "delivery_update",
       ],

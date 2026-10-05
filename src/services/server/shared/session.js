@@ -12,7 +12,6 @@ const {
   compareTokenHash,
 } = require("@/utils/auth");
 
-
 const ROTATION_GRACE_MS = 30 * 1000;
 const revokedKey = (sid) => `session:revoked:${sid}`;
 
@@ -25,21 +24,6 @@ async function markRevokedInCache(sessionIds) {
     );
   } catch (err) {
     logger.error("[session] could not cache revoked session ids:", err);
-  }
-}
-
-async function isSessionRevoked(sid) {
-  if (!sid || !mongoose.Types.ObjectId.isValid(sid)) return true;
-  try {
-    if (await redisClient.exists(revokedKey(String(sid)))) return true;
-    return false;
-  } catch (err) {
-    const active = await Session.exists({
-      _id: sid,
-      revokedAt: null,
-      expiresAt: { $gt: new Date() },
-    });
-    return !active;
   }
 }
 
@@ -56,7 +40,6 @@ async function issueTokens(user, sessionId) {
   return { accessToken, refreshToken };
 }
 
-/* === LOGIN: new session for this device === */
 async function createSession(user, req) {
   const session = new Session({
     user: user._id,
@@ -72,7 +55,6 @@ async function createSession(user, req) {
   return { session, ...tokens };
 }
 
-/*=== REFRESH ===*/
 async function rotateSession(refreshToken, req) {
   const payload = await verifyRefreshToken(refreshToken);
   if (!payload?.sid || !payload?.id) return { ok: false, reason: "invalid_token" };
@@ -113,7 +95,6 @@ async function rotateSession(refreshToken, req) {
   return { ok: false, reason: "reuse_detected" };
 }
 
-/* === REVOKE ONE === */
 async function revokeSession(sessionId, reason = "logout") {
   if (!sessionId || !mongoose.Types.ObjectId.isValid(sessionId)) return false;
   const res = await Session.updateOne(
@@ -124,7 +105,6 @@ async function revokeSession(sessionId, reason = "logout") {
   return res.modifiedCount > 0;
 }
 
-/* === REVOKE ALL OF A USER (optionally keep the current one) === */
 async function revokeAllUserSessions(userId, reason = "logout_all", { exceptSessionId = null } = {}) {
   const filter = { user: userId, revokedAt: null };
   if (exceptSessionId) filter._id = { $ne: exceptSessionId };
@@ -141,29 +121,11 @@ async function revokeAllUserSessions(userId, reason = "logout_all", { exceptSess
   return ids.length;
 }
 
-/* === LIST ACTIVE SESSIONS (for "active devices" in settings) === */
-async function listActiveSessions(userId, currentSessionId) {
-  const sessions = await Session.find({
-    user: userId,
-    revokedAt: null,
-    expiresAt: { $gt: new Date() },
-  })
-    .select("userAgent ip createdAt lastUsedAt expiresAt")
-    .sort({ lastUsedAt: -1 })
-    .lean();
-
-  return sessions.map((s) => ({
-    ...s,
-    isCurrent: String(s._id) === String(currentSessionId),
-  }));
-}
 export {
   createSession,
   rotateSession,
   revokeSession,
   revokeAllUserSessions,
-  listActiveSessions,
-  isSessionRevoked,
 };
 
 export default {
@@ -171,6 +133,4 @@ export default {
     rotateSession,
     revokeSession,
     revokeAllUserSessions,
-    listActiveSessions,
-    isSessionRevoked,
 };

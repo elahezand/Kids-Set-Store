@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import OtpForm from "@/components/template/main/login-register/otpForm";
 import { useSendOtp, useSignIn } from "@/services/client/auth";
-import { PHONE_REGEX, phoneSchema } from "@/utils/authSchemas";
+import { PHONE_REGEX, phoneSchema } from "@/validators/authForm";
 import { ROUTES } from "@/utils/constants";
 import type { SignInPayload } from "@/types";
 

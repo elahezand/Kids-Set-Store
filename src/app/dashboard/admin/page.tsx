@@ -5,7 +5,7 @@ import RecentOrders from "@/components/template/p-admin/index/recentOrders";
 import RecentTickets from "@/components/template/p-admin/index/recentTickets";
 import SalesChart from "@/components/template/p-admin/index/salesChart";
 import statsService from "@/services/server/admin/stats";
-import { getPanelSession } from "@/utils/auth/panelUser";
+import { requireAdmin } from "@/utils/auth/panelUser";
 import { ROUTES } from "@/utils/constants";
 import { formatPrice, toPlain } from "@/utils/format";
 import type { Metadata } from "next";
@@ -14,9 +14,7 @@ import type { AdminDashboard } from "@/types";
 export const metadata: Metadata = { title: "Dashboard" };
 
 export default async function AdminDashboardPage() {
-  const { user } = await getPanelSession();
-  if (!user) return null;
-
+  const { user } = await requireAdmin();
   const { data } = (await statsService.getDashboard()) as { data: AdminDashboard };
   const { counts, revenue, recentOrders, recentTickets } = toPlain(data);
 

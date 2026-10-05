@@ -6,7 +6,6 @@ import validateObjectId from "@/utils/validateObjectId";
 import commentService from "@/services/server/admin/comment";
 import { fromService, handleRouteError, jsonError, validationError } from "@/utils/apiResponse";
 
-// Every handler here: admin + valid id
 const guard = async (params) => {
     const admin = await authAdmin();
 
@@ -25,7 +24,6 @@ const guard = async (params) => {
 
 const readBody = (req) => req.json().catch(() => null);
 
-/* POST /api/admin/comments/:id  { body } — reply to a review (approves it when pending) */
 export async function POST(req, { params }) {
     try {
         await connectToDB();
@@ -48,7 +46,6 @@ export async function POST(req, { params }) {
     }
 }
 
-/* PUT /api/admin/comments/:id  { status, reason? } — approve / reject / spam */
 export async function PUT(req, { params }) {
     try {
         await connectToDB();
@@ -70,7 +67,6 @@ export async function PUT(req, { params }) {
     }
 }
 
-/* DELETE /api/admin/comments/:id  { reason? } — soft delete */
 export async function DELETE(req, { params }) {
     try {
         await connectToDB();

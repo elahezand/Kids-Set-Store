@@ -5,8 +5,8 @@ import Image from "next/image";
 import { LuImagePlus, LuSave, LuX } from "react-icons/lu";
 import { type FieldErrors, type Resolver, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import VariantsEditor from "./VariantsEditor";
-import CategorySpecs from "./CategorySpecs";
+import CategorySpecs from "@/components/template/p-admin/products/categorySpecs";
+import VariantsEditor from "@/components/template/p-admin/products/variantsEditor";
 import { imagesFormData, useCategoryFilters, useSaveProduct, useUploadImages } from "@/services/client/admin";
 import { PRODUCT_STATUS } from "@/utils/panelView";
 import {
@@ -30,7 +30,6 @@ interface ProductFormProps {
 const MAX_IMAGES = 10;
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
-/** category options level by level: [roots, children of the chosen root, …] */
 const levelsOf = (tree: CategoryNode[], path: string[]) => {
   const levels: CategoryNode[][] = [tree];
   path.forEach((id, index) => {
@@ -40,7 +39,6 @@ const levelsOf = (tree: CategoryNode[], path: string[]) => {
   return levels;
 };
 
-/** the deepest chosen category node (its filters include the parents' ones) */
 const nodeAt = (tree: CategoryNode[], path: string[]) => {
   let level = tree;
   let node: CategoryNode | undefined;
@@ -75,7 +73,6 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
   const resolver: Resolver<ProductFormValues, unknown, ProductFormOutput> = async (values, context, options) => {
     const zod = zodResolver(productFormSchema) as unknown as Resolver<ProductFormValues, unknown, ProductFormOutput>;
     const result = await zod(values, context, options);
-    // sizes & specs must match the chosen category (the API checks it again)
     const errors = { ...(result.errors as FieldErrors<ProductFormValues>) } as Record<string, unknown>;
     // errors.variants is an array of row errors, or one object for the whole list ("generate the variants first")
     const listError = errors.variants && !Array.isArray(errors.variants) ? errors.variants : null;
@@ -103,7 +100,6 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
   });
   const {
     register,
-    control,
     handleSubmit,
     formState: { errors, isDirty },
   } = form;
@@ -145,7 +141,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
     let uploaded: string[] = [];
     if (files.length) {
       const result = await upload.mutateAsync(imagesFormData(files)).catch(() => null);
-      if (!result) return; // the hook already showed the error
+      if (!result) return;
       uploaded = result.data ?? [];
     }
 
@@ -201,7 +197,6 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex min-w-0 flex-col gap-6">
-      {/* 1. title & description */}
       <section className="card">
         <div className="card-body space-y-5">
           <div>
@@ -226,7 +221,6 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
         </div>
       </section>
 
-      {/* 2. category — decides the sizes and the specification fields below */}
       <section className="card">
         <div className="card-header">
           <div>
@@ -266,13 +260,10 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
         </div>
       </section>
 
-      {/* 3. variants */}
       <VariantsEditor form={form} rules={rules} categoryName={category?.title} />
 
-      {/* 4. images */}
       {imagesSection}
 
-      {/* 5. specifications (the category's filters) */}
       <CategorySpecs
         form={form}
         filters={specFilters}
@@ -280,7 +271,6 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
         isLoading={Boolean(category) && categoryQuery.isLoading}
       />
 
-      {/* 6. publishing */}
       <section className="card">
         <div className="card-header">
           <h2 className="card-title">Publishing</h2>

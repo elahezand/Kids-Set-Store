@@ -52,20 +52,6 @@ export async function CategoriesSection() {
   return <Categories categories={toPlain(categories.slice(0, 5))} />;
 }
 
-export async function MostLovedSection() {
-  const products = await load<ProductDoc[]>("most loved", () => productService.getPopularProducts(HOME_LIMIT), []);
-  if (!products.length) return null;
-
-  return (
-    <ProductSlider
-      eyebrow="Top rated"
-      title="Most Loved"
-      href="/products?sort=popularity"
-      products={toProductCards(products)}
-    />
-  );
-}
-
 export async function ArticlesSection() {
   const result = await load<{ data: ArticleSummary[] }>(
     "articles",

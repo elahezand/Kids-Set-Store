@@ -3,7 +3,6 @@ import ticketService from "@/services/server/user/ticket";
 import { authUser } from "@/utils/auth/authGuard";
 import { fromService, handleRouteError, jsonError } from "@/utils/apiResponse";
 
-/* GET /api/user/tickets/:id  -> ticket + replies (only the owner) */
 export async function GET(request, { params }) {
     try {
         await connectToDB();

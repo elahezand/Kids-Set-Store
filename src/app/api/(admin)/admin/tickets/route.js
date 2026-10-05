@@ -5,8 +5,6 @@ import ticketService from "@/services/server/admin/ticket";
 import { handleRouteError, jsonError, paginated, validationError } from "@/utils/apiResponse";
 import { adminTicketsQuerySchema } from "@/validators/ticket";
 
-/* GET /api/admin/tickets?status=waiting|answered&q=&limit=&cursor=
-   replies go through POST /api/user/tickets/:id/answer (admins may answer any ticket) */
 export async function GET(request) {
     try {
         await connectToDB();

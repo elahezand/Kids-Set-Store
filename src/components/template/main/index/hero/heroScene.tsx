@@ -1,21 +1,22 @@
 "use client";
 
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Float } from "@react-three/drei";
-import { type Group, MathUtils } from "three";
+import { type Group, MathUtils, type Mesh, Vector3 } from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import {
   createLetterTexture,
   createShirtGeometry,
   createStarGeometry,
 } from "@/components/template/main/index/hero/shapes";
+import { scrollStarStore } from "@/components/template/main/index/scrollStar/scrollStarStore";
 
 const PALETTE = {
-  sage: "#7a80f6",
-  sageDeep: "#4a43d6",
-  coral: "#ff5f94",
-  mint: "#3fbf8c",
+  sage: "#38aba3",
+  sageDeep: "#127068",
+  coral: "#ff7a68",
+  mint: "#8ccf5f",
   peach: "#ff8a3d",
   sky: "#60b4fa",
   sun: "#ffc425",
@@ -40,7 +41,7 @@ const BALLOONS: Array<{ color: string; position: [number, number, number]; scale
 ];
 
 const STARS: Array<{ color: string; position: [number, number, number]; scale: number }> = [
-  { color: PALETTE.peach, position: [2.05, 0.3, 0.8], scale: 0.75 },
+  { color: PALETTE.sky, position: [2.05, 0.3, 0.8], scale: 0.75 },
   { color: PALETTE.sage, position: [-0.85, 2.35, 0.2], scale: 0.5 },
   { color: PALETTE.coral, position: [1.45, -2.25, 1], scale: 0.45 },
 ];
@@ -85,12 +86,45 @@ function Balloon({ color, position, scale }: (typeof BALLOONS)[number]) {
   );
 }
 
-function Star({ color, position, scale }: (typeof STARS)[number]) {
+function Star({
+  color,
+  position,
+  scale,
+  track = false,
+  hidden = false,
+}: (typeof STARS)[number] & { track?: boolean; hidden?: boolean }) {
   const geometry = useMemo(() => createStarGeometry(), []);
   useEffect(() => () => geometry.dispose(), [geometry]);
+  const ref = useRef<Mesh>(null);
+  const { camera, gl } = useThree();
+  const world = useMemo(() => new Vector3(), []);
+  const worldScale = useMemo(() => new Vector3(), []);
+
+  // the star that leaves on scroll: tell the scroll star where it is on screen, every frame
+  useFrame(() => {
+    const mesh = ref.current;
+    if (!track || !mesh) return;
+    mesh.getWorldPosition(world);
+    mesh.getWorldScale(worldScale);
+    const rect = gl.domElement.getBoundingClientRect();
+    const fov = "fov" in camera ? (camera.fov as number) : 38;
+    const viewHeight = 2 * Math.tan(MathUtils.degToRad(fov / 2)) * camera.position.distanceTo(world);
+    scrollStarStore.home.size = (worldScale.x / viewHeight) * rect.height;
+    world.project(camera);
+    scrollStarStore.home.x = rect.left + ((world.x + 1) / 2) * rect.width;
+    scrollStarStore.home.y = rect.top + ((1 - world.y) / 2) * rect.height;
+    scrollStarStore.home.valid = rect.bottom > 0 && rect.width > 0;
+  });
 
   return (
-    <mesh geometry={geometry} position={position} scale={scale} rotation={[0.2, -0.4, 0.15]}>
+    <mesh
+      ref={ref}
+      geometry={geometry}
+      position={position}
+      scale={scale}
+      rotation={[0.2, -0.4, 0.15]}
+      visible={!hidden}
+    >
       <meshStandardMaterial color={color} roughness={0.35} metalness={0.05} />
     </mesh>
   );
@@ -188,6 +222,16 @@ export default function HeroScene({ reducedMotion, compact }: HeroSceneProps) {
   const animate = !reducedMotion;
   const floatSpeed = animate ? 1.6 : 0;
 
+  // STARS[0] flies off to the section headers while scrolling (index/scrollStar)
+  const [starAway, setStarAway] = useState(scrollStarStore.detached);
+  useEffect(() => scrollStarStore.subscribe(setStarAway), []);
+  useEffect(
+    () => () => {
+      scrollStarStore.home.valid = false;
+    },
+    []
+  );
+
   return (
     <div ref={containerRef} className="absolute inset-y-0 -inset-x-4 md:-inset-x-16" aria-hidden="true">
       <Canvas
@@ -197,7 +241,7 @@ export default function HeroScene({ reducedMotion, compact }: HeroSceneProps) {
         gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
       >
         <ambientLight intensity={0.75} />
-        <hemisphereLight args={["#ffffff", "#c7c9ff", 0.6]} />
+        <hemisphereLight args={["#ffffff", "#c9ece8", 0.6]} />
         <directionalLight position={[4, 6, 5]} intensity={1.6} />
         <directionalLight position={[-5, 2, 3]} intensity={0.4} color={PALETTE.coral} />
 
@@ -216,9 +260,9 @@ export default function HeroScene({ reducedMotion, compact }: HeroSceneProps) {
             </Float>
           ))}
 
-          {(compact ? STARS.slice(0, 1) : STARS).map((star) => (
+          {(compact ? STARS.slice(0, 1) : STARS).map((star, index) => (
             <Float key={star.color} speed={floatSpeed * 1.5} rotationIntensity={1.2} floatIntensity={0.8}>
-              <Star {...star} />
+              <Star {...star} track={index === 0} hidden={index === 0 && starAway} />
             </Float>
           ))}
 
@@ -239,7 +283,7 @@ export default function HeroScene({ reducedMotion, compact }: HeroSceneProps) {
           opacity={0.3}
           resolution={compact ? 256 : 512}
           frames={animate && !compact ? Infinity : 1}
-          color="#4a43d6"
+          color="#127068"
         />
       </Canvas>
     </div>

@@ -11,7 +11,6 @@ const name = z
   .min(2, "Name must be at least 2 characters")
   .max(100, "Name must be at most 100 characters");
 
-// Optional: generated from name when empty
 const slug = z
   .string()
   .trim()
@@ -19,7 +18,6 @@ const slug = z
   .optional()
   .transform((value) => value || undefined);
 
-/* POST: "" / null / missing parentId -> root category */
 export const createCategorySchema = z.object({
   name,
   slug,
@@ -29,8 +27,6 @@ export const createCategorySchema = z.object({
   ),
 });
 
-/* PUT: only sent fields change
-   parentId: missing = keep, "" / null = move to root, id = move under that category */
 export const updateCategorySchema = z
   .object({
     name: name.optional(),

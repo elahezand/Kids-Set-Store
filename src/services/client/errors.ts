@@ -18,9 +18,6 @@ export const getErrorMessage = (error: unknown, fallback = "Something went wrong
   return fallback;
 };
 
-export const getErrorStatus = (error: unknown): number | undefined =>
-  isAxiosError(error) ? error.response?.status : undefined;
-
 export const showErrorToast = (error: unknown, fallback?: string) => {
   if ((error as AuthError | undefined)?._authToastShown) return;
   toast.error(getErrorMessage(error, fallback));

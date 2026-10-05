@@ -9,13 +9,13 @@ const RANGES = [7, 30, 90] as const;
 type Range = (typeof RANGES)[number];
 
 // brand colors from @theme in globals.css (recharts needs real values, not classes)
-const SAGE = "#358d5b";
-const CORAL = "#ff8c61";
+const SAGE = "#127068";
+const CORAL = "#ff7a68";
 const GRID = "rgba(140,140,140,0.18)";
-const AXIS = { fontSize: 12, fill: "#8c8c8c" };
+const AXIS = { fontSize: 12, fill: "#7e889a" };
 const tooltipStyle = {
   borderRadius: 12,
-  border: "1px solid #ebebeb",
+  border: "1px solid #e3e7ee",
   boxShadow: "0 12px 32px -8px rgba(16,24,40,.18)",
   fontSize: 13,
 };

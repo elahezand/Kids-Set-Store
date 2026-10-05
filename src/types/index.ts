@@ -13,3 +13,4 @@ export type * from "./site";
 export type * from "./ticket";
 export type * from "./dashboard";
 export type * from "./coupon";
+export type * from "./wallet";

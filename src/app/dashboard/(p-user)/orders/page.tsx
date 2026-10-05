@@ -3,8 +3,8 @@ import OrdersList from "@/components/template/p-user/orders/ordersList";
 import orderService from "@/services/server/user/order";
 import { getPanelSession } from "@/utils/auth/panelUser";
 import { toInitialPage } from "@/utils/initialPage";
-import { pickStatus } from "@/utils/panelStatus";
 import { ORDER_TABS, tabValues } from "@/utils/panelView";
+import { pickStatus } from "@/utils/searchParams";
 import type { Metadata } from "next";
 import type { OrderListItem, PageProps, Pagination } from "@/types";
 

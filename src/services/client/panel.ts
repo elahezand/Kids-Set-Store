@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { queryKeys } from "@/services/client/keys";
 import { useCursorList, useDelete, useGet, usePatch, usePost } from "@/services/client/query";
 import { ROUTES } from "@/utils/constants";
+import { formatPrice } from "@/utils/format";
 import type {
   ApiSuccess,
   CommentStatusFilter,
@@ -31,6 +32,39 @@ export const useMyOrders = (
 ) => {
   const params = statusParams(limit, status);
   return useCursorList("/user/order", queryKeys.myOrders(params), params, initialPage, "Could not load orders");
+};
+
+export const useCancelMyOrder = ({ onDone }: { onDone?: () => void } = {}) => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  return usePatch<ApiSuccess<OrderListItem>, string>((id) => `/user/order/${id}/cancel`, {
+    errorFallback: "Could not cancel the order",
+    onSuccess: (response) => {
+      const refund = response.data?.refundAmount;
+      toast.success(
+        refund ? `Order cancelled — ${formatPrice(refund)} was refunded to your wallet` : "Order cancelled"
+      );
+      queryClient.invalidateQueries({ queryKey: queryKeys.myOrders() });
+      onDone?.();
+      router.refresh();
+    },
+  });
+};
+
+export const useConfirmDelivery = ({ onDone }: { onDone?: () => void } = {}) => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  return usePatch<ApiSuccess, string>((id) => `/user/order/${id}/confirm-delivery`, {
+    errorFallback: "Could not confirm the delivery",
+    onSuccess: (response) => {
+      toast.success(response.message || "Thanks! Your order is marked as completed.");
+      queryClient.invalidateQueries({ queryKey: queryKeys.myOrders() });
+      onDone?.();
+      router.refresh();
+    },
+  });
 };
 
 export const useMyComments = (

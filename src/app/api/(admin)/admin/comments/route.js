@@ -5,7 +5,6 @@ import commentService from "@/services/server/admin/comment";
 import { adminCommentsQuerySchema } from "@/validators/comment";
 import { handleRouteError, jsonError, paginated, validationError } from "@/utils/apiResponse";
 
-/* GET /api/admin/comments?status=&productId=&userId=&q=&limit=&cursor= */
 export async function GET(req) {
     try {
         await connectToDB();

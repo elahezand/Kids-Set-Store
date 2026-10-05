@@ -8,7 +8,6 @@ const CART_STATUS = Object.freeze({
   CONVERTED: "converted",
 });
 
-/* ---------- Cart item ---------- */
 const cartItemSchema = new Schema(
   {
     productId: { type: Types.ObjectId, ref: "Product", required: true },
@@ -18,7 +17,6 @@ const cartItemSchema = new Schema(
   { _id: false }
 );
 
-/* ---------- Cart ---------- */
 const cartSchema = new Schema(
   {
     user: { type: Types.ObjectId, ref: "User", required: true },
@@ -45,7 +43,6 @@ const cartSchema = new Schema(
   }
 );
 
-/* ---------- Indexes ---------- */
 cartSchema.index(
   { user: 1 },
   { unique: true, partialFilterExpression: { status: CART_STATUS.ACTIVE } }

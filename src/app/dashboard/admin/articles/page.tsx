@@ -5,6 +5,7 @@ import ArticlesTable from "@/components/template/p-admin/articles/articlesTable"
 import articleService from "@/services/server/admin/article";
 import { adminListParams, filtersKey, readAdminFilters } from "@/utils/adminFilters";
 import { ROUTES } from "@/utils/constants";
+import { requireAdmin } from "@/utils/auth/panelUser";
 import { toInitialPage } from "@/utils/initialPage";
 import { ARTICLE_TABS, tabValues } from "@/utils/panelView";
 import type { Metadata } from "next";
@@ -15,6 +16,7 @@ export const metadata: Metadata = { title: "Articles" };
 const LIMIT = 15;
 
 export default async function AdminArticlesPage({ searchParams }: PageProps) {
+  await requireAdmin();
   const filters = readAdminFilters(await searchParams, tabValues(ARTICLE_TABS));
   const params = adminListParams.articles(LIMIT, filters);
 

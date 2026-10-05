@@ -5,7 +5,7 @@ interface SectionSkeletonProps {
 
 export default function SectionSkeleton({ variant = "cards", count = 5 }: SectionSkeletonProps) {
   return (
-    <div className="page-container" aria-busy="true" aria-label="Loading">
+    <div className="home-container" aria-busy="true" aria-label="Loading">
       <div className="mb-6 h-8 w-48 animate-pulse rounded-lg bg-gray-200 dark:bg-ink-800" />
 
       {variant === "cards" ? (

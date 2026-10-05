@@ -3,7 +3,6 @@ const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
 const paginate = require("@/utils/paginate");
 const escapeRegex = (text) => String(text).replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 
-/** Start of the given day (or null when the value isn't a date) */
 const startOfDay = (value) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
@@ -19,10 +18,6 @@ const endOfDay = (value) => {
   return date;
 };
 
-/**
- * Date range used by every dashboard table: ?from=2026-09-01&to=2026-09-30
- * `preset` is a shortcut the UI sends instead of two dates: today | 7d | 30d | 90d
- */
 const dateRangeFilter = (query = {}, field = "createdAt") => {
   const range = {};
 
@@ -44,7 +39,6 @@ const dateRangeFilter = (query = {}, field = "createdAt") => {
   return Object.keys(range).length ? { [field]: range } : {};
 };
 
-/** Case-insensitive "contains" search across the given fields */
 const searchFilter = (query = {}, fields = []) => {
   const term = String(query.q || "").trim();
   if (!term || !fields.length) return {};
@@ -55,19 +49,16 @@ const searchFilter = (query = {}, fields = []) => {
     : { $or: fields.map((field) => ({ [field]: regex })) };
 };
 
-/** ?status=... , ignored when it isn't one of the allowed values or is "all" */
 const statusFilter = (query = {}, allowed = [], field = "status") => {
   const value = query[field];
   if (!value || value === "all") return {};
   return allowed.length && !allowed.includes(value) ? {} : { [field]: value };
 };
 
-/** ?<field>=<objectId> (category, store, user, ...) */
 const idFilter = (query = {}, param, field = param) => {
   const value = query[param];
   return value && isValidId(value) ? { [field]: new mongoose.Types.ObjectId(value) } : {};
 };
-
 
 const buildListQuery = (query = {}, options = {}) => {
   const {
@@ -93,10 +84,8 @@ const buildListQuery = (query = {}, options = {}) => {
   };
 };
 
-/** limit shared by the tables (default 20, never above max) */
 const listLimit = (query = {}, fallback = 20, max = 100) =>
   Math.min(Math.max(Number(query.limit) || fallback, 1), max);
-
 
 const paginateList = (Model, query = {}, options = {}) => {
   const {
@@ -108,7 +97,6 @@ const paginateList = (Model, query = {}, options = {}) => {
     filters: extraFilters = {},
     ...listOptions
   } = options;
-
 
   return paginate(Model, {
     limit: listLimit(query, defaultLimit, maxLimit),

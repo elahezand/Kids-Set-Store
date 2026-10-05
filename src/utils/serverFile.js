@@ -16,5 +16,5 @@ export default async function handleFileUpload(file) {
     const filename = `${Date.now()}-${safeName(file.name)}`;
     await mkdir(UPLOAD_DIR, { recursive: true });
     await writeFile(path.join(UPLOAD_DIR, filename), buffer);
-    return `/uploads/${filename}`; // relative URL
+    return `/uploads/${filename}`;
 }

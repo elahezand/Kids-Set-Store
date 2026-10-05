@@ -2,7 +2,7 @@
 
 import { type FormEvent, useEffect, useState } from "react";
 import { useSendOtp, useVerifyOtp } from "@/services/client/auth";
-import { OTP_RESEND_SECONDS, otpCodeSchema } from "@/utils/authSchemas";
+import { OTP_RESEND_SECONDS, otpCodeSchema } from "@/validators/authForm";
 
 interface OtpFormProps {
   phone: string;

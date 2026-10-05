@@ -8,7 +8,6 @@ const code = z
   .regex(/^[a-zA-Z0-9_-]+$/, "Only letters, numbers, - and _")
   .transform((value) => value.toUpperCase());
 
-// "" / undefined -> null (no limit), string -> Date
 const optionalDate = z.preprocess(
   (value) => (value === "" || value === undefined ? null : value),
   z.coerce.date({ message: "Invalid date" }).nullable()
@@ -24,11 +23,6 @@ const datesInOrder = (data) =>
   !data.startsAt || !data.expiresAt || data.expiresAt > data.startsAt;
 const datesError = { message: "Expiry date must be after the start date", path: ["expiresAt"] };
 
-/* POST /api/user/coupon/validate */
-export const applyDiscountSchema = z.object({
-  code: z.string().trim().min(1, "Enter a discount code"),
-});
-
 const couponFields = {
   code,
   type: z.enum(["fixed", "percent"], { message: "Type must be fixed or percent" }),
@@ -43,20 +37,17 @@ const couponFields = {
 const percentInRange = (d) => d.type !== "percent" || d.amount === undefined || d.amount <= 100;
 const percentError = { message: "A percent coupon can't exceed 100", path: ["amount"] };
 
-/* POST /api/admin/coupon */
 export const createCouponSchema = z
   .object(couponFields)
   .refine(datesInOrder, datesError)
   .refine(percentInRange, percentError);
 
-/* PUT /api/admin/coupon/:id (only sent fields change) */
 export const updateCouponSchema = z
   .object(couponFields)
   .partial()
   .refine((data) => Object.values(data).some((v) => v !== undefined), "Nothing to update")
   .refine(datesInOrder, datesError);
 
-/* GET /api/admin/coupon */
 export const adminCouponsQuerySchema = z.object({
   search: z.string().trim().max(60).optional(),
   q: z.string().trim().max(60).optional(),
@@ -65,6 +56,3 @@ export const adminCouponsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).catch(20),
   cursor: z.string().trim().min(1).optional().catch(undefined),
 });
-
-// used by the admin "add code" form (client side)
-export const discountSchema = createCouponSchema;

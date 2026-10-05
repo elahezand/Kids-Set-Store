@@ -2,23 +2,27 @@ const Order = require("@/model/order");
 const User = require("@/model/user");
 const { notifyUser, NOTIFY_LINKS } = require("@/utils/notify");
 const logger = require("@/utils/logger");
-const { verifyPayment } = require("./zarinpal");
+const { verifyPayment } = require("@/services/server/shared/zarinpal");
 const { walletSpentOn } = require("@/services/server/shared/wallet");
-const { finalizeOrder, revertOrder, autoCompleteShippedOrders } = require("@/services/server/shared/order");
+const {
+    finalizeOrder,
+    revertOrder,
+    autoCompleteShippedOrders,
+    pastDueQuery,
+    pastDueAt,
+} = require("@/services/server/shared/order");
 
 const ABANDON_AFTER_MS = Number(process.env.ORDER_ABANDON_MINUTES || 30) * 60 * 1000;
 const BATCH = 100;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const COD_OVERDUE_DAYS = Number(process.env.ORDER_AUTO_COMPLETE_DAYS || 7);
 const COD_REMIND_EVERY_DAYS = Number(process.env.ORDER_COD_REMIND_DAYS || 7);
 
-/** query for shipped cash orders nobody confirmed in time (shared with the admin filter) */
 const overdueCashQuery = () => ({
     status: "shipped",
     paymentMethod: "cash",
     paymentStatus: "pending",
-    shippedAt: { $lte: new Date(Date.now() - COD_OVERDUE_DAYS * DAY_MS) },
+    ...pastDueQuery(),
 });
 
 /* 1) money already taken, finalize never finished → continue it */
@@ -82,6 +86,7 @@ const resolvePendingPayments = async () => {
             logger.info(`[sweeper] order ${order._id} was paid after all — finalized`);
         } else {
             order.status = "cancelled";
+            order.$locals.skipStatusNotify = true; // revertOrder sends the cancel message
             await order.save();
             await revertOrder(order);
             cancelled++;
@@ -97,9 +102,12 @@ const resolvePendingPayments = async () => {
 const flagOverdueCashOrders = async () => {
     const remindBefore = new Date(Date.now() - COD_REMIND_EVERY_DAYS * DAY_MS);
 
+    // overdueCashQuery has its own $or -> combine both with $and
     const orders = await Order.find({
-        ...overdueCashQuery(),
-        $or: [{ cashOverdueNotifiedAt: null }, { cashOverdueNotifiedAt: { $lte: remindBefore } }],
+        $and: [
+            overdueCashQuery(),
+            { $or: [{ cashOverdueNotifiedAt: null }, { cashOverdueNotifiedAt: { $lte: remindBefore } }] },
+        ],
     }).limit(BATCH);
 
     if (!orders.length) return 0;
@@ -108,12 +116,12 @@ const flagOverdueCashOrders = async () => {
 
     for (const order of orders) {
         const shortId = String(order._id).slice(-6).toUpperCase();
-        const days = Math.floor((Date.now() - new Date(order.shippedAt).getTime()) / DAY_MS);
+        const days = Math.max(1, Math.floor((Date.now() - pastDueAt(order).getTime()) / DAY_MS));
 
         for (const admin of admins) {
             await notifyUser(
                 admin._id,
-                `Cash order #${shortId} was shipped ${days} days ago and is still unconfirmed — mark it delivered or cancel it`,
+                `Cash order #${shortId} is ${days} day(s) past its delivery date and still unpaid — collect the cash, then press "Cash received"`,
                 { type: "cod_overdue", link: NOTIFY_LINKS.adminOrders }
             );
         }

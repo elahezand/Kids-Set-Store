@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const articleSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
-    slug: { type: String, required: true, trim: true, lowercase: true }, // unique index below
+    slug: { type: String, required: true, trim: true, lowercase: true },
     excerpt: { type: String, required: true, trim: true },
     content: { type: String, required: true },
 
@@ -34,7 +34,6 @@ articleSchema.index(
   { slug: 1 },
   { unique: true, partialFilterExpression: { slug: { $type: "string" } } }
 );
-
 
 const Article =
   mongoose.models.Article || mongoose.model("Article", articleSchema);

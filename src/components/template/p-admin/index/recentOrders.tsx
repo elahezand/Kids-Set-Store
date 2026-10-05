@@ -3,7 +3,7 @@ import { LuArrowRight, LuShoppingBag } from "react-icons/lu";
 import EmptyState from "@/components/modules/ui/emptyState";
 import { ROUTES } from "@/utils/constants";
 import { formatDate, formatPrice } from "@/utils/format";
-import { ORDER_STATUS, PAYMENT_STATUS, personName, shortId } from "@/utils/panelView";
+import { ORDER_STATUS, paymentState, personName, shortId } from "@/utils/panelView";
 import type { AdminOrder } from "@/types";
 
 export default function RecentOrders({ orders }: { orders: AdminOrder[] }) {
@@ -19,7 +19,7 @@ export default function RecentOrders({ orders }: { orders: AdminOrder[] }) {
         <ul className="divide-y divide-gray-200 dark:divide-white/5">
           {orders.map((order) => {
             const status = ORDER_STATUS[order.status] ?? ORDER_STATUS.created;
-            const payment = PAYMENT_STATUS[order.paymentStatus] ?? PAYMENT_STATUS.pending;
+            const payment = paymentState(order);
             return (
               <li key={String(order._id)} className="flex items-center justify-between gap-3 px-4 py-3.5 sm:px-5">
                 <div className="min-w-0">

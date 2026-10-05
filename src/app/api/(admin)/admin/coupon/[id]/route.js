@@ -8,8 +8,6 @@ import validateObjectId from "@/utils/validateObjectId";
 import couponService from "@/services/server/admin/coupon";
 import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
-// Every handler here: admin + valid id
-
 const guard = async (params) => {
     const admin = await authAdmin();
 
@@ -38,8 +36,6 @@ const guard = async (params) => {
         id,
     };
 };
-
-/* GET /api/admin/coupons/:id */
 
 export async function GET(req, { params }) {
     try {
@@ -77,8 +73,6 @@ export async function GET(req, { params }) {
         );
     }
 }
-
-/* PUT /api/admin/coupons/:id */
 
 export async function PUT(req, { params }) {
     try {
@@ -141,8 +135,6 @@ export async function PUT(req, { params }) {
         );
     }
 }
-
-/* DELETE /api/admin/coupons/:id */
 
 export async function DELETE(req, { params }) {
     try {

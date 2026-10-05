@@ -17,7 +17,6 @@ export interface Coupon {
   createdAt?: ISODate;
 }
 
-/* body of POST /api/admin/coupon (validators/coupon createCouponSchema) */
 export interface CouponPayload {
   code: string;
   type: CouponType;

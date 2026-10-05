@@ -2,7 +2,7 @@
 
 import { type FormEvent, useState } from "react";
 import Link from "next/link";
-import { LuCheck, LuEye, LuMessageSquare, LuReply, LuTrash2, LuX } from "react-icons/lu";
+import { LuCheck, LuCornerDownRight, LuEye, LuMessageSquare, LuReply, LuTrash2, LuX } from "react-icons/lu";
 import ListCard from "@/components/modules/panel/listCard";
 import SearchBox from "@/components/modules/panel/searchBox";
 import StatusTabs from "@/components/modules/panel/statusTabs";
@@ -15,7 +15,7 @@ import { ROUTES } from "@/utils/constants";
 import { formatDate } from "@/utils/format";
 import { ADMIN_COMMENT_TABS, COMMENT_STATUS, personName } from "@/utils/panelView";
 import type { AdminFilters, AdminListParams } from "@/utils/adminFilters";
-import type { AdminComment, AdminCommentStatusFilter, Paginated } from "@/types";
+import type { AdminComment, AdminCommentReply, AdminCommentStatusFilter, Paginated } from "@/types";
 
 interface CommentsTableProps {
   initialPage: Paginated<AdminComment>;
@@ -29,7 +29,7 @@ type Dialog = { comment: AdminComment; mode: "view" | "reply" | "reject" } | nul
 export default function CommentsTable({ initialPage, params, filters, limit }: CommentsTableProps) {
   const { items: comments, ...pager } = useAdminComments(initialPage, params);
   const [dialog, setDialog] = useState<Dialog>(null);
-  const [deleting, setDeleting] = useState<AdminComment | null>(null);
+  const [deleting, setDeleting] = useState<{ id: string; isReply: boolean } | null>(null);
   const close = () => setDialog(null);
 
   const moderate = useModerateComment({ onDone: close });
@@ -81,7 +81,7 @@ export default function CommentsTable({ initialPage, params, filters, limit }: C
             <LuCheck className="size-3.5" /> Approve
           </button>
         )}
-        {comment.status === "approved" && (
+        {comment.status === "approved" && !comment.replies?.length && (
           <button
             type="button"
             onClick={() => setDialog({ comment, mode: "reply" })}
@@ -103,7 +103,7 @@ export default function CommentsTable({ initialPage, params, filters, limit }: C
         )}
         <button
           type="button"
-          onClick={() => setDeleting(comment)}
+          onClick={() => setDeleting({ id, isReply: false })}
           className="btn btn-soft-danger btn-sm btn-icon"
           aria-label="Delete comment"
           title="Delete"
@@ -159,6 +159,13 @@ export default function CommentsTable({ initialPage, params, filters, limit }: C
                   {comment.moderation?.rejectReason && comment.status !== "approved" && (
                     <p className="text-xs text-danger-500">Reason: {comment.moderation.rejectReason}</p>
                   )}
+                  {comment.replies?.map((item) => (
+                    <ReplyItem
+                      key={String(item._id)}
+                      reply={item}
+                      onDelete={() => setDeleting({ id: String(item._id), isReply: true })}
+                    />
+                  ))}
                 </div>
                 <div className="shrink-0">{actions(comment)}</div>
               </li>
@@ -177,6 +184,9 @@ export default function CommentsTable({ initialPage, params, filters, limit }: C
           <p className="text-sm leading-7 break-words whitespace-pre-line text-gray-800 dark:text-gray-200">
             {dialog.comment.body}
           </p>
+          {dialog.comment.replies?.map((item) => (
+            <ReplyItem key={String(item._id)} reply={item} full />
+          ))}
         </Modal>
       )}
 
@@ -232,14 +242,57 @@ export default function CommentsTable({ initialPage, params, filters, limit }: C
 
       <ConfirmDialog
         open={Boolean(deleting)}
-        title="Delete this comment?"
-        description="It is removed from the product page and the product score is updated."
+        title={deleting?.isReply ? "Delete this reply?" : "Delete this comment?"}
+        description={
+          deleting?.isReply
+            ? "It is removed from the product page, and you can write a new reply."
+            : "It is removed from the product page and the product score is updated."
+        }
         confirmLabel="Delete"
         danger
         loading={remove.isPending}
         onClose={() => setDeleting(null)}
-        onConfirm={() => deleting && remove.mutate(String(deleting._id), { onSuccess: () => setDeleting(null) })}
+        onConfirm={() => deleting && remove.mutate(deleting.id, { onSuccess: () => setDeleting(null) })}
       />
     </>
+  );
+}
+
+function ReplyItem({
+  reply,
+  full = false,
+  onDelete,
+}: {
+  reply: AdminCommentReply;
+  full?: boolean;
+  onDelete?: () => void;
+}) {
+  return (
+    <div className="mt-2 flex items-start gap-2 rounded-xl border-l-4 border-sage-300 bg-sage-50/60 py-2 pr-2 pl-3 dark:border-sage-500/40 dark:bg-sage-500/5">
+      <LuCornerDownRight className="mt-0.5 size-3.5 shrink-0 text-sage-600" />
+      <div className="min-w-0 flex-1">
+        <p className="text-xs text-gray-700 dark:text-gray-400">
+          <span className="font-medium text-gray-900 dark:text-gray-100">Store reply</span>
+          {reply.user?.username ? ` · ${reply.user.username}` : ""}
+          {reply.createdAt ? ` · ${formatDate(reply.createdAt)}` : ""}
+        </p>
+        <p
+          className={`text-sm text-gray-700 dark:text-gray-300 ${full ? "break-words whitespace-pre-line" : "line-clamp-2"}`}
+        >
+          {reply.body}
+        </p>
+      </div>
+      {onDelete && (
+        <button
+          type="button"
+          onClick={onDelete}
+          className="btn btn-ghost btn-sm btn-icon shrink-0"
+          aria-label="Delete reply"
+          title="Delete reply"
+        >
+          <LuTrash2 className="size-3.5" />
+        </button>
+      )}
+    </div>
   );
 }

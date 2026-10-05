@@ -15,17 +15,6 @@ export interface SessionUser {
   createdAt?: ISODate;
 }
 
-export interface ProfileFormValues {
-  username: string;
-  email: string;
-  phone: string;
-  password?: string;
-  newPassword?: string;
-  confirmPassword?: string;
-}
-
-/* ---------- admin ---------- */
-
 export type UserRoleFilter = "all" | UserRole;
 
 export interface AdminUser extends SessionUser {

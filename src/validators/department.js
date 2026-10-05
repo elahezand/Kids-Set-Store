@@ -6,7 +6,6 @@ const title = z
   .min(2, "Title must be at least 2 characters")
   .max(80, "Title must be at most 80 characters");
 
-// "" -> null so the description can be cleared
 const description = z
   .string()
   .trim()
@@ -14,7 +13,6 @@ const description = z
   .optional()
   .transform((value) => (value === "" ? null : value));
 
-/* POST /api/admin/departments */
 export const createDepartmentSchema = z.object({
   title,
   description,
@@ -22,7 +20,6 @@ export const createDepartmentSchema = z.object({
   order: z.coerce.number().int().min(0).optional(),
 });
 
-/* PUT /api/admin/departments/:id (only sent fields change) */
 export const updateDepartmentSchema = createDepartmentSchema
   .partial()
   .refine(

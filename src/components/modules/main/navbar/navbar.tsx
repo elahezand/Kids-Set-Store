@@ -3,7 +3,7 @@ import CartCount from "@/components/modules/main/navbar/cartCount";
 import DesktopMenu from "@/components/modules/main/navbar/desktopMenu";
 import FavoritesCount from "@/components/modules/main/navbar/favoritesCount";
 import MobileMenu from "@/components/modules/main/navbar/mobileMenu";
-import NavbarShell from "./navbarShell";
+import NavbarShell from "@/components/modules/main/navbar/navbarShell";
 import ThemeToggle from "@/components/modules/ui/themeToggle";
 import connectToDB from "@/configs/db";
 import categoryService from "@/services/server/public/category";

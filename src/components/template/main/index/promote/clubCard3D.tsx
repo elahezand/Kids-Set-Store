@@ -15,12 +15,22 @@ const CARD_THICKNESS = 6;
 const face =
   "absolute inset-0 rounded-2xl p-5 text-left text-white shadow-float [backface-visibility:hidden] [-webkit-backface-visibility:hidden]";
 
-export default function ClubCard3D() {
+/** `bare`: no background and no clipping — for layouts where the card breaks out of a colored panel */
+export default function ClubCard3D({ bare = false }: { bare?: boolean }) {
   const [flipped, setFlipped] = useState(false);
 
   return (
-    <ParallaxStage max={14} className="h-full min-h-[320px] w-full overflow-hidden bg-sage-100 dark:bg-sage-900/40">
-      <div className="relative flex h-full min-h-[320px] items-center justify-center [transform-style:preserve-3d]">
+    <ParallaxStage
+      max={14}
+      className={
+        bare
+          ? "h-full min-h-[280px] w-full"
+          : "h-full min-h-[320px] w-full overflow-hidden bg-sage-100 dark:bg-sage-900/40"
+      }
+    >
+      <div
+        className={`relative flex h-full items-center justify-center [transform-style:preserve-3d] ${bare ? "min-h-[280px]" : "min-h-[320px]"}`}
+      >
         <div
           aria-hidden="true"
           className="absolute h-[170px] w-[260px] rounded-2xl bg-white/70 shadow-card sm:h-[190px] sm:w-[300px] dark:bg-white/10"

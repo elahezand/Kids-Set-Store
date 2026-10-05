@@ -16,6 +16,13 @@ const fail422 = (message) => ({ success: false, status: 422, message });
 
 const specOf = (specs, key) => (specs instanceof Map ? specs.get(key) : specs?.[key]);
 
+/*
+ * The product must match its category (the deepest of categoryPath, with the filters it inherits
+ * from its parents):
+ *  - sizes (CATEGORY_LOCKED_ATTRIBUTES) are options of the category's "size" filter; colors are free
+ *  - specs: required filters are filled, select / radio values are options, yes/no is "true"
+ *  - finalPrice sent with a variant equals price - discount% (the model stores the same value)
+ */
 const checkProductAgainstCategory = async ({ categoryPath = [], variants = [], specs = {} }) => {
     for (const variant of variants) {
         if (variant.finalPrice === undefined) continue;
@@ -34,7 +41,6 @@ const checkProductAgainstCategory = async ({ categoryPath = [], variants = [], s
     return matchCategory(category, { variants, specs });
 };
 
-/* pure part of the check: a category (with inherited filters) against variants + specs */
 const matchCategory = (category, { variants = [], specs = {} }) => {
     const filters = category.filters || [];
     const isChoice = (f) => ["select", "radio"].includes(f.type) && f.options?.length;
@@ -204,7 +210,6 @@ const updateProduct = async (id, data, files = []) => {
         updateData.status = status;
     }
 
-    // images = the ones the admin kept + the new uploads
     if (data.images || files?.length) {
         updateData.images = [
             ...(data.images ?? product.images),

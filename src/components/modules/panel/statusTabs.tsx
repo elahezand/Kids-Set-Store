@@ -10,7 +10,6 @@ export interface StatusTab<T extends string> {
 interface StatusTabsProps<T extends string> {
   tabs: ReadonlyArray<StatusTab<T>>;
   value: T;
-  /** query param the tabs write to (default `status`) */
   param?: string;
 }
 

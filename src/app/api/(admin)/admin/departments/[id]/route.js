@@ -8,8 +8,6 @@ import validateObjectId from "@/utils/validateObjectId";
 import departmentService from "@/services/server/admin/department";
 import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
-// Every handler here: admin + valid id
-
 const guard = async (params) => {
     const admin = await authAdmin();
 
@@ -38,8 +36,6 @@ const guard = async (params) => {
         id,
     };
 };
-
-/* PUT /api/admin/departments/:id */
 
 export async function PUT(req, { params }) {
     try {
@@ -102,8 +98,6 @@ export async function PUT(req, { params }) {
         );
     }
 }
-
-/* DELETE /api/admin/departments/:id */
 
 export async function DELETE(req, { params }) {
     try {

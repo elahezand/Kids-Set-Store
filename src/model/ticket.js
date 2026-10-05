@@ -74,8 +74,6 @@ const ticketSchema = new mongoose.Schema(
     }
 );
 
-// Indexes
-
 ticketSchema.index({ user: 1, createdAt: -1 });
 
 ticketSchema.index({
@@ -89,8 +87,6 @@ ticketSchema.index({
 });
 
 ticketSchema.index({ createdAt: -1 });
-
-// Model
 
 const ticketModel =
     mongoose.models.Ticket ||

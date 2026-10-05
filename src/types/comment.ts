@@ -47,9 +47,7 @@ export interface MyComment {
   createdAt?: ISODate;
 }
 
-/* ---------- admin ---------- */
-
-export type AdminCommentStatusFilter = "all" | Exclude<CommentStatus, "deleted">;
+export type AdminCommentStatusFilter = "all" | Exclude<CommentStatus, "deleted"> | "replied";
 
 export interface AdminComment {
   _id: Id;
@@ -59,6 +57,14 @@ export interface AdminComment {
   user?: { _id: Id; username?: string; phone?: string } | null;
   product?: { _id: Id; title: string; images?: string[] } | null;
   moderation?: { rejectReason?: string | null } | null;
+  createdAt?: ISODate;
+  replies?: AdminCommentReply[];
+}
+
+export interface AdminCommentReply {
+  _id: Id;
+  body: string;
+  user?: { _id: Id; username?: string } | null;
   createdAt?: ISODate;
 }
 

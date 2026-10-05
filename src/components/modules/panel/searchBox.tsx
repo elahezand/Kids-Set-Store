@@ -6,11 +6,9 @@ import { useQueryParams } from "@/services/client/listing";
 
 interface SearchBoxProps {
   placeholder?: string;
-  /** query param it writes to (default `q`) */
   param?: string;
 }
 
-/** Search field for panel tables: writes ?q= to the URL, the server page reloads the first page. */
 export default function SearchBox({ placeholder = "Search…", param = "q" }: SearchBoxProps) {
   const { get, update, isPending } = useQueryParams<string>();
   const current = get(param);

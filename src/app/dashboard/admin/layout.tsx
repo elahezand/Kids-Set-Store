@@ -1,10 +1,7 @@
-import { redirect } from "next/navigation";
 import PanelShell from "@/components/modules/panel/panelShell";
 import RefreshAccessToken from "@/components/modules/ui/refreshAccessToken";
-import { getPanelSession } from "@/utils/auth/panelUser";
-import { ROUTES } from "@/utils/constants";
-import { isAdmin } from "@/utils/role";
 import type { Metadata } from "next";
+import { requireAdmin } from "@/utils/auth/panelUser";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
@@ -13,9 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
-  const { user, expired } = await getPanelSession();
-  if (!user && !expired) redirect(ROUTES.login);
-  if (user && !isAdmin(user)) redirect(ROUTES.dashboard.home);
+  const { user, expired } = await requireAdmin();
 
   return (
     <RefreshAccessToken shouldRefresh={expired}>

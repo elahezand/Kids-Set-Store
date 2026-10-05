@@ -7,6 +7,7 @@ const { escapeRegex } = require("@/utils/helper");
 const AppError = require("@/utils/AppError");
 const logger = require("@/utils/logger");
 const { round2 } = require("@/utils/pricing");
+const { notifyUser, NOTIFY_LINKS } = require("@/utils/notify");
 
 const buildOrderIdSearchExpr = (q) => {
     if (!q || !String(q).trim()) return null;
@@ -20,14 +21,12 @@ const buildOrderIdSearchExpr = (q) => {
 };
 
 const finalizeOrder = async (order) => {
-    // 1) coupon usage — once per order
     if (order.coupon?.couponId && !order.couponCounted) {
         await Coupon.updateOne({ _id: order.coupon.couponId }, { $inc: { usedCount: 1 } });
         order.couponCounted = true;
         await order.save();
     }
     for (const item of order.items) {
-        // 2) stock — once per item
         if (!item.stockReserved) {
             let result = null;
 
@@ -89,17 +88,39 @@ const revertOrder = async (order) => {
     if (refund > 0) {
         const given = await refundToWallet(order.user, order._id, refund, "order cancelled");
         if (given > 0) {
-            if (gatewayPaid > 0) order.paymentStatus = "refunded";
+            // paid orders (gateway or fully from the wallet) become "refunded"; unpaid cash stays "pending"
+            if (order.paymentStatus === "paid") order.paymentStatus = "refunded";
             order.refundedAt = new Date();
             order.refundAmount = given;
         }
     }
 
+    // nothing was charged: the payment of a cancelled order can't happen any more -> "failed" (model enum)
+    if (order.paymentStatus === "pending") order.paymentStatus = "failed";
+
     order.revertedAt = new Date();
     await order.save();
+
+    // one message with the refund (the callers skip the plain "status changed to cancelled" one)
+    const shortId = String(order._id).slice(-6).toUpperCase();
+    const amount = Number(order.refundAmount || 0);
+    await notifyUser(
+        order.user,
+        amount > 0
+            ? `Your order #${shortId} was cancelled. ${amount.toLocaleString("en-US", { maximumFractionDigits: 2 })} $ was refunded to your wallet.`
+            : `Your order #${shortId} was cancelled.`,
+        { type: "order_status", link: NOTIFY_LINKS.userOrders }
+    );
 };
 
+const DAY_MS = 24 * 60 * 60 * 1000;
 const AUTO_COMPLETE_DAYS = Number(process.env.ORDER_AUTO_COMPLETE_DAYS || 7);
+const AFTER_ETA_DAYS = Number(process.env.ORDER_AUTO_COMPLETE_AFTER_ETA_DAYS || 3);
+
+/**
+ * completes a shipped order. For cash orders this also marks them paid, so it is only called when the
+ * money is confirmed: by an admin ("Cash received") — never by the customer's own confirmation.
+ */
 const completeDeliveredOrder = async (order, { auto = false } = {}) => {
     order.status = "completed";
     order.isDelivered = true;
@@ -109,81 +130,64 @@ const completeDeliveredOrder = async (order, { auto = false } = {}) => {
     await order.save();
 };
 
-/* shipped orders the buyer never confirmed → completed after AUTO_COMPLETE_DAYS */
-const autoCompleteShippedOrders = async () => {
-    const deadline = new Date(Date.now() - AUTO_COMPLETE_DAYS * 24 * 60 * 60 * 1000);
+/* "should have arrived + grace days" is over — the same date for online auto-complete and cash overdue */
+const pastDueQuery = (now = Date.now()) => ({
+    $or: [
+        { expectedDeliveryAt: { $ne: null, $lte: new Date(now - AFTER_ETA_DAYS * DAY_MS) } },
+        { expectedDeliveryAt: null, shippedAt: { $ne: null, $lte: new Date(now - AUTO_COMPLETE_DAYS * DAY_MS) } },
+    ],
+});
 
+const pastDueAt = (order) => {
+    if (order.expectedDeliveryAt) return new Date(new Date(order.expectedDeliveryAt).getTime() + AFTER_ETA_DAYS * DAY_MS);
+    if (order.shippedAt) return new Date(new Date(order.shippedAt).getTime() + AUTO_COMPLETE_DAYS * DAY_MS);
+    return null;
+};
+
+const isPastDue = (order, now = Date.now()) => {
+    const due = pastDueAt(order);
+    return Boolean(due && due.getTime() <= now);
+};
+
+const autoCompleteShippedOrders = async () => {
     const orders = await Order.find({
         status: "shipped",
         paymentStatus: "paid",
-        shippedAt: { $lte: deadline },
-        $or: [{ expectedDeliveryAt: null }, { expectedDeliveryAt: { $lte: deadline } }],
         autoCompletedAt: null,
+        ...pastDueQuery(),
     }).limit(200);
 
     for (const order of orders) {
         await completeDeliveredOrder(order, { auto: true });
-        logger.info(`[order ${order._id}] auto-completed after ${AUTO_COMPLETE_DAYS} days, seller funds released`);
+        logger.info(`[order ${order._id}] auto-completed (buyer did not confirm delivery)`);
     }
 
     return orders.length;
 };
 
-const maybeMarkOrderShipped = (order) => {
-    if (["shipped", "completed", "cancelled"].includes(order.status)) return;
-    const allShipped = order.items.every((item) => item.fulfillment?.status === "shipped");
-    if (allShipped) {
-        order.status = "shipped";
-        order.shippedAt = order.shippedAt || new Date();
-    }
+const markOrderShipped = (order, trackingCode, estimatedDeliveryAt = null) => {
+    order.trackingCode = trackingCode;
+    order.shippedAt = new Date();
+    order.expectedDeliveryAt = estimatedDeliveryAt || null;
+    order.status = "shipped";
 };
 
-const markItemShipped = (item, trackingCode, estimatedDeliveryAt = null) => {
-    item.fulfillment = {
-        status: "shipped",
-        trackingCode: trackingCode || item.fulfillment?.trackingCode || null,
-        shippedAt: new Date(),
-        estimatedDeliveryAt: estimatedDeliveryAt || null,
-    };
-};
-
-/** order.expectedDeliveryAt = the latest arrival time among the items that have one */
-const refreshExpectedDelivery = (order) => {
-    const times = (order.items || [])
-        .map((item) => item.fulfillment?.estimatedDeliveryAt)
-        .filter(Boolean)
-        .map((d) => new Date(d).getTime());
-    order.expectedDeliveryAt = times.length ? new Date(Math.max(...times)) : null;
-};
-
-/** changes the expected arrival of an item that already shipped */
-const setItemDeliveryEstimate = (order, item, estimatedDeliveryAt) => {
-    if (["completed", "cancelled"].includes(order.status)) {
-        throw new AppError(400, `The delivery time of a ${order.status} order can't be changed`);
+const setOrderDeliveryEstimate = (order, estimatedDeliveryAt) => {
+    if (order.status !== "shipped") {
+        throw new AppError(400, "Only a shipped order can get a new delivery time");
     }
-    if (item.fulfillment?.status !== "shipped") {
-        throw new AppError(400, "Ship the item first, then set its delivery time");
-    }
-    item.fulfillment.estimatedDeliveryAt = estimatedDeliveryAt;
-    order.markModified("items");
-    refreshExpectedDelivery(order);
-};
-
-const assertShippable = (order) => {
-    if (order.status === "created" || order.status === "cancelled") {
-        throw new AppError(400, `Order cannot be marked as shipped from status "${order.status}"`);
-    }
+    order.expectedDeliveryAt = estimatedDeliveryAt;
 };
 
 module.exports = {
+    pastDueQuery,
+    pastDueAt,
+    isPastDue,
     completeDeliveredOrder,
     autoCompleteShippedOrders,
     revertOrder,
     buildOrderIdSearchExpr,
     finalizeOrder,
-    maybeMarkOrderShipped,
-    markItemShipped,
-    refreshExpectedDelivery,
-    setItemDeliveryEstimate,
-    assertShippable,
+    markOrderShipped,
+    setOrderDeliveryEstimate,
 };

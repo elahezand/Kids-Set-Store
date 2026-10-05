@@ -8,8 +8,6 @@ import validate from "@/utils/validate";
 import couponService from "@/services/server/admin/coupon";
 import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
-/* GET /api/admin/coupons */
-
 export async function GET(req) {
     try {
         await connectToDB();
@@ -62,8 +60,6 @@ export async function GET(req) {
         );
     }
 }
-
-/* POST /api/admin/coupons */
 
 export async function POST(req) {
     try {

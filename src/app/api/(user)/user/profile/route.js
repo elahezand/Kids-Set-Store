@@ -3,7 +3,6 @@ import profileService from "@/services/server/user/profile";
 import { authUser } from "@/utils/auth/authGuard";
 import { formDataToObject, fromService, handleRouteError, jsonError } from "@/utils/apiResponse";
 
-/* PATCH /api/user/profile  (multipart FormData, `avatar` is an optional image file) */
 export async function PATCH(request) {
     try {
         await connectToDB();

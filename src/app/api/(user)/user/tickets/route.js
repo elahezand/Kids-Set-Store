@@ -8,7 +8,6 @@ const currentUser = async () => {
     return user && user.status !== "expired" ? user : null;
 };
 
-/* GET /api/user/tickets?q=&limit=&cursor=  -> the user's tickets (newest first) */
 export async function GET(request) {
     try {
         await connectToDB();
@@ -23,7 +22,6 @@ export async function GET(request) {
     }
 }
 
-/* POST /api/user/tickets  { title, department, subDepartment, priority, content } */
 export async function POST(request) {
     try {
         await connectToDB();

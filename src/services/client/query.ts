@@ -93,7 +93,6 @@ export const useInfiniteGet = <TItem>(
 
 const flattenPages = <TItem>(pages?: Array<Paginated<TItem>>) => pages?.flatMap((page) => page.data ?? []) ?? [];
 
-/** "Load more" list seeded with the page the server already rendered: returns the flat `items` too. */
 export const useCursorList = <TItem>(
   url: string,
   key: readonly unknown[],

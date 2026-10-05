@@ -12,7 +12,7 @@ const encodeCursor = (values) =>
 const toCursorValue = (value) => {
   if (value === null || value === undefined) return null;
   if (value instanceof Date) return value.toISOString();
-  if (typeof value === "object") return String(value); // ObjectId
+  if (typeof value === "object") return String(value);
   return value;
 };
 
@@ -25,7 +25,6 @@ const decodeCursor = (cursor) => {
   }
 };
 
-// values in the cursor are JSON -> turn ids / dates back into real types
 const revive = (key, value) => {
   if (value === null || value === undefined) return value;
   if (key === "_id" && mongoose.isValidObjectId(value)) {

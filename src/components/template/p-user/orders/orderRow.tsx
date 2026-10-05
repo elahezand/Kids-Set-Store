@@ -1,10 +1,11 @@
 import { formatDate, formatPrice } from "@/utils/format";
-import { ORDER_STATUS, orderItemsCount, PAYMENT_STATUS, shortId } from "@/utils/panelView";
+import type { ReactNode } from "react";
+import { ORDER_STATUS, orderItemsCount, paymentState, shortId } from "@/utils/panelView";
 import type { OrderListItem } from "@/types";
 
-export default function OrderRow({ order }: { order: OrderListItem }) {
+export default function OrderRow({ order, action }: { order: OrderListItem; action?: ReactNode }) {
   const status = ORDER_STATUS[order.status] ?? ORDER_STATUS.created;
-  const payment = PAYMENT_STATUS[order.paymentStatus] ?? PAYMENT_STATUS.pending;
+  const payment = paymentState(order);
   const count = orderItemsCount(order);
 
   return (
@@ -18,6 +19,7 @@ export default function OrderRow({ order }: { order: OrderListItem }) {
           <span className={`badge ${status.badge}`}>{status.label}</span>
           <span className={`badge ${payment.badge}`}>{payment.label}</span>
         </div>
+        {action && <div className="mt-3">{action}</div>}
       </div>
       <span className="shrink-0 text-sm font-semibold tabular-nums">{formatPrice(order.pricing?.total)}</span>
     </div>

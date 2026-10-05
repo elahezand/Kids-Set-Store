@@ -4,8 +4,7 @@ import { authUser } from "@/utils/auth/authGuard";
 import { ticketReplySchema } from "@/validators/ticket";
 import { fromService, handleRouteError, jsonError, validationError } from "@/utils/apiResponse";
 
-/* POST /api/user/tickets/:id/answer  { content }
-   the owner replies to their ticket; an admin can reply to any ticket (admin panel uses it too) */
+// the admin panel uses this route too: an admin can reply to any ticket
 export async function POST(request, { params }) {
     try {
         await connectToDB();

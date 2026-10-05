@@ -7,9 +7,6 @@ import validate from "@/utils/validate";
 import departmentService from "@/services/server/admin/department";
 import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
-/* GET /api/admin/departments
-   All departments, including inactive ones */
-
 export async function GET() {
     try {
         await connectToDB();
@@ -37,8 +34,6 @@ export async function GET() {
         );
     }
 }
-
-/* POST /api/admin/departments */
 
 export async function POST(req) {
     try {

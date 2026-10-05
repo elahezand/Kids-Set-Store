@@ -3,10 +3,8 @@ import Department from "@/model/department";
 import SubDepartment from "@/model/subDepartment";
 import { paginateList } from "@/utils/listQuery";
 
-/* ?status=answered | waiting  ->  isAnswer true | false  (anything else = all) */
 const TICKET_STATUS = { answered: true, waiting: false };
 
-/* GET /api/admin/tickets?status=&q=&user=&department=&limit=&cursor= (first messages only, not replies) */
 const getAllTickets = async ({ status, ...query } = {}) =>
     paginateList(Ticket, query, {
         defaultLimit: 15,

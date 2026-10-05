@@ -20,18 +20,12 @@ import {
 
 interface VariantsEditorProps {
   form: UseFormReturn<ProductFormValues, unknown, ProductFormOutput>;
-  /** the category's size / color options */
   rules: Map<string, VariantRule>;
   categoryName?: string;
 }
 
 const errorText = (message?: unknown) => (message ? <span className="field-error">{String(message)}</span> : null);
 
-/**
- * Every variant is size + color, with its own price, discount and stock.
- * Sizes come from the category (when it has a size filter), colors are free.
- * "Generate" builds every size × color pair and keeps the rows that already exist (same id, price, stock).
- */
 export default function VariantsEditor({ form, rules, categoryName }: VariantsEditorProps) {
   const { control, register, getValues, setValue, formState } = form;
   const errors = formState.errors as FieldErrors<ProductFormValues>;
@@ -62,13 +56,11 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
   const [bulk, setBulk] = useState({ price: "", discount: "", stock: "" });
   const [notice, setNotice] = useState("");
 
-  /* a new category with sizes: keep the picked sizes it has, or start with all of them */
   const sizeKey = sizeRule?.options.map((option) => option.value).join("|") ?? "";
   useEffect(() => {
     if (!sizeRule || !sizesLocked) return;
     const kept = splitList(getValues("sizes")).filter((size) => allowedValue(sizeRule, size));
     setValue("sizes", (kept.length ? kept : sizeRule.options.map((option) => option.value)).join(", "));
-    // only when the category's sizes change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sizeKey]);
 
@@ -133,7 +125,6 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
       </div>
 
       <div className="card-body space-y-6">
-        {/* 1. sizes & colors */}
         <div className="space-y-4">
           <div className="grid gap-2 sm:grid-cols-[6rem_1fr] sm:items-start">
             <span className="label sm:mt-2.5 sm:mb-0">Sizes</span>
@@ -213,7 +204,6 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
           </div>
         </div>
 
-        {/* 2. bulk values */}
         <div className="rounded-xl bg-gray-50 p-3 dark:bg-white/5">
           <p className="mb-2 text-xs font-medium text-gray-700 dark:text-gray-400">
             Same values for many variants? Fill them here and apply (also used for new rows).
@@ -249,7 +239,6 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
           </div>
         </div>
 
-        {/* 3. variant rows */}
         <div>
           <div className="table-wrap rounded-xl border border-gray-200 dark:border-white/10">
             <table className="data-table min-w-[820px] [&_td]:px-2 [&_td:first-child]:pl-4 [&_th]:px-2 [&_th:first-child]:pl-4">

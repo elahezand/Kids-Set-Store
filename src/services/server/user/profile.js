@@ -8,10 +8,6 @@ const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 const fail = (status, message, details) => ({ success: false, status, message, details });
 
-/**
- * PATCH /api/user/profile  (FormData: username, email, phone, password?, newPassword?,
- * confirmPassword?, avatar?) — used by the profile form of both panels.
- */
 const updateProfile = async (userId, fields = {}, avatar = null) => {
     const parsed = profileValidationSchema.safeParse(fields);
     if (!parsed.success) {
@@ -27,7 +23,6 @@ const updateProfile = async (userId, fields = {}, avatar = null) => {
     const user = await User.findById(userId).select("+password");
     if (!user) return fail(404, "User not found");
 
-    // phone / email are unique: say which one is taken instead of a raw 409
     if (phone !== user.phone && (await User.exists({ phone, _id: { $ne: userId } }))) {
         return fail(409, "This phone number is already used", [{ field: "phone", message: "Already used" }]);
     }

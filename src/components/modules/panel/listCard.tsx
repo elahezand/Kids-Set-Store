@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 
 interface ListCardProps {
   title: string;
-  /** tabs, search, buttons… shown in the header */
   toolbar?: ReactNode;
   isEmpty: boolean;
   empty: ReactNode;
@@ -20,7 +19,6 @@ interface ListCardProps {
   };
 }
 
-/** Card used by every panel table: header with toolbar, empty state, rows, "Load more". */
 export default function ListCard({ title, toolbar, isEmpty, empty, children, pager }: ListCardProps) {
   return (
     <section className="card overflow-hidden">

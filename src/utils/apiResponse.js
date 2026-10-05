@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 
-
-
 const ENVELOPE_KEYS = new Set(["success", "message", "data", "pagination", "errors", "meta"]);
 
 export const normalizePagination = (pagination) => {
@@ -38,18 +36,14 @@ export const toEnvelope = (body, status = 200) => {
   return envelope;
 };
 
-/** Drop-in replacement for NextResponse.json() that enforces the envelope */
 export const respond = (body = {}, init = {}) =>
   NextResponse.json(toEnvelope(body, init.status ?? 200), init);
-
-/* ---------- helpers for new code ---------- */
 
 export const ok = (data, { status = 200, message, meta } = {}) =>
   respond({ success: true, data, message, meta }, { status });
 
 export const created = (data, message) => ok(data, { status: 201, message });
 
-/** result of utils/paginate (or any { data, pagination }) */
 export const paginated = (result, { meta, message } = {}) =>
   respond({ success: true, data: result?.data ?? [], pagination: result?.pagination, meta, message });
 

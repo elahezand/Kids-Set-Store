@@ -92,7 +92,6 @@ export async function POST(req) {
             { status: 200 }
         );
 
-        // Access token
         response.cookies.set(
             "accessToken",
             accessToken,
@@ -102,7 +101,6 @@ export async function POST(req) {
             }
         );
 
-        // Refresh token
         response.cookies.set(
             "refreshToken",
             refreshToken,

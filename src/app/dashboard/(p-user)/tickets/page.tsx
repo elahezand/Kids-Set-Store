@@ -4,8 +4,8 @@ import TicketsList from "@/components/template/p-user/tickets/ticketsList";
 import ticketService from "@/services/server/user/ticket";
 import { getPanelSession } from "@/utils/auth/panelUser";
 import { toInitialPage } from "@/utils/initialPage";
-import { pickStatus } from "@/utils/panelStatus";
 import { tabValues, TICKET_TABS } from "@/utils/panelView";
+import { pickStatus } from "@/utils/searchParams";
 import type { Metadata } from "next";
 import type { PageProps, Pagination, TicketSummary } from "@/types";
 

@@ -14,7 +14,7 @@ const ArticlesSlider = ({ articles = [] }: { articles?: ArticleSummary[] }) => {
   const canLoop = articles.length > MAX_SLIDES_PER_VIEW;
 
   return (
-    <div className="page-container">
+    <div className="home-container">
       <SectionHeader eyebrow="From the journal" title="Our Articles" href={ROUTES.articles} />
       {articles.length ? (
         <Swiper

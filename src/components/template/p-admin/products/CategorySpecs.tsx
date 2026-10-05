@@ -6,16 +6,11 @@ import type { CategoryFilter } from "@/types";
 
 interface CategorySpecsProps {
   form: UseFormReturn<ProductFormValues, unknown, ProductFormOutput>;
-  /** the category's filters except size / color (its own + its parents') */
   filters: CategoryFilter[];
   categoryName?: string;
   isLoading?: boolean;
 }
 
-/**
- * Specifications = the category's filters, so the shop filters on /products find the product.
- * select / radio -> one of the filter's options, boolean -> yes / no, text -> free text.
- */
 export default function CategorySpecs({ form, filters, categoryName, isLoading = false }: CategorySpecsProps) {
   const { register, control } = form;
   const errors = (form.formState.errors as FieldErrors<ProductFormValues>).specs as

@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-/*ADDRESS */
 const addressSchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true },
     postalCode: { type: String, required: true },
@@ -16,7 +15,6 @@ const addressSchema = new mongoose.Schema({
     },
 });
 
-/*USER */
 const userSchema = new mongoose.Schema(
     {
         username: {
@@ -28,7 +26,7 @@ const userSchema = new mongoose.Schema(
         phone: {
             type: String,
             required: true,
-            match: /^09\d{9}$/, // unique index: userSchema.index({ phone: 1 })
+            match: /^09\d{9}$/,
         },
 
         email: {
@@ -45,7 +43,6 @@ const userSchema = new mongoose.Schema(
             select: false,
         },
 
-        // refunds of cancelled orders land here
         wallet: {
             balance: { type: Number, default: 0, min: 0 },
         },
@@ -92,8 +89,6 @@ const userSchema = new mongoose.Schema(
         },
     }
 );
-
-/* INDEXES */
 
 userSchema.index({ phone: 1 }, { unique: true });
 userSchema.index({ email: 1 }, { unique: true, sparse: true });

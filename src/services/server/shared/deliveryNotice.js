@@ -44,24 +44,14 @@ const sendOnce = async (userId, msg, opts) => {
     await notifyUser(userId, msg, opts);
 };
 
-/**
- * after an item was marked shipped
- */
-const notifyItemShipped = async (order, item) => {
-    const eta = item.fulfillment?.estimatedDeliveryAt;
-    const tracking = item.fulfillment?.trackingCode;
-    const whole = order.status === "shipped";
+const notifyOrderShipped = async (order) => {
+    const eta = order.expectedDeliveryAt;
+    const tracking = order.trackingCode;
 
     const msg = [
-        whole
-            ? `Your order #${shortId(order)} has shipped.`
-            : `Part of your order #${shortId(order)} has shipped (${item.productSnapshot?.title || "an item"}).`,
-        eta
-            ? `Expected delivery: ${formatArrival(eta)}.`
-            : null,
-        tracking
-            ? `Tracking code: ${tracking}.`
-            : null,
+        `Your order #${shortId(order)} has shipped.`,
+        eta ? `Expected delivery: ${formatArrival(eta)}.` : null,
+        tracking ? `Tracking code: ${tracking}.` : null,
     ]
         .filter(Boolean)
         .join(" ");
@@ -72,11 +62,8 @@ const notifyItemShipped = async (order, item) => {
     });
 };
 
-/**
- * after the expected arrival of a shipped item was changed
- */
-const notifyDeliveryUpdated = async (order, item) => {
-    const eta = item.fulfillment?.estimatedDeliveryAt;
+const notifyDeliveryUpdated = async (order) => {
+    const eta = order.expectedDeliveryAt;
 
     if (!eta) return;
 
@@ -89,13 +76,13 @@ const notifyDeliveryUpdated = async (order, item) => {
 };
 
 export {
-    notifyItemShipped,
+    notifyOrderShipped,
     notifyDeliveryUpdated,
     formatArrival,
 };
 
 export default {
-    notifyItemShipped,
+    notifyOrderShipped,
     notifyDeliveryUpdated,
     formatArrival,
 };

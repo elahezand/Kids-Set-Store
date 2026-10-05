@@ -76,8 +76,6 @@ const productSchema = new Schema(
   }
 );
 
-
-/* === HOOKS === */
 productSchema.pre("save", async function () {
   this.variants.forEach((v) => {
     v.finalPrice = calcFinalPrice(v.price, v.discount);
@@ -96,7 +94,6 @@ productSchema.pre("save", async function () {
   }
 });
 
-/* === INDEXES === */
 productSchema.index({ status: 1, categoryPath: 1, minPrice: 1 });
 productSchema.index({ "variants.sku": 1 }, { sparse: true });
 productSchema.index({ tags: 1 });

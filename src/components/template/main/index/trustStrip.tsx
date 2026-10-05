@@ -10,7 +10,7 @@ const PROMISES = [
 export default function TrustStrip() {
   return (
     <section aria-label="Why shop with us" className="border-y border-gray-200 dark:border-white/10">
-      <ul className="container-x grid grid-cols-2 gap-x-4 gap-y-6 py-6 lg:grid-cols-4 lg:py-8">
+      <ul className="home-container grid grid-cols-2 gap-x-4 gap-y-6 py-6 lg:grid-cols-4 lg:py-8">
         {PROMISES.map(({ icon: Icon, title, text }) => (
           <li key={title} className="flex items-start gap-3">
             <Icon className="mt-0.5 size-6 shrink-0 text-sage-600 dark:text-sage-400" aria-hidden="true" />

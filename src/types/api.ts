@@ -23,8 +23,6 @@ export interface ApiFailure {
   errors?: FieldError[];
 }
 
-export type ApiResponse<TData = unknown, TMeta = Record<string, unknown>> = ApiSuccess<TData, TMeta> | ApiFailure;
-
 export interface Paginated<TItem, TMeta = Record<string, unknown>> extends ApiSuccess<TItem[], TMeta> {
   pagination: Pagination;
 }

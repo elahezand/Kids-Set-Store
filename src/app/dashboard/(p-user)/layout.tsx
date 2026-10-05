@@ -1,8 +1,6 @@
-import { redirect } from "next/navigation";
 import PanelShell from "@/components/modules/panel/panelShell";
 import RefreshAccessToken from "@/components/modules/ui/refreshAccessToken";
-import { getPanelSession } from "@/utils/auth/panelUser";
-import { ROUTES } from "@/utils/constants";
+import { requirePanelUser } from "@/utils/auth/panelUser";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
@@ -12,9 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function UserLayout({ children }: { children: ReactNode }) {
-  const { user, expired } = await getPanelSession();
-  if (!user && !expired) redirect(ROUTES.login);
-
+  const { user, expired } = await requirePanelUser();
   return (
     <RefreshAccessToken shouldRefresh={expired}>
       <PanelShell variant="user" user={user}>

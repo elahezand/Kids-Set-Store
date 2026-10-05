@@ -72,20 +72,23 @@ export interface OrderItem {
 
 export interface OrderListItem extends OrderSummary {
   items: OrderItem[];
+  shippingAddress?: ShippingAddress;
+  coupon?: { code: string } | null;
+  trackingCode?: string | null;
+  shippedAt?: ISODate | null;
+  expectedDeliveryAt?: ISODate | null;
+  isDelivered?: boolean;
+  deliveredAt?: ISODate | null;
+  refundAmount?: number;
+  refundedAt?: ISODate | null;
 }
 
 export type OrderStatusFilter = "all" | OrderStatus;
 
-/* ---------- admin ---------- */
+export type AdminOrderStatusFilter = OrderStatusFilter | "cash" | "overdue";
 
 export interface AdminOrderItem extends OrderItem {
   price?: number;
-  fulfillment?: {
-    status: "pending" | "shipped";
-    trackingCode: string | null;
-    shippedAt: ISODate | null;
-    estimatedDeliveryAt: ISODate | null;
-  };
 }
 
 export interface AdminOrder extends Omit<OrderListItem, "user" | "items"> {
@@ -94,6 +97,8 @@ export interface AdminOrder extends Omit<OrderListItem, "user" | "items"> {
   shippingAddress?: ShippingAddress;
   coupon?: { code: string } | null;
   isCashOverdue?: boolean;
+  refundAmount?: number;
+  refundedAt?: ISODate | null;
   shippedAt?: ISODate | null;
   deliveredAt?: ISODate | null;
 }
@@ -103,9 +108,8 @@ export interface UpdateOrderPayload {
   paymentStatus?: PaymentStatus;
 }
 
-export interface ShipItemPayload {
+export interface ShipOrderPayload {
   orderId: Id;
-  itemId: Id;
   trackingCode: string;
   estimatedDeliveryAt?: string;
 }

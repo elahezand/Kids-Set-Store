@@ -7,8 +7,6 @@ import validate from "@/utils/validate";
 import contactService from "@/services/server/admin/contact";
 import { validationError, jsonError, handleRouteError, respond } from "@/utils/apiResponse";
 
-/* GET /api/admin/contacts?status=new&cursor=...&limit=... */
-
 export async function GET(req) {
     try {
         await connectToDB();

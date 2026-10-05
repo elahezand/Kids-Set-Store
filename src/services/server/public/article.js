@@ -59,7 +59,6 @@ const getPublicArticles = async (query = {}) => {
     });
 };
 
-/* Categories that really have published articles (filter on /articles) */
 const getPublicArticleCategories = async () => {
     const ids = await Article.distinct("category", {
         isPublished: true,

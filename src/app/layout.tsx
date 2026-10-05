@@ -2,7 +2,7 @@ import { type ReactNode, Suspense } from "react";
 import "@/app/globals.css";
 import PageLoader from "@/components/modules/ui/pageLoader";
 import ScrollToTop from "@/components/modules/ui/scrollToTop";
-import QueryProvider from "@/utils/providers/queryProvider";
+import QueryProvider from "@/components/providers/queryProvider";
 import type { Metadata, Viewport } from "next";
 
 export const dynamic = "force-dynamic";
@@ -38,7 +38,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
 
-      <body className="bg-white transition-colors duration-300 dark:bg-gray-900">
+      <body className="bg-white transition-colors duration-300 dark:bg-ink-900">
         <QueryProvider>
           <div className="flex min-h-screen flex-col">
             <ScrollToTop />

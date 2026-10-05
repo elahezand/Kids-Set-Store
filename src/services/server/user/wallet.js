@@ -47,7 +47,6 @@ const getMyWallet = async (userId, query = {}) => {
     const sum = (type) =>
         totals.find((item) => item._id === type)?.total || 0;
 
-    // same envelope as every list: data = transactions, meta = wallet summary
     return {
         success: true,
         data: result.data,

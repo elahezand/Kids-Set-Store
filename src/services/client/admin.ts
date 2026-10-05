@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { queryKeys } from "@/services/client/keys";
 import { useCursorList, useDelete, useGet, usePatch, usePost, usePut } from "@/services/client/query";
 import { ROUTES } from "@/utils/constants";
+import { formatPrice } from "@/utils/format";
 import type { AdminListParams } from "@/utils/adminFilters";
 import type {
   AdminArticle,
@@ -26,13 +27,10 @@ import type {
   ProductPayload,
   ProductStatus,
   ReplyCommentPayload,
-  ShipItemPayload,
+  ShipOrderPayload,
   UpdateOrderPayload,
 } from "@/types";
 
-/* ---------- shared ---------- */
-
-/** after every admin change: toast, refetch the admin lists and re-render the server page */
 const useAfterChange = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -46,8 +44,6 @@ const useAfterChange = () => {
 
 type WithId<T> = T & { id: Id };
 
-/* ---------- dashboard ---------- */
-
 export const useAdminStats = (days: number) =>
   useGet<ApiSuccess<AdminStatsSeries>>(
     "/admin/stat",
@@ -55,9 +51,6 @@ export const useAdminStats = (days: number) =>
     { queryKey: queryKeys.admin.stats(days), errorFallback: "Could not load the chart", staleTime: 60 * 1000 }
   );
 
-/* ---------- uploads ---------- */
-
-/** uploads images to /api/admin/upload (send `imagesFormData(files)`) and resolves with their public paths */
 export const useUploadImages = () =>
   usePost<ApiSuccess<string[]>, FormData>("/admin/upload", { errorFallback: "Could not upload the images" });
 
@@ -67,8 +60,6 @@ export const imagesFormData = (files: File[]) => {
   return data;
 };
 
-/* ---------- orders ---------- */
-
 export const useAdminOrders = (initialPage: Paginated<AdminOrder>, params: AdminListParams) =>
   useCursorList("/admin/order", queryKeys.admin.orders(params), params, initialPage, "Could not load orders");
 
@@ -76,25 +67,29 @@ export const useUpdateOrder = ({ onDone }: { onDone?: () => void } = {}) => {
   const afterChange = useAfterChange();
   return usePut<ApiSuccess<AdminOrder>, WithId<UpdateOrderPayload>>(({ id }) => `/admin/order/${id}`, {
     errorFallback: "Could not update the order",
-    onSuccess: () => {
-      afterChange("Order updated", queryKeys.admin.orders());
+    onSuccess: (response) => {
+      const order = response.data;
+      const message =
+        order?.status === "cancelled"
+          ? order.refundAmount
+            ? `Order cancelled — ${formatPrice(order.refundAmount)} refunded to the customer's wallet (see the Cancelled tab)`
+            : "Order cancelled (see the Cancelled tab)"
+          : "Order updated";
+      afterChange(message, queryKeys.admin.orders());
       onDone?.();
     },
   });
 };
 
-export const useShipOrderItem = ({ onDone }: { onDone?: () => void } = {}) => {
+export const useShipOrder = ({ onDone }: { onDone?: () => void } = {}) => {
   const afterChange = useAfterChange();
-  return usePatch<ApiSuccess<AdminOrder>, ShipItemPayload>(
-    ({ orderId, itemId }) => `/admin/order/${orderId}/ship/${itemId}`,
-    {
-      errorFallback: "Could not mark the item as shipped",
-      onSuccess: () => {
-        afterChange("Item marked as shipped", queryKeys.admin.orders());
-        onDone?.();
-      },
-    }
-  );
+  return usePatch<ApiSuccess<AdminOrder>, ShipOrderPayload>(({ orderId }) => `/admin/order/${orderId}/ship`, {
+    errorFallback: "Could not mark the order as shipped",
+    onSuccess: () => {
+      afterChange("Order shipped — the customer was notified", queryKeys.admin.orders());
+      onDone?.();
+    },
+  });
 };
 
 export const useMarkOrderDelivered = ({ onDone }: { onDone?: () => void } = {}) => {
@@ -102,18 +97,15 @@ export const useMarkOrderDelivered = ({ onDone }: { onDone?: () => void } = {}) 
   return usePatch<ApiSuccess<AdminOrder>, Id>((id) => `/admin/order/${id}/delivered`, {
     errorFallback: "Could not mark the order as delivered",
     onSuccess: () => {
-      afterChange("Order marked as delivered", queryKeys.admin.orders());
+      afterChange("Order completed", queryKeys.admin.orders());
       onDone?.();
     },
   });
 };
 
-/* ---------- products ---------- */
-
 export const useAdminProducts = (initialPage: Paginated<AdminProduct>, params: AdminListParams) =>
   useCursorList("/admin/products", queryKeys.admin.products(params), params, initialPage, "Could not load products");
 
-/** filters of a category + the ones it inherits from its parents (sizes, colors…) */
 export const useCategoryFilters = (slug?: string) =>
   useGet<ApiSuccess<CategoryDetail>>(`/categories/${encodeURIComponent(slug ?? "")}`, undefined, {
     queryKey: queryKeys.admin.categoryFilters(slug ?? ""),
@@ -155,8 +147,6 @@ export const useDeleteProduct = () => {
   });
 };
 
-/* ---------- users ---------- */
-
 export const useAdminUsers = (initialPage: Paginated<AdminUser>, params: AdminListParams) =>
   useCursorList("/admin/users", queryKeys.admin.users(params), params, initialPage, "Could not load users");
 
@@ -183,8 +173,6 @@ export const useDeleteUser = () => {
     onSuccess: () => afterChange("User deleted", queryKeys.admin.users()),
   });
 };
-
-/* ---------- comments ---------- */
 
 export const useAdminComments = (initialPage: Paginated<AdminComment>, params: AdminListParams) =>
   useCursorList("/admin/comments", queryKeys.admin.comments(params), params, initialPage, "Could not load comments");
@@ -218,8 +206,6 @@ export const useDeleteComment = () => {
     onSuccess: () => afterChange("Comment deleted", queryKeys.admin.comments()),
   });
 };
-
-/* ---------- articles ---------- */
 
 export const useAdminArticles = (initialPage: Paginated<AdminArticle>, params: AdminListParams) =>
   useCursorList("/admin/article", queryKeys.admin.articles(params), params, initialPage, "Could not load articles");
@@ -258,12 +244,8 @@ export const useDeleteArticle = () => {
   });
 };
 
-/* ---------- tickets ---------- */
-
 export const useAdminTickets = (initialPage: Paginated<AdminTicket>, params: AdminListParams) =>
   useCursorList("/admin/tickets", queryKeys.admin.tickets(params), params, initialPage, "Could not load tickets");
-
-/* ---------- coupons (discounts page) ---------- */
 
 export const useAdminCoupons = (initialPage: Paginated<Coupon>, params: AdminListParams) =>
   useCursorList("/admin/coupon", queryKeys.admin.coupons(params), params, initialPage, "Could not load discount codes");

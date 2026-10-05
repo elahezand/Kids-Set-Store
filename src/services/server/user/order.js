@@ -14,27 +14,25 @@ import {
 } from "@/utils/helper";
 
 import { round2 } from "@/utils/pricing";
+import { notifyUser, NOTIFY_LINKS } from "@/utils/notify";
 import logger from "@/utils/logger";
 
-// one place for the gateway url / Rial conversion (with safe defaults in zarinpal.js)
 import {
     createPayment,
     paymentUrl as payUrl,
     tomanToRial as toRial,
-} from "../shared/zarinpal";
+} from "@/services/server/shared/zarinpal";
 
 import {
     buildOrderIdSearchExpr,
     finalizeOrder,
     revertOrder,
     completeDeliveredOrder,
-} from "../shared/order";
+} from "@/services/server/shared/order";
 
 import { isValidObjectId } from "mongoose";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-
-/* ========================= CHECKOUT ========================= */
 
 const checkout = async (
     userId,
@@ -102,10 +100,6 @@ const checkout = async (
             )
         );
 
-    /*
-      Undo everything a failed checkout already did:
-      cancel the unpaid order, give the cart back, return the wallet money.
-    */
     const rollback = async (reason) => {
         if (createdOrder) {
             await Order.updateOne(
@@ -194,12 +188,6 @@ const checkout = async (
                     sku: null,
                 },
 
-            fulfillment: {
-                status: "pending",
-                trackingCode: null,
-                shippedAt: null,
-            },
-
             estimatedShipBy: new Date(
                 Date.now() +
                 (item.shipsWithinDays ?? 3) * DAY_MS
@@ -231,9 +219,6 @@ const checkout = async (
 
         let paymentUrl = null;
 
-        /* ========================= WALLET ========================= */
-        // takes what it can from the wallet; the rest is paid below (ZarinPal / cash)
-
         if (walletPlanned > 0) {
             const charged = await spendFromWallet(
                 userId,
@@ -253,9 +238,6 @@ const checkout = async (
                 await order.save();
             }
         }
-
-        /* ========================= FULL WALLET PAYMENT ========================= */
-        // nothing left to pay -> the order is paid and finalized right now
 
         if (
             order.pricing.total === 0 &&
@@ -284,7 +266,6 @@ const checkout = async (
             };
         }
 
-        /* ========================= ZARINPAL ========================= */
         // finalizedAt stays null: verify() sets it after ZarinPal confirms the payment
 
         if (
@@ -321,9 +302,6 @@ const checkout = async (
             await order.save();
         }
 
-        /* ========================= CASH ========================= */
-        // paid on delivery -> finalize now (stock reserved, coupon counted)
-
         if (paymentMethod === "cash") {
             order.finalizedAt =
                 order.finalizedAt || new Date();
@@ -347,8 +325,6 @@ const checkout = async (
     }
 };
 
-/* ========================= MY ORDERS ========================= */
-
 const getMyOrders = async (userId, query = {}) => {
     const searchExpr = buildOrderIdSearchExpr(query.q);
 
@@ -359,8 +335,6 @@ const getMyOrders = async (userId, query = {}) => {
         filters: searchExpr ? { $expr: searchExpr } : {},
     });
 };
-
-/* ========================= GET ORDER ========================= */
 
 const getOrderById = async (orderId, userId) => {
     if (!isValidObjectId(orderId)) {
@@ -389,8 +363,6 @@ const getOrderById = async (orderId, userId) => {
         data: order,
     };
 };
-
-/* ========================= UPDATE ORDER ========================= */
 
 const OWNER_UPDATABLE_FIELDS = ["shippingAddress"];
 
@@ -449,8 +421,6 @@ const updateOrderByOwner = async (
     };
 };
 
-/* ========================= CANCEL ORDER ========================= */
-
 const cancelOrder = async (orderId, userId) => {
     if (!isValidObjectId(orderId)) {
         return {
@@ -485,21 +455,8 @@ const cancelOrder = async (orderId, userId) => {
         };
     }
 
-    if (
-        order.items?.some(
-            (item) =>
-                item.fulfillment?.status === "shipped"
-        )
-    ) {
-        return {
-            success: false,
-            status: 400,
-            message:
-                "Part of this order has already been shipped — contact support to cancel it",
-        };
-    }
-
     order.status = "cancelled";
+    order.$locals.skipStatusNotify = true; // revertOrder sends the cancel message (with the refund)
 
     await order.save();
 
@@ -510,8 +467,6 @@ const cancelOrder = async (orderId, userId) => {
         data: order,
     };
 };
-
-/* ========================= CONFIRM DELIVERY ========================= */
 
 const confirmDelivery = async (orderId, userId) => {
     if (!isValidObjectId(orderId)) {
@@ -543,10 +498,43 @@ const confirmDelivery = async (orderId, userId) => {
         };
     }
 
+    // cash on delivery: the customer's word is not proof of payment. Only the parcel is confirmed;
+    // the order completes (and becomes "paid") when an admin confirms the courier handed over the money.
+    if (order.paymentMethod === "cash" && order.paymentStatus !== "paid") {
+        if (order.isDelivered) {
+            return {
+                success: false,
+                status: 409,
+                message: "You already confirmed this order — it completes once the payment is confirmed",
+            };
+        }
+
+        order.isDelivered = true;
+        order.deliveredAt = new Date();
+        await order.save();
+
+        const admins = await User.find({ role: "ADMIN" }).select("_id").lean();
+        const shortId = String(order._id).slice(-6).toUpperCase();
+        for (const admin of admins) {
+            await notifyUser(
+                admin._id,
+                `Cash order #${shortId}: the customer confirmed receipt — check the courier handed over the money, then press "Cash received"`,
+                { type: "cod_received", link: NOTIFY_LINKS.adminOrders }
+            );
+        }
+
+        return {
+            success: true,
+            message: "Thanks! The order completes once your cash payment is confirmed.",
+            data: order,
+        };
+    }
+
     await completeDeliveredOrder(order);
 
     return {
         success: true,
+        message: "Thanks! Your order is marked as completed.",
         data: order,
     };
 };

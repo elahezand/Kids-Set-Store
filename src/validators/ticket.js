@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-/* POST /api/user/tickets  (also used by the "open a ticket" form) */
 export const ticketValidationSchema = z.object({
     title: z.string().trim().min(3, "Subject is too short").max(200, "Subject is too long"),
     department: z.string().min(1, "Choose a department"),
@@ -10,7 +9,6 @@ export const ticketValidationSchema = z.object({
     content: z.string().trim().min(5, "Message is too short").max(5000, "Message is too long"),
 });
 
-/* GET /api/admin/tickets */
 export const adminTicketsQuerySchema = z.object({
     status: z.enum(["waiting", "answered"]).optional().catch(undefined),
     q: z.string().trim().max(100).optional(),
@@ -18,7 +16,6 @@ export const adminTicketsQuerySchema = z.object({
     cursor: z.string().trim().min(1).optional().catch(undefined),
 });
 
-/* POST /api/user/tickets/:id/answer */
 export const ticketReplySchema = z.object({
     content: z.string().trim().min(3, "Message is too short").max(5000, "Message is too long"),
 });

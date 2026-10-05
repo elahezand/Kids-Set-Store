@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-const objectId = (message) => z.string().trim().regex(/^[a-f\d]{24}$/i, message);
+const objectId = (message) =>
+  z
+    .string()
+    .trim()
+    .regex(/^[a-f\d]{24}$/i, message);
 
 const textList = z
   .array(z.string().trim().max(200, "Each item must be at most 200 characters"))
@@ -10,9 +14,6 @@ const textList = z
 const limit = (fallback) => z.coerce.number().int().min(1).max(50).catch(fallback);
 const cursor = z.string().trim().min(1).optional().catch(undefined);
 
-/* ---------- User ---------- */
-
-/* POST /api/comment: review by a logged-in user */
 export const createCommentSchema = z.object({
   productId: objectId("Invalid product"),
 
@@ -34,60 +35,30 @@ export const createCommentSchema = z.object({
   recommendation: z.enum(["recommended", "not_recommended", "no_idea"]).optional(),
 });
 
-/* PUT /api/comment/:id: owner edits their own pending review */
-export const updateOwnCommentSchema = createCommentSchema
-  .omit({ productId: true })
-  .partial()
-  .refine(
-    (data) => Object.values(data).some((value) => value !== undefined),
-    "Nothing to update"
-  );
-
-/* GET /api/comment?productId=... */
-export const commentListQuerySchema = z.object({
-  productId: objectId("Invalid product"),
-  limit: limit(10),
-  cursor,
-});
-
-/* GET /api/comment/me */
-export const myCommentsQuerySchema = z.object({
-  limit: limit(10),
-  cursor,
-});
-
-/* ---------- Admin ---------- */
-
-/* GET /api/admin/comments?status=&productId=&userId= */
 export const adminCommentsQuerySchema = z.object({
-  status: z
-    .enum(["pending", "approved", "rejected", "spam", "deleted"])
-    .optional()
-    .catch(undefined),
+  status: z.enum(["pending", "approved", "rejected", "spam", "deleted"]).optional().catch(undefined),
   productId: objectId("Invalid product").optional().catch(undefined),
   userId: objectId("Invalid user").optional().catch(undefined),
+  replied: z.enum(["true"]).optional().catch(undefined),
   q: z.string().trim().max(100).optional(),
   limit: limit(20),
   cursor,
 });
 
-/* PUT /api/admin/comments/:id: reason required for rejected / deleted */
 export const moderateCommentSchema = z
   .object({
     status: z.enum(["approved", "rejected", "spam", "deleted"]),
     reason: z.string().trim().max(500).optional(),
   })
-  .refine(
-    (data) => ["approved", "spam"].includes(data.status) || Boolean(data.reason),
-    { message: "A reason is required", path: ["reason"] }
-  );
+  .refine((data) => ["approved", "spam"].includes(data.status) || Boolean(data.reason), {
+    message: "A reason is required",
+    path: ["reason"],
+  });
 
-/* DELETE /api/admin/comments/:id */
 export const deleteCommentSchema = z.object({
   reason: z.string().trim().max(500).optional(),
 });
 
-/* POST /api/admin/comments/:id: reply to a review */
 export const replyCommentSchema = z.object({
   body: z
     .string()
@@ -96,5 +67,4 @@ export const replyCommentSchema = z.object({
     .max(2000, "Reply must be at most 2000 characters"),
 });
 
-/* client-side form on the product page (same rules as createCommentSchema, productId comes from the page) */
 export const commentValidationSchema = createCommentSchema.omit({ productId: true });

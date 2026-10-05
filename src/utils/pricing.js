@@ -6,10 +6,6 @@ function calcFinalPrice(price, discount = 0) {
   return round2(p - (p * d) / 100);
 }
 
-function variantFinalPrice(variant) {
-  return variant ? variant.finalPrice : null;
-}
-
 function computeMinPrice(variants = []) {
   const prices = variants
     .map((v) => (typeof v.finalPrice === "number" ? v.finalPrice : calcFinalPrice(v.price, v.discount)))
@@ -21,6 +17,4 @@ export {
   round2,
   computeMinPrice,
   calcFinalPrice,
-  variantFinalPrice,
-
 };

@@ -29,7 +29,6 @@ const sumRevenue = async (match = {}) => {
     return row?.total || 0;
 };
 
-/* /dashboard/admin home: counters + latest orders & tickets (one round trip, all in parallel) */
 const getDashboard = async () => {
     const [
         users,
@@ -87,7 +86,6 @@ const getDashboard = async () => {
     };
 };
 
-/* GET /api/admin/stat?days=30 — orders, revenue and new users per day */
 const getStatsTimeseries = async (days = 30) => {
     const rangeDays = Math.min(Math.max(Number(days) || 30, 7), 365);
     const since = startOfDayUTC(rangeDays - 1);

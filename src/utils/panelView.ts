@@ -1,5 +1,6 @@
 import type {
   AdminCommentStatusFilter,
+  AdminOrderStatusFilter,
   ArticleStatusFilter,
   CommentStatus,
   CommentStatusFilter,
@@ -20,9 +21,9 @@ type Badge = { label: string; badge: string };
 
 export const ORDER_STATUS: Record<OrderStatus, Badge> = {
   created: { label: "Placed", badge: "badge-neutral" },
-  processing: { label: "Processing", badge: "badge-accent" },
+  processing: { label: "Processing", badge: "badge-new" },
   shipped: { label: "Shipped", badge: "badge-warning" },
-  completed: { label: "Delivered", badge: "badge-success" },
+  completed: { label: "Completed", badge: "badge-success" },
   cancelled: { label: "Cancelled", badge: "badge-danger" },
 };
 
@@ -71,10 +72,19 @@ export const couponState = (
 export const ORDER_STATUS_MOVES: Record<OrderStatus, OrderStatus[]> = {
   created: ["cancelled"],
   processing: ["cancelled"],
-  shipped: ["completed", "cancelled"],
+  shipped: ["completed"],
   completed: [],
   cancelled: [],
 };
+
+/**
+ * Payment badge of an order. A cancelled order that was never paid is "failed" (model enum) —
+ * the API sets that when it cancels; older cancelled orders may still say "pending" in the database.
+ */
+export const paymentState = (order: Pick<OrderListItem, "status" | "paymentStatus">): Badge =>
+  order.status === "cancelled" && order.paymentStatus === "pending"
+    ? PAYMENT_STATUS.failed
+    : (PAYMENT_STATUS[order.paymentStatus] ?? PAYMENT_STATUS.pending);
 
 export const TICKET_PRIORITY: Record<TicketPriority, Badge> = {
   1: { label: "Low", badge: "badge-neutral" },
@@ -86,6 +96,9 @@ export const ticketState = (isAnswer: boolean): Badge =>
   isAnswer ? { label: "Answered", badge: "badge-success" } : { label: "Waiting", badge: "badge-accent" };
 
 export const shortId = (id: string) => `#${String(id).slice(-6).toUpperCase()}`;
+
+export const canCancelOrder = (order: { status: OrderStatus }) =>
+  (ORDER_STATUS_MOVES[order.status] ?? []).includes("cancelled");
 
 export const orderItemsCount = (order: Pick<OrderListItem, "items">) =>
   order.items?.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) ?? 0;
@@ -118,6 +131,7 @@ export const ADMIN_COMMENT_TABS: ReadonlyArray<Tab<AdminCommentStatusFilter>> = 
   { value: "approved", label: "Approved" },
   { value: "rejected", label: "Rejected" },
   { value: "spam", label: "Spam" },
+  { value: "replied", label: "Replied" },
 ];
 
 export const PRODUCT_TABS: ReadonlyArray<Tab<ProductStatusFilter>> = [
@@ -143,6 +157,32 @@ export const COUPON_TABS: ReadonlyArray<Tab<CouponStatusFilter>> = [
   { value: "inactive", label: "Disabled" },
 ];
 
-/** name to show for a populated user ref (or a bare id) */
 export const personName = (user: { username?: string; phone?: string } | string | null | undefined, fallback = "—") =>
   user && typeof user === "object" ? user.username || user.phone || fallback : fallback;
+
+export const ADMIN_ORDER_TABS: ReadonlyArray<Tab<AdminOrderStatusFilter>> = [
+  ...ORDER_TABS,
+  { value: "cash", label: "Collect cash" },
+  { value: "overdue", label: "Cash overdue" },
+];
+
+export const awaitsCash = (order: Pick<OrderListItem, "status" | "paymentMethod" | "paymentStatus">) =>
+  order.status === "shipped" && order.paymentMethod === "cash" && order.paymentStatus === "pending";
+
+export const cashReceivedText = (order?: Pick<OrderListItem, "isDelivered"> | null) =>
+  order?.isDelivered
+    ? "The customer confirmed they received it. Only confirm once the courier has handed over the money — the order is marked paid and completed, and this can't be undone."
+    : "⚠ The customer hasn't confirmed receipt yet. Only confirm if the courier has really handed over the money — the order is marked paid and completed, and this can't be undone.";
+
+export const AUTO_COMPLETE_DAYS = 7;
+export const AUTO_COMPLETE_AFTER_ETA_DAYS = 3;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+export const autoCompleteDate = (order: Pick<OrderListItem, "shippedAt" | "expectedDeliveryAt">): Date | null => {
+  if (order.expectedDeliveryAt) {
+    return new Date(new Date(order.expectedDeliveryAt).getTime() + AUTO_COMPLETE_AFTER_ETA_DAYS * DAY_MS);
+  }
+  if (order.shippedAt) return new Date(new Date(order.shippedAt).getTime() + AUTO_COMPLETE_DAYS * DAY_MS);
+  return null;
+};

@@ -27,7 +27,7 @@ export default function ProductSlider({
   const canLoop = products.length > MAX_SLIDES_PER_VIEW;
 
   return (
-    <div className="page-container">
+    <div className="home-container">
       <SectionHeader eyebrow={eyebrow} title={title} href={href} />
       <Swiper
         slidesPerView={1}

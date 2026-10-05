@@ -1,41 +1,94 @@
 "use client";
 
 import { useState } from "react";
-import { LuEye, LuShoppingBag } from "react-icons/lu";
+import { LuBanknote, LuEye, LuPackageCheck, LuShoppingBag, LuX } from "react-icons/lu";
 import ListCard from "@/components/modules/panel/listCard";
 import SearchBox from "@/components/modules/panel/searchBox";
 import StatusTabs from "@/components/modules/panel/statusTabs";
+import ConfirmDialog from "@/components/modules/ui/confirmDialog";
 import EmptyState from "@/components/modules/ui/emptyState";
 import OrderDetails from "@/components/template/p-admin/orders/orderDetails";
-import { useAdminOrders } from "@/services/client/admin";
+import { useAdminOrders, useMarkOrderDelivered, useUpdateOrder } from "@/services/client/admin";
 import { formatDate, formatPrice } from "@/utils/format";
-import { ORDER_STATUS, ORDER_TABS, orderItemsCount, PAYMENT_STATUS, personName, shortId } from "@/utils/panelView";
+import {
+  ADMIN_ORDER_TABS,
+  ORDER_STATUS,
+  awaitsCash,
+  canCancelOrder,
+  cashReceivedText,
+  orderItemsCount,
+  paymentState,
+  personName,
+  shortId,
+} from "@/utils/panelView";
 import type { AdminFilters, AdminListParams } from "@/utils/adminFilters";
-import type { AdminOrder, OrderStatusFilter, Paginated } from "@/types";
+import type { AdminOrder, AdminOrderStatusFilter, Paginated } from "@/types";
 
 interface OrdersTableProps {
   initialPage: Paginated<AdminOrder>;
   params: AdminListParams;
-  filters: AdminFilters<OrderStatusFilter>;
+  filters: AdminFilters<AdminOrderStatusFilter>;
   limit: number;
 }
 
 export default function OrdersTable({ initialPage, params, filters, limit }: OrdersTableProps) {
   const { items: orders, ...pager } = useAdminOrders(initialPage, params);
   const [openId, setOpenId] = useState<string | null>(null);
-  // the modal reads the order from the list, so it shows fresh data after every change
   const open = orders.find((order) => String(order._id) === openId) ?? null;
+  const [cancelId, setCancelId] = useState<string | null>(null);
+  const cancel = useUpdateOrder({ onDone: () => setCancelId(null) });
+  const [cashId, setCashId] = useState<string | null>(null);
+  const cashReceived = useMarkOrderDelivered({ onDone: () => setCashId(null) });
 
   const badges = (order: AdminOrder) => {
     const status = ORDER_STATUS[order.status] ?? ORDER_STATUS.created;
-    const payment = PAYMENT_STATUS[order.paymentStatus] ?? PAYMENT_STATUS.pending;
+    const payment = paymentState(order);
     return { status, payment };
   };
 
-  const viewButton = (order: AdminOrder) => (
-    <button type="button" onClick={() => setOpenId(String(order._id))} className="btn btn-secondary btn-sm">
-      <LuEye className="size-3.5" /> Details
-    </button>
+  const cashBadges = (order: AdminOrder) =>
+    awaitsCash(order) && (
+      <>
+        {order.isCashOverdue ? (
+          <span className="badge badge-danger">
+            <LuBanknote className="size-3" /> Cash overdue
+          </span>
+        ) : (
+          <span className="badge badge-warning">
+            <LuBanknote className="size-3" /> Collect cash
+          </span>
+        )}
+        {order.isDelivered && (
+          <span className="badge badge-neutral">
+            <LuPackageCheck className="size-3" /> Customer received
+          </span>
+        )}
+      </>
+    );
+
+  const rowTone = (order: AdminOrder) =>
+    awaitsCash(order)
+      ? order.isCashOverdue
+        ? "bg-danger-50/60 dark:bg-danger-500/5"
+        : "bg-peach-50/60 dark:bg-peach-500/5"
+      : "";
+
+  const actions = (order: AdminOrder) => (
+    <div className="flex flex-wrap justify-end gap-2">
+      {awaitsCash(order) && (
+        <button type="button" onClick={() => setCashId(String(order._id))} className="btn btn-primary btn-sm">
+          <LuBanknote className="size-3.5" /> Cash received
+        </button>
+      )}
+      {canCancelOrder(order) && (
+        <button type="button" onClick={() => setCancelId(String(order._id))} className="btn btn-soft-danger btn-sm">
+          <LuX className="size-3.5" /> Cancel
+        </button>
+      )}
+      <button type="button" onClick={() => setOpenId(String(order._id))} className="btn btn-secondary btn-sm">
+        <LuEye className="size-3.5" /> Details
+      </button>
+    </div>
   );
 
   return (
@@ -44,7 +97,7 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
         title="All orders"
         toolbar={
           <>
-            <StatusTabs tabs={ORDER_TABS} value={filters.status} />
+            <StatusTabs tabs={ADMIN_ORDER_TABS} value={filters.status} />
             <SearchBox placeholder="Search order number…" />
           </>
         }
@@ -62,7 +115,7 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
           {orders.map((order) => {
             const { status, payment } = badges(order);
             return (
-              <li key={String(order._id)} className="space-y-2 px-4 py-4">
+              <li key={String(order._id)} className={`space-y-2 px-4 py-4 ${rowTone(order)}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -80,9 +133,9 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
                   <div className="flex flex-wrap gap-1.5">
                     <span className={`badge ${status.badge}`}>{status.label}</span>
                     <span className={`badge ${payment.badge}`}>{payment.label}</span>
-                    {order.isCashOverdue && <span className="badge badge-danger">Cash overdue</span>}
+                    {cashBadges(order)}
                   </div>
-                  {viewButton(order)}
+                  {actions(order)}
                 </div>
               </li>
             );
@@ -107,7 +160,7 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
               {orders.map((order) => {
                 const { status, payment } = badges(order);
                 return (
-                  <tr key={String(order._id)}>
+                  <tr key={String(order._id)} className={rowTone(order)}>
                     <td className="font-mono text-xs font-semibold text-gray-900 dark:text-gray-100">
                       {shortId(order._id)}
                     </td>
@@ -119,15 +172,15 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
                       <span className="ml-1.5 text-xs text-gray-600 capitalize">{order.paymentMethod}</span>
                     </td>
                     <td className="whitespace-nowrap">
-                      <span className={`badge ${status.badge}`}>{status.label}</span>
-                      {order.isCashOverdue && <span className="badge badge-danger ml-1.5">Cash overdue</span>}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className={`badge ${status.badge}`}>{status.label}</span>
+                        {cashBadges(order)}
+                      </div>
                     </td>
                     <td className="text-right font-semibold whitespace-nowrap tabular-nums">
                       {formatPrice(order.pricing?.total)}
                     </td>
-                    <td>
-                      <div className="flex justify-end">{viewButton(order)}</div>
-                    </td>
+                    <td>{actions(order)}</td>
                   </tr>
                 );
               })}
@@ -137,6 +190,27 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
       </ListCard>
 
       {open && <OrderDetails order={open} onClose={() => setOpenId(null)} />}
+
+      <ConfirmDialog
+        open={cancelId !== null}
+        title="Cancel this order?"
+        description="Reserved stock goes back to the store and anything already paid is refunded to the customer's wallet. This can't be undone."
+        confirmLabel="Cancel order"
+        danger
+        loading={cancel.isPending}
+        onClose={() => setCancelId(null)}
+        onConfirm={() => cancelId && cancel.mutate({ id: cancelId, status: "cancelled" })}
+      />
+
+      <ConfirmDialog
+        open={cashId !== null}
+        title="Cash received?"
+        description={cashReceivedText(orders.find((order) => String(order._id) === cashId))}
+        confirmLabel="Yes, cash received"
+        loading={cashReceived.isPending}
+        onClose={() => setCashId(null)}
+        onConfirm={() => cashId && cashReceived.mutate(cashId)}
+      />
     </>
   );
 }

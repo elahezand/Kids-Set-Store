@@ -3,7 +3,6 @@ import notificationService from "@/services/server/user/notification";
 import { authUser } from "@/utils/auth/authGuard";
 import { handleRouteError, jsonError, paginated } from "@/utils/apiResponse";
 
-/* GET /api/user/notification?limit=&cursor=  -> paginated envelope */
 export async function GET(request) {
     try {
         await connectToDB();

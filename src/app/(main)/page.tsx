@@ -1,18 +1,18 @@
 import { Suspense } from "react";
-import GrowthChart from "@/components/template/main/index/growthChart";
 import Hero from "@/components/template/main/index/hero/hero";
 import {
   ArticlesSection,
   BestSellersSection,
   CategoriesSection,
   LatestSection,
-  MostLovedSection,
   PromoteSection,
 } from "@/components/template/main/index/homeSections";
 import PromoText from "@/components/template/main/index/promoText";
 import SaleCord from "@/components/template/main/index/saleCord";
+import ScrollStar from "@/components/template/main/index/scrollStar/scrollStar";
 import SectionSkeleton from "@/components/template/main/index/sectionSkeleton";
 import TrustStrip from "@/components/template/main/index/trustStrip";
+import VideoShowcase from "@/components/template/main/index/videoShowcase";
 import { SITE_URL } from "@/utils/constants";
 import type { Metadata } from "next";
 
@@ -29,12 +29,22 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
-      <div className="relative">
-        <Hero />
-        <SaleCord />
+    <div className="flex min-h-screen flex-col gap-24 pb-24 sm:gap-32 sm:pb-32 lg:gap-48 lg:pb-40">
+      <ScrollStar />
+
+      {/* hero, sale tag and trust strip read as one intro block */}
+      <div>
+        <div className="relative">
+          <Hero />
+          <SaleCord />
+        </div>
+        <TrustStrip />
       </div>
-      <TrustStrip />
+
+      <Suspense fallback={<SectionSkeleton variant="block" />}>
+        <CategoriesSection />
+      </Suspense>
+
       <Suspense fallback={<SectionSkeleton />}>
         <LatestSection />
       </Suspense>
@@ -45,14 +55,7 @@ export default function Home() {
         <BestSellersSection />
       </Suspense>
 
-      <Suspense fallback={<SectionSkeleton variant="block" />}>
-        <CategoriesSection />
-      </Suspense>
-      <GrowthChart />
-
-      <Suspense fallback={<SectionSkeleton />}>
-        <MostLovedSection />
-      </Suspense>
+      <VideoShowcase />
 
       <Suspense fallback={<SectionSkeleton count={3} />}>
         <ArticlesSection />

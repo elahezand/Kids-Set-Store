@@ -1,9 +1,14 @@
 import Comment from "@/model/comment";
 import { paginateList } from "@/utils/listQuery";
 
-/* GET /api/admin/comments?status=&productId=&userId=&q=&limit=&cursor= (reviews only, not replies) */
-const getAdmin = async (query = {}) =>
-    paginateList(Comment, query, {
+const getAdmin = async (query = {}) => {
+    const filters =
+        query.replied === "true"
+            ? { _id: { $in: await Comment.distinct("parentId", { parentId: { $ne: null }, status: { $ne: "deleted" } }) } }
+            : {};
+
+    const result = await paginateList(Comment, query, {
+        filters,
         // deleted reviews are hidden unless ?status=deleted asks for them
         base: { parentId: null, status: { $ne: "deleted" } },
         statuses: ["pending", "approved", "rejected", "spam", "deleted"],
@@ -15,6 +20,26 @@ const getAdmin = async (query = {}) =>
         ],
     });
 
+    const ids = (result.data ?? []).map((comment) => comment._id);
+    if (!ids.length) return result;
+
+    const replies = await Comment.find({ parentId: { $in: ids }, status: { $ne: "deleted" } })
+        .sort({ createdAt: 1 })
+        .populate("user", "username")
+        .select("parentId body user createdAt")
+        .lean();
+
+    const byParent = new Map();
+    for (const reply of replies) {
+        const key = String(reply.parentId);
+        byParent.set(key, [...(byParent.get(key) ?? []), reply]);
+    }
+
+    return {
+        ...result,
+        data: result.data.map((comment) => ({ ...comment, replies: byParent.get(String(comment._id)) ?? [] })),
+    };
+};
 
 const replyToComment = async (adminId, parentId, body) => {
     const parent = await Comment.findById(parentId);
@@ -55,6 +80,16 @@ const replyToComment = async (adminId, parentId, body) => {
         };
 
         await parent.save();
+    }
+
+    // one public reply per review — delete it to write a new one
+    const alreadyReplied = await Comment.exists({ parentId: parent._id, status: { $ne: "deleted" } });
+    if (alreadyReplied) {
+        return {
+            success: false,
+            status: 409,
+            message: "This review already has a reply — delete it first to write a new one",
+        };
     }
 
     const reply = await Comment.create({

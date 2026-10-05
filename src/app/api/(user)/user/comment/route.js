@@ -5,7 +5,6 @@ import { handleRouteError, jsonError, validationError, respond, paginated } from
 import validate from "@/utils/validate";
 import { createCommentSchema } from "@/validators/comment";
 
-/* GET /api/user/comment?status=&limit=&cursor=  -> the user's own reviews */
 export async function GET(request) {
     try {
         await connectToDB();

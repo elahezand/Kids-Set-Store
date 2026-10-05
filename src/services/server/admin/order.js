@@ -4,26 +4,20 @@ import { runOrderSweeps } from "@/services/server/shared/orderSweeper" ;
 
 import {
     buildOrderIdSearchExpr,
-    maybeMarkOrderShipped,
-    markItemShipped,
+    markOrderShipped,
     revertOrder,
     finalizeOrder,
     completeDeliveredOrder,
-    refreshExpectedDelivery,
-    setItemDeliveryEstimate,
-    assertShippable,
+    setOrderDeliveryEstimate,
+    isPastDue,
 } from "@/services/server/shared/order";
 
 import {
-    notifyItemShipped,
+    notifyOrderShipped,
     notifyDeliveryUpdated,
 } from "@/services/server/shared/deliveryNotice";
 
 import { buildListQuery, listLimit } from "@/utils/listQuery";
-
-const OVERDUE_DAYS = Number(
-    process.env.ORDER_AUTO_COMPLETE_DAYS || 7
-);
 
 const ADMIN_UPDATABLE_FIELDS = [
     "paymentStatus",
@@ -35,7 +29,8 @@ const ADMIN_UPDATABLE_FIELDS = [
 const ALLOWED_STATUS_MOVES = {
     created: ["cancelled"],
     processing: ["cancelled"],
-    shipped: ["completed", "cancelled"],
+    // once it left the store an order can't be cancelled (customer and admin alike)
+    shipped: ["completed"],
     completed: [],
     cancelled: [],
 };
@@ -83,6 +78,14 @@ const getAllOrders = async (query = {}) => {
         filters.paymentMethod = query.paymentMethod;
     }
 
+    if (query.awaitingCash === "true") {
+        Object.assign(filters, {
+            status: "shipped",
+            paymentMethod: "cash",
+            paymentStatus: "pending",
+        });
+    }
+
     if (query.overdueCash === "true") {
         const { overdueCashQuery } = await import(
             "@/services/server/shared/orderSweeper"
@@ -118,14 +121,7 @@ const getAllOrders = async (query = {}) => {
             order.status === "shipped" &&
             order.paymentMethod === "cash" &&
             order.paymentStatus === "pending" &&
-            !!order.shippedAt &&
-            Date.now() -
-            new Date(order.shippedAt).getTime() >=
-            OVERDUE_DAYS *
-            24 *
-            60 *
-            60 *
-            1000,
+            isPastDue(order),
     }));
 
     return {
@@ -134,12 +130,7 @@ const getAllOrders = async (query = {}) => {
     };
 };
 
-const adminShipItem = async (
-    orderId,
-    itemId,
-    trackingCode,
-    estimatedDeliveryAt = null
-) => {
+const shipOrder = async (orderId, trackingCode, estimatedDeliveryAt = null) => {
     const order = await Order.findById(orderId);
 
     if (!order) {
@@ -150,42 +141,19 @@ const adminShipItem = async (
         };
     }
 
-    const item = order.items.id(itemId);
-
-    if (!item) {
+    if (order.status !== "processing") {
         return {
             success: false,
-            status: 404,
-            message: "Item not found in this order",
+            status: 400,
+            message: `Only a processing order can be shipped (this one is "${order.status}")`,
         };
     }
 
-    if (item.fulfillment?.status === "shipped") {
-        return {
-            success: false,
-            status: 409,
-            message: "This item is already marked as shipped",
-        };
-    }
-
-    // throws AppError(400) for "created" / "cancelled" orders
-    assertShippable(order);
-
-    markItemShipped(
-        item,
-        trackingCode,
-        estimatedDeliveryAt
-    );
-
-    order.markModified("items");
-
-    refreshExpectedDelivery(order);
-
-    maybeMarkOrderShipped(order);
-
+    markOrderShipped(order, trackingCode, estimatedDeliveryAt);
+    order.$locals.skipStatusNotify = true; // notifyOrderShipped sends the richer message
     await order.save();
 
-    await notifyItemShipped(order, item);
+    await notifyOrderShipped(order);
 
     return {
         success: true,
@@ -193,11 +161,7 @@ const adminShipItem = async (
     };
 };
 
-const adminSetDeliveryEstimate = async (
-    orderId,
-    itemId,
-    estimatedDeliveryAt
-) => {
+const adminSetDeliveryEstimate = async (orderId, estimatedDeliveryAt) => {
     const order = await Order.findById(orderId);
 
     if (!order) {
@@ -208,25 +172,10 @@ const adminSetDeliveryEstimate = async (
         };
     }
 
-    const item = order.items.id(itemId);
-
-    if (!item) {
-        return {
-            success: false,
-            status: 404,
-            message: "Item not found in this order",
-        };
-    }
-
-    setItemDeliveryEstimate(
-        order,
-        item,
-        estimatedDeliveryAt
-    );
-
+    setOrderDeliveryEstimate(order, estimatedDeliveryAt);
     await order.save();
 
-    await notifyDeliveryUpdated(order, item);
+    await notifyDeliveryUpdated(order);
 
     return {
         success: true,
@@ -334,6 +283,8 @@ const updateOrder = async (orderId, data) => {
     }
 
     const wasStatus = order.status;
+
+    if (data.status === "cancelled") order.$locals.skipStatusNotify = true;
 
     for (const field of ADMIN_UPDATABLE_FIELDS) {
         if (data[field] !== undefined) {
@@ -472,6 +423,7 @@ const markDelivered = async (orderId) => {
 
 export {
     ALLOWED_STATUS_MOVES,
+    shipOrder,
     adminSetDeliveryEstimate,
     markDelivered,
     runAutoComplete,
@@ -480,11 +432,11 @@ export {
     getAllOrders,
     getOrderByIdAdmin,
     updateOrder,
-    adminShipItem,
 };
 
 export default {
     ALLOWED_STATUS_MOVES,
+    shipOrder,
     adminSetDeliveryEstimate,
     markDelivered,
     runAutoComplete,
@@ -493,5 +445,4 @@ export default {
     getAllOrders,
     getOrderByIdAdmin,
     updateOrder,
-    adminShipItem,
 };

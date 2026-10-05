@@ -3,6 +3,7 @@ import CouponsTable from "@/components/template/p-admin/discounts/couponsTable";
 import couponService from "@/services/server/admin/coupon";
 import { adminListParams, filtersKey, readAdminFilters } from "@/utils/adminFilters";
 import { toInitialPage } from "@/utils/initialPage";
+import { requireAdmin } from "@/utils/auth/panelUser";
 import { COUPON_TABS, tabValues } from "@/utils/panelView";
 import type { Metadata } from "next";
 import type { Coupon, PageProps, Pagination } from "@/types";
@@ -12,6 +13,7 @@ export const metadata: Metadata = { title: "Discounts" };
 const LIMIT = 20;
 
 export default async function AdminDiscountsPage({ searchParams }: PageProps) {
+  await requireAdmin();
   const filters = readAdminFilters(await searchParams, tabValues(COUPON_TABS));
   const params = adminListParams.coupons(LIMIT, filters);
 

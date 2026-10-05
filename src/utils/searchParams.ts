@@ -16,3 +16,12 @@ export const listKey = (query: Record<string, string | undefined>) =>
   new URLSearchParams(
     Object.entries(query).filter((entry): entry is [string, string] => entry[0] !== "cursor" && Boolean(entry[1]))
   ).toString();
+
+export const pickStatus = <T extends string>(
+  params: SearchParams,
+  allowed: readonly T[],
+  key = "status"
+): T | "all" => {
+  const raw = firstParam(params[key]);
+  return allowed.find((item) => item === raw) ?? "all";
+};

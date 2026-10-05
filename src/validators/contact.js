@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-/* Same fields as model/contact.js (name, email, phone, body) */
 export const contactValidationSchema = z.object({
     name: z
         .string()
@@ -16,7 +15,6 @@ export const contactValidationSchema = z.object({
         .toLowerCase()
         .email("Invalid email format"),
 
-    // Iranian phone number validation with fixed length
     phone: z
         .string()
         .trim()
@@ -30,22 +28,18 @@ export const contactValidationSchema = z.object({
         .max(2000, "Message must be at most 2000 characters"),
 });
 
-/* public POST /api/contacts — same fields as the contact form */
 export const contactSchema = contactValidationSchema;
 
-/* GET /api/admin/contacts */
 export const adminContactsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional().catch(undefined),
   cursor: z.string().trim().min(1).optional().catch(undefined),
   status: z.enum(["pending", "answered"]).optional().catch(undefined),
 });
 
-/* POST /api/admin/contacts/:id — send the answer */
 export const answerContactSchema = z.object({
   answer: z.string().trim().min(3, "Answer must be at least 3 characters").max(3000),
 });
 
-/* PUT /api/admin/contacts/:id */
 export const updateContactSchema = z
   .object({
     status: z.enum(["pending", "answered"]).optional(),

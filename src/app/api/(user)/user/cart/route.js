@@ -3,7 +3,7 @@ import cartService from "@/services/server/user/cart";
 import { authUser } from "@/utils/auth/authGuard";
 import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
-// body khali bashe 500 nashe
+// an empty or invalid body must not end in a 500
 const readBody = async (request) => {
     try {
         return await request.json();

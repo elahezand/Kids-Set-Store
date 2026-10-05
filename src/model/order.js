@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema, Types } = mongoose;
 const { notifyUser, orderStatusMessage, NOTIFY_LINKS } = require("@/utils/notify");
-/*  Order item   */
 const orderItemSchema = new Schema({
   productId: { type: Types.ObjectId, ref: "Product", required: true },
   variantId: { type: Types.ObjectId, default: null },
@@ -22,12 +21,6 @@ const orderItemSchema = new Schema({
   },
 
   stockReserved: { type: Boolean, default: false },
-  fulfillment: {
-    status: { type: String, enum: ["pending", "shipped"], default: "pending" },
-    trackingCode: { type: String, trim: true, default: null },
-    shippedAt: { type: Date, default: null },
-    estimatedDeliveryAt: { type: Date, default: null },
-  },
   estimatedShipBy: { type: Date, default: null },
 });
 
@@ -96,6 +89,7 @@ const orderSchema = new Schema(
     revertedAt: { type: Date, default: null },
     idempotencyKey: { type: String, default: null },
     finalizedAt: { type: Date, default: null },
+    trackingCode: { type: String, trim: true, default: null },
     shippedAt: { type: Date, default: null },
     expectedDeliveryAt: { type: Date, default: null },
     autoCompletedAt: { type: Date, default: null },
@@ -114,7 +108,6 @@ orderSchema.index(
   { unique: true, partialFilterExpression: { idempotencyKey: { $type: "string" } } }
 );
 orderSchema.index({ "payment.authority": 1 });
-/* ---------- status change -> notification (utils/notify never throws) ---------- */
 
 const notifyStatus = (userId, orderId, status) =>
   notifyUser(userId, orderStatusMessage(orderId, status), {
@@ -127,7 +120,8 @@ orderSchema.pre("save", function () {
 });
 
 orderSchema.post("save", async function (doc) {
-  if (doc._statusChanged) await notifyStatus(doc.user, doc._id, doc.status);
+  // services that send their own, richer message (e.g. "shipped + tracking code") set $locals.skipStatusNotify
+  if (doc._statusChanged && !doc.$locals?.skipStatusNotify) await notifyStatus(doc.user, doc._id, doc.status);
 });
 
 async function rememberPrevStatus() {

@@ -32,7 +32,7 @@ export default function Categories({ categories = [] }: { categories?: CategoryN
   const oddCount = categories.length % 2 === 1;
 
   return (
-    <section className="mx-auto w-full px-8 sm:px-4  lg:px-18" aria-label="Shop by category">
+    <section className="home-container" aria-label="Shop by category">
       <SectionHeader
         eyebrow="Collections"
         title="Shop by category"
@@ -40,18 +40,34 @@ export default function Categories({ categories = [] }: { categories?: CategoryN
         href={ROUTES.products}
       />
 
-      <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <ul
+        className={`grid grid-cols-2 gap-x-3 gap-y-4 sm:gap-x-4 ${categories.length === 5 ? "lg:grid-cols-5" : "lg:grid-cols-4"}`}
+      >
         {categories.map((category, index) => {
           const tint = TINTS[index % TINTS.length];
           const wide = oddCount && index === categories.length - 1;
 
           return (
-            <li key={category.id} className={wide ? "col-span-2 md:col-span-1" : undefined}>
+            <li key={category.id} className={`pt-14 sm:pt-16 ${wide ? "col-span-2 md:col-span-1" : ""}`}>
               <Link
                 href={ROUTES.category(category.slug)}
-                className={`group relative flex h-full flex-col gap-4 overflow-hidden rounded-3xl px-4 pt-4 transition-shadow duration-300 hover:shadow-float focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 sm:px-5 sm:pt-5 ${tint.card}`}
+                className={`group relative flex h-full flex-col rounded-t-2xl  px-4 pb-4 transition-shadow duration-300 hover:shadow-float focus-visible:ring-2 focus-visible:ring-sage-500 focus-visible:outline-none sm:px-5 sm:pb-5 ${tint.card}`}
               >
-                <div className="flex items-start justify-between gap-2">
+                <div
+                  className={`relative mx-auto -mt-14 w-[82%] overflow-hidden rounded-t-full shadow-card ring-4 ring-white transition-transform duration-500 group-hover:-translate-y-2 motion-reduce:transition-none sm:-mt-16 dark:ring-ink-900 ${tint.arch} ${
+                    wide ? "aspect-[16/9] max-w-[260px] md:aspect-[4/5] md:max-w-none" : "aspect-[4/5]"
+                  }`}
+                >
+                  <Image
+                    fill
+                    src={FALLBACK_IMAGES[index % FALLBACK_IMAGES.length]}
+                    alt=""
+                    sizes="(min-width: 1024px) 18vw, (min-width: 768px) 30vw, 45vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
+                  />
+                </div>
+
+                <div className="mt-4 flex items-center justify-between gap-2">
                   <div className="min-w-0">
                     <h3 className="truncate text-base font-bold text-text-dark sm:text-lg dark:text-white">
                       {category.title}
@@ -63,19 +79,6 @@ export default function Categories({ categories = [] }: { categories?: CategoryN
                   <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white text-text-dark shadow-card transition-colors duration-300 group-hover:bg-sage-600 group-hover:text-white dark:bg-ink-800 dark:text-gray-100">
                     <LuArrowUpRight className="size-4 transition-transform duration-300 group-hover:rotate-45" />
                   </span>
-                </div>
-
-                <div
-                  className={`relative mx-auto mt-auto w-full overflow-hidden rounded-t-full ${tint.arch} ${wide ? "aspect-[16/9] max-w-[260px] md:aspect-[4/5] md:max-w-none" : "aspect-[4/5]"
-                    }`}
-                >
-                  <Image
-                    fill
-                    src={FALLBACK_IMAGES[index % FALLBACK_IMAGES.length]}
-                    alt=""
-                    sizes="(min-width: 1024px) 18vw, (min-width: 768px) 30vw, 45vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
-                  />
                 </div>
               </Link>
             </li>

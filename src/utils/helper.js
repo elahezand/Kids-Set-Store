@@ -13,8 +13,6 @@ function escapeRegex(text) {
     return String(text).replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 }
 
-/* ═══════════════════════════ SEARCH TEXT ═══════════════════════════ */
-
 function normalizeSearchText(str) {
     return String(str ?? "")
         .normalize("NFKD")
@@ -29,7 +27,6 @@ function normalizeSearchText(str) {
 const looseWordRegex = (word) =>
     new RegExp(word.split("").map(escapeRegex).join("[^a-z0-9]*"), "i");
 
-/* "blue" or "blue,pink" -> exact, case-insensitive match on one or more values */
 const exactAny = (raw) => {
     const regexes = String(raw)
         .split(",")
@@ -44,12 +41,10 @@ const exactAny = (raw) => {
 
 const MAX_SEARCH_WORDS = 5;
 
-/* ═══════════════════════════ PRODUCT FILTERS ═══════════════════════════ */
 async function buildProductFilters(query, { isAdmin = false } = {}) {
     const filters = {};
     const andConditions = [];
 
-    // 1. Status
     if (isAdmin) {
         filters.status =
             query.status && query.status !== "all"
@@ -59,17 +54,14 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
         filters.status = "active";
     }
 
-    // 2. Photos
     if (query.hasPhoto === "true") {
         filters["images.0"] = { $exists: true };
     }
 
-    // 3. SKU
     if (query.sku) {
         filters["variants.sku"] = String(query.sku).trim();
     }
 
-    // 4. Category (slugs are lowercase) — matches the category and everything under it
     if (query.category) {
         const categoryDoc = await Category.findOne({
             slug: String(query.category).trim().toLowerCase(),
@@ -82,7 +74,6 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
         filters.categoryPath = new mongoose.Types.ObjectId(query.categoryId);
     }
 
-    // 5. Price — on Product.minPrice (cheapest variant): ?price=min-max or ?min= / ?max=
     const priceFilter = {};
 
     if (query.price) {
@@ -103,7 +94,6 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
     }
     if (Object.keys(priceFilter).length) filters.minPrice = priceFilter;
 
-    // 6. Tags
     if (query.tags) {
         const tagsArray = String(query.tags)
             .split(",")
@@ -112,13 +102,12 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
         if (tagsArray.length > 0) filters.tags = { $in: tagsArray };
     }
 
-    // 7. Rating
     if (query.rating) {
         const minRating = Number(query.rating);
         if (!isNaN(minRating)) filters["metrics.score"] = { $gte: minRating };
     }
 
-    // 8. Variant attributes (size, color, stock, discount) — all on the SAME variant ("blue in 2T", not "blue in 3T + black in 2T")
+    // Variant attributes (size, color, stock, discount) — all on the SAME variant ("blue in 2T", not "blue in 3T + black in 2T")
     const variantMatch = {};
     for (const key of ["size", "color"]) {
         if (query[key]) {
@@ -127,13 +116,11 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
         }
     }
     if (query.inStock === "true") variantMatch.stock = { $gt: 0 };
-    // ?onSale=true -> at least one variant has a discount (the same variant as size / color above)
     if (query.onSale === "true") variantMatch.discount = { $gt: 0 };
     if (Object.keys(variantMatch).length) {
         filters.variants = { $elemMatch: variantMatch };
     }
 
-    // 9. Specs — ?material= shortcut and ?filter={"key":"value"} (value can be "a,b" or ["a","b"])
     const specs = {};
     if (query.material) specs.material = query.material;
 
@@ -153,7 +140,7 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
         if (match) filters[`specs.${key}`] = match;
     }
 
-    // 10. Text search — every word must appear in the title or the tags ("tshirt" finds "T-Shirt")
+    // Text search — every word must appear in the title or the tags ("tshirt" finds "T-Shirt")
     if (query.q) {
         const allWords = normalizeSearchText(query.q).slice(0, 100).split(" ").filter(Boolean);
         const longWords = allWords.filter((word) => word.length > 1);
@@ -165,14 +152,12 @@ async function buildProductFilters(query, { isAdmin = false } = {}) {
         }
     }
 
-    // 11. Created-at range, shared by every dashboard table (?from / ?to / ?preset)
     Object.assign(filters, dateRangeFilter(query, "createdAt"));
 
     if (andConditions.length > 0) filters.$and = andConditions;
 
     return filters;
 }
-/* ═══════════════════════════ CART ═══════════════════════════ */
 const itemKey = (item) =>
     `${String(item.productId?._id || item.productId || "")}::${String(
         item.variantId?._id || item.variantId || ""
@@ -202,7 +187,7 @@ const productInfoOf = (product) => ({
     images: product.images || [],
 });
 
-/* Chizi ke kharidari mishe: ya yek variant, ya khod-e mahsul (age variant nadare) */
+// what is bought: one variant, or the product itself when it has no variants
 const getSellable = (product, variantId) => {
     const hasVariants = product.variants?.length > 0;
 

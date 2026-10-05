@@ -2,7 +2,6 @@ import Article from "@/model/article";
 import { paginateList } from "@/utils/listQuery";
 import slugify from "@/utils/slugify";
 
-/* slug typed by the admin, or one made from the title ("-2", "-3"... when it is taken) */
 const resolveSlug = async (title, wanted, excludeId = null) => {
     const base = slugify(wanted || title) || `article-${Date.now()}`;
     const taken = async (slug) =>

@@ -21,14 +21,11 @@ const departmentSchema = new mongoose.Schema(
   }
 );
 
-/* ---------- Indexes ---------- */
-
 departmentSchema.index(
   { title: 1 },
   { unique: true, collation: { locale: "en", strength: 2 } }
 );
 
-// Active departments in display order
 departmentSchema.index({ isActive: 1, order: 1 });
 
 const DepartmentModel =

@@ -7,9 +7,6 @@ const MAX_FILES = 10;
 const MAX_BYTES = 5 * 1024 * 1024;
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 
-/* POST /api/admin/upload  (multipart FormData, one or more `files`)
-   -> { data: ["/uploads/..."] } — product images and article covers are uploaded here first,
-      then the returned paths are sent as JSON to the product / article API */
 export async function POST(request) {
     try {
         await connectToDB();

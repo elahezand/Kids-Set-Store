@@ -3,7 +3,6 @@ import { remember, CACHE_KEYS } from "@/utils/cache";
 import User from "@/model/user";
 import Order from "@/model/order";
 
-// same rule as the shop: only "active" products are public
 const PUBLISHED_PRODUCT_FILTER = { status: "active" };
 
 const getStartOfToday = () => {
@@ -40,7 +39,6 @@ const computePublicStats = async () => {
             createdAt: { $gte: getStartOfToday() },
         }),
 
-        // average score of products that really have reviews
         Product.aggregate([
             {
                 $match: {

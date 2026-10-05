@@ -1,6 +1,3 @@
-import type { Pagination } from "./api";
-import type { ProductCardData } from "./product";
-
 export type ListingSort = "latest" | "price" | "price-desc" | "popularity" | "bestSelling";
 
 export interface ListingQuery {
@@ -23,11 +20,6 @@ export interface ListingQuery {
 }
 
 export type ListingFilterKey = Exclude<keyof ListingQuery, "limit" | "cursor">;
-
-export interface ListingPage {
-  products: ProductCardData[];
-  pagination: Pagination;
-}
 
 export interface SelectOption<TValue extends string = string> {
   value: TValue;

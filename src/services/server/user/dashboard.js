@@ -6,7 +6,6 @@ import "@/model/department";
 
 const RECENT_LIMIT = 4;
 
-/* /p-user home: counters + latest tickets & orders (one round trip, all in parallel) */
 const getDashboard = async (userId) => {
     const [orders, tickets, comments, favorites, recentTickets, recentOrders] = await Promise.all([
         Order.countDocuments({ user: userId }),

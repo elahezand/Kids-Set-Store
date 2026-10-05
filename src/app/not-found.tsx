@@ -7,14 +7,14 @@ export default function NotFound() {
       <div className="mx-auto my-16 flex max-w-[700px] flex-col items-center justify-center gap-2 px-4 sm:flex-row sm:justify-between sm:gap-0 md:my-24">
         <p
           className="-z-10 mr-0 text-[5rem] leading-none text-coral-300 sm:mr-[2%] sm:text-[7rem] md:text-[10rem] lg:text-[14rem] xl:text-[18rem]"
-          style={{ textShadow: "14px 10px #7bc89c" }}
+          style={{ textShadow: "14px 10px #6cc8c0" }}
         >
           4
         </p>
         <div className="mug-404" aria-hidden="true" />
         <p
           className="-z-10 ml-0 text-[5rem] leading-none text-sage-400 sm:ml-[2%] sm:text-[7rem] md:text-[10rem] lg:text-[14rem] xl:text-[18rem]"
-          style={{ textShadow: "14px 10px #ff8c61" }}
+          style={{ textShadow: "14px 10px #ff9e8f" }}
         >
           4
         </p>
