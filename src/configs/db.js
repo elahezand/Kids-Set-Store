@@ -19,7 +19,8 @@ function startOrderSweeper() {
         try {
             const { runOrderSweeps } = await import("@/services/server/shared/orderSweeper");
             const result = await runOrderSweeps();
-            const total = result.finished + result.paid + result.cancelled + result.completed;
+            const total =
+                result.finished + result.paid + result.cancelled + result.completed + result.overdueCash;
             if (total) logger.info(`order sweeper: ${JSON.stringify(result)}`);
         } catch (err) {
             logger.error(`order sweeper failed: ${err}`);

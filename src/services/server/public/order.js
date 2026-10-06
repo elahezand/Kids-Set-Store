@@ -4,8 +4,9 @@ import { finalizeOrder } from "@/services/server/shared/order";
 
 const STALE_CLAIM_MS = 2 * 60 * 1000;
 
+// stock is reserved at checkout now, so "finished" also needs finalize to have moved it past "created"
 const isFinished = (order) =>
-    order.items.every((item) => item.stockReserved);
+    order.status !== "created" && order.items.every((item) => item.stockReserved);
 
 const toRial = (toman) =>
     Math.round(Number(toman || 0) * 10);

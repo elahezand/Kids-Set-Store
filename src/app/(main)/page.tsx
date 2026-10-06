@@ -29,10 +29,8 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col gap-24 pb-24 sm:gap-32 sm:pb-32 lg:gap-48 lg:pb-40">
+    <div>
       <ScrollStar />
-
-      {/* hero, sale tag and trust strip read as one intro block */}
       <div>
         <div className="relative">
           <Hero />
@@ -40,30 +38,31 @@ export default function Home() {
         </div>
         <TrustStrip />
       </div>
+      <div className="flex min-h-screen flex-col gap-24 pb-24 sm:gap-32 sm:pb-32 lg:gap-58 lg:pb-40 mt-24">
+        <Suspense fallback={<SectionSkeleton variant="block" />}>
+          <CategoriesSection />
+        </Suspense>
 
-      <Suspense fallback={<SectionSkeleton variant="block" />}>
-        <CategoriesSection />
-      </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <LatestSection />
+        </Suspense>
 
-      <Suspense fallback={<SectionSkeleton />}>
-        <LatestSection />
-      </Suspense>
+        <PromoText />
 
-      <PromoText />
+        <Suspense fallback={<SectionSkeleton />}>
+          <BestSellersSection />
+        </Suspense>
 
-      <Suspense fallback={<SectionSkeleton />}>
-        <BestSellersSection />
-      </Suspense>
+        <VideoShowcase />
 
-      <VideoShowcase />
+        <Suspense fallback={<SectionSkeleton count={3} />}>
+          <ArticlesSection />
+        </Suspense>
 
-      <Suspense fallback={<SectionSkeleton count={3} />}>
-        <ArticlesSection />
-      </Suspense>
-
-      <Suspense fallback={<SectionSkeleton variant="block" />}>
-        <PromoteSection />
-      </Suspense>
+        <Suspense fallback={<SectionSkeleton variant="block" />}>
+          <PromoteSection />
+        </Suspense>
+      </div>
     </div>
   );
 }

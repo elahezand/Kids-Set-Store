@@ -76,7 +76,6 @@ categorySchema.pre("validate", function (next) {
   } else if (this.slug) {
     this.slug = slugify(this.slug, { lower: true, strict: true });
   }
-  next();
 });
 categorySchema.virtual("children", {
   ref: "Category",

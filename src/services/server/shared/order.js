@@ -9,74 +9,138 @@ const logger = require("@/utils/logger");
 const { round2 } = require("@/utils/pricing");
 const { notifyUser, NOTIFY_LINKS } = require("@/utils/notify");
 
-const buildOrderIdSearchExpr = (q) => {
-    if (!q || !String(q).trim()) return null;
-    return {
-        $regexMatch: {
-            input: { $toString: "$_id" },
-            regex: escapeRegex(String(q).trim()),
-            options: "i",
-        },
-    };
-};
+const claimItem = (orderId, itemId, from) =>
+    Order.updateOne(
+        { _id: orderId, items: { $elemMatch: { _id: itemId, stockReserved: from ? true : { $ne: true } } } },
+        { $set: { "items.$.stockReserved": !from } }
+    );
 
-const finalizeOrder = async (order) => {
-    if (order.coupon?.couponId && !order.couponCounted) {
-        await Coupon.updateOne({ _id: order.coupon.couponId }, { $inc: { usedCount: 1 } });
-        order.couponCounted = true;
-        await order.save();
-    }
+/* Put back the stock of every reserved item (each item claimed, so it's never given back twice) */
+const releaseStock = async (order) => {
     for (const item of order.items) {
-        if (!item.stockReserved) {
-            let result = null;
+        if (!item.stockReserved) continue;
 
-            if (item.variantId) {
-                result = await Product.updateOne(
-                    {
-                        _id: item.productId,
-                        variants: { $elemMatch: { _id: item.variantId, stock: { $gte: item.quantity } } },
-                    },
-                    {
-                        $inc: {
-                            "metrics.sold": item.quantity,
-                            "variants.$[elem].stock": -item.quantity,
-                        },
-                    },
-                    { arrayFilters: [{ "elem._id": new Types.ObjectId(item.variantId) }] }
-                );
-            }
+        const released = await claimItem(order._id, item._id, true);
+        item.stockReserved = false;
+        if (!released.modifiedCount) continue;
 
-            if (result && result.modifiedCount === 0) {
-                logger.error(
-                    `[order ${order._id}] stock update FAILED for product ${item.productId} , variantId: ${item.variantId || "none"}, qty: ${item.quantity}) - needs manual review/refund.`
-                );
-            }
-
-            item.stockReserved = true;
-            await order.save();
-        }
-
-    }
-    order.status = "processing";
-};
-
-const revertOrder = async (order) => {
-    if (order.revertedAt) return;
-    for (const item of order.items) {
-        if (item.stockReserved && item.variantId) {
+        if (item.variantId) {
             await Product.updateOne(
                 { _id: item.productId },
                 { $inc: { "metrics.sold": -item.quantity, "variants.$[elem].stock": item.quantity } },
                 { arrayFilters: [{ "elem._id": new Types.ObjectId(item.variantId) }] }
             );
-
-            item.stockReserved = false;
+        } else {
+            await Product.updateOne({ _id: item.productId }, { $inc: { "metrics.sold": -item.quantity } });
         }
-        await order.save();
+    }
+};
+
+/*
+ * Take the stock at checkout, before the buyer goes to the payment gateway, so two buyers can't pay
+ * for the last item. All or nothing: if one item doesn't fit, everything taken so far goes back.
+ * Returns the item that ran out, or null when everything was reserved.
+ */
+const reserveStock = async (order) => {
+    for (const item of order.items) {
+        if (item.stockReserved) continue;
+
+        const claim = await claimItem(order._id, item._id, false);
+        if (!claim.modifiedCount) continue;
+        item.stockReserved = true;
+
+        if (!item.variantId) {
+            await Product.updateOne({ _id: item.productId }, { $inc: { "metrics.sold": item.quantity } });
+            continue;
+        }
+
+        const taken = await Product.updateOne(
+            {
+                _id: item.productId,
+                variants: { $elemMatch: { _id: item.variantId, stock: { $gte: item.quantity } } },
+            },
+            { $inc: { "metrics.sold": item.quantity, "variants.$[elem].stock": -item.quantity } },
+            { arrayFilters: [{ "elem._id": new Types.ObjectId(item.variantId) }] }
+        );
+
+        if (!taken.modifiedCount) {
+            // this one ran out: undo its claim (nothing was taken for it), then give back the rest
+            await claimItem(order._id, item._id, true);
+            item.stockReserved = false;
+            await releaseStock(order);
+            return item;
+        }
+    }
+    return null;
+};
+
+const finalizeOrder = async (order) => {
+    if (order.coupon?.couponId && !order.couponCounted) {
+        const claim = await Order.updateOne(
+            { _id: order._id, couponCounted: { $ne: true } },
+            { $set: { couponCounted: true } }
+        );
+        if (claim.modifiedCount) {
+            await Coupon.updateOne({ _id: order.coupon.couponId }, { $inc: { usedCount: 1 } });
+        }
+        order.couponCounted = true;
     }
 
+    for (const item of order.items) {
+        if (item.stockReserved) continue;
+
+        const claim = await claimItem(order._id, item._id, false);
+        item.stockReserved = true;
+        if (!claim.modifiedCount) continue; // another run already reserved this item
+
+        if (item.variantId) {
+            const result = await Product.updateOne(
+                {
+                    _id: item.productId,
+                    variants: { $elemMatch: { _id: item.variantId, stock: { $gte: item.quantity } } },
+                },
+                {
+                    $inc: {
+                        "metrics.sold": item.quantity,
+                        "variants.$[elem].stock": -item.quantity,
+                    },
+                },
+                { arrayFilters: [{ "elem._id": new Types.ObjectId(item.variantId) }] }
+            );
+
+            if (result.modifiedCount === 0) {
+                logger.error(
+                    `[order ${order._id}] stock update FAILED for product ${item.productId}, variantId: ${item.variantId}, qty: ${item.quantity} - needs manual review/refund.`
+                );
+            }
+        } else {
+            // products without variants have no stock to take, but still count as sold
+            await Product.updateOne({ _id: item.productId }, { $inc: { "metrics.sold": item.quantity } });
+        }
+    }
+
+    // a stuck order that was already shipped/completed must not move back
+    if (order.status === "created") order.status = "processing";
+    await order.save();
+};
+
+const revertOrder = async (order) => {
+    if (order.revertedAt) return;
+
+    const claim = await Order.updateOne({ _id: order._id, revertedAt: null }, { $set: { revertedAt: new Date() } });
+    if (!claim.modifiedCount) return; // already reverted by another run
+    order.revertedAt = new Date();
+
+    await releaseStock(order);
+
     if (order.coupon?.couponId && order.couponCounted) {
-        await Coupon.updateOne({ _id: order.coupon.couponId }, { $inc: { usedCount: -1 } });
+        const released = await Order.updateOne(
+            { _id: order._id, couponCounted: true },
+            { $set: { couponCounted: false } }
+        );
+        if (released.modifiedCount) {
+            await Coupon.updateOne({ _id: order.coupon.couponId }, { $inc: { usedCount: -1 } });
+        }
         order.couponCounted = false;
     }
 
@@ -98,7 +162,6 @@ const revertOrder = async (order) => {
     // nothing was charged: the payment of a cancelled order can't happen any more -> "failed" (model enum)
     if (order.paymentStatus === "pending") order.paymentStatus = "failed";
 
-    order.revertedAt = new Date();
     await order.save();
 
     // one message with the refund (the callers skip the plain "status changed to cancelled" one)
@@ -157,12 +220,26 @@ const autoCompleteShippedOrders = async () => {
         ...pastDueQuery(),
     }).limit(200);
 
+    let completed = 0;
+
     for (const order of orders) {
-        await completeDeliveredOrder(order, { auto: true });
-        logger.info(`[order ${order._id}] auto-completed (buyer did not confirm delivery)`);
+        try {
+            // claim first, so two overlapping runs don't both complete (and notify) the same order
+            const claim = await Order.updateOne(
+                { _id: order._id, status: "shipped", autoCompletedAt: null },
+                { $set: { autoCompletedAt: new Date() } }
+            );
+            if (!claim.modifiedCount) continue;
+
+            await completeDeliveredOrder(order, { auto: true });
+            completed++;
+            logger.info(`[order ${order._id}] auto-completed (buyer did not confirm delivery)`);
+        } catch (err) {
+            logger.error(`[order ${order._id}] auto-complete failed: ${err?.message || err}`);
+        }
     }
 
-    return orders.length;
+    return completed;
 };
 
 const markOrderShipped = (order, trackingCode, estimatedDeliveryAt = null) => {
@@ -179,6 +256,17 @@ const setOrderDeliveryEstimate = (order, estimatedDeliveryAt) => {
     order.expectedDeliveryAt = estimatedDeliveryAt;
 };
 
+const buildOrderIdSearchExpr = (q) => {
+    if (!q || !String(q).trim()) return null;
+    return {
+        $regexMatch: {
+            input: { $toString: "$_id" },
+            regex: escapeRegex(String(q).trim()),
+            options: "i",
+        },
+    };
+};
+
 module.exports = {
     pastDueQuery,
     pastDueAt,
@@ -188,6 +276,8 @@ module.exports = {
     revertOrder,
     buildOrderIdSearchExpr,
     finalizeOrder,
+    reserveStock,
+    releaseStock,
     markOrderShipped,
     setOrderDeliveryEstimate,
 };

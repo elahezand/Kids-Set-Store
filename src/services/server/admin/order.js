@@ -10,6 +10,7 @@ import {
     completeDeliveredOrder,
     setOrderDeliveryEstimate,
     isPastDue,
+    pastDueQuery,
 } from "@/services/server/shared/order";
 
 import {
@@ -326,12 +327,19 @@ const getStuckOrders = async () => {
             {
                 "items.stockReserved": false,
             },
+            // online payments reserve stock at checkout: paid but never finalized stays "created"
+            {
+                status: "created",
+                $or: [{ paymentMethod: "cash" }, { paymentStatus: "paid" }],
+            },
         ],
     })
         .sort({
             createdAt: -1,
         })
-        .limit(100);
+        .limit(100)
+        .populate("user", "username phone")
+        .lean();
 
     return {
         data: orders,
@@ -384,6 +392,32 @@ const repairOrder = async (orderId) => {
     };
 };
 
+/* What the order sweeps would pick up right now, for the admin "stuck orders" page */
+const getSweepStatus = async () => {
+    const [dueForCompletion, overdueCash] = await Promise.all([
+        Order.countDocuments({
+            status: "shipped",
+            paymentStatus: "paid",
+            autoCompletedAt: null,
+            ...pastDueQuery(),
+        }),
+        Order.countDocuments({
+            status: "shipped",
+            paymentMethod: "cash",
+            paymentStatus: "pending",
+            ...pastDueQuery(),
+        }),
+    ]);
+
+    return {
+        dueForCompletion,
+        overdueCash,
+        timerDisabled: process.env.DISABLE_ORDER_SWEEPER === "true",
+        timerMinutes: Number(process.env.ORDER_SWEEP_MINUTES || 10),
+        cronConfigured: Boolean(process.env.CRON_SECRET),
+    };
+};
+
 const runAutoComplete = async () => {
     const result = await runOrderSweeps();
 
@@ -427,6 +461,7 @@ export {
     adminSetDeliveryEstimate,
     markDelivered,
     runAutoComplete,
+    getSweepStatus,
     getStuckOrders,
     repairOrder,
     getAllOrders,
@@ -440,6 +475,7 @@ export default {
     adminSetDeliveryEstimate,
     markDelivered,
     runAutoComplete,
+    getSweepStatus,
     getStuckOrders,
     repairOrder,
     getAllOrders,

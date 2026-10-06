@@ -1,5 +1,8 @@
 import type {
+  AdminCartStatus,
+  AdminCartStatusFilter,
   AdminCommentStatusFilter,
+  ContactStatusFilter,
   AdminOrderStatusFilter,
   ArticleStatusFilter,
   CommentStatus,
@@ -185,4 +188,43 @@ export const autoCompleteDate = (order: Pick<OrderListItem, "shippedAt" | "expec
   }
   if (order.shippedAt) return new Date(new Date(order.shippedAt).getTime() + AUTO_COMPLETE_DAYS * DAY_MS);
   return null;
+};
+
+export const CONTACT_TABS: ReadonlyArray<Tab<ContactStatusFilter>> = [
+  { value: "all", label: "All" },
+  { value: "pending", label: "Unanswered" },
+  { value: "answered", label: "Answered" },
+];
+
+export const contactState = (status: string): Badge =>
+  status === "answered" ? { label: "Answered", badge: "badge-success" } : { label: "New", badge: "badge-accent" };
+
+export const CART_STATUS: Record<AdminCartStatus, Badge> = {
+  active: { label: "Active", badge: "badge-new" },
+  abandoned: { label: "Abandoned", badge: "badge-warning" },
+  converted: { label: "Ordered", badge: "badge-success" },
+};
+
+export const cartState = (status: string): Badge =>
+  CART_STATUS[status as AdminCartStatus] ?? { label: status || "Unknown", badge: "badge-neutral" };
+
+export const CART_TABS: ReadonlyArray<Tab<AdminCartStatusFilter>> = [
+  { value: "all", label: "All" },
+  ...(Object.keys(CART_STATUS) as AdminCartStatus[]).map((value) => ({ value, label: CART_STATUS[value].label })),
+];
+
+/** "3 days ago" style text for list rows */
+export const timeAgo = (value?: string | null) => {
+  if (!value) return "";
+  const diff = Date.now() - new Date(value).getTime();
+  if (!Number.isFinite(diff)) return "";
+  const minutes = Math.round(diff / 60000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours} h ago`;
+  const days = Math.round(hours / 24);
+  if (days < 30) return `${days} day${days === 1 ? "" : "s"} ago`;
+  const months = Math.round(days / 30);
+  return `${months} month${months === 1 ? "" : "s"} ago`;
 };

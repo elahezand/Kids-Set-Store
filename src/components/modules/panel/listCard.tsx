@@ -21,29 +21,28 @@ interface ListCardProps {
 
 export default function ListCard({ title, toolbar, isEmpty, empty, children, pager }: ListCardProps) {
   return (
-    <section className="card overflow-hidden">
-      <div className="card-header">
-        <h2 className="card-title">{title}</h2>
-        {toolbar && <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">{toolbar}</div>}
-      </div>
+    <div className="w-full min-w-0">
+      <section className="card w-full min-w-0 overflow-hidden">
+        <div className="card-header">
+          <h2 className="card-title">{title}</h2>
+          {toolbar && <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">{toolbar}</div>}
+        </div>
 
-      {isEmpty ? (
-        empty
-      ) : (
-        <>
-          {children}
-          <div className="px-4 pb-6">
-            <LoadMore
-              hasMore={Boolean(pager.hasNextPage)}
-              isLoading={pager.isFetchingNextPage}
-              onLoadMore={() => pager.fetchNextPage()}
-              count={pager.count}
-              limit={pager.limit}
-              noun={pager.noun}
-            />
-          </div>
-        </>
+        {isEmpty ? empty : children}
+      </section>
+
+      {!isEmpty && (
+        <div className="mt-6">
+          <LoadMore
+            hasMore={Boolean(pager.hasNextPage)}
+            isLoading={pager.isFetchingNextPage}
+            onLoadMore={() => pager.fetchNextPage()}
+            count={pager.count}
+            limit={pager.limit}
+            noun={pager.noun}
+          />
+        </div>
       )}
-    </section>
+    </div>
   );
 }

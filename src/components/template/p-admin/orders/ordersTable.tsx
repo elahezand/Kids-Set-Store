@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LuBanknote, LuEye, LuPackageCheck, LuShoppingBag, LuX } from "react-icons/lu";
+import { LuBanknote, LuClock, LuEye, LuPackageCheck, LuShoppingBag, LuX } from "react-icons/lu";
 import ListCard from "@/components/modules/panel/listCard";
 import SearchBox from "@/components/modules/panel/searchBox";
 import StatusTabs from "@/components/modules/panel/statusTabs";
@@ -13,6 +13,7 @@ import { formatDate, formatPrice } from "@/utils/format";
 import {
   ADMIN_ORDER_TABS,
   ORDER_STATUS,
+  autoCompleteDate,
   awaitsCash,
   canCancelOrder,
   cashReceivedText,
@@ -65,6 +66,21 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
         )}
       </>
     );
+
+  /* paid online and shipped: only the customer's "I received it" (or the auto-complete) is left */
+  const waitingBadge = (order: AdminOrder) => {
+    if (order.status !== "shipped" || order.paymentStatus !== "paid") return null;
+    const autoAt = autoCompleteDate(order);
+    return (
+      <span
+        className="badge badge-neutral"
+        title={autoAt ? `Completes by itself on ${formatDate(autoAt)} if the customer doesn't confirm` : undefined}
+      >
+        <LuClock className="size-3" /> Waiting for customer
+        {autoAt ? ` · auto ${formatDate(autoAt)}` : ""}
+      </span>
+    );
+  };
 
   const rowTone = (order: AdminOrder) =>
     awaitsCash(order)
@@ -134,6 +150,7 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
                     <span className={`badge ${status.badge}`}>{status.label}</span>
                     <span className={`badge ${payment.badge}`}>{payment.label}</span>
                     {cashBadges(order)}
+                    {waitingBadge(order)}
                   </div>
                   {actions(order)}
                 </div>
@@ -175,6 +192,7 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
                       <div className="flex flex-wrap items-center gap-1.5">
                         <span className={`badge ${status.badge}`}>{status.label}</span>
                         {cashBadges(order)}
+                    {waitingBadge(order)}
                       </div>
                     </td>
                     <td className="text-right font-semibold whitespace-nowrap tabular-nums">

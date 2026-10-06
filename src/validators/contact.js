@@ -34,6 +34,7 @@ export const adminContactsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional().catch(undefined),
   cursor: z.string().trim().min(1).optional().catch(undefined),
   status: z.enum(["pending", "answered"]).optional().catch(undefined),
+  q: z.string().trim().max(100).optional().catch(undefined),
 });
 
 export const answerContactSchema = z.object({

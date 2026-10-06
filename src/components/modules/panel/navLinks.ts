@@ -1,11 +1,19 @@
 import {
   LuBadgePercent,
+  LuBell,
+  LuFolderTree,
   LuHeart,
   LuLayoutDashboard,
+  LuLifeBuoy,
+  LuMail,
   LuMessageSquare,
   LuNewspaper,
   LuPackage,
+  LuSend,
+  LuSettings,
+  LuShieldCheck,
   LuShoppingBag,
+  LuShoppingCart,
   LuTicket,
   LuUserCog,
   LuUsers,
@@ -20,6 +28,8 @@ export interface PanelLink {
   label: string;
   icon: IconType;
   exact?: boolean;
+  /** Group heading shown above this link in the sidebar (only when it changes) */
+  section?: string;
 }
 
 export interface PanelNav {
@@ -33,15 +43,22 @@ export const panelNav: Record<PanelVariant, PanelNav> = {
     title: "Admin Panel",
     home: ROUTES.admin.home,
     links: [
-      { href: ROUTES.admin.home, label: "Dashboard", icon: LuLayoutDashboard, exact: true },
-      { href: ROUTES.admin.orders, label: "Orders", icon: LuShoppingBag },
-      { href: ROUTES.admin.products, label: "Products", icon: LuPackage },
-      { href: ROUTES.admin.users, label: "Users", icon: LuUsers },
-      { href: ROUTES.admin.comments, label: "Comments", icon: LuMessageSquare },
-      { href: ROUTES.admin.articles, label: "Articles", icon: LuNewspaper },
-      { href: ROUTES.admin.tickets, label: "Tickets", icon: LuTicket },
-      { href: ROUTES.admin.discounts, label: "Discounts", icon: LuBadgePercent },
-      { href: ROUTES.admin.account, label: "Account", icon: LuUserCog },
+      { href: ROUTES.admin.home, label: "Dashboard", icon: LuLayoutDashboard, exact: true, section: "Overview" },
+      { href: ROUTES.admin.orders, label: "Orders", icon: LuShoppingBag, section: "Sales" },
+      { href: ROUTES.admin.carts, label: "Carts", icon: LuShoppingCart, section: "Sales" },
+      { href: ROUTES.admin.discounts, label: "Discounts", icon: LuBadgePercent, section: "Sales" },
+      { href: ROUTES.admin.products, label: "Products", icon: LuPackage, section: "Catalog" },
+      { href: ROUTES.admin.categories, label: "Categories", icon: LuFolderTree, section: "Catalog" },
+      { href: ROUTES.admin.users, label: "Users", icon: LuUsers, section: "People" },
+      { href: ROUTES.admin.admins, label: "Admins", icon: LuShieldCheck, section: "People" },
+      { href: ROUTES.admin.tickets, label: "Tickets", icon: LuTicket, section: "Support" },
+      { href: ROUTES.admin.departments, label: "Departments", icon: LuLifeBuoy, section: "Support" },
+      { href: ROUTES.admin.contacts, label: "Messages", icon: LuMail, section: "Support" },
+      { href: ROUTES.admin.comments, label: "Comments", icon: LuMessageSquare, section: "Support" },
+      { href: ROUTES.admin.articles, label: "Articles", icon: LuNewspaper, section: "Content" },
+      { href: ROUTES.admin.newsletter, label: "Newsletter", icon: LuSend, section: "Content" },
+      { href: ROUTES.admin.siteInfo, label: "Site info", icon: LuSettings, section: "Settings" },
+      { href: ROUTES.admin.account, label: "Account", icon: LuUserCog, section: "Settings" },
     ],
   },
   user: {

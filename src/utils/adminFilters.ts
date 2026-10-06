@@ -46,6 +46,9 @@ export const adminListParams = {
     clean({ limit, isPublished: status === "all" ? undefined : String(status === "published"), q }),
   coupons: (limit: number, { status, q }: AdminFilters<string>) =>
     clean({ limit, isActive: status === "all" ? undefined : String(status === "active"), q }),
+  contacts: (limit: number, { status, q }: AdminFilters<string>) => clean({ limit, status: tab(status), q }),
+  newsletter: (limit: number, { q }: AdminFilters<string>) => clean({ limit, q }),
+  carts: (limit: number, { status }: AdminFilters<string>) => clean({ limit, status: tab(status) }),
 };
 
 export const filtersKey = ({ status, q }: AdminFilters<string>) => `${status}|${q}`;

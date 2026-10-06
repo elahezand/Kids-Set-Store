@@ -19,7 +19,7 @@ const getContacts = async (query = {}) => {
     const [result, unreadCount] = await Promise.all([
         paginateList(Contact, query, {
             statuses: ["pending", "answered"],
-            search: ["name", "email", "phone"],
+            search: ["name", "email", "phone", "body"],
             populate: POPULATE,
         }),
         Contact.countDocuments({ status: "pending" }),

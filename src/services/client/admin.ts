@@ -9,6 +9,15 @@ import { ROUTES } from "@/utils/constants";
 import { formatPrice } from "@/utils/format";
 import type { AdminListParams } from "@/utils/adminFilters";
 import type {
+  AdminCart,
+  AdminCartDetail,
+  CategoryPayload,
+  ContactMessage,
+  DepartmentPayload,
+  NewsletterSubscriber,
+  NotificationPayload,
+  OrderSweepResult,
+  SiteInfo,
   AdminArticle,
   AdminComment,
   AdminOrder,
@@ -274,5 +283,183 @@ export const useDeleteCoupon = () => {
   return useDelete<ApiSuccess, Id>((id) => `/admin/coupon/${id}`, {
     errorFallback: "Could not delete the code",
     onSuccess: () => afterChange("Discount code deleted", queryKeys.admin.coupons()),
+  });
+};
+
+/* ---------- categories ---------- */
+
+export const useSaveCategory = (categoryId?: Id, { onDone }: { onDone?: () => void } = {}) => {
+  const afterChange = useAfterChange();
+  const done = (message: string) => () => {
+    afterChange(message);
+    onDone?.();
+  };
+  const create = usePost<ApiSuccess, CategoryPayload>("/admin/categories", {
+    errorFallback: "Could not create the category",
+    onSuccess: done("Category created"),
+  });
+  const update = usePut<ApiSuccess, Partial<CategoryPayload>>(`/admin/categories/${categoryId}`, {
+    errorFallback: "Could not save the category",
+    onSuccess: done("Category saved"),
+  });
+  return categoryId ? update : create;
+};
+
+export const useDeleteCategory = () => {
+  const afterChange = useAfterChange();
+  return useDelete<ApiSuccess, Id>((id) => `/admin/categories/${id}`, {
+    errorFallback: "Could not delete the category",
+    onSuccess: () => afterChange("Category deleted"),
+  });
+};
+
+/* ---------- ticket departments ---------- */
+
+export const useSaveDepartment = (departmentId?: Id, { onDone }: { onDone?: () => void } = {}) => {
+  const afterChange = useAfterChange();
+  const done = (message: string) => () => {
+    afterChange(message);
+    onDone?.();
+  };
+  const create = usePost<ApiSuccess, DepartmentPayload>("/admin/departments", {
+    errorFallback: "Could not create the department",
+    onSuccess: done("Department created"),
+  });
+  const update = usePut<ApiSuccess, Partial<DepartmentPayload>>(`/admin/departments/${departmentId}`, {
+    errorFallback: "Could not save the department",
+    onSuccess: done("Department saved"),
+  });
+  return departmentId ? update : create;
+};
+
+/** Quick on/off and reorder from the list, without opening the form */
+export const useUpdateDepartment = () => {
+  const afterChange = useAfterChange();
+  return usePut<ApiSuccess, WithId<Partial<DepartmentPayload>>>(({ id }) => `/admin/departments/${id}`, {
+    errorFallback: "Could not update the department",
+    onSuccess: () => afterChange(undefined),
+  });
+};
+
+export const useDeleteDepartment = () => {
+  const afterChange = useAfterChange();
+  return useDelete<ApiSuccess, Id>((id) => `/admin/departments/${id}`, {
+    errorFallback: "Could not delete the department",
+    onSuccess: () => afterChange("Department deleted"),
+  });
+};
+
+export const useSaveTopic = () => {
+  const afterChange = useAfterChange();
+  const create = usePost<ApiSuccess, { department: Id; title: string }>("/admin/sub-departments", {
+    errorFallback: "Could not add the topic",
+    onSuccess: () => afterChange("Topic added"),
+  });
+  const update = usePut<ApiSuccess, { id: Id; title: string }>(({ id }) => `/admin/sub-departments/${id}`, {
+    errorFallback: "Could not rename the topic",
+    onSuccess: () => afterChange("Topic renamed"),
+  });
+  return { create, update };
+};
+
+export const useDeleteTopic = () => {
+  const afterChange = useAfterChange();
+  return useDelete<ApiSuccess, Id>((id) => `/admin/sub-departments/${id}`, {
+    errorFallback: "Could not delete the topic",
+    onSuccess: () => afterChange("Topic deleted"),
+  });
+};
+
+/* ---------- contact messages ---------- */
+
+export const useAdminContacts = (initialPage: Paginated<ContactMessage>, params: AdminListParams) =>
+  useCursorList("/admin/contacts", queryKeys.admin.contacts(params), params, initialPage, "Could not load messages");
+
+export const useAnswerContact = ({ onDone }: { onDone?: () => void } = {}) => {
+  const afterChange = useAfterChange();
+  return usePost<ApiSuccess<ContactMessage>, { id: Id; answer: string }>(({ id }) => `/admin/contacts/${id}`, {
+    errorFallback: "Could not send the answer",
+    onSuccess: () => {
+      afterChange("Answer emailed to the sender", queryKeys.admin.contacts());
+      onDone?.();
+    },
+  });
+};
+
+export const useDeleteContact = () => {
+  const afterChange = useAfterChange();
+  return useDelete<ApiSuccess, Id>((id) => `/admin/contacts/${id}`, {
+    errorFallback: "Could not delete the message",
+    onSuccess: () => afterChange("Message deleted", queryKeys.admin.contacts()),
+  });
+};
+
+/* ---------- newsletter ---------- */
+
+export const useAdminNewsletter = (initialPage: Paginated<NewsletterSubscriber>, params: AdminListParams) =>
+  useCursorList(
+    "/admin/newsletter",
+    queryKeys.admin.newsletter(params),
+    params,
+    initialPage,
+    "Could not load subscribers"
+  );
+
+/* ---------- carts ---------- */
+
+export const useAdminCarts = (initialPage: Paginated<AdminCart>, params: AdminListParams) =>
+  useCursorList("/admin/cart", queryKeys.admin.carts(params), params, initialPage, "Could not load carts");
+
+export const useAdminCart = (id?: Id) =>
+  useGet<ApiSuccess<AdminCartDetail>>(`/admin/cart/${id}`, undefined, {
+    queryKey: queryKeys.admin.cart(id ?? ""),
+    enabled: Boolean(id),
+    errorFallback: "Could not load the cart",
+    staleTime: 30 * 1000,
+  });
+
+export const useDeleteCart = ({ onDone }: { onDone?: () => void } = {}) => {
+  const afterChange = useAfterChange();
+  return useDelete<ApiSuccess, Id>((id) => `/admin/cart/${id}`, {
+    errorFallback: "Could not delete the cart",
+    onSuccess: () => {
+      afterChange("Cart emptied and removed", queryKeys.admin.carts());
+      onDone?.();
+    },
+  });
+};
+
+/* ---------- notifications ---------- */
+
+export const useSendNotification = () =>
+  usePost<ApiSuccess, NotificationPayload>("/admin/notification", {
+    errorFallback: "Could not send the notification",
+  });
+
+/* ---------- site info ---------- */
+
+export const useSaveSiteInfo = () => {
+  const afterChange = useAfterChange();
+  return usePut<ApiSuccess<SiteInfo>, SiteInfo>("/admin/info", {
+    errorFallback: "Could not save the site info",
+    onSuccess: () => afterChange("Site info saved — the store shows it right away"),
+  });
+};
+
+/* ---------- order maintenance ---------- */
+
+export const useRepairOrder = () => {
+  const afterChange = useAfterChange();
+  return usePost<ApiSuccess, Id>((id) => `/admin/order/${id}/repair`, {
+    errorFallback: "Could not repair the order",
+    onSuccess: () => afterChange("Order repaired — stock reserved and order finalized", queryKeys.admin.orders()),
+  });
+};
+
+export const useRunOrderSweeps = () => {
+  const afterChange = useAfterChange();
+  return usePost<ApiSuccess<OrderSweepResult>, void>("/admin/order/auto-complete", {
+    errorFallback: "Could not run the order checks",
+    onSuccess: () => afterChange(undefined, queryKeys.admin.orders()),
   });
 };

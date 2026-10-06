@@ -28,6 +28,8 @@ import {
     finalizeOrder,
     revertOrder,
     completeDeliveredOrder,
+    reserveStock,
+    releaseStock,
 } from "@/services/server/shared/order";
 
 import { isValidObjectId } from "mongoose";
@@ -102,6 +104,13 @@ const checkout = async (
 
     const rollback = async (reason) => {
         if (createdOrder) {
+            // stock reserved for an online payment that never started goes back (never for a paid order)
+            if (createdOrder.paymentStatus !== "paid") {
+                await releaseStock(createdOrder).catch((error) =>
+                    logger.error(`[checkout] could not release stock of order ${createdOrder._id}:`, error)
+                );
+            }
+
             await Order.updateOne(
                 { _id: createdOrder._id, paymentStatus: { $ne: "paid" } },
                 { $set: { status: "cancelled", paymentStatus: "failed" } }
@@ -273,6 +282,19 @@ const checkout = async (
                 paymentMethod === "zarinpal") &&
             order.pricing.total > 0
         ) {
+            // take the stock now, so nobody else can pay for the same last items meanwhile
+            const outOfStock = await reserveStock(order);
+
+            if (outOfStock) {
+                await rollback("out of stock");
+
+                return {
+                    success: false,
+                    status: 409,
+                    message: `${outOfStock.productSnapshot?.title || "An item"} just sold out. Please check your cart.`,
+                };
+            }
+
             const payment = await createPayment(
                 toRial(order.pricing.total),
                 `Order ${order._id}`,

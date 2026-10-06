@@ -4,9 +4,18 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LuLogOut, LuStore, LuX } from "react-icons/lu";
-import { isLinkActive, panelNav, type PanelVariant } from "@/components/modules/panel/navLinks";
+import { isLinkActive, panelNav, type PanelLink, type PanelVariant } from "@/components/modules/panel/navLinks";
 import ConfirmDialog from "@/components/modules/ui/confirmDialog";
 import { useLogout } from "@/services/client/panel";
+
+const groupLinks = (links: PanelLink[]) =>
+  links.reduce<Array<{ title: string; links: PanelLink[] }>>((groups, link) => {
+    const title = link.section ?? "Menu";
+    const last = groups[groups.length - 1];
+    if (last?.title === title) last.links.push(link);
+    else groups.push({ title, links: [link] });
+    return groups;
+  }, []);
 
 interface SidebarProps {
   variant?: PanelVariant;
@@ -17,6 +26,7 @@ interface SidebarProps {
 export default function Sidebar({ variant = "user", open = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const nav = panelNav[variant] ?? panelNav.user;
+  const groups = groupLinks(nav.links);
   const [confirmLogout, setConfirmLogout] = useState(false);
   const logout = useLogout();
 
@@ -60,33 +70,37 @@ export default function Sidebar({ variant = "user", open = false, onClose }: Sid
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-5">
-          <p className="mb-2 px-3 text-[11px] font-semibold tracking-wider text-gray-600 uppercase">Menu</p>
-          <ul className="space-y-1">
-            {nav.links.map((link) => {
-              const active = isLinkActive(pathname, link);
-              const Icon = link.icon;
-              return (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    onClick={onClose}
-                    aria-current={active ? "page" : undefined}
-                    className={`group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                      active
-                        ? "bg-sage-50 text-sage-700 dark:bg-sage-500/10 dark:text-sage-300"
-                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-100"
-                    }`}
-                  >
-                    {active && <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-sage-500" />}
-                    <Icon
-                      className={`size-[18px] shrink-0 ${active ? "text-sage-600 dark:text-sage-300" : "text-gray-600 group-hover:text-gray-800 dark:group-hover:text-gray-300"}`}
-                    />
-                    {link.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+          {groups.map((group, groupIndex) => (
+            <div key={group.title} className={groupIndex ? "mt-5" : ""}>
+              <p className="mb-2 px-3 text-[11px] font-semibold tracking-wider text-gray-600 uppercase">{group.title}</p>
+              <ul className="space-y-1">
+                {group.links.map((link) => {
+                  const active = isLinkActive(pathname, link);
+                  const Icon = link.icon;
+                  return (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        onClick={onClose}
+                        aria-current={active ? "page" : undefined}
+                        className={`group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                          active
+                            ? "bg-sage-50 text-sage-700 dark:bg-sage-500/10 dark:text-sage-300"
+                            : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-100"
+                        }`}
+                      >
+                        {active && <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-sage-500" />}
+                        <Icon
+                          className={`size-[18px] shrink-0 ${active ? "text-sage-600 dark:text-sage-300" : "text-gray-600 group-hover:text-gray-800 dark:group-hover:text-gray-300"}`}
+                        />
+                        {link.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
         </nav>
 
         <div className="space-y-1 border-t border-gray-200 p-3 dark:border-white/10">

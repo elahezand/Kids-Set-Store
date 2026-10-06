@@ -21,6 +21,10 @@ export const queryKeys = {
     articles: (filters: object = {}) => ["admin", "articles", filters] as const,
     tickets: (filters: object = {}) => ["admin", "tickets", filters] as const,
     coupons: (filters: object = {}) => ["admin", "coupons", filters] as const,
+    contacts: (filters: object = {}) => ["admin", "contacts", filters] as const,
+    newsletter: (filters: object = {}) => ["admin", "newsletter", filters] as const,
+    carts: (filters: object = {}) => ["admin", "carts", filters] as const,
+    cart: (id: string) => ["admin", "cart", id] as const,
     categoryFilters: (slug: string) => ["admin", "category-filters", slug] as const,
   },
 };

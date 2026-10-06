@@ -96,3 +96,23 @@ server services are JavaScript.
 
 Dark mode uses the `dark` class on `<html>` (`dark:` variant).
 
+
+## Order automation
+
+`runOrderSweeps` (finish half-finished orders, settle pending payments, auto-complete shipped
+orders, remind admins about overdue cash) runs in three ways:
+
+1. **In-app timer** — `configs/db.js` starts it after the first DB connection and repeats every
+   `ORDER_SWEEP_MINUTES` (default 10). Works on a long-running server (`next start`, VPS, Docker).
+   It does **not** survive on serverless hosting. Turn it off with `DISABLE_ORDER_SWEEPER=true`.
+2. **Cron endpoint** — set `CRON_SECRET` and call `GET /api/cron/orders` with
+   `Authorization: Bearer <CRON_SECRET>`:
+   ```
+   */10 * * * * curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://your-site/api/cron/orders
+   ```
+   On Vercel, add `{"crons":[{"path":"/api/cron/orders","schedule":"*/10 * * * *"}]}` to
+   `vercel.json` (Vercel sends the header itself; the Hobby plan only allows daily crons).
+3. **By hand** — Admin → Orders → Order checks → "Run checks now".
+
+Only paid, shipped orders auto-complete (7 days after shipping, or 3 days after the expected
+delivery date). Unpaid cash-on-delivery orders never complete on their own; admins get reminders.

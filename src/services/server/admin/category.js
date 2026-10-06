@@ -36,7 +36,7 @@ const isSelfOrDescendant = async (
 };
 
 const createCategory = async (data) => {
-    const { name, parentId } = data;
+    const { name, parentId, description } = data;
 
     const slug = slugify(data.slug || name);
 
@@ -63,8 +63,8 @@ const createCategory = async (data) => {
     }
 
     const nameTaken = await Category.exists({
-        name,
-        parentId,
+        title: name,
+        parentId: parentId ?? null,
     }).collation({
         locale: "en",
         strength: 2,
@@ -93,9 +93,10 @@ const createCategory = async (data) => {
     }
 
     const category = await Category.create({
-        name,
+        title: name,
         slug,
-        parentId,
+        parentId: parentId ?? null,
+        description: description ?? "",
     });
 
     return {
@@ -116,7 +117,7 @@ const updateCategory = async (id, data) => {
     }
 
     const nextName =
-        data.name ?? category.name;
+        data.name ?? category.title;
 
     const nextParentId =
         data.parentId !== undefined
@@ -166,7 +167,7 @@ const updateCategory = async (id, data) => {
         const nameTaken =
             await Category.exists({
                 _id: { $ne: id },
-                name: nextName,
+                title: nextName,
                 parentId:
                     nextParentId ?? null,
             }).collation({
@@ -212,7 +213,11 @@ const updateCategory = async (id, data) => {
         category.slug = nextSlug;
     }
 
-    category.name = nextName;
+    category.title = nextName;
+
+    if (data.description !== undefined) {
+        category.description = data.description ?? "";
+    }
     category.parentId =
         nextParentId ?? null;
 
@@ -286,6 +291,44 @@ const deleteCategory = async (id) => {
 
 
 
+/* Flat list for the admin panel: every category (inactive too) with its usage counts */
+const getAdminCategories = async () => {
+    const [categories, productCounts] = await Promise.all([
+        Category.find()
+            .select("title name slug description parentId isActive createdAt")
+            .lean(),
+        Product.aggregate([
+            { $unwind: "$categoryPath" },
+            { $group: { _id: "$categoryPath", count: { $sum: 1 } } },
+        ]),
+    ]);
+
+    const products = new Map(
+        productCounts.map((row) => [String(row._id), row.count])
+    );
+    const children = new Map();
+
+    for (const category of categories) {
+        if (!category.parentId) continue;
+        const key = String(category.parentId);
+        children.set(key, (children.get(key) || 0) + 1);
+    }
+
+    return categories
+        .map((category) => ({
+            _id: String(category._id),
+            title: category.title ?? category.name ?? "",
+            slug: category.slug,
+            description: category.description || "",
+            parentId: category.parentId ? String(category.parentId) : null,
+            isActive: category.isActive !== false,
+            productsCount: products.get(String(category._id)) || 0,
+            childrenCount: children.get(String(category._id)) || 0,
+            createdAt: category.createdAt,
+        }))
+        .sort((a, b) => a.title.localeCompare(b.title));
+};
+
 // every successful write clears the cached public copy (services/server/public)
 const clearsCache = (fn) => async (...args) => {
     const result = await fn(...args);
@@ -298,12 +341,14 @@ const deleteCategoryCached = clearsCache(deleteCategory);
 const updateCategoryCached = clearsCache(updateCategory);
 
 export {
+    getAdminCategories,
     createCategoryCached as createCategory,
     deleteCategoryCached as deleteCategory,
     updateCategoryCached as updateCategory,
 };
 
 export default {
+    getAdminCategories,
     createCategory: createCategoryCached,
     deleteCategory: deleteCategoryCached,
     updateCategory: updateCategoryCached,

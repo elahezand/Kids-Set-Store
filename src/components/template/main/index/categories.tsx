@@ -1,23 +1,62 @@
-import Image from "next/image";
 import Link from "next/link";
-import { LuArrowUpRight } from "react-icons/lu";
+import type { ReactNode } from "react";
 import SectionHeader from "@/components/modules/main/sectionHeader";
 import { ROUTES } from "@/utils/constants";
 import type { CategoryNode } from "@/types";
 
-const FALLBACK_IMAGES = [
-  "/images/3d13c0c692c13e3a2b23ec4aada83643.jpg",
-  "/images/be27ba179f604eecc99ae2e18cb2c1d0.jpg",
-  "/images/58a9656fc91cd2625e04e78334ee367c.jpg",
-  "/images/e7b713eecc952b345214d544b8da1ad1.jpg",
+const TINTS = [
+  { bg: "bg-coral-50 dark:bg-coral-500/10", motif: "text-coral-200 dark:text-coral-500/30", letter: "text-coral-500" },
+  { bg: "bg-sky-50 dark:bg-sky-500/10", motif: "text-sky-200 dark:text-sky-500/30", letter: "text-sky-500" },
+  { bg: "bg-sun-50 dark:bg-sun-500/10", motif: "text-sun-200 dark:text-sun-500/30", letter: "text-sun-500" },
+  { bg: "bg-mint-50 dark:bg-mint-500/10", motif: "text-mint-200 dark:text-mint-500/30", letter: "text-mint-500" },
+  { bg: "bg-sage-50 dark:bg-sage-500/10", motif: "text-sage-200 dark:text-sage-500/30", letter: "text-sage-500" },
 ];
 
-const TINTS = [
-  { card: "bg-coral-50 dark:bg-coral-500/10", arch: "bg-coral-200 dark:bg-coral-500/25" },
-  { card: "bg-sky-50 dark:bg-sky-500/10", arch: "bg-sky-200 dark:bg-sky-500/25" },
-  { card: "bg-sun-50 dark:bg-sun-500/10", arch: "bg-sun-200 dark:bg-sun-500/25" },
-  { card: "bg-mint-50 dark:bg-mint-500/10", arch: "bg-mint-200 dark:bg-mint-500/25" },
-  { card: "bg-sage-50 dark:bg-sage-500/10", arch: "bg-sage-200 dark:bg-sage-500/25" },
+// Decorative patterns drawn in a 64x64 box; each uses currentColor so the tint controls it.
+const MOTIFS: ReactNode[] = [
+  // Concentric rings
+  <g key="rings" fill="none" stroke="currentColor" strokeWidth="4">
+    <circle cx="32" cy="32" r="38" />
+    <circle cx="32" cy="32" r="28" />
+    <circle cx="32" cy="32" r="18" />
+  </g>,
+  // Dot grid
+  <g key="dots" fill="currentColor">
+    {Array.from({ length: 25 }, (_, i) => (
+      <circle key={i} cx={8 + (i % 5) * 12} cy={8 + Math.floor(i / 5) * 12} r="2.5" />
+    ))}
+  </g>,
+  // Waves
+  <g key="waves" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+    {[18, 32, 46].map((y) => (
+      <path key={y} d={`M-4 ${y} Q4 ${y - 7} 12 ${y} T28 ${y} T44 ${y} T60 ${y} T76 ${y}`} />
+    ))}
+  </g>,
+  // Petals
+  <g key="petals" fill="currentColor">
+    {Array.from({ length: 6 }, (_, i) => (
+      <ellipse key={i} cx="32" cy="15" rx="7" ry="13" transform={`rotate(${i * 60} 32 32)`} />
+    ))}
+  </g>,
+  // Diagonal stripes
+  <g key="stripes" stroke="currentColor" strokeWidth="4">
+    {Array.from({ length: 9 }, (_, i) => (
+      <line key={i} x1={-32 + i * 12} y1="64" x2={i * 12} y2="0" />
+    ))}
+  </g>,
+];
+
+// Organic background shape behind the grid
+const BLOB_PATH =
+  "M120 60 C220 0 380 30 470 20 C590 8 720 40 770 130 C820 220 760 330 650 360 C540 390 430 350 320 370 C200 392 70 360 35 260 C0 160 40 100 120 60 Z";
+
+// Four-point sparkle, drawn in a 24x24 box
+const SPARKLE_PATH = "M12 0 C13 7 17 11 24 12 C17 13 13 17 12 24 C11 17 7 13 0 12 C7 11 11 7 12 0 Z";
+
+const SPARKLES = [
+  { className: "left-2 top-4 size-5 sm:left-6 sm:size-7", tint: "text-sun-300 dark:text-sun-500/50" },
+  { className: "right-4 top-0 size-3 sm:right-10 sm:size-4", tint: "text-coral-300 dark:text-coral-500/50" },
+  { className: "bottom-3 right-1 size-4 sm:right-4 sm:size-6", tint: "text-sky-300 dark:text-sky-500/50" },
 ];
 
 const subtitle = (category: CategoryNode) =>
@@ -29,8 +68,6 @@ const subtitle = (category: CategoryNode) =>
 export default function Categories({ categories = [] }: { categories?: CategoryNode[] }) {
   if (!categories.length) return null;
 
-  const oddCount = categories.length % 2 === 1;
-
   return (
     <section className="home-container" aria-label="Shop by category">
       <SectionHeader
@@ -40,51 +77,97 @@ export default function Categories({ categories = [] }: { categories?: CategoryN
         href={ROUTES.products}
       />
 
-      <ul
-        className={`grid grid-cols-2 gap-x-3 gap-y-4 sm:gap-x-4 ${categories.length === 5 ? "lg:grid-cols-5" : "lg:grid-cols-4"}`}
-      >
-        {categories.map((category, index) => {
-          const tint = TINTS[index % TINTS.length];
-          const wide = oddCount && index === categories.length - 1;
+      <div className="relative mx-auto  px-4 py-12 sm:px-10 sm:py-16">
+        {/* Layered background shape */}
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 800 400"
+          preserveAspectRatio="none"
+          className="pointer-events-none absolute inset-0 size-full"
+        >
+          <defs>
+            <linearGradient id="categories-blob-fill" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="currentColor" className="text-sage-100 dark:text-sage-500/15" />
+              <stop offset="100%" stopColor="currentColor" className="text-mint-50 dark:text-mint-500/5" />
+            </linearGradient>
+          </defs>
 
-          return (
-            <li key={category.id} className={`pt-14 sm:pt-16 ${wide ? "col-span-2 md:col-span-1" : ""}`}>
-              <Link
-                href={ROUTES.category(category.slug)}
-                className={`group relative flex h-full flex-col rounded-t-2xl  px-4 pb-4 transition-shadow duration-300 hover:shadow-float focus-visible:ring-2 focus-visible:ring-sage-500 focus-visible:outline-none sm:px-5 sm:pb-5 ${tint.card}`}
-              >
-                <div
-                  className={`relative mx-auto -mt-14 w-[82%] overflow-hidden rounded-t-full shadow-card ring-4 ring-white transition-transform duration-500 group-hover:-translate-y-2 motion-reduce:transition-none sm:-mt-16 dark:ring-ink-900 ${tint.arch} ${
-                    wide ? "aspect-[16/9] max-w-[260px] md:aspect-[4/5] md:max-w-none" : "aspect-[4/5]"
-                  }`}
+          {/* Soft offset shadow shape */}
+          <path
+            d={BLOB_PATH}
+            transform="rotate(4 400 200) translate(14 10)"
+            className="fill-sky-50 dark:fill-sky-500/5"
+          />
+          {/* Main shape */}
+          <path d={BLOB_PATH} fill="url(#categories-blob-fill)" />
+          {/* Stitched outline */}
+          <path
+            d={BLOB_PATH}
+            fill="none"
+            strokeWidth="1.5"
+            strokeDasharray="2 7"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+            transform="rotate(-3 400 200)"
+            className="stroke-sage-400 dark:stroke-sage-500/40"
+          />
+        </svg>
+
+        {/* Sparkles, kept outside the stretched SVG so they stay crisp */}
+        {SPARKLES.map((sparkle, i) => (
+          <svg
+            key={i}
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className={`pointer-events-none absolute ${sparkle.className} ${sparkle.tint}`}
+          >
+            <path d={SPARKLE_PATH} fill="currentColor" />
+          </svg>
+        ))}
+
+        <ul className="relative grid grid-cols-4 px-8 max-w-[750px] m-auto">
+          {categories.map((category, index) => {
+            const tint = TINTS[index % TINTS.length];
+            const motif = MOTIFS[index % MOTIFS.length];
+            const letter = category.title.trim().charAt(0).toUpperCase();
+
+            return (
+              <li key={category.id}>
+                <Link
+                  href={ROUTES.category(category.slug)}
+                  className="group flex flex-col items-center gap-3 rounded-2xl p-1 text-center focus-visible:ring-2 focus-visible:ring-sage-500 focus-visible:outline-none"
                 >
-                  <Image
-                    fill
-                    src={FALLBACK_IMAGES[index % FALLBACK_IMAGES.length]}
-                    alt=""
-                    sizes="(min-width: 1024px) 18vw, (min-width: 768px) 30vw, 45vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
-                  />
-                </div>
-
-                <div className="mt-4 flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <h3 className="truncate text-base font-bold text-text-dark sm:text-lg dark:text-white">
-                      {category.title}
-                    </h3>
-                    <p className="mt-0.5 line-clamp-1 text-xs text-gray-600 sm:text-sm dark:text-gray-400">
-                      {subtitle(category)}
-                    </p>
-                  </div>
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white text-text-dark shadow-card transition-colors duration-300 group-hover:bg-sage-600 group-hover:text-white dark:bg-ink-800 dark:text-gray-100">
-                    <LuArrowUpRight className="size-4 transition-transform duration-300 group-hover:rotate-45" />
+                  <span
+                    className={`relative flex size-24 items-center justify-center overflow-hidden rounded-full shadow-card ring-4 ring-white transition duration-300 after:pointer-events-none after:absolute after:inset-1.5 after:rounded-full after:border after:border-white/80 group-hover:-translate-y-1.5 group-hover:shadow-float group-hover:ring-sage-500 motion-reduce:transition-none sm:size-28 lg:size-44 lg:after:inset-2.5 dark:ring-ink-900 dark:after:border-white/10 ${tint.bg}`}
+                  >
+                    <svg
+                      viewBox="0 0 64 64"
+                      aria-hidden="true"
+                      className={`absolute inset-0 size-full transition-transform duration-700 group-hover:rotate-45 motion-reduce:transition-none ${tint.motif}`}
+                    >
+                      {motif}
+                    </svg>
+                    <span
+                      className={`relative flex size-12 items-center justify-center rounded-full bg-white/85 text-2xl font-bold shadow-sm backdrop-blur-sm sm:size-14 sm:text-3xl lg:size-20 lg:text-4xl dark:bg-ink-900/70 ${tint.letter}`}
+                    >
+                      {letter}
+                    </span>
                   </span>
-                </div>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+
+                  <span className="w-full min-w-0">
+                    <span className="block truncate text-sm font-semibold tracking-tight text-text-dark sm:text-base dark:text-white">
+                      {category.title}
+                    </span>
+                    <span className="mt-0.5 hidden truncate text-xs text-gray-600 sm:block dark:text-gray-400">
+                      {subtitle(category)}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </section>
   );
 }

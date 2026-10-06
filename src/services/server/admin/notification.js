@@ -25,6 +25,7 @@ const create = async (data) => {
     const notification = await Notification.create({
         msg: data.msg,
         user: recipient._id,
+        link: data.link || null,
     });
 
     return {

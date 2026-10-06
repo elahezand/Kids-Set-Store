@@ -33,6 +33,7 @@ export const ROUTES = {
   admin: {
     home: "/dashboard/admin",
     orders: "/dashboard/admin/orders",
+    stuckOrders: "/dashboard/admin/orders/stuck",
     products: "/dashboard/admin/products",
     newProduct: "/dashboard/admin/products/new",
     product: (id: string) => `/dashboard/admin/products/${id}`,
@@ -44,6 +45,14 @@ export const ROUTES = {
     tickets: "/dashboard/admin/tickets",
     ticket: (id: string) => `/dashboard/admin/tickets/${id}`,
     discounts: "/dashboard/admin/discounts",
+    categories: "/dashboard/admin/categories",
+    departments: "/dashboard/admin/departments",
+    contacts: "/dashboard/admin/contacts",
+    newsletter: "/dashboard/admin/newsletter",
+    carts: "/dashboard/admin/carts",
+    notifications: "/dashboard/admin/notifications",
+    admins: "/dashboard/admin/admins",
+    siteInfo: "/dashboard/admin/site-info",
     account: "/dashboard/admin/detail-account",
   },
 } as const;

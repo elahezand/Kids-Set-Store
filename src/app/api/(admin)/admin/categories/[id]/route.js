@@ -78,3 +78,31 @@ export async function PUT(req, { params }) {
     );
   }
 }
+
+export async function DELETE(req, { params }) {
+  try {
+    await connectToDB();
+
+    const admin = await authAdmin();
+
+    if (!admin || admin.status === "expired") {
+      return jsonError("Admin access required", 401);
+    }
+
+    const { id } = await params;
+
+    if (!validateObjectId(id)) {
+      return jsonError("Category not found", 404);
+    }
+
+    const serviceResult = await categoryService.deleteCategory(id);
+
+    if (!serviceResult.success) {
+      return jsonError(serviceResult.message, serviceResult.status);
+    }
+
+    return respond({ message: "Category deleted successfully" }, { status: 200 });
+  } catch (err) {
+    return handleRouteError(err, "DELETE /api/admin/categories/:id");
+  }
+}

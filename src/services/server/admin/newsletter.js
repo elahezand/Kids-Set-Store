@@ -10,10 +10,14 @@ const getAll = async (searchParams) => {
     return paginateList(Newsletter, query, { search: ["email"] });
 };
 
+const countAll = () => Newsletter.countDocuments();
+
 export {
     getAll,
+    countAll,
 };
 
 export default {
     getAll,
+    countAll,
 };

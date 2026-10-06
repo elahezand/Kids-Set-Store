@@ -131,7 +131,7 @@ const getAllUsers = async (query = {}) => {
 
 const getAdmins = async () => {
     const admins = await User.find({ role: "ADMIN" })
-        .select("username phone")
+        .select("username phone email profilePicture createdAt")
         .sort({ username: 1 })
         .lean();
 

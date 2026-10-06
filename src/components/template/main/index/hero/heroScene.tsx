@@ -18,7 +18,7 @@ const PALETTE = {
   coral: "#ff7a68",
   mint: "#8ccf5f",
   peach: "#ff8a3d",
-  sky: "#60b4fa",
+  sky: "#0f71c2",
   sun: "#ffc425",
 };
 
@@ -36,7 +36,7 @@ const BLOCKS: Array<{ letter: string; color: string; position: [number, number, 
 
 const BALLOONS: Array<{ color: string; position: [number, number, number]; scale: number }> = [
   { color: PALETTE.coral, position: [-1.95, 1.55, -0.4], scale: 0.48 },
-  { color: PALETTE.sky, position: [1.85, 1.85, -0.9], scale: 0.42 },
+  { color: PALETTE.sage, position: [1.85, 1.85, -0.9], scale: 0.42 },
   { color: PALETTE.sun, position: [0.25, 2.25, -1.8], scale: 0.36 },
 ];
 
@@ -145,7 +145,7 @@ function Shirt() {
   return (
     <group position={[-2.05, 0.15, 0.6]} rotation={[0.1, 0.45, -0.18]} scale={0.72}>
       <mesh geometry={shirt}>
-        <meshStandardMaterial color={PALETTE.mint} roughness={0.7} />
+        <meshStandardMaterial color={PALETTE.sageDeep} roughness={0.7} />
       </mesh>
       <mesh geometry={badge} position={[0.2, 0.18, 0.13]}>
         <meshStandardMaterial color={PALETTE.sun} roughness={0.4} />

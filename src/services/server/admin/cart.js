@@ -7,6 +7,7 @@ import { buildCartView } from "@/services/server/shared/cart";
 const getAdminCarts = async (query = {}) =>
     paginateList(Cart, query, {
         defaultLimit: 15,
+        sort: { updatedAt: -1 },
         statuses: ["active", "abandoned", "converted"],
         ids: { user: "user" },
         populate: [
@@ -18,7 +19,7 @@ const getAdminCarts = async (query = {}) =>
 const getCartById = async (id) => {
     const cart = await Cart.findById(id).populate(
         "user",
-        "name email phone"
+        "username email phone"
     );
 
     if (!cart) {
@@ -29,7 +30,7 @@ const getCartById = async (id) => {
         };
     }
 
-    const data = buildCartView(cart, {
+    const data = await buildCartView(cart, {
         prune: false,
     });
 

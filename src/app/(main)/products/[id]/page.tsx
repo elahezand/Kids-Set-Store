@@ -82,7 +82,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     },
   };
 
-  return (
+   return (
     <div className="page-container">
       <script
         type="application/ld+json"
@@ -91,14 +91,22 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
       <Breadcrumb route="products" title={view.name} />
 
-      <div data-aos="fade-up" className="mx-auto max-w-[1200px] text-text dark:text-gray-100">
+      <div
+        data-aos="fade-up"
+        className="mx-auto flex max-w-[1200px] flex-col gap-16 pb-20 text-text sm:gap-20 lg:gap-28 lg:pb-28 dark:text-gray-100"
+      >
         <ProductContent product={view} commentsCount={commentsCount} isFavorited={isFavorited} />
 
-        <section id="comments" className="scroll-mt-28 border-t border-gray-200 pt-10 dark:border-white/10">
+        <section
+          id="comments"
+          className="scroll-mt-28 border-t border-gray-200 pt-12 sm:pt-16 dark:border-white/10"
+        >
           <Comments productId={view._id} total={commentsCount} isLoggedIn={Boolean(user)} />
         </section>
 
-        <RelatedProducts related={toProductCards(related)} />
+        <section className="border-t border-gray-200 pt-12 sm:pt-16 dark:border-white/10">
+          <RelatedProducts related={toProductCards(related)} />
+        </section>
       </div>
     </div>
   );
