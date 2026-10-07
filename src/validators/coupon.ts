@@ -14,13 +14,13 @@ const optionalDate = z.preprocess(
   z.coerce.date({ message: "Invalid date" }).nullable()
 );
 
-const optionalNumber = (label) =>
+const optionalNumber = (label: string) =>
   z.preprocess(
     (v) => (v === "" || v === undefined || v === null || Number.isNaN(v) ? null : v),
     z.coerce.number({ message: `${label} must be a number` }).min(0, `${label} can't be negative`).nullable()
   );
 
-const datesInOrder = (data) =>
+const datesInOrder = (data: { startsAt?: Date | null; expiresAt?: Date | null }) =>
   !data.startsAt || !data.expiresAt || data.expiresAt > data.startsAt;
 const datesError = { message: "Expiry date must be after the start date", path: ["expiresAt"] };
 
@@ -35,7 +35,7 @@ const couponFields = {
   isActive: z.boolean().optional(),
 };
 
-const percentInRange = (d) => d.type !== "percent" || d.amount === undefined || d.amount <= 100;
+const percentInRange = (d: { type?: string; amount?: number }) => d.type !== "percent" || d.amount === undefined || d.amount <= 100;
 const percentError = { message: "A percent coupon can't exceed 100", path: ["amount"] };
 
 export const createCouponSchema = z

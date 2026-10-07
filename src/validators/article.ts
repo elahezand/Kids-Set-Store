@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { dateRangeQuery } from "@/validators/_shared";
 
-const objectId = (message) => z.string().trim().regex(/^[a-f\d]{24}$/i, message);
+const objectId = (message: string) => z.string().trim().regex(/^[a-f\d]{24}$/i, message);
 
 const title = z
   .string()

@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { dateRangeQuery } from "@/validators/_shared";
 
-const ORDER_STATUSES = ["created", "processing", "shipped", "completed", "cancelled"];
-const PAYMENT_STATUSES = ["pending", "paid", "failed", "refunded"];
+const ORDER_STATUSES = ["created", "processing", "shipped", "completed", "cancelled"] as const;
+const PAYMENT_STATUSES = ["pending", "paid", "failed", "refunded"] as const;
 
 const optionalDate = z.preprocess(
   (v) => (v === "" || v === undefined ? undefined : v),

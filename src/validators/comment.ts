@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { dateRangeQuery } from "@/validators/_shared";
 
-const objectId = (message) =>
+const objectId = (message: string) =>
   z
     .string()
     .trim()
@@ -12,7 +12,7 @@ const textList = z
   .max(10, "At most 10 items")
   .optional();
 
-const limit = (fallback) => z.coerce.number().int().min(1).max(50).catch(fallback);
+const limit = (fallback: number) => z.coerce.number().int().min(1).max(50).catch(fallback);
 const cursor = z.string().trim().min(1).optional().catch(undefined);
 
 export const createCommentSchema = z.object({

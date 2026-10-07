@@ -1,16 +1,15 @@
 import { z } from "zod";
 import { dateRangeQuery } from "@/validators/_shared";
 
-const objectId = (message) => z.string().trim().regex(/^[a-f\d]{24}$/i, message);
+const objectId = (message: string) => z.string().trim().regex(/^[a-f\d]{24}$/i, message);
 
-const PRODUCT_STATUSES = ["draft", "active", "inactive"];
+const PRODUCT_STATUSES = ["draft", "active", "inactive"] as const;
 
 export const VARIANT_FILTER_SLUGS = ["size", "color"];
 
 export const CATEGORY_LOCKED_ATTRIBUTES = ["size"];
 
 const variantSchema = z.object({
-  // sent back on edit so the variant keeps its id (carts / orders point to it)
   _id: objectId("Invalid variant").optional(),
   attributes: z.record(z.string(), z.string()).refine((a) => Object.keys(a).length > 0, "Variant needs at least one attribute"),
   sku: z.string().trim().min(1, "SKU is required"),
@@ -44,7 +43,7 @@ const csv = z.preprocess(
   z.array(z.string())
 );
 
-const money = (label) =>
+const money = (label: string) =>
   z.preprocess(
     (v) => (v === "" || v === null || v === undefined ? undefined : v),
     z.coerce.number({ message: `${label} is required` }).min(0, `${label} can't be negative`)
@@ -91,9 +90,7 @@ export const productFormSchema = z
       if (seen.has(key)) ctx.addIssue({ code: "custom", message: "Same size & color as another variant", path: ["variants", i, "color"] });
       seen.add(key);
 
-      // no check on finalPrice: the form shows it computed from price & discount, and the payload
-      // recomputes it — the value loaded with the product goes stale as soon as the price changes
-
+  
       const sku = variant.sku?.trim().toUpperCase();
       if (sku && skus.has(sku)) ctx.addIssue({ code: "custom", message: "SKU already used", path: ["variants", i, "sku"] });
       if (sku) skus.add(sku);
@@ -126,3 +123,4 @@ export const adminProductsQuerySchema = z
     ...dateRangeQuery,
   })
   .passthrough();
+
