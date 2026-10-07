@@ -7,6 +7,8 @@ import { LuLogOut, LuStore, LuX } from "react-icons/lu";
 import { isLinkActive, panelNav, type PanelLink, type PanelVariant } from "@/components/modules/panel/navLinks";
 import ConfirmDialog from "@/components/modules/ui/confirmDialog";
 import { useLogout } from "@/services/client/panel";
+import SiteLogo from "@/components/modules/ui/siteLogo";
+import { SITE_NAME } from "@/utils/constants";
 
 const groupLinks = (links: PanelLink[]) =>
   links.reduce<Array<{ title: string; links: PanelLink[] }>>((groups, link) => {
@@ -21,9 +23,10 @@ interface SidebarProps {
   variant?: PanelVariant;
   open?: boolean;
   onClose: () => void;
+  logo?: string | null;
 }
 
-export default function Sidebar({ variant = "user", open = false, onClose }: SidebarProps) {
+export default function Sidebar({ variant = "user", open = false, onClose, logo = null }: SidebarProps) {
   const pathname = usePathname();
   const nav = panelNav[variant] ?? panelNav.user;
   const groups = groupLinks(nav.links);
@@ -56,11 +59,15 @@ export default function Sidebar({ variant = "user", open = false, onClose }: Sid
       >
         <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-gray-200 px-5 dark:border-white/10">
           <Link href={nav.home} onClick={onClose} className="flex items-center gap-2.5">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-sage-400 to-sage-600 text-sm font-bold text-white shadow-card">
-              SK
-            </span>
+            {logo ? (
+              <SiteLogo src={logo} className="size-9 shrink-0 rounded-xl" />
+            ) : (
+              <span className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-sage-400 to-sage-600 text-sm font-bold text-white shadow-card">
+                SK
+              </span>
+            )}
             <span className="leading-tight">
-              <span className="block text-sm font-bold tracking-wide text-gray-900 dark:text-gray-100">SETKIDS</span>
+              <span className="block text-sm font-bold tracking-wide text-gray-900 dark:text-gray-100">{SITE_NAME}</span>
               <span className="block text-xs text-gray-700 dark:text-gray-500">{nav.title}</span>
             </span>
           </Link>

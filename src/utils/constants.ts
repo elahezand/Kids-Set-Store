@@ -56,3 +56,5 @@ export const ROUTES = {
     account: "/dashboard/admin/detail-account",
   },
 } as const;
+
+export const SITE_NAME = "SETKIDS";

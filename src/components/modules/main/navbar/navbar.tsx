@@ -4,6 +4,7 @@ import DesktopMenu from "@/components/modules/main/navbar/desktopMenu";
 import FavoritesCount from "@/components/modules/main/navbar/favoritesCount";
 import MobileMenu from "@/components/modules/main/navbar/mobileMenu";
 import NavbarShell from "@/components/modules/main/navbar/navbarShell";
+import SiteLogo from "@/components/modules/ui/siteLogo";
 import ThemeToggle from "@/components/modules/ui/themeToggle";
 import connectToDB from "@/configs/db";
 import categoryService from "@/services/server/public/category";
@@ -12,7 +13,7 @@ import { getMe } from "@/utils/auth/authGuard";
 import { ROUTES } from "@/utils/constants";
 import type { CategoryNode } from "@/types";
 
-export default async function Navbar() {
+export default async function Navbar({ logo }: { logo?: string | null }) {
   await connectToDB();
 
   const [user, tree] = await Promise.all([getMe(), categoryService.getAllCategories() as Promise<CategoryNode[]>]);
@@ -24,8 +25,8 @@ export default async function Navbar() {
   return (
     <NavbarShell>
       <div className="mx-auto flex h-full w-full max-w-container items-center justify-between gap-3 px-4 sm:px-6">
-        <Link href={ROUTES.home} className="shrink-0 text-2xl font-bold">
-          SETKIDS
+        <Link href={ROUTES.home} className="flex shrink-0 items-center text-2xl font-bold" aria-label="Home">
+          <SiteLogo src={logo} className="h-10 w-auto max-w-[160px] sm:h-12" />
         </Link>
 
         <DesktopMenu tree={tree} username={username} />
@@ -36,7 +37,7 @@ export default async function Navbar() {
           <FavoritesCount isLoggedIn={isLoggedIn} initialCount={favoriteCount} />
         </div>
 
-        <MobileMenu tree={tree} username={username} favoriteCount={favoriteCount} />
+        <MobileMenu tree={tree} username={username} favoriteCount={favoriteCount} logo={logo} />
       </div>
     </NavbarShell>
   );

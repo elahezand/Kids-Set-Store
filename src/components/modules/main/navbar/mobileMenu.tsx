@@ -7,6 +7,7 @@ import { LuChevronDown, LuChevronRight, LuMenu, LuX } from "react-icons/lu";
 import CartCount from "@/components/modules/main/navbar/cartCount";
 import FavoritesCount from "@/components/modules/main/navbar/favoritesCount";
 import { ACCOUNT_LINKS, PAGE_LINKS } from "@/components/modules/main/navbar/menuLinks";
+import SiteLogo from "@/components/modules/ui/siteLogo";
 import ThemeToggle from "@/components/modules/ui/themeToggle";
 import { ROUTES } from "@/utils/constants";
 import type { CategoryNode } from "@/types";
@@ -15,9 +16,10 @@ interface MobileMenuProps {
   tree?: CategoryNode[];
   username?: string | null;
   favoriteCount?: number;
+  logo?: string | null;
 }
 
-export default function MobileMenu({ tree = [], username = null, favoriteCount = 0 }: MobileMenuProps) {
+export default function MobileMenu({ tree = [], username = null, favoriteCount = 0, logo = null }: MobileMenuProps) {
   const isLoggedIn = Boolean(username);
   const [open, setOpen] = useState(false);
   const [openCategory, setOpenCategory] = useState<string | null>(null);
@@ -79,8 +81,8 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
         }`}
       >
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-200 px-5 py-4 dark:border-white/10">
-          <Link href={ROUTES.home} className="text-xl font-bold text-sage-600 dark:text-sage-300">
-            SETKIDS
+          <Link href={ROUTES.home} className="flex items-center text-xl font-bold text-sage-600 dark:text-sage-300" aria-label="Home">
+            <SiteLogo src={logo} className="h-9 w-auto max-w-[140px]" />
           </Link>
 
           <div className="flex items-center gap-3 text-xl text-gray-800 dark:text-gray-300">

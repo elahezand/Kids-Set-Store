@@ -2,6 +2,7 @@ import Link from "next/link";
 import { FaInstagram, FaLinkedinIn, FaTelegram } from "react-icons/fa6";
 import { LuMail, LuMapPin, LuPhone } from "react-icons/lu";
 import NewsletterForm from "@/components/modules/main/footer/newsletterForm";
+import SiteLogo from "@/components/modules/ui/siteLogo";
 import { ROUTES } from "@/utils/constants";
 import type { IconType } from "react-icons";
 import type { SiteInfo } from "@/types";
@@ -64,8 +65,12 @@ const Footer = ({ info = null }: { info?: SiteInfo | null }) => {
     <footer className="border-t border-gray-200 bg-gray-50 text-text dark:border-white/10 dark:bg-ink-950 dark:text-gray-300">
       <div className="container-x grid gap-12 py-14 md:grid-cols-[1.4fr_2fr] md:gap-16 lg:py-16">
         <div>
-          <Link href={ROUTES.home} className="text-2xl font-bold tracking-tight text-sage-600 dark:text-sage-300">
-            SETKIDS
+          <Link
+            href={ROUTES.home}
+            className="inline-flex items-center text-2xl font-bold tracking-tight text-sage-600 dark:text-sage-300"
+            aria-label="Home"
+          >
+            <SiteLogo src={info?.logo} className="h-12 w-auto max-w-[180px]" />
           </Link>
 
           <p className="mt-4 max-w-[42ch] text-sm leading-7 text-gray-700 dark:text-gray-500">
