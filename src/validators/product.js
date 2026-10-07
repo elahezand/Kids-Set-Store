@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { dateRangeQuery } from "@/validators/_shared";
 
 const objectId = (message) => z.string().trim().regex(/^[a-f\d]{24}$/i, message);
 
@@ -90,9 +91,8 @@ export const productFormSchema = z
       if (seen.has(key)) ctx.addIssue({ code: "custom", message: "Same size & color as another variant", path: ["variants", i, "color"] });
       seen.add(key);
 
-      if (variant.finalPrice !== undefined && variant.finalPrice > variant.price) {
-        ctx.addIssue({ code: "custom", message: "Can't be more than the price", path: ["variants", i, "finalPrice"] });
-      }
+      // no check on finalPrice: the form shows it computed from price & discount, and the payload
+      // recomputes it — the value loaded with the product goes stale as soon as the price changes
 
       const sku = variant.sku?.trim().toUpperCase();
       if (sku && skus.has(sku)) ctx.addIssue({ code: "custom", message: "SKU already used", path: ["variants", i, "sku"] });
@@ -123,6 +123,6 @@ export const adminProductsQuerySchema = z
     rating: z.string().optional(),
     hasPhoto: z.string().optional(),
     filter: z.string().optional(),
+    ...dateRangeQuery,
   })
   .passthrough();
-
