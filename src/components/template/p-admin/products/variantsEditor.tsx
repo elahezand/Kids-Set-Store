@@ -73,27 +73,57 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
 
   const bulkDefaults = () => ({ price: bulk.price, discount: bulk.discount || 0, stock: bulk.stock || 0 });
 
+  /** variants (by size|color key) that are no longer in the Sizes / Colors fields — kept until removed on purpose */
+  const [extraKeys, setExtraKeys] = useState<string[]>([]);
+
+  /**
+   * Adds the missing sizes × colors rows. It never deletes: writing only "red" in Colors adds the red
+   * variants and keeps the blue ones with their price and stock. Removing is always explicit.
+   */
   const generate = () => {
     const pairs = combinations(getValues("sizes"), getValues("colors"));
     if (!pairs.length) {
       setNotice("Pick at least one size and write at least one color first");
+      setExtraKeys([]);
       return;
     }
 
-    const current = new Map(getValues("variants").map((variant) => [variantKey(variant), variant]));
+    const current = getValues("variants");
+    const existing = new Set(current.map(variantKey));
+    const wanted = new Set(pairs.map(variantKey));
     const title = getValues("title");
-    const next = pairs.map(
-      (pair) =>
-        current.get(variantKey(pair)) ?? {
-          ...emptyVariant(bulkDefaults()),
-          ...pair,
-          sku: makeSku(title, pair.size, pair.color),
-        }
-    );
 
-    const kept = next.filter((row) => current.has(variantKey(row))).length;
-    variants.replace(next);
-    setNotice(`${next.length} variants · ${next.length - kept} new, ${kept} kept`);
+    const added = pairs
+      .filter((pair) => !existing.has(variantKey(pair)))
+      .map((pair) => ({
+        ...emptyVariant(bulkDefaults()),
+        ...pair,
+        sku: makeSku(title, pair.size, pair.color),
+      }));
+    if (added.length) variants.append(added, { shouldFocus: false });
+
+    // show every size & color the product really has in the two fields again
+    const all = [...current, ...added];
+    if (!sizesLocked) setValue("sizes", splitList(all.map((row) => row.size).join(",")).join(", "));
+    setValue("colors", splitList(all.map((row) => row.color).join(",")).join(", "), { shouldDirty: true });
+
+    const extras = current.filter((row) => !wanted.has(variantKey(row))).map(variantKey);
+    setExtraKeys(extras);
+    setNotice(
+      added.length
+        ? `${added.length} new variant${added.length === 1 ? "" : "s"} added, ${current.length} kept`
+        : "Nothing new — every size × color already has a variant"
+    );
+  };
+
+  const removeExtras = () => {
+    const keys = new Set(extraKeys);
+    const indexes = getValues("variants")
+      .map((row, index) => (keys.has(variantKey(row)) ? index : -1))
+      .filter((index) => index >= 0);
+    variants.remove(indexes);
+    setExtraKeys([]);
+    setNotice(`${indexes.length} variant${indexes.length === 1 ? "" : "s"} removed`);
   };
 
   const applyToAll = () => {
@@ -202,6 +232,17 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
             </button>
             {notice && <span className="text-xs text-gray-700 dark:text-gray-400">{notice}</span>}
           </div>
+          {extraKeys.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 rounded-xl bg-sun-50 px-3 py-2 text-xs text-gray-800 sm:ml-[6.5rem] dark:bg-sun-500/10 dark:text-gray-300">
+              <span>
+                {extraKeys.length} existing variant{extraKeys.length === 1 ? " is" : "s are"} not in the lists above
+                and {extraKeys.length === 1 ? "was" : "were"} kept.
+              </span>
+              <button type="button" onClick={removeExtras} className="btn btn-soft-danger btn-sm">
+                <LuTrash2 className="size-3.5" /> Remove {extraKeys.length === 1 ? "it" : "them"}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="rounded-xl bg-gray-50 p-3 dark:bg-white/5">
