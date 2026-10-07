@@ -3,16 +3,24 @@ import "@/app/globals.css";
 import PageLoader from "@/components/modules/ui/pageLoader";
 import ScrollToTop from "@/components/modules/ui/scrollToTop";
 import QueryProvider from "@/components/providers/queryProvider";
+import infoService from "@/services/server/public/info";
 import type { Metadata, Viewport } from "next";
+import type { SiteInfo } from "@/types";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+const BASE_METADATA: Metadata = {
   title: "Set Kids - Premium Children's Clothing",
   description: "Shop premium and stylish children's clothing for all ages",
   keywords: "kids clothing, children's fashion, online store, Set Kids",
   robots: "index, follow",
 };
+
+/** the logo from Admin › Site info is also the browser-tab icon */
+export async function generateMetadata(): Promise<Metadata> {
+  const logo = ((await infoService.getSiteInfo()) as SiteInfo | null)?.logo?.trim();
+  return logo ? { ...BASE_METADATA, icons: { icon: logo, apple: logo } } : BASE_METADATA;
+}
 
 export const viewport: Viewport = {
   width: "device-width",

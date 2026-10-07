@@ -40,14 +40,24 @@ export default async function ContactPage() {
       <Breadcrumb route="contact-us" title="Contact Us" />
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12">
         <div className="flex flex-col items-center justify-center gap-6">
-          <Image
-            width={200}
-            height={200}
-            alt=""
-            priority
-            src="/images/59aa50c82c33be2762280e2c0939bde3.jpg"
-            className="h-[140px] w-full object-contain sm:h-[180px]"
-          />
+          <div className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-b from-sage-50 to-peach-50 px-4 pt-8 sm:px-8">
+            <div
+              aria-hidden="true"
+              className="absolute -top-14 -right-8 size-44 rounded-full bg-sun-400/25 blur-2xl dark:bg-sun-400/10"
+            />
+            <p className="relative text-center text-sm font-semibold text-coral-500 dark:text-coral-400">
+              We&apos;d love to hear from you
+            </p>
+            <Image
+              src="/images/about-kids.webp"
+              alt="Five smiling kids lying on the floor in colorful sweaters"
+              width={1074}
+              height={396}
+              sizes="(min-width: 768px) 50vw, 100vw"
+              priority
+              className="relative mt-4 h-auto w-full"
+            />
+          </div>
 
           {details.length > 0 && (
             <ul className="flex w-full flex-col gap-3 rounded-2xl bg-mint-200/60 p-5 text-sm dark:bg-ink-800">

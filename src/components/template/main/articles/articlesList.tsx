@@ -23,7 +23,7 @@ export default function ArticlesList({ query, initialPage, limit = 15 }: Article
 
   return (
     <>
-      <div data-aos="fade-up" className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div data-aos="fade-up" className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {articles.map((item) => (
           <Article key={String(item._id)} {...item} />
         ))}

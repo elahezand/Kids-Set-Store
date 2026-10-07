@@ -142,7 +142,7 @@ export default function ProductCard({
             aria-label={`Choose options for ${name}`}
           >
             <LuSlidersHorizontal className="size-4" />
-            {variantsCount} options
+        options
           </Link>
         ) : (
           <button
