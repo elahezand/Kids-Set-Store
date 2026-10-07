@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { dateRangeQuery } from "@/validators/_shared";
 
 const objectId = (message) =>
   z
@@ -36,6 +37,7 @@ export const createCommentSchema = z.object({
 });
 
 export const adminCommentsQuerySchema = z.object({
+  ...dateRangeQuery,
   status: z.enum(["pending", "approved", "rejected", "spam", "deleted"]).optional().catch(undefined),
   productId: objectId("Invalid product").optional().catch(undefined),
   userId: objectId("Invalid user").optional().catch(undefined),

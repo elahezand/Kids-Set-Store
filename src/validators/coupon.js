@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { dateRangeQuery } from "@/validators/_shared";
 
 const code = z
   .string()
@@ -49,6 +50,7 @@ export const updateCouponSchema = z
   .refine(datesInOrder, datesError);
 
 export const adminCouponsQuerySchema = z.object({
+  ...dateRangeQuery,
   search: z.string().trim().max(60).optional(),
   q: z.string().trim().max(60).optional(),
   type: z.enum(["fixed", "percent"]).optional().catch(undefined),

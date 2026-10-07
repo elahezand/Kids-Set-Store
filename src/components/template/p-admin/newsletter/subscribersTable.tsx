@@ -2,11 +2,13 @@
 
 import { LuCopy, LuDownload, LuSend } from "react-icons/lu";
 import { toast } from "sonner";
+import DateRangeFilter from "@/components/modules/panel/dateRangeFilter";
 import ListCard from "@/components/modules/panel/listCard";
 import SearchBox from "@/components/modules/panel/searchBox";
 import EmptyState from "@/components/modules/ui/emptyState";
 import { useAdminNewsletter } from "@/services/client/admin";
 import { formatDate } from "@/utils/format";
+import { filteredEmptyText } from "@/utils/adminFilters";
 import type { AdminFilters, AdminListParams } from "@/utils/adminFilters";
 import type { NewsletterSubscriber, Paginated } from "@/types";
 
@@ -46,6 +48,7 @@ export default function SubscribersTable({ initialPage, params, filters, limit }
       title="Subscribers"
       toolbar={
         <>
+          <DateRangeFilter value={filters} label="Signed up" />
           <SearchBox placeholder="Search emails…" />
           <button
             type="button"
@@ -71,7 +74,7 @@ export default function SubscribersTable({ initialPage, params, filters, limit }
       empty={
         <EmptyState
           title="No subscribers"
-          description={filters.q ? `Nothing matches "${filters.q}".` : "Emails from the footer signup form show up here."}
+          description={filteredEmptyText(filters) ?? "Emails from the footer signup form show up here."}
           icon={LuSend}
         />
       }

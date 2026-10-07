@@ -3,6 +3,7 @@
 import { type FormEvent, useState } from "react";
 import Link from "next/link";
 import { LuCheck, LuCornerDownRight, LuEye, LuMessageSquare, LuReply, LuTrash2, LuX } from "react-icons/lu";
+import DateRangeFilter from "@/components/modules/panel/dateRangeFilter";
 import ListCard from "@/components/modules/panel/listCard";
 import SearchBox from "@/components/modules/panel/searchBox";
 import StatusTabs from "@/components/modules/panel/statusTabs";
@@ -14,6 +15,7 @@ import { useAdminComments, useDeleteComment, useModerateComment, useReplyComment
 import { ROUTES } from "@/utils/constants";
 import { formatDate } from "@/utils/format";
 import { ADMIN_COMMENT_TABS, COMMENT_STATUS, personName } from "@/utils/panelView";
+import { filteredEmptyText } from "@/utils/adminFilters";
 import type { AdminFilters, AdminListParams } from "@/utils/adminFilters";
 import type { AdminComment, AdminCommentReply, AdminCommentStatusFilter, Paginated } from "@/types";
 
@@ -121,6 +123,7 @@ export default function CommentsTable({ initialPage, params, filters, limit }: C
         toolbar={
           <>
             <StatusTabs tabs={ADMIN_COMMENT_TABS} value={filters.status} />
+            <DateRangeFilter value={filters} label="Written" />
             <SearchBox placeholder="Search in comments…" />
           </>
         }
@@ -128,7 +131,7 @@ export default function CommentsTable({ initialPage, params, filters, limit }: C
         empty={
           <EmptyState
             title={filters.status === "pending" ? "Nothing to review" : "No comments found"}
-            description={filters.q ? `Nothing matches "${filters.q}".` : "Customer reviews will show up here."}
+            description={filteredEmptyText(filters) ?? "Customer reviews will show up here."}
             icon={LuMessageSquare}
           />
         }

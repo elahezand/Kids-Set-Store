@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { LuEye, LuEyeOff, LuNewspaper, LuPencil, LuPlus, LuTrash2 } from "react-icons/lu";
+import DateRangeFilter from "@/components/modules/panel/dateRangeFilter";
 import ListCard from "@/components/modules/panel/listCard";
 import SearchBox from "@/components/modules/panel/searchBox";
 import StatusTabs from "@/components/modules/panel/statusTabs";
@@ -13,6 +14,7 @@ import { useAdminArticles, useDeleteArticle, useToggleArticle } from "@/services
 import { PLACEHOLDER_IMAGE, ROUTES } from "@/utils/constants";
 import { formatDate } from "@/utils/format";
 import { ARTICLE_TABS, articleState } from "@/utils/panelView";
+import { filteredEmptyText } from "@/utils/adminFilters";
 import type { AdminFilters, AdminListParams } from "@/utils/adminFilters";
 import type { AdminArticle, ArticleStatusFilter, Paginated } from "@/types";
 
@@ -66,6 +68,7 @@ export default function ArticlesTable({ initialPage, params, filters, limit }: A
         toolbar={
           <>
             <StatusTabs tabs={ARTICLE_TABS} value={filters.status} />
+            <DateRangeFilter value={filters} label="Created" />
             <SearchBox placeholder="Search titles…" />
           </>
         }
@@ -73,7 +76,7 @@ export default function ArticlesTable({ initialPage, params, filters, limit }: A
         empty={
           <EmptyState
             title="No articles found"
-            description={filters.q ? `Nothing matches "${filters.q}".` : "Write your first post for the blog."}
+            description={filteredEmptyText(filters) ?? "Write your first post for the blog."}
             icon={LuNewspaper}
             action={
               <Link href={ROUTES.admin.newArticle} className="btn btn-primary btn-sm">

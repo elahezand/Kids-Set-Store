@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { dateRangeQuery } from "@/validators/_shared";
 
 export const contactValidationSchema = z.object({
     name: z
@@ -31,6 +32,7 @@ export const contactValidationSchema = z.object({
 export const contactSchema = contactValidationSchema;
 
 export const adminContactsQuerySchema = z.object({
+  ...dateRangeQuery,
   limit: z.coerce.number().int().min(1).max(50).optional().catch(undefined),
   cursor: z.string().trim().min(1).optional().catch(undefined),
   status: z.enum(["pending", "answered"]).optional().catch(undefined),

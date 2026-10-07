@@ -8,6 +8,8 @@ const getAdminCarts = async (query = {}) =>
     paginateList(Cart, query, {
         defaultLimit: 15,
         sort: { updatedAt: -1 },
+        // the list is ordered by last activity, so the date filter follows it too
+        dateField: "updatedAt",
         statuses: ["active", "abandoned", "converted"],
         ids: { user: "user" },
         populate: [

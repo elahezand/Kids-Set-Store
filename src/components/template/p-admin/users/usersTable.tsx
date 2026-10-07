@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { LuBan, LuShieldCheck, LuShieldOff, LuTrash2, LuUndo2, LuUsers } from "react-icons/lu";
+import DateRangeFilter from "@/components/modules/panel/dateRangeFilter";
 import ListCard from "@/components/modules/panel/listCard";
 import SearchBox from "@/components/modules/panel/searchBox";
 import StatusTabs from "@/components/modules/panel/statusTabs";
@@ -13,6 +14,7 @@ import { DEFAULT_AVATAR } from "@/utils/constants";
 import { formatDate, formatPrice } from "@/utils/format";
 import { USER_ROLE_TABS } from "@/utils/panelView";
 import { isAdmin } from "@/utils/role";
+import { filteredEmptyText } from "@/utils/adminFilters";
 import type { AdminFilters, AdminListParams } from "@/utils/adminFilters";
 import type { AdminUser, Paginated, UserRoleFilter } from "@/types";
 
@@ -151,6 +153,7 @@ export default function UsersTable({ initialPage, params, filters, currentUserId
         toolbar={
           <>
             <StatusTabs tabs={USER_ROLE_TABS} value={filters.status} param="role" />
+            <DateRangeFilter value={filters} label="Joined" />
             <SearchBox placeholder="Name, phone or email…" />
           </>
         }
@@ -158,7 +161,7 @@ export default function UsersTable({ initialPage, params, filters, currentUserId
         empty={
           <EmptyState
             title="No users found"
-            description={filters.q ? `Nothing matches "${filters.q}".` : "Accounts will show up here."}
+            description={filteredEmptyText(filters) ?? "Accounts will show up here."}
             icon={LuUsers}
           />
         }

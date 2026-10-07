@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { dateRangeQuery } from "@/validators/_shared";
 
 const objectId = (message) => z.string().trim().regex(/^[a-f\d]{24}$/i, message);
 
@@ -70,6 +71,7 @@ export const articleListQuerySchema = z.object({
 });
 
 export const adminArticlesQuerySchema = articleListQuerySchema.extend({
+  ...dateRangeQuery,
   limit: z.coerce.number().int().min(1).max(50).catch(15),
   q: z.string().trim().max(100).optional(),
   isPublished: z.enum(["true", "false", "all"]).optional().catch(undefined),

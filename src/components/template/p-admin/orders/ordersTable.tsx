@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { LuBanknote, LuClock, LuEye, LuPackageCheck, LuShoppingBag, LuX } from "react-icons/lu";
+import DateRangeFilter from "@/components/modules/panel/dateRangeFilter";
 import ListCard from "@/components/modules/panel/listCard";
 import SearchBox from "@/components/modules/panel/searchBox";
 import StatusTabs from "@/components/modules/panel/statusTabs";
@@ -22,6 +23,7 @@ import {
   personName,
   shortId,
 } from "@/utils/panelView";
+import { filteredEmptyText } from "@/utils/adminFilters";
 import type { AdminFilters, AdminListParams } from "@/utils/adminFilters";
 import type { AdminOrder, AdminOrderStatusFilter, Paginated } from "@/types";
 
@@ -114,6 +116,7 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
         toolbar={
           <>
             <StatusTabs tabs={ADMIN_ORDER_TABS} value={filters.status} />
+            <DateRangeFilter value={filters} label="Placed" />
             <SearchBox placeholder="Search order number…" />
           </>
         }
@@ -121,7 +124,7 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
         empty={
           <EmptyState
             title="No orders found"
-            description={filters.q ? `Nothing matches "${filters.q}".` : "Orders with this status will show up here."}
+            description={filteredEmptyText(filters) ?? "Orders with this status will show up here."}
             icon={LuShoppingBag}
           />
         }

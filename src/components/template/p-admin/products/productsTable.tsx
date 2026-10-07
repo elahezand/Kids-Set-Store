@@ -4,6 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { LuExternalLink, LuPackage, LuPencil, LuPlus, LuTrash2 } from "react-icons/lu";
+import CategoryFilter from "@/components/modules/panel/categoryFilter";
+import DateRangeFilter from "@/components/modules/panel/dateRangeFilter";
 import ListCard from "@/components/modules/panel/listCard";
 import SearchBox from "@/components/modules/panel/searchBox";
 import StatusTabs from "@/components/modules/panel/statusTabs";
@@ -15,6 +17,7 @@ import { PLACEHOLDER_IMAGE, ROUTES } from "@/utils/constants";
 import { formatPrice } from "@/utils/format";
 import { PRODUCT_STATUS, PRODUCT_TABS, productState } from "@/utils/panelView";
 import { totalStock } from "@/utils/productForm";
+import { filteredEmptyText } from "@/utils/adminFilters";
 import type { AdminFilters, AdminListParams } from "@/utils/adminFilters";
 import type { AdminProduct, Paginated, ProductStatus, ProductStatusFilter } from "@/types";
 
@@ -23,9 +26,10 @@ interface ProductsTableProps {
   params: AdminListParams;
   filters: AdminFilters<ProductStatusFilter>;
   limit: number;
+  categories: Array<{ id: string; label: string }>;
 }
 
-export default function ProductsTable({ initialPage, params, filters, limit }: ProductsTableProps) {
+export default function ProductsTable({ initialPage, params, filters, limit, categories }: ProductsTableProps) {
   const { items: products, ...pager } = useAdminProducts(initialPage, params);
   const [deleting, setDeleting] = useState<AdminProduct | null>(null);
 
@@ -95,6 +99,8 @@ export default function ProductsTable({ initialPage, params, filters, limit }: P
         toolbar={
           <>
             <StatusTabs tabs={PRODUCT_TABS} value={filters.status} />
+            <CategoryFilter categories={categories} value={filters.category} />
+            <DateRangeFilter value={filters} label="Added" />
             <SearchBox placeholder="Search products…" />
             <Link href={ROUTES.admin.newProduct} className="btn btn-primary btn-sm">
               <LuPlus className="size-4" /> New product
@@ -105,7 +111,7 @@ export default function ProductsTable({ initialPage, params, filters, limit }: P
         empty={
           <EmptyState
             title="No products found"
-            description={filters.q ? `Nothing matches "${filters.q}".` : "Products you add will show up here."}
+            description={filteredEmptyText(filters) ?? "Products you add will show up here."}
             icon={LuPackage}
             action={
               <Link href={ROUTES.admin.newProduct} className="btn btn-primary btn-sm">

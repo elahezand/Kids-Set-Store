@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { LuBadgePercent, LuPlus, LuTrash2 } from "react-icons/lu";
+import DateRangeFilter from "@/components/modules/panel/dateRangeFilter";
 import ListCard from "@/components/modules/panel/listCard";
 import SearchBox from "@/components/modules/panel/searchBox";
 import StatusTabs from "@/components/modules/panel/statusTabs";
@@ -11,6 +12,7 @@ import CouponForm from "@/components/template/p-admin/discounts/couponForm";
 import { useAdminCoupons, useDeleteCoupon, useUpdateCoupon } from "@/services/client/admin";
 import { formatDate, formatPrice } from "@/utils/format";
 import { COUPON_TABS, couponState } from "@/utils/panelView";
+import { filteredEmptyText } from "@/utils/adminFilters";
 import type { AdminFilters, AdminListParams } from "@/utils/adminFilters";
 import type { Coupon, CouponStatusFilter, Paginated } from "@/types";
 
@@ -98,6 +100,7 @@ export default function CouponsTable({ initialPage, params, filters, limit }: Co
         toolbar={
           <>
             <StatusTabs tabs={COUPON_TABS} value={filters.status} />
+            <DateRangeFilter value={filters} label="Created" />
             <SearchBox placeholder="Search codes…" />
             <button type="button" onClick={() => setCreating(true)} className="btn btn-primary btn-sm">
               <LuPlus className="size-4" /> New code
@@ -108,7 +111,7 @@ export default function CouponsTable({ initialPage, params, filters, limit }: Co
         empty={
           <EmptyState
             title="No discount codes"
-            description={filters.q ? `Nothing matches "${filters.q}".` : "Create a code to run a promotion."}
+            description={filteredEmptyText(filters) ?? "Create a code to run a promotion."}
             icon={LuBadgePercent}
             action={
               <button type="button" onClick={() => setCreating(true)} className="btn btn-primary btn-sm">

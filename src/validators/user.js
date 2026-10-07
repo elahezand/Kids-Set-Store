@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { dateRangeQuery } from "@/validators/_shared";
 
 const phoneSchema = z
   .string()
@@ -45,6 +46,7 @@ export const createUserSchema = z.object({
 });
 
 export const adminUsersQuerySchema = z.object({
+  ...dateRangeQuery,
   role: z.enum(["ADMIN", "USER"]).optional().catch(undefined),
   q: z.string().trim().max(100).optional(),
   limit: z.coerce.number().int().min(1).max(50).catch(20),

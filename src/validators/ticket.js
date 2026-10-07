@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { dateRangeQuery } from "@/validators/_shared";
 
 export const ticketValidationSchema = z.object({
     title: z.string().trim().min(3, "Subject is too short").max(200, "Subject is too long"),
@@ -10,6 +11,7 @@ export const ticketValidationSchema = z.object({
 });
 
 export const adminTicketsQuerySchema = z.object({
+    ...dateRangeQuery,
     status: z.enum(["waiting", "answered"]).optional().catch(undefined),
     q: z.string().trim().max(100).optional(),
     limit: z.coerce.number().int().min(1).max(50).catch(15),

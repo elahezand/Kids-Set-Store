@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { dateRangeQuery } from "@/validators/_shared";
 
 const ORDER_STATUSES = ["created", "processing", "shipped", "completed", "cancelled"];
 const PAYMENT_STATUSES = ["pending", "paid", "failed", "refunded"];
@@ -22,9 +23,7 @@ export const adminOrdersQuerySchema = z
       .catch(undefined),
     user: z.string().optional(),
     q: z.string().trim().max(100).optional(),
-    preset: z.string().optional(),
-    from: z.string().optional(),
-    to: z.string().optional(),
+    ...dateRangeQuery,
   })
   .passthrough();
 

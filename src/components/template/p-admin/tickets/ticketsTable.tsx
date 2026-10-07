@@ -1,6 +1,7 @@
 "use client";
 
 import { LuTicket } from "react-icons/lu";
+import DateRangeFilter from "@/components/modules/panel/dateRangeFilter";
 import ListCard from "@/components/modules/panel/listCard";
 import SearchBox from "@/components/modules/panel/searchBox";
 import StatusTabs from "@/components/modules/panel/statusTabs";
@@ -8,6 +9,7 @@ import EmptyState from "@/components/modules/ui/emptyState";
 import TicketRow from "@/components/template/p-admin/tickets/ticketRow";
 import { useAdminTickets } from "@/services/client/admin";
 import { TICKET_TABS } from "@/utils/panelView";
+import { filteredEmptyText } from "@/utils/adminFilters";
 import type { AdminFilters, AdminListParams } from "@/utils/adminFilters";
 import type { AdminTicket, Paginated, TicketStatusFilter } from "@/types";
 
@@ -33,6 +35,7 @@ export default function TicketsTable({ initialPage, params, filters, limit }: Ti
       toolbar={
         <>
           <StatusTabs tabs={TICKET_TABS} value={filters.status} />
+          <DateRangeFilter value={filters} label="Opened" />
           <SearchBox placeholder="Search subjects…" />
         </>
       }
@@ -40,7 +43,7 @@ export default function TicketsTable({ initialPage, params, filters, limit }: Ti
       empty={
         <EmptyState
           title="No tickets here"
-          description={filters.q ? `Nothing matches "${filters.q}".` : EMPTY_TEXT[filters.status]}
+          description={filteredEmptyText(filters) ?? EMPTY_TEXT[filters.status]}
           icon={LuTicket}
         />
       }

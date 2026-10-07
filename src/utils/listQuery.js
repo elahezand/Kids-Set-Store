@@ -3,8 +3,12 @@ const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
 const paginate = require("@/utils/paginate");
 const escapeRegex = (text) => String(text).replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 
+/** "2026-09-01" is a calendar day, not UTC midnight -> read it in the server's own timezone */
+const toDate = (value) =>
+  /^\d{4}-\d{2}-\d{2}$/.test(String(value)) ? new Date(`${value}T00:00:00`) : new Date(value);
+
 const startOfDay = (value) => {
-  const date = new Date(value);
+  const date = toDate(value);
   if (Number.isNaN(date.getTime())) return null;
   date.setHours(0, 0, 0, 0);
   return date;
@@ -12,7 +16,7 @@ const startOfDay = (value) => {
 
 /** End of the given day, so "to=2026-09-01" includes everything that happened that day */
 const endOfDay = (value) => {
-  const date = new Date(value);
+  const date = toDate(value);
   if (Number.isNaN(date.getTime())) return null;
   date.setHours(23, 59, 59, 999);
   return date;

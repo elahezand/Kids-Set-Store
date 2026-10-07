@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { LuEye, LuShoppingCart, LuTrash2 } from "react-icons/lu";
+import DateRangeFilter from "@/components/modules/panel/dateRangeFilter";
 import ListCard from "@/components/modules/panel/listCard";
 import StatusTabs from "@/components/modules/panel/statusTabs";
 import ConfirmDialog from "@/components/modules/ui/confirmDialog";
@@ -9,6 +10,7 @@ import EmptyState from "@/components/modules/ui/emptyState";
 import CartDetails from "@/components/template/p-admin/carts/cartDetails";
 import { useAdminCarts, useDeleteCart } from "@/services/client/admin";
 import { CART_TABS, cartState, personName, timeAgo } from "@/utils/panelView";
+import { filteredEmptyText } from "@/utils/adminFilters";
 import type { AdminFilters, AdminListParams } from "@/utils/adminFilters";
 import type { AdminCart, AdminCartStatusFilter, Paginated } from "@/types";
 
@@ -72,12 +74,17 @@ export default function CartsTable({ initialPage, params, filters, limit }: Cart
     <>
       <ListCard
         title="Shopping carts"
-        toolbar={<StatusTabs tabs={CART_TABS} value={filters.status} />}
+        toolbar={
+          <>
+            <StatusTabs tabs={CART_TABS} value={filters.status} />
+            <DateRangeFilter value={filters} label="Last activity" />
+          </>
+        }
         isEmpty={carts.length === 0}
         empty={
           <EmptyState
             title="No carts"
-            description="Carts appear as soon as a signed-in customer adds something."
+            description={filteredEmptyText(filters) ?? "Carts appear as soon as a signed-in customer adds something."}
             icon={LuShoppingCart}
           />
         }
