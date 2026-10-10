@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 const couponSchema = new mongoose.Schema(
   {
     code: { type: String, required: true, unique: true, uppercase: true, trim: true },
@@ -11,6 +10,8 @@ const couponSchema = new mongoose.Schema(
     expiresAt: { type: Date, default: null },
     usageLimit: { type: Number, min: 0, default: null },
     usedCount: { type: Number, min: 0, default: 0 },
+    minOrderAmount: { type: Number, min: 0, default: 0 },
+    perUserLimit: { type: Number, min: 0, default: null },
   },
   { timestamps: true }
 );
@@ -18,4 +19,4 @@ const couponSchema = new mongoose.Schema(
 couponSchema.index({ isActive: 1, expiresAt: 1 });
 
 const Coupon = mongoose.models.Coupon || mongoose.model("Coupon", couponSchema);
-module.exports = Coupon;
+export default Coupon;

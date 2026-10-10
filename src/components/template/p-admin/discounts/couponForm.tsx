@@ -17,6 +17,8 @@ const EMPTY: FormInput = {
   amount: 10,
   maxDiscount: "",
   usageLimit: "",
+  perUserLimit: "",
+  minOrderAmount: "",
   startsAt: "",
   expiresAt: "",
   isActive: true,
@@ -49,7 +51,7 @@ export default function CouponForm({ onClose }: { onClose: () => void }) {
             Cancel
           </button>
           <button type="submit" form="coupon-form" className="btn btn-primary" disabled={create.isPending}>
-            {create.isPending ? "Creating…" : "Create code"}
+            {create.isPending ? "Creating..." : "Create code"}
           </button>
         </>
       }
@@ -126,6 +128,36 @@ export default function CouponForm({ onClose }: { onClose: () => void }) {
             className={`input ${errors.usageLimit ? "input-error" : ""}`}
           />
           {error("usageLimit")}
+        </div>
+
+        <div>
+          <label htmlFor="coupon-user-limit" className="label">
+            Uses per customer
+          </label>
+          <input
+            id="coupon-user-limit"
+            type="number"
+            min={0}
+            {...register("perUserLimit")}
+            placeholder="Unlimited"
+            className={`input ${errors.perUserLimit ? "input-error" : ""}`}
+          />
+          {error("perUserLimit")}
+        </div>
+
+        <div>
+          <label htmlFor="coupon-min-order" className="label">
+            Minimum order
+          </label>
+          <input
+            id="coupon-min-order"
+            type="number"
+            min={0}
+            {...register("minOrderAmount")}
+            placeholder="No minimum"
+            className={`input ${errors.minOrderAmount ? "input-error" : ""}`}
+          />
+          {error("minOrderAmount")}
         </div>
 
         <div>

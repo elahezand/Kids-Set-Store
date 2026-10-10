@@ -17,7 +17,10 @@ const optionalDate = z.preprocess(
 const optionalNumber = (label: string) =>
   z.preprocess(
     (v) => (v === "" || v === undefined || v === null || Number.isNaN(v) ? null : v),
-    z.coerce.number({ message: `${label} must be a number` }).min(0, `${label} can't be negative`).nullable()
+    z.coerce
+      .number({ message: `${label} must be a number` })
+      .min(0, `${label} can't be negative`)
+      .nullable()
   );
 
 const datesInOrder = (data: { startsAt?: Date | null; expiresAt?: Date | null }) =>
@@ -30,12 +33,15 @@ const couponFields = {
   amount: z.coerce.number({ message: "Amount is required" }).min(0, "Amount can't be negative"),
   maxDiscount: optionalNumber("Max discount"),
   usageLimit: optionalNumber("Usage limit"),
+  perUserLimit: optionalNumber("Per-user limit"),
+  minOrderAmount: optionalNumber("Minimum order"),
   startsAt: optionalDate,
   expiresAt: optionalDate,
   isActive: z.boolean().optional(),
 };
 
-const percentInRange = (d: { type?: string; amount?: number }) => d.type !== "percent" || d.amount === undefined || d.amount <= 100;
+const percentInRange = (d: { type?: string; amount?: number }) =>
+  d.type !== "percent" || d.amount === undefined || d.amount <= 100;
 const percentError = { message: "A percent coupon can't exceed 100", path: ["amount"] };
 
 export const createCouponSchema = z

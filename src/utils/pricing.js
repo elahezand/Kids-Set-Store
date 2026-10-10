@@ -13,8 +13,15 @@ function computeMinPrice(variants = []) {
   return prices.length ? Math.min(...prices) : 0;
 }
 
-export {
-  round2,
-  computeMinPrice,
-  calcFinalPrice,
-};
+const SHIPPING_COST = Number(process.env.SHIPPING_COST || 0);
+const FREE_SHIPPING_OVER = Number(process.env.FREE_SHIPPING_OVER || 0);
+
+function shippingCostFor(amount) {
+  if (!SHIPPING_COST) return 0;
+  if (FREE_SHIPPING_OVER && amount >= FREE_SHIPPING_OVER) return 0;
+  return SHIPPING_COST;
+}
+
+const formatMoney = (amount) => `${Number(amount || 0).toLocaleString("en-US", { maximumFractionDigits: 2 })} $`;
+
+export { round2, computeMinPrice, calcFinalPrice, shippingCostFor, formatMoney };

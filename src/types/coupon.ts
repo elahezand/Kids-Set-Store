@@ -13,6 +13,8 @@ export interface Coupon {
   startsAt: ISODate | null;
   expiresAt: ISODate | null;
   usageLimit: number | null;
+  perUserLimit: number | null;
+  minOrderAmount: number | null;
   usedCount: number;
   createdAt?: ISODate;
 }
@@ -23,6 +25,8 @@ export interface CouponPayload {
   amount: number;
   maxDiscount: number | null;
   usageLimit: number | null;
+  perUserLimit: number | null;
+  minOrderAmount: number | null;
   startsAt: Date | null;
   expiresAt: Date | null;
   isActive?: boolean;
