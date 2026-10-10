@@ -9,14 +9,27 @@ services:
       - "3000:3000"
     env_file: .env
     environment:
-      MONGO_URL: mongodb://host.docker.internal:27017/setkid-db
+      MONGO_URL: mongodb://mongo:27017/setkids
       REDIS_HOST: redis
       REDIS_PORT: 6379
     volumes:
-      - ./public/uploads:/app/public/uploads
+      - uploads:/app/public/uploads
     depends_on:
+      mongo:
+        condition: service_healthy
       redis:
         condition: service_healthy
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
   redis:
@@ -31,4 +44,6 @@ services:
     restart: unless-stopped
 
 volumes:
+  uploads:
+  mongo-data:
   redis-data:

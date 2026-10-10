@@ -1,118 +1,70 @@
-# SET KIDS — Next.js store
+# SET KIDS
 
-Next.js 15 (App Router) · React 19 · Tailwind CSS v4 · MongoDB (mongoose) · TanStack Query
+Online store for kids' clothing.
+
+Stack: Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS 4, MongoDB (Mongoose), Redis, TanStack Query, Zod, ZarinPal.
+
+## Features
+
+- Product catalog with variants, categories, filters and search
+- Cart, coupons, wallet and checkout (online payment or cash on delivery)
+- Login with password or SMS code, refresh-token sessions
+- User dashboard: orders, tickets, comments, favorites, profile
+- Admin panel: products, orders, users, coupons, articles, tickets, comments, site settings
+- Automatic order checks (unpaid, stuck and delivered orders)
 
 ## Getting started
 
 ```bash
-cp .env.example .env     # fill in the values (see below)
+cp .env.example .env
 npm install
+npm run seed:admin -- 09xxxxxxxxx YourPassword123!
 npm run dev
 ```
 
-Required env vars: `MONGO_URL`, `ACCESS_TOKEN`, `REFRESH_TOKEN`, `NEXT_PUBLIC_API_URL`
-(everything else is listed in `.env.example`).
+MongoDB and Redis must be running. With Docker everything starts together:
+
+```bash
+docker compose up -d --build
+```
+
+## Scripts
+
+| Command              | Description                     |
+| -------------------- | ------------------------------- |
+| `npm run dev`        | Development server              |
+| `npm run build`      | Production build                |
+| `npm start`          | Run the production build        |
+| `npm run lint`       | ESLint                          |
+| `npm run typecheck`  | TypeScript check                |
+| `npm run format`     | Prettier                        |
+| `npm run seed:admin` | Create or promote an admin user |
 
 ## Project structure
 
-```
-src/
-├─ app/                          routes only (no business logic)
-│  ├─ (main)/                    storefront pages
-│  ├─ dashboard/
-│  │  ├─ (p-user)/               user dashboard  → /dashboard/...
-│  │  └─ admin/                  admin panel     → /dashboard/admin/...
-│  └─ api/
-│     ├─ (public)/               no login needed
-│     ├─ (user)/user/            logged-in user
-│     └─ (admin)/admin/          admin only
-├─ components/
-│  ├─ modules/                   reusable building blocks
-│  │  ├─ main/                   storefront: navbar/, footer/, article/, productCard, breadcrumb, ...
-│  │  ├─ panel/                  dashboard shell: sidebar, topbar, pageHeader, statCard, ...
-│  │  └─ ui/                     generic UI: modal, confirmDialog, emptyState, stars, pageLoader, ...
-│  └─ template/                  page-specific sections, one folder per route
-│     ├─ main/                   index (home), products, product, cart, articles, contact-us, ...
-│     ├─ p-user/                 user dashboard sections
-│     └─ p-admin/                admin panel sections
-├─ configs/                      db.js (mongoose connection), redis.js
-├─ model/                        mongoose models
-├─ services/
-│  ├─ client/                    browser: React Query hooks over /api (cart, favorite, auth, panel, admin, ...)
-│  └─ server/                    business logic used by api routes and server pages
-│     └─ admin/ public/ user/ shared/
-├─ types/                        shared TypeScript types (import from "@/types")
-├─ validators/                   zod schemas, one file per domain
-└─ utils/
-   ├─ constants.ts               ROUTES (incl. ROUTES.admin), SITE_URL, DEFAULT_AVATAR, PLACEHOLDER_IMAGE
-   ├─ auth/  providers/  hooks/  actions/
-   └─ format, productView, articleView, panelView, adminFilters, productForm, share, searchParams, ...
-```
-
-Main site and both dashboards (user + admin) are written in TypeScript (`.ts` / `.tsx`); the API, models and
-server services are JavaScript.
-
-**Naming rule:** one domain = one name everywhere:
-`model/product.js` → `services/{admin,public,user}/product.js` → `validators/product.js`
-→ `api/.../products`. Same for `favorite`, `coupon`, `newsletter`, ...
-
-**Component rule:** used by more than one page → `modules/`, otherwise next to its page in `template/`.
-
-## Conventions
-
-- Imports always use the `@/` alias (= `src/`), never relative paths.
-- Internal links use `ROUTES` from `@/utils/constants` instead of hard-coded strings.
-- File names are camelCase (`productCard.tsx`), components are PascalCase (`ProductCard`).
-- Formatting: Prettier (`.prettierrc.json`) — `npx prettier --write "src/**/*.{ts,tsx}"`.
-- API route pattern: `connectToDB()` → auth guard → `validate(schema, body)` → service → `NextResponse`.
-- Services return `{ success, status?, message?, data? }`; routes turn that into HTTP.
-- Every list (storefront, user panel, admin panel) uses the cursor `paginate` + a "Load more" button.
-  Panel pages render the first page on the server (service → `toInitialPage`) and the client list
-  continues it through the matching `/api` route (`useCursorList`).
-- Admin tables: `?status=` (or `?role=`) tabs + `?q=` search, read with `readAdminFilters` and turned into
-  API params with `adminListParams.<list>` — the server page and the client list share that object.
-- Admin changes go through `services/client/admin.ts` (toast → invalidate `queryKeys.admin.*` → `router.refresh()`).
-- Images (product photos, article covers) are uploaded to `POST /api/admin/upload` first; the returned paths
-  are then sent as JSON to the product / article API.
-- Route guards must reject expired sessions too: `if (!user || user.status === "expired")`.
-- Dynamic route folder names must match what the handler reads (`[productId]` ↔ `const { productId } = await params`).
-
-## Styling
-
-- Tailwind utilities in JSX. No `*.module.css` files.
-- Brand colors / fonts / shadows are defined once in `@theme` inside `globals.css`
-  (`sage` = primary, `coral` = accent, `ink` = dark surfaces).
-- Repeated UI patterns are component classes in `globals.css`:
-
-| Class | Use |
-| --- | --- |
-| `btn` + `btn-primary` / `btn-accent` / `btn-secondary` / `btn-ghost` / `btn-danger` / `btn-soft-primary` / `btn-soft-danger` | buttons (`btn-sm`, `btn-lg`, `btn-icon` for sizes) |
-| `label`, `input` (+ `input-error`), `field-error`, `field-hint` | forms |
-| `card`, `card-header`, `card-title`, `card-body` | surfaces |
-| `table-wrap` + `data-table` | responsive tables |
-| `badge` + `badge-success` / `-danger` / `-warning` / `-accent` / `-neutral` | status pills |
-| `page-container` | centered storefront container |
-| `spinner`, `skeleton`, `checkbox` | feedback & custom checkbox |
-
-Dark mode uses the `dark` class on `<html>` (`dark:` variant).
-
+- `src/app` - pages and API routes (`api/(public)`, `api/(user)`, `api/(admin)`)
+- `src/components/modules` - shared components
+- `src/components/template` - page sections
+- `src/configs` - MongoDB and Redis connections
+- `src/model` - Mongoose models
+- `src/services/client` - React Query hooks
+- `src/services/server` - business logic (admin, public, user, shared)
+- `src/types` - TypeScript types
+- `src/validators` - Zod schemas
+- `src/utils` - helpers
 
 ## Order automation
 
-`runOrderSweeps` (finish half-finished orders, settle pending payments, auto-complete shipped
-orders, remind admins about overdue cash) runs in three ways:
+Order checks run every `ORDER_SWEEP_MINUTES` (default 10) inside the server process. On serverless hosting, set `DISABLE_ORDER_SWEEPER=true` and call the cron endpoint instead:
 
-1. **In-app timer** — `configs/db.js` starts it after the first DB connection and repeats every
-   `ORDER_SWEEP_MINUTES` (default 10). Works on a long-running server (`next start`, VPS, Docker).
-   It does **not** survive on serverless hosting. Turn it off with `DISABLE_ORDER_SWEEPER=true`.
-2. **Cron endpoint** — set `CRON_SECRET` and call `GET /api/cron/orders` with
-   `Authorization: Bearer <CRON_SECRET>`:
-   ```
-   */10 * * * * curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://your-site/api/cron/orders
-   ```
-   On Vercel, add `{"crons":[{"path":"/api/cron/orders","schedule":"*/10 * * * *"}]}` to
-   `vercel.json` (Vercel sends the header itself; the Hobby plan only allows daily crons).
-3. **By hand** — Admin → Orders → Order checks → "Run checks now".
+```
+*/10 * * * * curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://your-site/api/cron/orders
+```
 
-Only paid, shipped orders auto-complete (7 days after shipping, or 3 days after the expected
-delivery date). Unpaid cash-on-delivery orders never complete on their own; admins get reminders.
+## Security
+
+- Rate limiting on login, signup, SMS codes, password reset and public forms (Redis)
+- Banned users are blocked on every request
+- Changing the phone number requires an SMS code
+- Changing or resetting the password signs out other devices
+- Uploaded images are checked by file content
