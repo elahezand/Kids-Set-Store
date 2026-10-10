@@ -41,7 +41,7 @@ export default function PromoText() {
           </h2>
 
           <p className="mt-4 max-w-[46ch] text-base leading-7 text-white/80 sm:text-lg">
-            Comfortable, durable and playful clothing for kids — picked by parents, tested by children, and priced so a
+            Comfortable, durable and playful clothing for kids - picked by parents, tested by children, and priced so a
             growth spurt is never a problem.
           </p>
 

@@ -11,7 +11,6 @@ import type { SiteInfo } from "@/types";
 
 const social = z.string().trim().max(300, "At most 300 characters");
 
-/* mirrors validators/info.js (the server checks again) */
 const schema = z.object({
   phone: z.string().trim().min(5, "Phone is required").max(20, "At most 20 characters"),
   email: z.string().trim().toLowerCase().email("Enter a valid email"),
@@ -141,9 +140,7 @@ export default function SiteInfoForm({ info }: { info: SiteInfo | null }) {
                   placeholder={item.placeholder}
                   className={`input ${errors.socials?.[item.key] ? "input-error" : ""}`}
                 />
-                {errors.socials?.[item.key] && (
-                  <span className="field-error">{errors.socials[item.key]?.message}</span>
-                )}
+                {errors.socials?.[item.key] && <span className="field-error">{errors.socials[item.key]?.message}</span>}
               </div>
             ))}
           </div>
@@ -183,7 +180,7 @@ export default function SiteInfoForm({ info }: { info: SiteInfo | null }) {
               disabled={upload.isPending}
               className="btn btn-secondary w-full"
             >
-              <LuUpload className="size-4" /> {upload.isPending ? "Uploading…" : logo ? "Replace logo" : "Upload logo"}
+              <LuUpload className="size-4" /> {upload.isPending ? "Uploading..." : logo ? "Replace logo" : "Upload logo"}
             </button>
             <div>
               <label htmlFor="info-logo" className="label">
@@ -205,8 +202,12 @@ export default function SiteInfoForm({ info }: { info: SiteInfo | null }) {
         </section>
 
         <div className="xl:sticky xl:top-20">
-          <button type="submit" disabled={save.isPending || upload.isPending || !isDirty} className="btn btn-primary w-full">
-            <LuSave className="size-4" /> {save.isPending ? "Saving…" : isDirty ? "Save changes" : "Saved"}
+          <button
+            type="submit"
+            disabled={save.isPending || upload.isPending || !isDirty}
+            className="btn btn-primary w-full"
+          >
+            <LuSave className="size-4" /> {save.isPending ? "Saving..." : isDirty ? "Save changes" : "Saved"}
           </button>
           {!info && (
             <p className="mt-2 text-center text-xs text-gray-700 dark:text-gray-500">

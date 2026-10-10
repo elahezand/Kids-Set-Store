@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 const articleSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
@@ -30,12 +29,8 @@ const articleSchema = new mongoose.Schema(
 );
 
 articleSchema.index({ isPublished: 1, createdAt: -1 });
-articleSchema.index(
-  { slug: 1 },
-  { unique: true, partialFilterExpression: { slug: { $type: "string" } } }
-);
+articleSchema.index({ slug: 1 }, { unique: true, partialFilterExpression: { slug: { $type: "string" } } });
 
-const Article =
-  mongoose.models.Article || mongoose.model("Article", articleSchema);
+const Article = mongoose.models.Article || mongoose.model("Article", articleSchema);
 
-module.exports = Article;
+export default Article;

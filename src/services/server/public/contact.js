@@ -1,11 +1,11 @@
 import Contact from "@/model/contact";
 
 const createContact = async (data) => {
-    return Contact.create(data);
+  return Contact.create(data);
 };
 
 const contacrService = {
-    createContact,
+  createContact,
 };
 
-export default contacrService
+export default contacrService;

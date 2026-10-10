@@ -47,7 +47,7 @@ export default function ContactDialog({ message, onDelete, onClose }: ContactDia
               className="btn btn-primary"
               disabled={reply.isPending || tooShort}
             >
-              {reply.isPending ? "Sending…" : "Send answer"}
+              {reply.isPending ? "Sending..." : "Send answer"}
             </button>
           )}
         </>

@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 const schema = new mongoose.Schema(
   {
     key: {
@@ -35,4 +34,4 @@ const schema = new mongoose.Schema(
 );
 
 const Info = mongoose.models.Info || mongoose.model("Info", schema);
-module.exports = Info
+export default Info;

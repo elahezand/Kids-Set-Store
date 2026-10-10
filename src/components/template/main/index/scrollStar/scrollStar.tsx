@@ -11,7 +11,6 @@ import {
 const StarCanvas = dynamic(() => import("@/components/template/main/index/scrollStar/starCanvas"), { ssr: false });
 
 const SIZE = 56;
-/** a section header "takes" the star once it is above this line (fraction of the viewport height) */
 const ENTER_LINE = 0.72;
 const FLY = 4.5;
 const FOLLOW = 18;
@@ -28,10 +27,6 @@ const supportsWebGL = () => {
 const damp = (from: number, to: number, lambda: number, dt: number) =>
   from + (to - from) * (1 - Math.exp(-lambda * dt));
 
-/**
- * One of the hero's stars detaches when you scroll and flies to the header of the section you are looking at
- * (`[data-star-anchor]` in SectionHeader). Scrolling back to the top sends it home into the hero.
- */
 export default function ScrollStar() {
   const ref = useRef<HTMLDivElement>(null);
   const spin = useRef(0.6);

@@ -27,7 +27,6 @@ export default function SectionHeader({
         )}
         <h2 className="text-2xl leading-tight font-bold tracking-tight text-text-dark sm:text-3xl dark:text-white">
           {title}
-          {/* the hero star lands here when this section is on screen (index/scrollStar) */}
           <span data-star-anchor aria-hidden="true" className="ml-2 inline-block size-9 align-middle sm:size-10" />
         </h2>
         {description && (

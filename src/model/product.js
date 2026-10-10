@@ -1,8 +1,7 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const { Schema } = mongoose;
-const { nanoid } = require("nanoid");
-const { calcFinalPrice, computeMinPrice } = require("@/utils/pricing");
-
+import { nanoid } from "nanoid";
+import { calcFinalPrice, computeMinPrice } from "@/utils/pricing";
 const VariantSchema = new Schema(
   {
     attributes: {
@@ -51,7 +50,6 @@ const productSchema = new Schema(
     variants: {
       type: [VariantSchema],
       required: true,
-
     },
     shortIdentifier: { type: String, unique: true, sparse: true },
     tags: { type: [String], default: [] },
@@ -102,4 +100,4 @@ productSchema.index(
   { weights: { title: 10, description: 2 }, name: "ProductTextIndex" }
 );
 
-module.exports = mongoose.models.Product || mongoose.model("Product", productSchema);
+export default mongoose.models.Product || mongoose.model("Product", productSchema);

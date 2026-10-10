@@ -4,13 +4,11 @@ import { LuFolderTree } from "react-icons/lu";
 import { useQueryParams } from "@/services/client/listing";
 
 interface CategoryFilterProps {
-  /** flattened tree, e.g. { id, label: "Girls › Dresses" } */
   categories: Array<{ id: string; label: string }>;
   value: string;
   param?: string;
 }
 
-/** Picking a parent category also lists the products of its sub-categories */
 export default function CategoryFilter({ categories, value, param = "category" }: CategoryFilterProps) {
   const { update, isPending } = useQueryParams<string>();
 

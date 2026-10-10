@@ -20,8 +20,6 @@ export const scrollStarStore = {
   },
 };
 
-/** on-screen size (px) of the star drawn by StarCanvas inside the SIZE box — used to match the hero's star */
 export const CANVAS_STAR_PX = 37;
 
-/** the hero's star that leaves on scroll (same color as STARS[0] in heroScene — PALETTE.sky) */
 export const SCROLL_STAR_COLOR = "#0f71c2";

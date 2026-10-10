@@ -2,31 +2,26 @@ import { z } from "zod";
 import { dateRangeQuery } from "@/validators/_shared";
 
 export const contactValidationSchema = z.object({
-    name: z
-        .string()
-        .trim()
-        .min(3, "Name must be at least 3 characters")
-        .max(40, "Name cannot exceed 40 characters")
-        // Simple regex for English & Persian letters to avoid backtracking issues
-        .refine((val) => /^[a-zA-Z\u0600-\u06FF\s]+$/.test(val), "Name must only contain letters"),
+  name: z
+    .string()
+    .trim()
+    .min(3, "Name must be at least 3 characters")
+    .max(40, "Name cannot exceed 40 characters")
+    .refine((val) => /^[a-zA-Z\u0600-\u06FF\s]+$/.test(val), "Name must only contain letters"),
 
-    email: z
-        .string()
-        .trim()
-        .toLowerCase()
-        .email("Invalid email format"),
+  email: z.string().trim().toLowerCase().email("Invalid email format"),
 
-    phone: z
-        .string()
-        .trim()
-        .length(11, "Phone number must be exactly 11 digits")
-        .regex(/^09\d{9}$/, "Invalid Iranian phone number format"),
+  phone: z
+    .string()
+    .trim()
+    .length(11, "Phone number must be exactly 11 digits")
+    .regex(/^09\d{9}$/, "Invalid Iranian phone number format"),
 
-    body: z
-        .string()
-        .trim()
-        .min(5, "Message must be at least 5 characters")
-        .max(2000, "Message must be at most 2000 characters"),
+  body: z
+    .string()
+    .trim()
+    .min(5, "Message must be at least 5 characters")
+    .max(2000, "Message must be at most 2000 characters"),
 });
 
 export const contactSchema = contactValidationSchema;

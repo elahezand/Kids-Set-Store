@@ -15,7 +15,6 @@ const CARD_THICKNESS = 6;
 const face =
   "absolute inset-0 rounded-2xl p-5 text-left text-white shadow-float [backface-visibility:hidden] [-webkit-backface-visibility:hidden]";
 
-/** `bare`: no background and no clipping — for layouts where the card breaks out of a colored panel */
 export default function ClubCard3D({ bare = false }: { bare?: boolean }) {
   const [flipped, setFlipped] = useState(false);
 

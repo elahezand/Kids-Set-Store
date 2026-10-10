@@ -62,7 +62,10 @@ export default function CartDetails({ cart, onDelete, onClose }: CartDetailsProp
                   ? Object.values(item.variantSnapshot.attributes).join(" / ")
                   : "";
                 return (
-                  <li key={`${item.productId?._id}-${item.variantId ?? index}`} className="flex items-center gap-3 py-3">
+                  <li
+                    key={`${item.productId?._id}-${item.variantId ?? index}`}
+                    className="flex items-center gap-3 py-3"
+                  >
                     <Image
                       src={item.productId?.images?.[0] || PLACEHOLDER_IMAGE}
                       alt=""
@@ -90,8 +93,8 @@ export default function CartDetails({ cart, onDelete, onClose }: CartDetailsProp
 
           {detail.removedItems.length > 0 && (
             <p className="rounded-lg bg-sun-50 px-3 py-2 text-xs text-sun-800 dark:bg-sun-500/10 dark:text-sun-300">
-              {detail.removedItems.length} item{detail.removedItems.length === 1 ? " is" : "s are"} no longer
-              available (out of stock or hidden) and would be dropped at checkout.
+              {detail.removedItems.length} item{detail.removedItems.length === 1 ? " is" : "s are"} no longer available
+              (out of stock or hidden) and would be dropped at checkout.
             </p>
           )}
 

@@ -18,20 +18,13 @@ const slug = z
   .optional()
   .transform((value) => value || undefined);
 
-const description = z
-  .string()
-  .trim()
-  .max(300, "Description must be at most 300 characters")
-  .optional();
+const description = z.string().trim().max(300, "Description must be at most 300 characters").optional();
 
 export const createCategorySchema = z.object({
   name,
   slug,
   description,
-  parentId: z.preprocess(
-    (value) => (value === "" || value === undefined ? null : value),
-    objectId.nullable()
-  ),
+  parentId: z.preprocess((value) => (value === "" || value === undefined ? null : value), objectId.nullable()),
 });
 
 export const updateCategorySchema = z
@@ -39,12 +32,6 @@ export const updateCategorySchema = z
     name: name.optional(),
     slug,
     description,
-    parentId: z.preprocess(
-      (value) => (value === "" ? null : value),
-      objectId.nullable().optional()
-    ),
+    parentId: z.preprocess((value) => (value === "" ? null : value), objectId.nullable().optional()),
   })
-  .refine(
-    (data) => Object.values(data).some((value) => value !== undefined),
-    "Nothing to update"
-  );
+  .refine((data) => Object.values(data).some((value) => value !== undefined), "Nothing to update");

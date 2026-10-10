@@ -196,9 +196,9 @@ export default function ArticleForm({ article, categories }: ArticleFormProps) {
             >
               <LuSave className="size-4" />
               {upload.isPending
-                ? "Uploading cover…"
+                ? "Uploading cover..."
                 : save.isPending
-                  ? "Saving…"
+                  ? "Saving..."
                   : isEdit
                     ? "Save changes"
                     : "Create article"}

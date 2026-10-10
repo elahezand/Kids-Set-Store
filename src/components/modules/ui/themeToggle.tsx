@@ -16,9 +16,7 @@ export default function ThemeToggle() {
     document.documentElement.classList.toggle("dark", next);
     try {
       localStorage.setItem("theme", next ? "dark" : "light");
-    } catch {
-      // storage can be blocked (private mode); the theme still switches for this visit
-    }
+    } catch {}
   };
 
   return (

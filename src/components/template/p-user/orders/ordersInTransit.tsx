@@ -11,7 +11,7 @@ import { autoCompleteDate, shortId } from "@/utils/panelView";
 import type { OrderListItem } from "@/types";
 
 const STEPS = ["Ordered", "Prepared", "Shipped", "Delivered"] as const;
-const CURRENT_STEP = 2; // every order here is shipped
+const CURRENT_STEP = 2;
 
 function Steps({ order }: { order: OrderListItem }) {
   const dates = [order.createdAt, null, order.shippedAt, order.expectedDeliveryAt];
@@ -73,7 +73,10 @@ export default function OrdersInTransit({ orders }: { orders: OrderListItem[] })
           const autoAt = order.paymentStatus === "paid" ? autoCompleteDate(order) : null;
           const images = order.items.slice(0, 3);
           return (
-            <li key={String(order._id)} className="grid gap-4 px-4 py-5 sm:px-5 lg:grid-cols-[1fr_16rem] lg:items-center">
+            <li
+              key={String(order._id)}
+              className="grid gap-4 px-4 py-5 sm:px-5 lg:grid-cols-[1fr_16rem] lg:items-center"
+            >
               <div className="min-w-0 space-y-4">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                   <div className="flex -space-x-2">

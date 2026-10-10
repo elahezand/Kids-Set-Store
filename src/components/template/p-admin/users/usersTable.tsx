@@ -154,7 +154,7 @@ export default function UsersTable({ initialPage, params, filters, currentUserId
           <>
             <StatusTabs tabs={USER_ROLE_TABS} value={filters.status} param="role" />
             <DateRangeFilter value={filters} label="Joined" />
-            <SearchBox placeholder="Name, phone or email…" />
+            <SearchBox placeholder="Name, phone or email..." />
           </>
         }
         isEmpty={users.length === 0}
@@ -209,7 +209,7 @@ export default function UsersTable({ initialPage, params, filters, currentUserId
                         {user.lastDevice && <span className="block text-xs text-gray-600">{user.lastDevice}</span>}
                       </>
                     ) : (
-                      <span className="text-gray-600">—</span>
+                      <span className="text-gray-600">-</span>
                     )}
                   </td>
                   <td className="tabular-nums">{user.ordersCount ?? 0}</td>

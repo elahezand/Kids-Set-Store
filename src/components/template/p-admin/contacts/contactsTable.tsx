@@ -36,7 +36,7 @@ export default function ContactsTable({ initialPage, params, filters, limit }: C
           <>
             <StatusTabs tabs={CONTACT_TABS} value={filters.status} />
             <DateRangeFilter value={filters} label="Received" />
-            <SearchBox placeholder="Name, email, phone or text…" />
+            <SearchBox placeholder="Name, email, phone or text..." />
           </>
         }
         isEmpty={messages.length === 0}
@@ -45,9 +45,9 @@ export default function ContactsTable({ initialPage, params, filters, limit }: C
             title={filters.status === "pending" && !isFiltered(filters) ? "Inbox zero" : "No messages"}
             description={
               filteredEmptyText(filters) ??
-                (filters.status === "pending"
-                  ? "Every message has an answer."
-                  : "Messages sent from the Contact us page show up here.")
+              (filters.status === "pending"
+                ? "Every message has an answer."
+                : "Messages sent from the Contact us page show up here.")
             }
             icon={LuMail}
           />

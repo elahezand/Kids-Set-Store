@@ -42,7 +42,7 @@ const Promote = ({ stats = null }: { stats?: PublicStats | null }) => {
       <SectionHeader
         eyebrow="Set Kids Club"
         title="More than a clothing store"
-        description="Perks for the families who shop with us — and the numbers behind them."
+        description="Perks for the families who shop with us - and the numbers behind them."
       />
 
       <div className="grid gap-20 pt-16 sm:pt-20 lg:grid-cols-2 lg:gap-8">

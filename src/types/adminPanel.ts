@@ -1,8 +1,6 @@
 import type { Id, ISODate } from "./api";
 import type { CartItem, CartPricing } from "./cart";
 
-/* ---------- categories ---------- */
-
 export interface AdminCategory {
   _id: Id;
   title: string;
@@ -22,8 +20,6 @@ export interface CategoryPayload {
   parentId: Id | null;
 }
 
-/* ---------- ticket departments ---------- */
-
 export interface AdminDepartment {
   id: Id;
   title: string;
@@ -39,8 +35,6 @@ export interface DepartmentPayload {
   isActive?: boolean;
   order?: number;
 }
-
-/* ---------- contact messages ---------- */
 
 export type ContactStatus = "pending" | "answered";
 export type ContactStatusFilter = "all" | ContactStatus;
@@ -58,15 +52,11 @@ export interface ContactMessage {
   createdAt?: ISODate;
 }
 
-/* ---------- newsletter ---------- */
-
 export interface NewsletterSubscriber {
   _id: Id;
   email: string;
   createdAt?: ISODate;
 }
-
-/* ---------- carts ---------- */
 
 export type AdminCartStatus = "active" | "abandoned" | "converted";
 export type AdminCartStatusFilter = "all" | AdminCartStatus;
@@ -104,8 +94,6 @@ export interface AdminCartDetail {
   updatedAt?: ISODate;
 }
 
-/* ---------- admins & notifications ---------- */
-
 export interface AdminAccount {
   _id: Id;
   username: string;
@@ -120,8 +108,6 @@ export interface NotificationPayload {
   msg: string;
   link?: string | null;
 }
-
-/* ---------- order sweeps ---------- */
 
 export interface OrderSweepResult {
   finished: number;
@@ -149,4 +135,3 @@ export interface OrderSweepStatus {
   timerMinutes: number;
   cronConfigured: boolean;
 }
-

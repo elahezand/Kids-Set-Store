@@ -28,11 +28,11 @@ const attributesText = (item: OrderItem) =>
 
 const statusNote = (order: OrderListItem) => {
   if (order.status === "created") return "Waiting for your payment.";
-  if (order.status === "processing") return "We're preparing your order — you can still cancel it until it ships.";
+  if (order.status === "processing") return "We're preparing your order - you can still cancel it until it ships.";
   if (order.status === "shipped" && order.paymentMethod === "cash")
     return order.isDelivered
-      ? "You confirmed you received it — the order completes once the store confirms your cash payment."
-      : "On its way — pay the courier in cash when it arrives.";
+      ? "You confirmed you received it - the order completes once the store confirms your cash payment."
+      : "On its way - pay the courier in cash when it arrives.";
   if (order.status === "shipped") return "On its way.";
   if (order.status === "completed")
     return `Completed${order.deliveredAt ? ` on ${formatDate(order.deliveredAt)}` : ""}. Thanks for your order!`;
@@ -145,10 +145,10 @@ export default function OrderDetails({ order, actions, onClose }: OrderDetailsPr
           <p className="flex items-center gap-2 rounded-xl bg-gray-50 p-3 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-400">
             <LuX className="size-4 shrink-0" />
             {order.refundAmount
-              ? `Cancelled — ${formatPrice(order.refundAmount)} was refunded to your wallet${
+              ? `Cancelled - ${formatPrice(order.refundAmount)} was refunded to your wallet${
                   order.refundedAt ? ` on ${formatDate(order.refundedAt)}` : ""
                 }.`
-              : "Cancelled — nothing was paid, so there was nothing to refund."}
+              : "Cancelled - nothing was paid, so there was nothing to refund."}
           </p>
         )}
 

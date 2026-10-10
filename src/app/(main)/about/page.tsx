@@ -119,7 +119,9 @@ export default function AboutPage() {
       <section className="mt-14 flex flex-col items-start justify-between gap-4 rounded-2xl bg-sage-50 p-6 sm:mt-16 sm:flex-row sm:items-center sm:p-8 dark:bg-ink-950">
         <div>
           <h2 className="text-lg font-bold sm:text-xl">Have a question about a size or an order?</h2>
-          <p className="mt-1 text-sm text-gray-700 dark:text-gray-400">We read every message and reply as soon as we can.</p>
+          <p className="mt-1 text-sm text-gray-700 dark:text-gray-400">
+            We read every message and reply as soon as we can.
+          </p>
         </div>
         <Link href={ROUTES.contact} className="btn btn-primary shrink-0">
           Contact us

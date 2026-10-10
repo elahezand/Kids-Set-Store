@@ -14,7 +14,8 @@ interface CategorySpecsProps {
 export default function CategorySpecs({ form, filters, categoryName, isLoading = false }: CategorySpecsProps) {
   const { register, control } = form;
   const errors = (form.formState.errors as FieldErrors<ProductFormValues>).specs as
-    Record<string, { message?: string }> | undefined;
+    | Record<string, { message?: string }>
+    | undefined;
 
   return (
     <section className="card">

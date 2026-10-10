@@ -1,11 +1,8 @@
-/* 1. Tailwind ------------------------------------------------------------ */
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* 2. Design tokens ------------------------------------------------------- */
 @theme {
-  /* Primary — deep teal (token name: sage). 500+ is AA with white text. */
   --color-sage: #38aba3;
   --color-sage-50: #ecf8f7;
   --color-sage-100: #d0efec;
@@ -18,7 +15,6 @@
   --color-sage-800: #0c4a45;
   --color-sage-900: #08332f;
 
-  /* Accent — coral (token name: coral). 600+ with white text. */
   --color-coral: #ff9e8f;
   --color-coral-50: #fff3f1;
   --color-coral-100: #ffe2dd;
@@ -31,7 +27,6 @@
   --color-coral-800: #78271e;
   --color-coral-900: #4f1a14;
 
-  /* Supporting — fresh mint */
   --color-mint: #a8ecd2;
   --color-mint-50: #edfcf6;
   --color-mint-100: #d2f7e8;
@@ -44,7 +39,6 @@
   --color-mint-800: #135744;
   --color-mint-900: #0c372c;
 
-  /* Supporting — apricot */
   --color-peach: #ffd9b3;
   --color-peach-50: #fff7ee;
   --color-peach-100: #ffecd7;
@@ -57,7 +51,6 @@
   --color-peach-800: #804315;
   --color-peach-900: #522b0f;
 
-  /* Sky — light blue */
   --color-sky-50: #eefaff;
   --color-sky-100: #d8f2fd;
   --color-sky-200: #b3e5fb;
@@ -69,7 +62,6 @@
   --color-sky-800: #19577b;
   --color-sky-900: #133b54;
 
-  /* Sun — butter yellow */
   --color-sun-50: #fffbe8;
   --color-sun-100: #fff3c2;
   --color-sun-200: #ffe78a;
@@ -81,7 +73,6 @@
   --color-sun-800: #7f5711;
   --color-sun-900: #523810;
 
-  /* Status */
   --color-danger: #e5484d;
   --color-danger-light: #f87171;
   --color-danger-50: #fef1f1;
@@ -98,7 +89,6 @@
   --color-success: #178a68;
   --color-success-light: #edfcf6;
 
-  /* Neutrals — clean cool grey */
   --color-gray-50: #f7f8fa;
   --color-gray-100: #eff1f5;
   --color-gray-200: #e3e7ee;
@@ -110,7 +100,6 @@
   --color-gray-800: #2e3441;
   --color-gray-900: #1c212b;
 
-  /* Dark surfaces — deep navy night */
   --color-ink-700: #232a3a;
   --color-ink-800: #1a2030;
   --color-ink-900: #131826;
@@ -142,9 +131,6 @@
   --normal-border: rgb(255 255 255 / 0.1);
 }
 
-/* 3. Base ---------------------------------------------------------------- */
-/* Both files live under one family name, so font-medium / font-semibold /
-   font-bold pick the real file instead of the browser faking bold. */
 @font-face {
   font-family: shabnam;
   src: url("/fonts/shabnam/Shabnam-Medium.woff") format("woff");
@@ -169,8 +155,6 @@
   html,
   body {
     max-width: 100vw;
-    /* NOTE: for a Persian storefront, prefer removing this and setting
-       <html dir="rtl" lang="fa"> in the root layout. */
     direction: ltr;
   }
 
@@ -244,7 +228,6 @@
   }
 }
 
-/* 4. Components ---------------------------------------------------------- */
 @layer components {
   .section-y {
     @apply py-14 sm:py-20 md:py-24 lg:py-28;
@@ -254,7 +237,6 @@
     @apply mx-auto w-full max-w-container px-4 sm:px-6 lg:px-8;
   }
 
-  /* home sections: horizontal padding only, the page sets the vertical rhythm */
   .home-container {
     @apply mx-auto w-full px-8 sm:px-4 lg:px-18;
   }
@@ -507,12 +489,12 @@
     @apply inline-flex items-center overflow-hidden rounded-xl border border-gray-300 bg-white dark:border-white/10 dark:bg-ink-900;
   }
 
-  .qty>button {
+  .qty > button {
     @apply grid size-10 place-items-center text-lg text-gray-700 transition-colors hover:bg-gray-100 disabled:opacity-40 dark:text-gray-300 dark:hover:bg-white/5;
   }
 
-  .qty>input,
-  .qty>span {
+  .qty > input,
+  .qty > span {
     @apply w-10 border-0 bg-transparent text-center text-sm font-semibold tabular-nums outline-none;
   }
 
@@ -577,8 +559,12 @@
     background-image:
       radial-gradient(circle at 1px 1px, rgb(255 158 143 / 0.35) 1.5px, transparent 0),
       radial-gradient(circle at 1px 1px, rgb(56 171 163 / 0.35) 1.5px, transparent 0);
-    background-size: 28px 28px, 28px 28px;
-    background-position: 0 0, 14px 14px;
+    background-size:
+      28px 28px,
+      28px 28px;
+    background-position:
+      0 0,
+      14px 14px;
   }
 
   html.dark .bg-playful {
@@ -589,12 +575,8 @@
   }
 }
 
-/* 5. Vendor overrides ---------------------------------------------------- */
-
-/* Swiper — kept inside a layer so Tailwind utilities on slides/images always win.
-   (Slide images are sized in JSX with next/image `fill` + object-cover/contain.) */
 @layer components {
-  .swiper{
+  .swiper {
     padding: 1rem 0rem;
   }
   .swiper-slide {
@@ -604,7 +586,9 @@
   .swiper-pagination-bullet {
     background: var(--color-gray-400) !important;
     opacity: 1 !important;
-    transition: width 0.2s, background-color 0.2s;
+    transition:
+      width 0.2s,
+      background-color 0.2s;
   }
 
   .swiper-pagination-bullet-active {
@@ -621,7 +605,9 @@
   .gallery-slider-2 .swiper-slide {
     opacity: 0.45;
     cursor: pointer;
-    transition: opacity 0.2s, box-shadow 0.2s;
+    transition:
+      opacity 0.2s,
+      box-shadow 0.2s;
   }
 
   .gallery-slider-2 .swiper-slide-thumb-active {
@@ -736,11 +722,10 @@ html.dark .swal-text {
   margin: 0.75rem 0;
 }
 
-.rich-editor .ProseMirror p+p {
+.rich-editor .ProseMirror p + p {
   margin-top: 0.5rem;
 }
 
-/* 6. Keyframes & decorative --------------------------------------------- */
 @keyframes fade-in {
   from {
     opacity: 0;

@@ -21,14 +21,10 @@ const departmentSchema = new mongoose.Schema(
   }
 );
 
-departmentSchema.index(
-  { title: 1 },
-  { unique: true, collation: { locale: "en", strength: 2 } }
-);
+departmentSchema.index({ title: 1 }, { unique: true, collation: { locale: "en", strength: 2 } });
 
 departmentSchema.index({ isActive: 1, order: 1 });
 
-const DepartmentModel =
-  mongoose.models.Department || mongoose.model("Department", departmentSchema);
+const DepartmentModel = mongoose.models.Department || mongoose.model("Department", departmentSchema);
 
 export default DepartmentModel;

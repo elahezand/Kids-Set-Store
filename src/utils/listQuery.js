@@ -1,11 +1,9 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
-const paginate = require("@/utils/paginate");
+import paginate from "@/utils/paginate";
 const escapeRegex = (text) => String(text).replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 
-/** "2026-09-01" is a calendar day, not UTC midnight -> read it in the server's own timezone */
-const toDate = (value) =>
-  /^\d{4}-\d{2}-\d{2}$/.test(String(value)) ? new Date(`${value}T00:00:00`) : new Date(value);
+const toDate = (value) => (/^\d{4}-\d{2}-\d{2}$/.test(String(value)) ? new Date(`${value}T00:00:00`) : new Date(value));
 
 const startOfDay = (value) => {
   const date = toDate(value);
@@ -14,7 +12,6 @@ const startOfDay = (value) => {
   return date;
 };
 
-/** End of the given day, so "to=2026-09-01" includes everything that happened that day */
 const endOfDay = (value) => {
   const date = toDate(value);
   if (Number.isNaN(date.getTime())) return null;
@@ -48,9 +45,7 @@ const searchFilter = (query = {}, fields = []) => {
   if (!term || !fields.length) return {};
 
   const regex = new RegExp(escapeRegex(term.slice(0, 100)), "i");
-  return fields.length === 1
-    ? { [fields[0]]: regex }
-    : { $or: fields.map((field) => ({ [field]: regex })) };
+  return fields.length === 1 ? { [fields[0]]: regex } : { $or: fields.map((field) => ({ [field]: regex })) };
 };
 
 const statusFilter = (query = {}, allowed = [], field = "status") => {
@@ -65,14 +60,7 @@ const idFilter = (query = {}, param, field = param) => {
 };
 
 const buildListQuery = (query = {}, options = {}) => {
-  const {
-    dateField = "createdAt",
-    statuses = [],
-    statusField = "status",
-    search = [],
-    ids = {},
-    base = {},
-  } = options;
+  const { dateField = "createdAt", statuses = [], statusField = "status", search = [], ids = {}, base = {} } = options;
 
   const idFilters = Object.entries(ids).reduce(
     (acc, [param, field]) => ({ ...acc, ...idFilter(query, param, field) }),
@@ -88,8 +76,7 @@ const buildListQuery = (query = {}, options = {}) => {
   };
 };
 
-const listLimit = (query = {}, fallback = 20, max = 100) =>
-  Math.min(Math.max(Number(query.limit) || fallback, 1), max);
+const listLimit = (query = {}, fallback = 20, max = 100) => Math.min(Math.max(Number(query.limit) || fallback, 1), max);
 
 const paginateList = (Model, query = {}, options = {}) => {
   const {
@@ -112,12 +99,6 @@ const paginateList = (Model, query = {}, options = {}) => {
   });
 };
 
-module.exports = {
-  paginateList,
-  buildListQuery,
-  dateRangeFilter,
-  searchFilter,
-  statusFilter,
-  idFilter,
-  listLimit,
-};
+export { paginateList, buildListQuery, dateRangeFilter, searchFilter, statusFilter, idFilter, listLimit };
+
+export default { paginateList, buildListQuery, dateRangeFilter, searchFilter, statusFilter, idFilter, listLimit };

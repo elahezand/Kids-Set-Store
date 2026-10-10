@@ -6,63 +6,48 @@ import Order from "@/model/order";
 const PUBLISHED_PRODUCT_FILTER = { status: "active" };
 
 const getStartOfToday = () => {
-    const now = new Date();
+  const now = new Date();
 
-    return new Date(
-        Date.UTC(
-            now.getUTCFullYear(),
-            now.getUTCMonth(),
-            now.getUTCDate()
-        )
-    );
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
 };
 
-// cached for 5 minutes: counts over whole collections
 const getPublicStats = async () => remember(CACHE_KEYS.stats, 300, computePublicStats);
 
 const computePublicStats = async () => {
-    const [
-        activeProducts,
-        activeUsers,
-        successfulDeals,
-        todayProducts,
-        ratingRows,
-    ] = await Promise.all([
-        Product.countDocuments(PUBLISHED_PRODUCT_FILTER),
+  const [activeProducts, activeUsers, successfulDeals, todayProducts, ratingRows] = await Promise.all([
+    Product.countDocuments(PUBLISHED_PRODUCT_FILTER),
 
-        User.countDocuments(),
+    User.countDocuments(),
 
-        Order.countDocuments({ status: "completed" }),
+    Order.countDocuments({ status: "completed" }),
 
-        Product.countDocuments({
-            ...PUBLISHED_PRODUCT_FILTER,
-            createdAt: { $gte: getStartOfToday() },
-        }),
+    Product.countDocuments({
+      ...PUBLISHED_PRODUCT_FILTER,
+      createdAt: { $gte: getStartOfToday() },
+    }),
 
-        Product.aggregate([
-            {
-                $match: {
-                    ...PUBLISHED_PRODUCT_FILTER,
-                    "metrics.reviewsCount": { $gt: 0 },
-                },
-            },
-            { $group: { _id: null, avg: { $avg: "$metrics.score" } } },
-        ]),
-    ]);
+    Product.aggregate([
+      {
+        $match: {
+          ...PUBLISHED_PRODUCT_FILTER,
+          "metrics.reviewsCount": { $gt: 0 },
+        },
+      },
+      { $group: { _id: null, avg: { $avg: "$metrics.score" } } },
+    ]),
+  ]);
 
-    const averageRating = ratingRows[0]?.avg
-        ? Math.round(ratingRows[0].avg * 10) / 10
-        : 0;
+  const averageRating = ratingRows[0]?.avg ? Math.round(ratingRows[0].avg * 10) / 10 : 0;
 
-    return {
-        activeProducts,
-        activeUsers,
-        successfulDeals,
-        todayProducts,
-        averageRating,
-    };
+  return {
+    activeProducts,
+    activeUsers,
+    successfulDeals,
+    todayProducts,
+    averageRating,
+  };
 };
 
 const statService = { getPublicStats };
 
-export default statService
+export default statService;

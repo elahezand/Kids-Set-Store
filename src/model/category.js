@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const slugify = require("slugify");
+import mongoose from "mongoose";
+import slugify from "slugify";
 const { Schema } = mongoose;
 
 const optionSchema = new Schema(
@@ -68,7 +68,6 @@ const categorySchema = new Schema(
   }
 );
 
-
 categorySchema.index({ slug: 1 }, { unique: true });
 categorySchema.pre("validate", function (next) {
   if (!this.slug && this.title) {
@@ -83,7 +82,6 @@ categorySchema.virtual("children", {
   foreignField: "parentId",
 });
 
-const Category =
-  mongoose.models.Category || mongoose.model("Category", categorySchema);
+const Category = mongoose.models.Category || mongoose.model("Category", categorySchema);
 
-module.exports = Category;
+export default Category;

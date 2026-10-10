@@ -52,7 +52,7 @@ export default function DepartmentForm({ department, nextOrder, onClose }: Depar
             Cancel
           </button>
           <button type="submit" form="department-form" className="btn btn-primary" disabled={save.isPending}>
-            {save.isPending ? "Saving…" : editing ? "Save changes" : "Create department"}
+            {save.isPending ? "Saving..." : editing ? "Save changes" : "Create department"}
           </button>
         </>
       }

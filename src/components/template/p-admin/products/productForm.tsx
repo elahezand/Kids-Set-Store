@@ -64,7 +64,6 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
   const previews = useMemo(() => files.map((file) => URL.createObjectURL(file)), [files]);
   useEffect(() => () => previews.forEach((url) => URL.revokeObjectURL(url)), [previews]);
 
-  // the category's rules change while the form is open: the resolver reads the latest ones
   const categoryRules = useRef<{ rules: ReturnType<typeof variantRulesOf>; specFilters: CategoryFilter[] }>({
     rules: new Map(),
     specFilters: [],
@@ -74,7 +73,6 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
     const zod = zodResolver(productFormSchema) as unknown as Resolver<ProductFormValues, unknown, ProductFormOutput>;
     const result = await zod(values, context, options);
     const errors = { ...(result.errors as FieldErrors<ProductFormValues>) } as Record<string, unknown>;
-    // errors.variants is an array of row errors, or one object for the whole list ("generate the variants first")
     const listError = errors.variants && !Array.isArray(errors.variants) ? errors.variants : null;
     const variantErrors = (Array.isArray(errors.variants) ? [...errors.variants] : []) as Array<
       Record<string, unknown> | undefined
@@ -229,7 +227,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
               {!category
                 ? "Choose it first: the sizes and specifications below come from it."
                 : categoryQuery.isLoading
-                  ? "Loading the category filters…"
+                  ? "Loading the category filters..."
                   : `Sizes${rules.get("color") ? ", color suggestions" : ""} and specifications come from ${category.title}${
                       path.filter(Boolean).length > 1 ? " and its parent categories" : ""
                     }.`}
@@ -306,9 +304,9 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
           >
             <LuSave className="size-4" />
             {upload.isPending
-              ? "Uploading images…"
+              ? "Uploading images..."
               : save.isPending
-                ? "Saving…"
+                ? "Saving..."
                 : isEdit
                   ? "Save changes"
                   : "Create product"}

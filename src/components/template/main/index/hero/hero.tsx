@@ -68,7 +68,7 @@ export default function Hero() {
           <Squiggle className="mt-3 h-3 w-28 text-coral-300 sm:w-36" />
 
           <p className="mt-4 max-w-[40ch] text-[15px] leading-7 text-gray-700 sm:text-base dark:text-gray-400">
-            Soft fabrics, easy fits and colors kids love — from first steps to fourteen.
+            Soft fabrics, easy fits and colors kids love - from first steps to fourteen.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-4 sm:gap-6">

@@ -10,36 +10,31 @@ import { handleRouteError, jsonError, validationError, respond } from "@/utils/a
 import { adminOrdersQuerySchema } from "@/validators/order";
 
 export async function GET(request) {
-    try {
-        await connectToDB();
+  try {
+    await connectToDB();
 
-        const admin = await authAdmin();
+    const admin = await authAdmin();
 
-        if (!admin || admin.status === "expired") {
-            return jsonError("Unauthorized", 401);
-        }
-
-        const { searchParams } = new URL(request.url);
-        const query = Object.fromEntries(searchParams.entries());
-
-        const result = validate(
-            adminOrdersQuerySchema,
-            query
-        );
-
-        if (!result.success) {
-            return validationError(result.errors);
-        }
-
-        const data = await orderService.getAllOrders(
-            result.data
-        );
-
-        return respond({
-            data: data.data,
-            pagination: data.pagination,
-        });
-    } catch (error) {
-        return handleRouteError(error);
+    if (!admin || admin.status === "expired") {
+      return jsonError("Unauthorized", 401);
     }
+
+    const { searchParams } = new URL(request.url);
+    const query = Object.fromEntries(searchParams.entries());
+
+    const result = validate(adminOrdersQuerySchema, query);
+
+    if (!result.success) {
+      return validationError(result.errors);
+    }
+
+    const data = await orderService.getAllOrders(result.data);
+
+    return respond({
+      data: data.data,
+      pagination: data.pagination,
+    });
+  } catch (error) {
+    return handleRouteError(error);
+  }
 }

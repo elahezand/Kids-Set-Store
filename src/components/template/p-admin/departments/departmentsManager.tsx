@@ -98,7 +98,7 @@ function Topics({ department }: { department: AdminDepartmentOverview }) {
                   disabled={topic.ticketsCount > 0}
                   className="rounded-full p-1 text-gray-600 hover:bg-white hover:text-danger-600 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-white/10"
                   aria-label={`Delete ${topic.title}`}
-                  title={topic.ticketsCount > 0 ? "Tickets use this topic — rename it instead" : "Delete"}
+                  title={topic.ticketsCount > 0 ? "Tickets use this topic - rename it instead" : "Delete"}
                 >
                   <LuX className="size-3" />
                 </button>
@@ -215,7 +215,7 @@ export default function DepartmentsManager({ departments }: { departments: Admin
                   disabled={department.ticketsCount > 0}
                   className="btn btn-soft-danger btn-sm btn-icon disabled:cursor-not-allowed disabled:opacity-40"
                   aria-label={`Delete ${department.title}`}
-                  title={department.ticketsCount > 0 ? "Tickets use it — hide it instead" : "Delete"}
+                  title={department.ticketsCount > 0 ? "Tickets use it - hide it instead" : "Delete"}
                 >
                   <LuTrash2 className="size-3.5" />
                 </button>

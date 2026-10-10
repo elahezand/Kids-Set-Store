@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 const notificationSchema = new mongoose.Schema(
   {
     msg: {
@@ -35,21 +34,21 @@ const notificationSchema = new mongoose.Schema(
       default: null,
     },
   },
-    {
-        timestamps: true,
-        toObject: { virtuals: true },
-        toJSON: {
-            virtuals: true,
-            transform(doc, ret) {
-                ret.id = ret._id.toString();
-                delete ret._id;
-                delete ret.__v;
-                return ret;
-            },
-        },
-    }
+  {
+    timestamps: true,
+    toObject: { virtuals: true },
+    toJSON: {
+      virtuals: true,
+      transform(doc, ret) {
+        ret.id = ret._id.toString();
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      },
+    },
+  }
 );
 
 const Notification = mongoose.models.Notification || mongoose.model("Notification", notificationSchema);
 
-module.exports = Notification;
+export default Notification;

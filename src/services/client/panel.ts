@@ -43,7 +43,7 @@ export const useCancelMyOrder = ({ onDone }: { onDone?: () => void } = {}) => {
     onSuccess: (response) => {
       const refund = response.data?.refundAmount;
       toast.success(
-        refund ? `Order cancelled — ${formatPrice(refund)} was refunded to your wallet` : "Order cancelled"
+        refund ? `Order cancelled - ${formatPrice(refund)} was refunded to your wallet` : "Order cancelled"
       );
       queryClient.invalidateQueries({ queryKey: queryKeys.myOrders() });
       onDone?.();

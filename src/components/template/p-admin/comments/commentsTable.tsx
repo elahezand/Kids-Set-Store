@@ -124,7 +124,7 @@ export default function CommentsTable({ initialPage, params, filters, limit }: C
           <>
             <StatusTabs tabs={ADMIN_COMMENT_TABS} value={filters.status} />
             <DateRangeFilter value={filters} label="Written" />
-            <SearchBox placeholder="Search in comments…" />
+            <SearchBox placeholder="Search in comments..." />
           </>
         }
         isEmpty={comments.length === 0}
@@ -214,7 +214,7 @@ export default function CommentsTable({ initialPage, params, filters, limit }: C
                 className={`btn ${dialog.mode === "reply" ? "btn-primary" : "btn-soft-danger"}`}
               >
                 {reply.isPending || moderate.isPending
-                  ? "Please wait…"
+                  ? "Please wait..."
                   : dialog.mode === "reply"
                     ? "Publish reply"
                     : "Reject"}

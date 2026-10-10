@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const { Schema, Types } = mongoose;
 
 const walletTransactionSchema = new Schema(
@@ -17,5 +17,4 @@ walletTransactionSchema.index(
   { unique: true, partialFilterExpression: { order: { $type: "objectId" } } }
 );
 
-module.exports =
-  mongoose.models.WalletTransaction || mongoose.model("WalletTransaction", walletTransactionSchema);
+export default mongoose.models.WalletTransaction || mongoose.model("WalletTransaction", walletTransactionSchema);

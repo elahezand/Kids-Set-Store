@@ -9,7 +9,7 @@ interface SearchBoxProps {
   param?: string;
 }
 
-export default function SearchBox({ placeholder = "Search…", param = "q" }: SearchBoxProps) {
+export default function SearchBox({ placeholder = "Search...", param = "q" }: SearchBoxProps) {
   const { get, update, isPending } = useQueryParams<string>();
   const current = get(param);
   const [value, setValue] = useState(current);

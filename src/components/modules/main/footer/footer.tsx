@@ -74,7 +74,7 @@ const Footer = ({ info = null }: { info?: SiteInfo | null }) => {
           </Link>
 
           <p className="mt-4 max-w-[42ch] text-sm leading-7 text-gray-700 dark:text-gray-500">
-            Comfortable, durable clothing for kids from first steps to fourteen — picked by parents, tested by children.
+            Comfortable, durable clothing for kids from first steps to fourteen - picked by parents, tested by children.
           </p>
 
           <ul className="mt-6 flex flex-col gap-3 text-sm">

@@ -67,7 +67,9 @@ export default function Sidebar({ variant = "user", open = false, onClose, logo 
               </span>
             )}
             <span className="leading-tight">
-              <span className="block text-sm font-bold tracking-wide text-gray-900 dark:text-gray-100">{SITE_NAME}</span>
+              <span className="block text-sm font-bold tracking-wide text-gray-900 dark:text-gray-100">
+                {SITE_NAME}
+              </span>
               <span className="block text-xs text-gray-700 dark:text-gray-500">{nav.title}</span>
             </span>
           </Link>
@@ -79,7 +81,9 @@ export default function Sidebar({ variant = "user", open = false, onClose, logo 
         <nav className="flex-1 overflow-y-auto px-3 py-5">
           {groups.map((group, groupIndex) => (
             <div key={group.title} className={groupIndex ? "mt-5" : ""}>
-              <p className="mb-2 px-3 text-[11px] font-semibold tracking-wider text-gray-600 uppercase">{group.title}</p>
+              <p className="mb-2 px-3 text-[11px] font-semibold tracking-wider text-gray-600 uppercase">
+                {group.title}
+              </p>
               <ul className="space-y-1">
                 {group.links.map((link) => {
                   const active = isLinkActive(pathname, link);

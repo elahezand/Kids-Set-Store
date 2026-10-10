@@ -71,7 +71,6 @@ export const couponState = (
   return { label: "Active", badge: "badge-success" };
 };
 
-/* same rules as services/server/admin/order.js (the server checks them again) */
 export const ORDER_STATUS_MOVES: Record<OrderStatus, OrderStatus[]> = {
   created: ["cancelled"],
   processing: ["cancelled"],
@@ -80,10 +79,6 @@ export const ORDER_STATUS_MOVES: Record<OrderStatus, OrderStatus[]> = {
   cancelled: [],
 };
 
-/**
- * Payment badge of an order. A cancelled order that was never paid is "failed" (model enum) —
- * the API sets that when it cancels; older cancelled orders may still say "pending" in the database.
- */
 export const paymentState = (order: Pick<OrderListItem, "status" | "paymentStatus">): Badge =>
   order.status === "cancelled" && order.paymentStatus === "pending"
     ? PAYMENT_STATUS.failed
@@ -160,7 +155,7 @@ export const COUPON_TABS: ReadonlyArray<Tab<CouponStatusFilter>> = [
   { value: "inactive", label: "Disabled" },
 ];
 
-export const personName = (user: { username?: string; phone?: string } | string | null | undefined, fallback = "—") =>
+export const personName = (user: { username?: string; phone?: string } | string | null | undefined, fallback = "-") =>
   user && typeof user === "object" ? user.username || user.phone || fallback : fallback;
 
 export const ADMIN_ORDER_TABS: ReadonlyArray<Tab<AdminOrderStatusFilter>> = [
@@ -174,8 +169,8 @@ export const awaitsCash = (order: Pick<OrderListItem, "status" | "paymentMethod"
 
 export const cashReceivedText = (order?: Pick<OrderListItem, "isDelivered"> | null) =>
   order?.isDelivered
-    ? "The customer confirmed they received it. Only confirm once the courier has handed over the money — the order is marked paid and completed, and this can't be undone."
-    : "⚠ The customer hasn't confirmed receipt yet. Only confirm if the courier has really handed over the money — the order is marked paid and completed, and this can't be undone.";
+    ? "The customer confirmed they received it. Only confirm once the courier has handed over the money - the order is marked paid and completed, and this can't be undone."
+    : "⚠ The customer hasn't confirmed receipt yet. Only confirm if the courier has really handed over the money - the order is marked paid and completed, and this can't be undone.";
 
 export const AUTO_COMPLETE_DAYS = 7;
 export const AUTO_COMPLETE_AFTER_ETA_DAYS = 3;
@@ -213,7 +208,6 @@ export const CART_TABS: ReadonlyArray<Tab<AdminCartStatusFilter>> = [
   ...(Object.keys(CART_STATUS) as AdminCartStatus[]).map((value) => ({ value, label: CART_STATUS[value].label })),
 ];
 
-/** "3 days ago" style text for list rows */
 export const timeAgo = (value?: string | null) => {
   if (!value) return "";
   const diff = Date.now() - new Date(value).getTime();

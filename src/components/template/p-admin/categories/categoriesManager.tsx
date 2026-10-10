@@ -14,8 +14,8 @@ import type { AdminCategory, Id } from "@/types";
 type Editing = { category?: AdminCategory | null; parentId?: Id | null } | null;
 
 const blockReason = (category: AdminCategory) => {
-  if (category.childrenCount) return `Has ${category.childrenCount} sub categories — move or delete them first`;
-  if (category.productsCount) return `${category.productsCount} products use it — move them first`;
+  if (category.childrenCount) return `Has ${category.childrenCount} sub categories - move or delete them first`;
+  if (category.productsCount) return `${category.productsCount} products use it - move them first`;
   return null;
 };
 
@@ -86,7 +86,7 @@ export default function CategoriesManager({ categories }: { categories: AdminCat
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Filter categories…"
+                placeholder="Filter categories..."
                 aria-label="Filter categories"
                 className="input py-2 pr-3 pl-9 text-sm"
               />

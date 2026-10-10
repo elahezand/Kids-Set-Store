@@ -67,7 +67,7 @@ export default function SendTicket() {
             disabled={isLoading}
             className={`input ${errors.department ? "input-error" : ""}`}
           >
-            <option value="">{isLoading ? "Loading…" : "Select department"}</option>
+            <option value="">{isLoading ? "Loading..." : "Select department"}</option>
             {departments.map((item) => (
               <option key={String(item._id)} value={String(item._id)}>
                 {item.title}
@@ -133,7 +133,7 @@ export default function SendTicket() {
             id="ticket-content"
             {...register("content")}
             rows={6}
-            placeholder="Tell us more…"
+            placeholder="Tell us more..."
             className={`input ${errors.content ? "input-error" : ""}`}
           />
           {error("content")}
@@ -142,7 +142,7 @@ export default function SendTicket() {
         <div className="flex justify-end sm:col-span-2">
           <button type="submit" className="btn btn-primary w-full sm:w-auto" disabled={isPending}>
             <LuSend className="size-4" />
-            {isPending ? "Sending…" : "Send ticket"}
+            {isPending ? "Sending..." : "Send ticket"}
           </button>
         </div>
       </form>

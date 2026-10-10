@@ -1,7 +1,6 @@
-const User = require("@/model/user");
-const WalletTransaction = require("@/model/walletTransaction");
-const logger = require("@/utils/logger");
-
+import User from "@/model/user";
+import WalletTransaction from "@/model/walletTransaction";
+import logger from "@/utils/logger";
 const walletSpentOn = async (orderId) => {
   const tx = await WalletTransaction.findOne({
     order: orderId,
@@ -58,15 +57,12 @@ const spendFromWallet = async (userId, orderId, amount) => {
       }
     );
 
-    logger.error(
-      `[wallet] could not record spend for order ${orderId}: ${err}`
-    );
+    logger.error(`[wallet] could not record spend for order ${orderId}: ${err}`);
 
     throw err;
   }
 };
 
-/** Puts money back into the wallet (refund / failed checkout). Runs once per order. */
 const refundToWallet = async (userId, orderId, amount, note = "") => {
   if (!amount || amount <= 0) return 0;
 
@@ -81,8 +77,6 @@ const refundToWallet = async (userId, orderId, amount, note = "") => {
   return amount;
 };
 
-module.exports = {
-  walletSpentOn,
-  spendFromWallet,
-  refundToWallet,
-};
+export { walletSpentOn, spendFromWallet, refundToWallet };
+
+export default { walletSpentOn, spendFromWallet, refundToWallet };

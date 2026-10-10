@@ -27,7 +27,7 @@ const isVariantFilter = (filter: CategoryFilter) => VARIANT_SLUGS.includes(filte
 
 const flatten = (nodes: CategoryNode[] = [], depth = 0): CategoryOption[] =>
   nodes.flatMap((node) => [
-    { slug: node.slug, label: `${"— ".repeat(depth)}${node.title}` },
+    { slug: node.slug, label: `${"- ".repeat(depth)}${node.title}` },
     ...flatten(node.children, depth + 1),
   ]);
 

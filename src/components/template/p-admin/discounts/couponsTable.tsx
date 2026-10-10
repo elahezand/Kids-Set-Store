@@ -101,7 +101,7 @@ export default function CouponsTable({ initialPage, params, filters, limit }: Co
           <>
             <StatusTabs tabs={COUPON_TABS} value={filters.status} />
             <DateRangeFilter value={filters} label="Created" />
-            <SearchBox placeholder="Search codes…" />
+            <SearchBox placeholder="Search codes..." />
             <button type="button" onClick={() => setCreating(true)} className="btn btn-primary btn-sm">
               <LuPlus className="size-4" /> New code
             </button>

@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 const contactSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -59,4 +58,4 @@ contactSchema.index({ email: 1, createdAt: -1 });
 
 const Contact = mongoose.models.Contact || mongoose.model("Contact", contactSchema);
 
-module.exports = Contact
+export default Contact;

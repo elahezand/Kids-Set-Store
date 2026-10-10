@@ -30,7 +30,6 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
   const { control, register, getValues, setValue, formState } = form;
   const errors = formState.errors as FieldErrors<ProductFormValues>;
 
-  /** typed number field: no spinner arrows, no mouse-wheel changes, Persian digits allowed */
   const numberField = (name: `variants.${number}.${"price" | "discount" | "stock"}`, decimal = true) => {
     const field = register(name);
     return {
@@ -73,13 +72,8 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
 
   const bulkDefaults = () => ({ price: bulk.price, discount: bulk.discount || 0, stock: bulk.stock || 0 });
 
-  /** variants (by size|color key) that are no longer in the Sizes / Colors fields — kept until removed on purpose */
   const [extraKeys, setExtraKeys] = useState<string[]>([]);
 
-  /**
-   * Adds the missing sizes × colors rows. It never deletes: writing only "red" in Colors adds the red
-   * variants and keeps the blue ones with their price and stock. Removing is always explicit.
-   */
   const generate = () => {
     const pairs = combinations(getValues("sizes"), getValues("colors"));
     if (!pairs.length) {
@@ -102,7 +96,6 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
       }));
     if (added.length) variants.append(added, { shouldFocus: false });
 
-    // show every size & color the product really has in the two fields again
     const all = [...current, ...added];
     if (!sizesLocked) setValue("sizes", splitList(all.map((row) => row.size).join(",")).join(", "));
     setValue("colors", splitList(all.map((row) => row.color).join(",")).join(", "), { shouldDirty: true });
@@ -112,7 +105,7 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
     setNotice(
       added.length
         ? `${added.length} new variant${added.length === 1 ? "" : "s"} added, ${current.length} kept`
-        : "Nothing new — every size × color already has a variant"
+        : "Nothing new - every size × color already has a variant"
     );
   };
 
@@ -182,7 +175,7 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
                   })}
                 </div>
                 <p className="mt-1.5 flex items-center gap-1 text-xs text-gray-600">
-                  <LuLock className="size-3" /> Sizes of {categoryName || "the category"} — pick the ones you sell
+                  <LuLock className="size-3" /> Sizes of {categoryName || "the category"} - pick the ones you sell
                 </p>
               </div>
             ) : (
@@ -211,7 +204,7 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
               />
               <p className="field-hint">
                 Any color you like
-                {colorRule ? ` — suggested: ${colorRule.options.map((option) => option.label).join(", ")}` : ""}.
+                {colorRule ? ` - suggested: ${colorRule.options.map((option) => option.label).join(", ")}` : ""}.
               </p>
             </div>
           </div>
@@ -235,8 +228,8 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
           {extraKeys.length > 0 && (
             <div className="flex flex-wrap items-center gap-2 rounded-xl bg-sun-50 px-3 py-2 text-xs text-gray-800 sm:ml-[6.5rem] dark:bg-sun-500/10 dark:text-gray-300">
               <span>
-                {extraKeys.length} existing variant{extraKeys.length === 1 ? " is" : "s are"} not in the lists above
-                and {extraKeys.length === 1 ? "was" : "were"} kept.
+                {extraKeys.length} existing variant{extraKeys.length === 1 ? " is" : "s are"} not in the lists above and{" "}
+                {extraKeys.length === 1 ? "was" : "were"} kept.
               </span>
               <button type="button" onClick={removeExtras} className="btn btn-soft-danger btn-sm">
                 <LuTrash2 className="size-3.5" /> Remove {extraKeys.length === 1 ? "it" : "them"}
@@ -299,7 +292,7 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
                 {variants.fields.length === 0 && (
                   <tr>
                     <td colSpan={8} className="py-8 text-center text-sm text-gray-600">
-                      No variants yet — pick the sizes, write the colors and press{" "}
+                      No variants yet - pick the sizes, write the colors and press{" "}
                       <span className="font-medium text-gray-800 dark:text-gray-300">Generate variants</span>.
                     </td>
                   </tr>
@@ -375,7 +368,7 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
                       </td>
                       <td className="pt-5 whitespace-nowrap" aria-live="polite">
                         {final === null ? (
-                          <span className="text-gray-500">—</span>
+                          <span className="text-gray-500">-</span>
                         ) : (
                           <span
                             className={`font-semibold tabular-nums ${discounted ? "text-sage-700 dark:text-sage-300" : "text-gray-900 dark:text-gray-100"}`}

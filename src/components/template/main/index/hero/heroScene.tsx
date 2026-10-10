@@ -100,7 +100,6 @@ function Star({
   const world = useMemo(() => new Vector3(), []);
   const worldScale = useMemo(() => new Vector3(), []);
 
-  // the star that leaves on scroll: tell the scroll star where it is on screen, every frame
   useFrame(() => {
     const mesh = ref.current;
     if (!track || !mesh) return;
@@ -222,7 +221,6 @@ export default function HeroScene({ reducedMotion, compact }: HeroSceneProps) {
   const animate = !reducedMotion;
   const floatSpeed = animate ? 1.6 : 0;
 
-  // STARS[0] flies off to the section headers while scrolling (index/scrollStar)
   const [starAway, setStarAway] = useState(scrollStarStore.detached);
   useEffect(() => scrollStarStore.subscribe(setStarAway), []);
   useEffect(

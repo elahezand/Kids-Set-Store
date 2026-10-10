@@ -36,8 +36,7 @@ export const toEnvelope = (body, status = 200) => {
   return envelope;
 };
 
-export const respond = (body = {}, init = {}) =>
-  NextResponse.json(toEnvelope(body, init.status ?? 200), init);
+export const respond = (body = {}, init = {}) => NextResponse.json(toEnvelope(body, init.status ?? 200), init);
 
 export const ok = (data, { status = 200, message, meta } = {}) =>
   respond({ success: true, data, message, meta }, { status });
@@ -47,8 +46,7 @@ export const created = (data, message) => ok(data, { status: 201, message });
 export const paginated = (result, { meta, message } = {}) =>
   respond({ success: true, data: result?.data ?? [], pagination: result?.pagination, meta, message });
 
-export const jsonError = (message, status = 400, errors) =>
-  respond({ success: false, message, errors }, { status });
+export const jsonError = (message, status = 400, errors) => respond({ success: false, message, errors }, { status });
 
 export const fromService = (result, { status = 200, message } = {}) =>
   result?.success === false
@@ -70,7 +68,6 @@ export const formDataToObject = (formData, { skipEmpty = false } = {}) => {
   return result;
 };
 
-// errors: [{ field, message }] — showErrorToast on the client reads the same shape
 export const validationError = (errorsOrZodError) => {
   const errors = Array.isArray(errorsOrZodError)
     ? errorsOrZodError

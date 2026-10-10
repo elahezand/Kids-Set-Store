@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 const { Schema, Types } = mongoose;
 
 const CART_STATUS = Object.freeze({
@@ -43,14 +42,11 @@ const cartSchema = new Schema(
   }
 );
 
-cartSchema.index(
-  { user: 1 },
-  { unique: true, partialFilterExpression: { status: CART_STATUS.ACTIVE } }
-);
+cartSchema.index({ user: 1 }, { unique: true, partialFilterExpression: { status: CART_STATUS.ACTIVE } });
 cartSchema.index({ user: 1, status: 1 });
 cartSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const Cart = mongoose.models.Cart || mongoose.model("Cart", cartSchema);
 
-module.exports = Cart;
-module.exports.CART_STATUS = CART_STATUS;
+export default Cart;
+export { CART_STATUS };

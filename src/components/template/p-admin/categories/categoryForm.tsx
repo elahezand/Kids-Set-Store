@@ -24,9 +24,7 @@ type FormValues = z.infer<typeof schema>;
 
 interface CategoryFormProps {
   categories: AdminCategory[];
-  /** Editing this category; empty means create */
   category?: AdminCategory | null;
-  /** Pre-selected parent when adding a sub category */
   parentId?: Id | null;
   onClose: () => void;
 }
@@ -77,7 +75,7 @@ export default function CategoryForm({ categories, category, parentId, onClose }
             Cancel
           </button>
           <button type="submit" form="category-form" className="btn btn-primary" disabled={save.isPending}>
-            {save.isPending ? "Saving…" : editing ? "Save changes" : "Create category"}
+            {save.isPending ? "Saving..." : editing ? "Save changes" : "Create category"}
           </button>
         </>
       }
@@ -120,7 +118,7 @@ export default function CategoryForm({ categories, category, parentId, onClose }
             Parent
           </label>
           <select id="category-parent" {...register("parentId")} className="input">
-            <option value="">None — top-level category</option>
+            <option value="">None - top-level category</option>
             {parentOptions.map((row) => (
               <option key={row._id} value={row._id}>
                 {"\u00A0\u00A0".repeat(row.depth * 2)}

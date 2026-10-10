@@ -59,7 +59,7 @@ export default function StuckOrders({ orders, status }: StuckOrdersProps) {
             <p className="mt-0.5 max-w-2xl text-xs text-gray-700 dark:text-gray-500">{schedule}</p>
           </div>
           <button type="button" onClick={run} disabled={sweeps.isPending} className="btn btn-primary btn-sm">
-            <LuPlay className="size-4" /> {sweeps.isPending ? "Running…" : "Run checks now"}
+            <LuPlay className="size-4" /> {sweeps.isPending ? "Running..." : "Run checks now"}
           </button>
         </div>
         <div className="card-body grid gap-3 sm:grid-cols-3">
@@ -74,7 +74,10 @@ export default function StuckOrders({ orders, status }: StuckOrdersProps) {
             <p className="mt-1 text-xs text-gray-700 dark:text-gray-400">
               Cash on delivery, past due and unpaid. These never complete on their own.{" "}
               {status.overdueCash > 0 && (
-                <Link href={`${ROUTES.admin.orders}?status=overdue`} className="text-sage-700 hover:underline dark:text-sage-300">
+                <Link
+                  href={`${ROUTES.admin.orders}?status=overdue`}
+                  className="text-sage-700 hover:underline dark:text-sage-300"
+                >
                   Review them
                 </Link>
               )}
@@ -99,8 +102,8 @@ export default function StuckOrders({ orders, status }: StuckOrdersProps) {
           <div>
             <h2 className="card-title">Stuck orders</h2>
             <p className="mt-0.5 text-xs text-gray-700 dark:text-gray-500">
-              The payment went through but the order didn&apos;t finish: stock wasn&apos;t reserved and the
-              coupon wasn&apos;t counted. Repair finishes it.
+              The payment went through but the order didn&apos;t finish: stock wasn&apos;t reserved and the coupon
+              wasn&apos;t counted. Repair finishes it.
             </p>
           </div>
         </div>
@@ -173,9 +176,7 @@ export default function StuckOrders({ orders, status }: StuckOrdersProps) {
         confirmLabel="Repair"
         loading={repair.isPending}
         onClose={() => setRepairing(null)}
-        onConfirm={() =>
-          repairing && repair.mutate(String(repairing._id), { onSuccess: () => setRepairing(null) })
-        }
+        onConfirm={() => repairing && repair.mutate(String(repairing._id), { onSuccess: () => setRepairing(null) })}
       />
     </div>
   );

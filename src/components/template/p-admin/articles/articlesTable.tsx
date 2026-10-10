@@ -26,7 +26,7 @@ interface ArticlesTableProps {
 }
 
 const authorName = (article: AdminArticle) =>
-  article.author && typeof article.author === "object" ? article.author.username || article.author.name || "—" : "—";
+  article.author && typeof article.author === "object" ? article.author.username || article.author.name || "-" : "-";
 
 export default function ArticlesTable({ initialPage, params, filters, limit }: ArticlesTableProps) {
   const { items: articles, ...pager } = useAdminArticles(initialPage, params);
@@ -69,7 +69,7 @@ export default function ArticlesTable({ initialPage, params, filters, limit }: A
           <>
             <StatusTabs tabs={ARTICLE_TABS} value={filters.status} />
             <DateRangeFilter value={filters} label="Created" />
-            <SearchBox placeholder="Search titles…" />
+            <SearchBox placeholder="Search titles..." />
           </>
         }
         isEmpty={articles.length === 0}

@@ -11,7 +11,6 @@ import { PLACEHOLDER_IMAGE, ROUTES } from "@/utils/constants";
 import { formatPrice } from "@/utils/format";
 import type { ProductCardData } from "@/types";
 
-/* a soft pastel only behind the photo; the card itself stays white */
 const PHOTO_TINTS = [
   "bg-coral-50 dark:bg-coral-500/10",
   "bg-sky-50 dark:bg-sky-500/10",
@@ -43,7 +42,6 @@ export default function ProductCard({
   const { mutate: addToCart, isPending } = useAddToCart();
   const [justAdded, setJustAdded] = useState(false);
 
-  // after adding, the button says "Added" for a moment, then goes back
   useEffect(() => {
     if (!justAdded) return;
     const timer = setTimeout(() => setJustAdded(false), 1600);
@@ -68,10 +66,7 @@ export default function ProductCard({
       : "bg-sage-600 text-white hover:bg-sage-700";
 
   return (
-    <article
-      className="group relative flex h-full flex-col rounded-3xl bg-white p-2.5 ring-1 ring-gray-200/70 transition-shadow duration-300 hover:shadow-float sm:p-3 dark:bg-ink-800 dark:ring-white/5"
-    >
-      {/* the only color on the card: a soft pastel tile behind the photo */}
+    <article className="group relative flex h-full flex-col rounded-3xl bg-white p-2.5 ring-1 ring-gray-200/70 transition-shadow duration-300 hover:shadow-float sm:p-3 dark:bg-ink-800 dark:ring-white/5">
       <Link
         href={href}
         aria-label={name}
@@ -142,7 +137,7 @@ export default function ProductCard({
             aria-label={`Choose options for ${name}`}
           >
             <LuSlidersHorizontal className="size-4" />
-        options
+            options
           </Link>
         ) : (
           <button
@@ -155,12 +150,15 @@ export default function ProductCard({
             {justAdded ? (
               <LuCheck className="size-4" />
             ) : isPending ? (
-              <span className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent" aria-hidden="true" />
+              <span
+                className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent"
+                aria-hidden="true"
+              />
             ) : inStock ? (
               <LuShoppingCart className="size-4" />
             ) : null}
             <span aria-live="polite">
-              {!inStock ? "Sold out" : justAdded ? "Added" : isPending ? "Adding…" : "Add to cart"}
+              {!inStock ? "Sold out" : justAdded ? "Added" : isPending ? "Adding..." : "Add to cart"}
             </span>
           </button>
         )}

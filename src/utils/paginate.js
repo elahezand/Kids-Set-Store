@@ -1,13 +1,10 @@
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 const MAX_LIMIT = 99;
 const DEFAULT_LIMIT = 21;
 
-const getPath = (obj, path) =>
-  path.split(".").reduce((acc, key) => (acc == null ? acc : acc[key]), obj);
+const getPath = (obj, path) => path.split(".").reduce((acc, key) => (acc == null ? acc : acc[key]), obj);
 
-const encodeCursor = (values) =>
-  Buffer.from(JSON.stringify(values)).toString("base64url");
+const encodeCursor = (values) => Buffer.from(JSON.stringify(values)).toString("base64url");
 
 const toCursorValue = (value) => {
   if (value === null || value === undefined) return null;
@@ -38,15 +35,11 @@ const revive = (key, value) => {
 };
 
 const normalizeSort = (sort) => {
-  const entries = Object.entries(sort || {}).map(([key, dir]) => [
-    key,
-    Number(dir) === 1 || dir === "asc" ? 1 : -1,
-  ]);
+  const entries = Object.entries(sort || {}).map(([key, dir]) => [key, Number(dir) === 1 || dir === "asc" ? 1 : -1]);
   if (!entries.some(([key]) => key === "_id")) entries.push(["_id", -1]);
   return entries;
 };
 
-/* (a > x) OR (a = x AND b > y) OR ... */
 const buildCursorCondition = (sortEntries, values) => {
   const or = sortEntries.map(([key, dir], index) => {
     const condition = {};
@@ -62,14 +55,7 @@ const buildCursorCondition = (sortEntries, values) => {
 
 const paginate = async (
   Model,
-  {
-    limit,
-    cursor = null,
-    filters = {},
-    sort = { createdAt: -1 },
-    populate = null,
-    select = null,
-  } = {}
+  { limit, cursor = null, filters = {}, sort = { createdAt: -1 }, populate = null, select = null } = {}
 ) => {
   const safeLimit = Math.min(Math.max(Number(limit) || DEFAULT_LIMIT, 1), MAX_LIMIT);
   const sortEntries = normalizeSort(sort);
@@ -85,7 +71,6 @@ const paginate = async (
       const values = decoded.map((value, i) => revive(sortEntries[i][0], value));
       condition = buildCursorCondition(sortEntries, values);
     } else if (!decoded) {
-      // legacy cursor: value of the first sort key
       const [firstKey, firstDir] = sortEntries[0];
       condition = { [firstKey]: firstDir === 1 ? { $gt: cursor } : { $lt: cursor } };
     }
@@ -93,7 +78,9 @@ const paginate = async (
     if (condition) query.$and = [...(query.$and || []), condition];
   }
 
-  let dbQuery = Model.find(query).sort(sortObject).limit(safeLimit + 1);
+  let dbQuery = Model.find(query)
+    .sort(sortObject)
+    .limit(safeLimit + 1);
 
   if (select) dbQuery = dbQuery.select(select);
   if (populate) dbQuery = dbQuery.populate(populate);
@@ -105,9 +92,7 @@ const paginate = async (
   const last = data[data.length - 1];
 
   const nextCursor =
-    hasMore && last
-      ? encodeCursor(sortEntries.map(([key]) => toCursorValue(getPath(last, key))))
-      : null;
+    hasMore && last ? encodeCursor(sortEntries.map(([key]) => toCursorValue(getPath(last, key)))) : null;
 
   return {
     data,
@@ -119,6 +104,6 @@ const paginate = async (
   };
 };
 
-module.exports = paginate;
-module.exports.paginate = paginate;
-module.exports.default = paginate;
+export { paginate };
+
+export default paginate;

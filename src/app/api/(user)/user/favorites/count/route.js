@@ -4,21 +4,19 @@ import { authUser } from "@/utils/auth/authGuard";
 import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function GET() {
-    try {
-        await connectToDB();
+  try {
+    await connectToDB();
 
-        const user = await authUser();
+    const user = await authUser();
 
-        if (!user || user.status === "expired") {
-            return jsonError("Unauthorized", 401);
-        }
-
-        const result = await favoriteService.getFavoriteCount(
-            user._id
-        );
-
-        return respond(result);
-    } catch (error) {
-        return handleRouteError(error);
+    if (!user || user.status === "expired") {
+      return jsonError("Unauthorized", 401);
     }
+
+    const result = await favoriteService.getFavoriteCount(user._id);
+
+    return respond(result);
+  } catch (error) {
+    return handleRouteError(error);
+  }
 }

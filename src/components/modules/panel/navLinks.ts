@@ -28,7 +28,6 @@ export interface PanelLink {
   label: string;
   icon: IconType;
   exact?: boolean;
-  /** Group heading shown above this link in the sidebar (only when it changes) */
   section?: string;
 }
 

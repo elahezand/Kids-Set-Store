@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { dateRangeQuery } from "@/validators/_shared";
 
-const objectId = (message: string) => z.string().trim().regex(/^[a-f\d]{24}$/i, message);
+const objectId = (message: string) =>
+  z
+    .string()
+    .trim()
+    .regex(/^[a-f\d]{24}$/i, message);
 
 const title = z
   .string()
@@ -24,7 +28,6 @@ const excerpt = z
   .min(10, "Short description must be at least 10 characters")
   .max(500, "Short description must be at most 500 characters");
 
-// the rich editor always sends HTML: count the visible text only
 const content = z
   .string()
   .trim()

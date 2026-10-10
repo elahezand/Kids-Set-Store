@@ -4,23 +4,22 @@ import { authUser } from "@/utils/auth/authGuard";
 import { ticketReplySchema } from "@/validators/ticket";
 import { fromService, handleRouteError, jsonError, validationError } from "@/utils/apiResponse";
 
-// the admin panel uses this route too: an admin can reply to any ticket
 export async function POST(request, { params }) {
-    try {
-        await connectToDB();
+  try {
+    await connectToDB();
 
-        const user = await authUser();
-        if (!user || user.status === "expired") return jsonError("Unauthorized", 401);
+    const user = await authUser();
+    if (!user || user.status === "expired") return jsonError("Unauthorized", 401);
 
-        const { id } = await params;
-        const body = await request.json().catch(() => ({}));
+    const { id } = await params;
+    const body = await request.json().catch(() => ({}));
 
-        const parsed = ticketReplySchema.safeParse(body);
-        if (!parsed.success) return validationError(parsed.error);
+    const parsed = ticketReplySchema.safeParse(body);
+    if (!parsed.success) return validationError(parsed.error);
 
-        const result = await ticketService.createAnswer(id, user, parsed.data.content);
-        return fromService(result, { status: 201, message: "Reply sent" });
-    } catch (error) {
-        return handleRouteError(error);
-    }
+    const result = await ticketService.createAnswer(id, user, parsed.data.content);
+    return fromService(result, { status: 201, message: "Reply sent" });
+  } catch (error) {
+    return handleRouteError(error);
+  }
 }

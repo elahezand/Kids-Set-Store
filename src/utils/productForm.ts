@@ -38,7 +38,6 @@ export interface ProductFormOutput extends Omit<ProductFormValues, "tags" | "var
 
 const STATUSES: ProductStatus[] = ["draft", "active", "inactive"];
 
-/** same formula as the backend (utils/pricing) so the admin sees the price the customer pays */
 export const finalPriceOf = (price: number | string, discount: number | string) =>
   price === "" || price === null || price === undefined ? null : calcFinalPrice(Number(price), Number(discount) || 0);
 
@@ -145,7 +144,6 @@ export const buildProductPayload = (
   specs: Object.fromEntries(
     specFilters
       .map((filter) => [filter.slug, String(values.specs?.[filter.slug] ?? "").trim()] as const)
-      // an unticked yes/no filter is simply not stored (the shop filters on "true")
       .filter(([, value]) => value && value !== "false")
   ),
   ...(images ? { images } : {}),
@@ -203,10 +201,6 @@ export const totalStock = (product: Pick<AdminProduct, "variants">) =>
 const PERSIAN_DIGITS = "۰۱۲۳۴۵۶۷۸۹";
 const ARABIC_DIGITS = "٠١٢٣٤٥٦٧٨٩";
 
-/**
- * What the admin types -> a clean number string: Persian / Arabic digits become 0-9,
- * "٫" / "," become ".", anything else is dropped. `decimal: false` keeps whole numbers only.
- */
 export const cleanNumberInput = (raw: string, { decimal = true }: { decimal?: boolean } = {}) => {
   const latin = raw
     .replace(/[۰-۹]/g, (d) => String(PERSIAN_DIGITS.indexOf(d)))

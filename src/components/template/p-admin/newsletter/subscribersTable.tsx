@@ -49,7 +49,7 @@ export default function SubscribersTable({ initialPage, params, filters, limit }
       toolbar={
         <>
           <DateRangeFilter value={filters} label="Signed up" />
-          <SearchBox placeholder="Search emails…" />
+          <SearchBox placeholder="Search emails..." />
           <button
             type="button"
             onClick={copy}

@@ -302,7 +302,7 @@ const CartTable = ({ initialCart, addresses = [], defaultPhone = "", walletBalan
               >
                 {addresses.map((address, index) => (
                   <option key={index} value={index}>
-                    {address.name} — {address.city}
+                    {address.name} - {address.city}
                   </option>
                 ))}
               </select>

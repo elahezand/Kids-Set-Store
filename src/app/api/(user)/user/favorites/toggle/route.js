@@ -4,28 +4,25 @@ import { authUser } from "@/utils/auth/authGuard";
 import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function POST(request) {
-    try {
-        await connectToDB();
+  try {
+    await connectToDB();
 
-        const user = await authUser();
+    const user = await authUser();
 
-        if (!user || user.status === "expired") {
-            return jsonError("Unauthorized", 401);
-        }
-
-        const body = await request.json();
-
-        const result = await favoriteService.toggleFavorite(
-            user._id,
-            body.productId
-        );
-
-        if (!result.success) {
-            return jsonError(result.message, result.status);
-        }
-
-        return respond(result);
-    } catch (error) {
-        return handleRouteError(error);
+    if (!user || user.status === "expired") {
+      return jsonError("Unauthorized", 401);
     }
+
+    const body = await request.json();
+
+    const result = await favoriteService.toggleFavorite(user._id, body.productId);
+
+    if (!result.success) {
+      return jsonError(result.message, result.status);
+    }
+
+    return respond(result);
+  } catch (error) {
+    return handleRouteError(error);
+  }
 }

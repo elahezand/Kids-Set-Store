@@ -7,7 +7,6 @@ import { DATE_PRESETS, type DateFilters } from "@/utils/adminFilters";
 
 interface DateRangeFilterProps {
   value: DateFilters;
-  /** what the date means for this list, e.g. "Joined" or "Last activity" */
   label?: string;
 }
 
@@ -26,10 +25,6 @@ const daysAgo = (days: number) => {
   return dayString(date);
 };
 
-/**
- * Date filter for the admin tables: a quick preset (today, last 7/30/90 days) or a custom
- * from–to range. Everything lives in the URL (?preset= or ?from=&to=), like the tabs and search.
- */
 export default function DateRangeFilter({ value, label = "Date" }: DateRangeFilterProps) {
   const { update, isPending } = useQueryParams<string>();
   const hasRange = Boolean(value.from || value.to);
@@ -43,7 +38,6 @@ export default function DateRangeFilter({ value, label = "Date" }: DateRangeFilt
   const choose = (next: string) => {
     if (next === CUSTOM) {
       setCustom(true);
-      // the table reloads on every filter change, so a preset becomes the same range written out
       if (value.preset) update({ preset: null, from: daysAgo(PRESET_DAYS[value.preset] ?? 0), to: daysAgo(0) });
       return;
     }
@@ -88,7 +82,7 @@ export default function DateRangeFilter({ value, label = "Date" }: DateRangeFilt
               {preset.label}
             </option>
           ))}
-          <option value={CUSTOM}>Custom range…</option>
+          <option value={CUSTOM}>Custom range...</option>
         </select>
       </div>
 

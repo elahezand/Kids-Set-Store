@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { dateRangeQuery } from "@/validators/_shared";
 
-const objectId = (message: string) => z.string().trim().regex(/^[a-f\d]{24}$/i, message);
+const objectId = (message: string) =>
+  z
+    .string()
+    .trim()
+    .regex(/^[a-f\d]{24}$/i, message);
 
 const PRODUCT_STATUSES = ["draft", "active", "inactive"] as const;
 
@@ -11,7 +15,9 @@ export const CATEGORY_LOCKED_ATTRIBUTES = ["size"];
 
 const variantSchema = z.object({
   _id: objectId("Invalid variant").optional(),
-  attributes: z.record(z.string(), z.string()).refine((a) => Object.keys(a).length > 0, "Variant needs at least one attribute"),
+  attributes: z
+    .record(z.string(), z.string())
+    .refine((a) => Object.keys(a).length > 0, "Variant needs at least one attribute"),
   sku: z.string().trim().min(1, "SKU is required"),
   price: z.coerce.number({ message: "Variant price is required" }).min(0),
   discount: z.coerce.number().min(0).max(100).optional().default(0),
@@ -39,7 +45,13 @@ const productFields = {
 export const createProductSchema = z.object(productFields);
 
 const csv = z.preprocess(
-  (v) => (Array.isArray(v) ? v : String(v ?? "").split(",").map((s) => s.trim()).filter(Boolean)),
+  (v) =>
+    Array.isArray(v)
+      ? v
+      : String(v ?? "")
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
   z.array(z.string())
 );
 
@@ -65,12 +77,16 @@ export const productFormSchema = z
           color: z.string().trim().min(1, "Enter a color").max(50),
           sku: z.string().trim().max(60).optional(),
           price: money("Price"),
-          discount: z.preprocess((v) => (v === "" ? 0 : v), z.coerce.number().min(0, "0-100").max(100, "0-100")).default(0),
+          discount: z
+            .preprocess((v) => (v === "" ? 0 : v), z.coerce.number().min(0, "0-100").max(100, "0-100"))
+            .default(0),
           finalPrice: z.preprocess(
             (v) => (v === "" || v === null || v === undefined ? undefined : v),
             z.coerce.number({ message: "Must be a number" }).min(0, "Can't be negative").optional()
           ),
-          stock: z.preprocess((v) => (v === "" ? 0 : v), z.coerce.number().int("Whole number").min(0, "Can't be negative")).default(0),
+          stock: z
+            .preprocess((v) => (v === "" ? 0 : v), z.coerce.number().int("Whole number").min(0, "Can't be negative"))
+            .default(0),
         })
       )
       .min(1, "Generate the variants first (sizes × colors)")
@@ -87,12 +103,17 @@ export const productFormSchema = z
     const skus = new Set();
     data.variants.forEach((variant, i) => {
       const key = `${variant.size.toLowerCase()}|${variant.color.toLowerCase()}`;
-      if (seen.has(key)) ctx.addIssue({ code: "custom", message: "Same size & color as another variant", path: ["variants", i, "color"] });
+      if (seen.has(key))
+        ctx.addIssue({
+          code: "custom",
+          message: "Same size & color as another variant",
+          path: ["variants", i, "color"],
+        });
       seen.add(key);
 
-  
       const sku = variant.sku?.trim().toUpperCase();
-      if (sku && skus.has(sku)) ctx.addIssue({ code: "custom", message: "SKU already used", path: ["variants", i, "sku"] });
+      if (sku && skus.has(sku))
+        ctx.addIssue({ code: "custom", message: "SKU already used", path: ["variants", i, "sku"] });
       if (sku) skus.add(sku);
     });
   });
@@ -123,4 +144,3 @@ export const adminProductsQuerySchema = z
     ...dateRangeQuery,
   })
   .passthrough();
-

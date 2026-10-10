@@ -18,7 +18,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "SET KIDS | Kids Clothing Store",
-  description: "New arrivals, best sellers and stylish outfits for kids — shop online with fast delivery.",
+  description: "New arrivals, best sellers and stylish outfits for kids - shop online with fast delivery.",
   ...(SITE_URL && { alternates: { canonical: SITE_URL } }),
   openGraph: {
     title: "SET KIDS | Kids Clothing Store",

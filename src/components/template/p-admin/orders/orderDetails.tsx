@@ -69,7 +69,6 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
 
   const confirmAction = () => {
     if (confirm === "cancel") update.mutate({ id, status: "cancelled" });
-    // markDelivered completes the order and, for cash, marks it paid
     if (confirm === "cashComplete" || confirm === "complete") delivered.mutate(id);
   };
 
@@ -183,23 +182,23 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
             <p className="flex items-center gap-2 rounded-xl bg-gray-50 p-3 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-400">
               <LuX className="size-4 shrink-0" />
               {order.refundAmount
-                ? `Cancelled — ${formatPrice(order.refundAmount)} was refunded to the customer's wallet${
+                ? `Cancelled - ${formatPrice(order.refundAmount)} was refunded to the customer's wallet${
                     order.refundedAt ? ` on ${formatDate(order.refundedAt)}` : ""
                   }.`
-                : "Cancelled — nothing was paid, so there was nothing to refund."}
+                : "Cancelled - nothing was paid, so there was nothing to refund."}
             </p>
           )}
 
           {order.status === "created" && (
             <p className="flex items-center gap-2 rounded-xl bg-gray-50 p-3 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-400">
-              <LuClock className="size-4 shrink-0" /> Waiting for the payment — it can be shipped once it is processing.
+              <LuClock className="size-4 shrink-0" /> Waiting for the payment - it can be shipped once it is processing.
             </p>
           )}
 
           {autoCompletes && (
             <p className="flex items-center gap-2 rounded-xl bg-sage-50 p-3 text-sm text-sage-800 dark:bg-sage-500/10 dark:text-sage-300">
               <LuClock className="size-4 shrink-0" />
-              Paid online — completes when the customer confirms delivery
+              Paid online - completes when the customer confirms delivery
               {autoCompleteAt ? `, or by itself on ${formatDate(autoCompleteAt)}` : ""} (
               {order.expectedDeliveryAt
                 ? `${AUTO_COMPLETE_AFTER_ETA_DAYS} days after the expected delivery`
@@ -218,10 +217,10 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
             >
               <LuBanknote className="size-4 shrink-0" />
               {order.isCashOverdue
-                ? `Cash overdue${dueAt ? ` since ${formatDate(dueAt)}` : ""} — it should have arrived and is still unpaid.`
+                ? `Cash overdue${dueAt ? ` since ${formatDate(dueAt)}` : ""} - it should have arrived and is still unpaid.`
                 : `Cash on delivery${
                     order.isDelivered
-                      ? ` — the customer confirmed receipt${order.deliveredAt ? ` on ${formatDate(order.deliveredAt)}` : ""}`
+                      ? ` - the customer confirmed receipt${order.deliveredAt ? ` on ${formatDate(order.deliveredAt)}` : ""}`
                       : ""
                   }. Press "Cash received" once the courier has handed over the money${
                     dueAt ? ` (flagged overdue after ${formatDate(dueAt)})` : ""
@@ -324,7 +323,7 @@ function ShipForm({ onSubmit, onCancel, pending, label, hint }: ShipFormProps) {
         />
         <div className="flex gap-2">
           <button type="submit" disabled={pending} className="btn btn-primary btn-sm flex-1">
-            <LuTruck className="size-3.5" /> {pending ? "Saving…" : "Mark shipped"}
+            <LuTruck className="size-3.5" /> {pending ? "Saving..." : "Mark shipped"}
           </button>
           <button type="button" onClick={onCancel} className="btn btn-ghost btn-sm btn-icon" aria-label="Cancel">
             <LuX className="size-4" />

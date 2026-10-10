@@ -15,7 +15,6 @@ import { formatDate } from "@/utils/format";
 import { COMMENT_STATUS as STATUS, COMMENT_TABS } from "@/utils/panelView";
 import type { CommentStatusFilter, MyComment, Paginated } from "@/types";
 
-// customers see "spam" as a normal rejection
 const statusOf = (comment: MyComment) =>
   STATUS[comment.status === "spam" ? "rejected" : comment.status] ?? STATUS.pending;
 

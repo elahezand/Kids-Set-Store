@@ -15,7 +15,6 @@ const childrenMap = (categories: AdminCategory[]) => {
   return map;
 };
 
-/** Parents first, each followed by its children (depth-first), so the list reads like a tree */
 export const toCategoryRows = (categories: AdminCategory[]): CategoryRow[] => {
   const map = childrenMap(categories);
   const rows: CategoryRow[] = [];
@@ -34,7 +33,6 @@ export const toCategoryRows = (categories: AdminCategory[]): CategoryRow[] => {
   return rows;
 };
 
-/** The category itself and everything under it — none of these can become its parent */
 export const selfAndDescendants = (categories: AdminCategory[], id: Id): Set<Id> => {
   const map = childrenMap(categories);
   const result = new Set<Id>([id]);

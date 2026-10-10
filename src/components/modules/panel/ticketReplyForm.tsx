@@ -32,7 +32,7 @@ export default function TicketReplyForm({ ticketID }: TicketReplyFormProps) {
         id="ticket-reply"
         value={content}
         onChange={(event) => setContent(event.target.value)}
-        placeholder="Write your reply here…"
+        placeholder="Write your reply here..."
         rows={4}
         maxLength={5000}
         className="input"
@@ -40,7 +40,7 @@ export default function TicketReplyForm({ ticketID }: TicketReplyFormProps) {
       <div className="mt-3 flex justify-end">
         <button type="submit" className="btn btn-primary w-full sm:w-auto" disabled={isPending}>
           <LuSend className="size-4" />
-          {isPending ? "Sending…" : "Send reply"}
+          {isPending ? "Sending..." : "Send reply"}
         </button>
       </div>
     </form>

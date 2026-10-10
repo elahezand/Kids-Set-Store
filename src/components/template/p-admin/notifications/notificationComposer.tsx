@@ -12,9 +12,7 @@ interface NotificationComposerProps {
   admins: AdminAccount[];
   currentUserId: Id;
   initialRecipients?: Id[];
-  /** Form id, so a modal footer can hold the submit button */
   formId?: string;
-  /** Hide the built-in submit button (a modal footer has one) */
   hideSubmit?: boolean;
   onSent?: () => void;
   onStateChange?: (state: { sending: boolean; canSend: boolean }) => void;
@@ -167,7 +165,7 @@ export default function NotificationComposer({
         <div className="flex justify-end">
           <button type="submit" disabled={!ready || sending} className="btn btn-primary">
             <LuSend className="size-4" />
-            {sending ? "Sending…" : recipients.size > 1 ? `Send to ${recipients.size} admins` : "Send notification"}
+            {sending ? "Sending..." : recipients.size > 1 ? `Send to ${recipients.size} admins` : "Send notification"}
           </button>
         </div>
       )}

@@ -81,7 +81,7 @@ export const useUpdateOrder = ({ onDone }: { onDone?: () => void } = {}) => {
       const message =
         order?.status === "cancelled"
           ? order.refundAmount
-            ? `Order cancelled — ${formatPrice(order.refundAmount)} refunded to the customer's wallet (see the Cancelled tab)`
+            ? `Order cancelled - ${formatPrice(order.refundAmount)} refunded to the customer's wallet (see the Cancelled tab)`
             : "Order cancelled (see the Cancelled tab)"
           : "Order updated";
       afterChange(message, queryKeys.admin.orders());
@@ -95,7 +95,7 @@ export const useShipOrder = ({ onDone }: { onDone?: () => void } = {}) => {
   return usePatch<ApiSuccess<AdminOrder>, ShipOrderPayload>(({ orderId }) => `/admin/order/${orderId}/ship`, {
     errorFallback: "Could not mark the order as shipped",
     onSuccess: () => {
-      afterChange("Order shipped — the customer was notified", queryKeys.admin.orders());
+      afterChange("Order shipped - the customer was notified", queryKeys.admin.orders());
       onDone?.();
     },
   });
@@ -286,8 +286,6 @@ export const useDeleteCoupon = () => {
   });
 };
 
-/* ---------- categories ---------- */
-
 export const useSaveCategory = (categoryId?: Id, { onDone }: { onDone?: () => void } = {}) => {
   const afterChange = useAfterChange();
   const done = (message: string) => () => {
@@ -313,8 +311,6 @@ export const useDeleteCategory = () => {
   });
 };
 
-/* ---------- ticket departments ---------- */
-
 export const useSaveDepartment = (departmentId?: Id, { onDone }: { onDone?: () => void } = {}) => {
   const afterChange = useAfterChange();
   const done = (message: string) => () => {
@@ -332,7 +328,6 @@ export const useSaveDepartment = (departmentId?: Id, { onDone }: { onDone?: () =
   return departmentId ? update : create;
 };
 
-/** Quick on/off and reorder from the list, without opening the form */
 export const useUpdateDepartment = () => {
   const afterChange = useAfterChange();
   return usePut<ApiSuccess, WithId<Partial<DepartmentPayload>>>(({ id }) => `/admin/departments/${id}`, {
@@ -370,8 +365,6 @@ export const useDeleteTopic = () => {
   });
 };
 
-/* ---------- contact messages ---------- */
-
 export const useAdminContacts = (initialPage: Paginated<ContactMessage>, params: AdminListParams) =>
   useCursorList("/admin/contacts", queryKeys.admin.contacts(params), params, initialPage, "Could not load messages");
 
@@ -394,8 +387,6 @@ export const useDeleteContact = () => {
   });
 };
 
-/* ---------- newsletter ---------- */
-
 export const useAdminNewsletter = (initialPage: Paginated<NewsletterSubscriber>, params: AdminListParams) =>
   useCursorList(
     "/admin/newsletter",
@@ -404,8 +395,6 @@ export const useAdminNewsletter = (initialPage: Paginated<NewsletterSubscriber>,
     initialPage,
     "Could not load subscribers"
   );
-
-/* ---------- carts ---------- */
 
 export const useAdminCarts = (initialPage: Paginated<AdminCart>, params: AdminListParams) =>
   useCursorList("/admin/cart", queryKeys.admin.carts(params), params, initialPage, "Could not load carts");
@@ -429,30 +418,24 @@ export const useDeleteCart = ({ onDone }: { onDone?: () => void } = {}) => {
   });
 };
 
-/* ---------- notifications ---------- */
-
 export const useSendNotification = () =>
   usePost<ApiSuccess, NotificationPayload>("/admin/notification", {
     errorFallback: "Could not send the notification",
   });
 
-/* ---------- site info ---------- */
-
 export const useSaveSiteInfo = () => {
   const afterChange = useAfterChange();
   return usePut<ApiSuccess<SiteInfo>, SiteInfo>("/admin/info", {
     errorFallback: "Could not save the site info",
-    onSuccess: () => afterChange("Site info saved — the store shows it right away"),
+    onSuccess: () => afterChange("Site info saved - the store shows it right away"),
   });
 };
-
-/* ---------- order maintenance ---------- */
 
 export const useRepairOrder = () => {
   const afterChange = useAfterChange();
   return usePost<ApiSuccess, Id>((id) => `/admin/order/${id}/repair`, {
     errorFallback: "Could not repair the order",
-    onSuccess: () => afterChange("Order repaired — stock reserved and order finalized", queryKeys.admin.orders()),
+    onSuccess: () => afterChange("Order repaired - stock reserved and order finalized", queryKeys.admin.orders()),
   });
 };
 

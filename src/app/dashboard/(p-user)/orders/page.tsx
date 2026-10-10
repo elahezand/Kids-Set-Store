@@ -25,7 +25,6 @@ export default async function OrdersPage({ searchParams }: PageProps) {
       limit: LIMIT,
       ...(status !== "all" && { status }),
     }),
-    // shipped orders always show on top, whatever tab is open
     orderService.getMyOrders(user._id, { limit: 20, status: "shipped" }),
   ]);
   const result = list as { data: OrderListItem[]; pagination: Pagination };

@@ -69,7 +69,6 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
       </>
     );
 
-  /* paid online and shipped: only the customer's "I received it" (or the auto-complete) is left */
   const waitingBadge = (order: AdminOrder) => {
     if (order.status !== "shipped" || order.paymentStatus !== "paid") return null;
     const autoAt = autoCompleteDate(order);
@@ -117,7 +116,7 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
           <>
             <StatusTabs tabs={ADMIN_ORDER_TABS} value={filters.status} />
             <DateRangeFilter value={filters} label="Placed" />
-            <SearchBox placeholder="Search order number…" />
+            <SearchBox placeholder="Search order number..." />
           </>
         }
         isEmpty={orders.length === 0}
@@ -195,7 +194,7 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
                       <div className="flex flex-wrap items-center gap-1.5">
                         <span className={`badge ${status.badge}`}>{status.label}</span>
                         {cashBadges(order)}
-                    {waitingBadge(order)}
+                        {waitingBadge(order)}
                       </div>
                     </td>
                     <td className="text-right font-semibold whitespace-nowrap tabular-nums">

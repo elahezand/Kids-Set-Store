@@ -1,95 +1,92 @@
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 const ticketSchema = new mongoose.Schema(
-    {
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-            index: true,
-        },
-
-        department: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Department",
-            required: true,
-        },
-
-        subDepartment: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "SubDepartment",
-            required: true,
-        },
-
-        priority: {
-            type: Number,
-            required: true,
-            min: 1,
-            max: 3,
-        },
-
-        title: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-
-        content: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-
-        parent: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Ticket",
-            default: null,
-            index: true,
-        },
-
-        isAnswer: {
-            type: Boolean,
-            default: false,
-        },
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
     },
-    {
-        timestamps: true,
 
-        toObject: {
-            virtuals: true,
-        },
+    department: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department",
+      required: true,
+    },
 
-        toJSON: {
-            virtuals: true,
+    subDepartment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubDepartment",
+      required: true,
+    },
 
-            transform(doc, ret) {
-                ret.id = ret._id.toString();
+    priority: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 3,
+    },
 
-                delete ret._id;
-                delete ret.__v;
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-                return ret;
-            },
-        },
-    }
+    content: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    parent: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Ticket",
+      default: null,
+      index: true,
+    },
+
+    isAnswer: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    timestamps: true,
+
+    toObject: {
+      virtuals: true,
+    },
+
+    toJSON: {
+      virtuals: true,
+
+      transform(doc, ret) {
+        ret.id = ret._id.toString();
+
+        delete ret._id;
+        delete ret.__v;
+
+        return ret;
+      },
+    },
+  }
 );
 
 ticketSchema.index({ user: 1, createdAt: -1 });
 
 ticketSchema.index({
-    department: 1,
-    subDepartment: 1,
+  department: 1,
+  subDepartment: 1,
 });
 
 ticketSchema.index({
-    parent: 1,
-    createdAt: 1,
+  parent: 1,
+  createdAt: 1,
 });
 
 ticketSchema.index({ createdAt: -1 });
 
-const ticketModel =
-    mongoose.models.Ticket ||
-    mongoose.model("Ticket", ticketSchema);
+const ticketModel = mongoose.models.Ticket || mongoose.model("Ticket", ticketSchema);
 
-module.exports = ticketModel;
+export default ticketModel;

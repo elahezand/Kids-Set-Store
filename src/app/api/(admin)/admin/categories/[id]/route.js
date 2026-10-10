@@ -13,69 +13,42 @@ export async function PUT(req, { params }) {
     const admin = await authAdmin();
 
     if (!admin || admin.status === "expired") {
-      return jsonError(
-        "Admin access required",
-        401
-      );
+      return jsonError("Admin access required", 401);
     }
 
     const { id } = await params;
 
     if (!validateObjectId(id)) {
-      return jsonError(
-        "Category not found",
-        404
-      );
+      return jsonError("Category not found", 404);
     }
 
-    const body = await req.json().catch(
-      () => null
-    );
+    const body = await req.json().catch(() => null);
 
     if (!body) {
-      return jsonError(
-        "Invalid JSON body",
-        400
-      );
+      return jsonError("Invalid JSON body", 400);
     }
 
-    const result = validate(
-      updateCategorySchema,
-      body
-    );
+    const result = validate(updateCategorySchema, body);
 
     if (!result.success) {
-      return validationError(
-        result.errors
-      );
+      return validationError(result.errors);
     }
 
-    const serviceResult =
-      await categoryService.updateCategory(
-        id,
-        result.data
-      );
+    const serviceResult = await categoryService.updateCategory(id, result.data);
 
     if (!serviceResult.success) {
-      return jsonError(
-        serviceResult.message,
-        serviceResult.status
-      );
+      return jsonError(serviceResult.message, serviceResult.status);
     }
 
     return respond(
       {
-        message:
-          "Category updated successfully",
+        message: "Category updated successfully",
         data: serviceResult.data,
       },
       { status: 200 }
     );
   } catch (err) {
-    return handleRouteError(
-      err,
-      "PUT /api/admin/categories/:id"
-    );
+    return handleRouteError(err, "PUT /api/admin/categories/:id");
   }
 }
 

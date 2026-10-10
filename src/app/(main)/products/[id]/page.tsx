@@ -82,7 +82,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     },
   };
 
-   return (
+  return (
     <div className="page-container">
       <script
         type="application/ld+json"
@@ -97,10 +97,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       >
         <ProductContent product={view} commentsCount={commentsCount} isFavorited={isFavorited} />
 
-        <section
-          id="comments"
-          className="scroll-mt-28 border-t border-gray-200 pt-12 sm:pt-16 dark:border-white/10"
-        >
+        <section id="comments" className="scroll-mt-28 border-t border-gray-200 pt-12 sm:pt-16 dark:border-white/10">
           <Comments productId={view._id} total={commentsCount} isLoggedIn={Boolean(user)} />
         </section>
 

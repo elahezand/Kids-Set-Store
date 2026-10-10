@@ -21,7 +21,6 @@ export interface DateFilters {
 export interface AdminFilters<T extends string> extends DateFilters {
   status: T | "all";
   q: string;
-  /** products only: id of a category (its sub-categories are included) */
   category: string;
 }
 
@@ -33,7 +32,6 @@ const readDay = (params: SearchParams, key: string) => {
   return DAY.test(value) && !Number.isNaN(new Date(value).getTime()) ? value : "";
 };
 
-/** ?preset wins over a custom range; a reversed range (from after to) is swapped */
 export const readDateFilters = (params: SearchParams): DateFilters => {
   const preset = DATE_PRESETS.find((item) => item.value === firstParam(params.preset))?.value ?? "";
   if (preset) return { preset, from: "", to: "" };
@@ -68,10 +66,6 @@ const tab = <T extends string>(value: T | "all") => (value === "all" ? undefined
 
 const dates = ({ preset, from, to }: DateFilters) => ({ preset, from, to });
 
-/**
- * Tab + search -> API params, one function per list. The server page and the client list use the
- * same object, so the first page rendered on the server matches the pages loaded by "Load more".
- */
 export const adminListParams = {
   orders: (limit: number, filters: AdminFilters<string>) => {
     const { status, q } = filters;
@@ -115,10 +109,8 @@ export const adminListParams = {
 export const filtersKey = ({ status, q, category, preset, from, to }: AdminFilters<string>) =>
   [status, q, category, preset, from, to].join("|");
 
-/** true when anything narrows the list — the empty state then says "nothing matches" */
 export const isFiltered = ({ q, category, preset, from, to }: AdminFilters<string>) =>
   Boolean(q || category || preset || from || to);
 
-/** Empty-state text when filters hide everything, or null when the list is simply empty */
 export const filteredEmptyText = (filters: AdminFilters<string>) =>
   filters.q ? `Nothing matches "${filters.q}".` : isFiltered(filters) ? "Nothing matches these filters." : null;

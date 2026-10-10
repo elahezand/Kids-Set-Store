@@ -12,33 +12,27 @@ const TINTS = [
   { bg: "bg-sage-50 dark:bg-sage-500/10", motif: "text-sage-200 dark:text-sage-500/30", letter: "text-sage-500" },
 ];
 
-// Decorative patterns drawn in a 64x64 box; each uses currentColor so the tint controls it.
 const MOTIFS: ReactNode[] = [
-  // Concentric rings
   <g key="rings" fill="none" stroke="currentColor" strokeWidth="4">
     <circle cx="32" cy="32" r="38" />
     <circle cx="32" cy="32" r="28" />
     <circle cx="32" cy="32" r="18" />
   </g>,
-  // Dot grid
   <g key="dots" fill="currentColor">
     {Array.from({ length: 25 }, (_, i) => (
       <circle key={i} cx={8 + (i % 5) * 12} cy={8 + Math.floor(i / 5) * 12} r="2.5" />
     ))}
   </g>,
-  // Waves
   <g key="waves" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
     {[18, 32, 46].map((y) => (
       <path key={y} d={`M-4 ${y} Q4 ${y - 7} 12 ${y} T28 ${y} T44 ${y} T60 ${y} T76 ${y}`} />
     ))}
   </g>,
-  // Petals
   <g key="petals" fill="currentColor">
     {Array.from({ length: 6 }, (_, i) => (
       <ellipse key={i} cx="32" cy="15" rx="7" ry="13" transform={`rotate(${i * 60} 32 32)`} />
     ))}
   </g>,
-  // Diagonal stripes
   <g key="stripes" stroke="currentColor" strokeWidth="4">
     {Array.from({ length: 9 }, (_, i) => (
       <line key={i} x1={-32 + i * 12} y1="64" x2={i * 12} y2="0" />
@@ -46,11 +40,9 @@ const MOTIFS: ReactNode[] = [
   </g>,
 ];
 
-// Organic background shape behind the grid
 const BLOB_PATH =
   "M120 60 C220 0 380 30 470 20 C590 8 720 40 770 130 C820 220 760 330 650 360 C540 390 430 350 320 370 C200 392 70 360 35 260 C0 160 40 100 120 60 Z";
 
-// Four-point sparkle, drawn in a 24x24 box
 const SPARKLE_PATH = "M12 0 C13 7 17 11 24 12 C17 13 13 17 12 24 C11 17 7 13 0 12 C7 11 11 7 12 0 Z";
 
 const SPARKLES = [
@@ -78,7 +70,6 @@ export default function Categories({ categories = [] }: { categories?: CategoryN
       />
 
       <div className="relative mx-auto  px-4 py-12 sm:px-10 sm:py-16">
-        {/* Layered background shape */}
         <svg
           aria-hidden="true"
           viewBox="0 0 800 400"
@@ -92,15 +83,12 @@ export default function Categories({ categories = [] }: { categories?: CategoryN
             </linearGradient>
           </defs>
 
-          {/* Soft offset shadow shape */}
           <path
             d={BLOB_PATH}
             transform="rotate(4 400 200) translate(14 10)"
             className="fill-sky-50 dark:fill-sky-500/5"
           />
-          {/* Main shape */}
           <path d={BLOB_PATH} fill="url(#categories-blob-fill)" />
-          {/* Stitched outline */}
           <path
             d={BLOB_PATH}
             fill="none"
@@ -113,7 +101,6 @@ export default function Categories({ categories = [] }: { categories?: CategoryN
           />
         </svg>
 
-        {/* Sparkles, kept outside the stretched SVG so they stay crisp */}
         {SPARKLES.map((sparkle, i) => (
           <svg
             key={i}

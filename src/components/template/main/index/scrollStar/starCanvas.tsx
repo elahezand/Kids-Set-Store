@@ -36,7 +36,6 @@ function SpinningStar({ spin }: { spin: SpinRef }) {
 export default function StarCanvas({ spin }: { spin: SpinRef }) {
   return (
     <Canvas
-      // the wrapper is scaled with a CSS transform: measure the layout size, not the transformed box
       resize={{ offsetSize: true }}
       dpr={[1, 2]}
       camera={{ position: [0, 0, 3], fov: 40 }}

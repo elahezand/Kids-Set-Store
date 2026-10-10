@@ -6,22 +6,22 @@ import { adminCommentsQuerySchema } from "@/validators/comment";
 import { handleRouteError, jsonError, paginated, validationError } from "@/utils/apiResponse";
 
 export async function GET(req) {
-    try {
-        await connectToDB();
+  try {
+    await connectToDB();
 
-        const admin = await authAdmin();
+    const admin = await authAdmin();
 
-        if (!admin || admin.status === "expired") {
-            return jsonError("Admin access required", 401);
-        }
-
-        const { searchParams } = new URL(req.url);
-        const result = validate(adminCommentsQuerySchema, Object.fromEntries(searchParams.entries()));
-
-        if (!result.success) return validationError(result.errors);
-
-        return paginated(await commentService.getAdmin(result.data));
-    } catch (err) {
-        return handleRouteError(err, "GET /api/admin/comments");
+    if (!admin || admin.status === "expired") {
+      return jsonError("Admin access required", 401);
     }
+
+    const { searchParams } = new URL(req.url);
+    const result = validate(adminCommentsQuerySchema, Object.fromEntries(searchParams.entries()));
+
+    if (!result.success) return validationError(result.errors);
+
+    return paginated(await commentService.getAdmin(result.data));
+  } catch (err) {
+    return handleRouteError(err, "GET /api/admin/comments");
+  }
 }

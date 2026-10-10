@@ -101,7 +101,7 @@ export default function ProductsTable({ initialPage, params, filters, limit, cat
             <StatusTabs tabs={PRODUCT_TABS} value={filters.status} />
             <CategoryFilter categories={categories} value={filters.category} />
             <DateRangeFilter value={filters} label="Added" />
-            <SearchBox placeholder="Search products…" />
+            <SearchBox placeholder="Search products..." />
             <Link href={ROUTES.admin.newProduct} className="btn btn-primary btn-sm">
               <LuPlus className="size-4" /> New product
             </Link>

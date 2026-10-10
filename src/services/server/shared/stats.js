@@ -1,4 +1,3 @@
-
 function getStartOfToday() {
   const now = new Date();
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
@@ -33,7 +32,6 @@ async function countByDay(Model, days, extraMatch = {}, dateField = "createdAt")
   return buildDayBuckets(days).map((day) => ({ day, count: map.get(day) || 0 }));
 }
 
-module.exports = {
-  buildDayBuckets,
-  countByDay,
-};
+export { buildDayBuckets, countByDay };
+
+export default { buildDayBuckets, countByDay };

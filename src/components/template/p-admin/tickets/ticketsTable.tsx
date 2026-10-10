@@ -36,7 +36,7 @@ export default function TicketsTable({ initialPage, params, filters, limit }: Ti
         <>
           <StatusTabs tabs={TICKET_TABS} value={filters.status} />
           <DateRangeFilter value={filters} label="Opened" />
-          <SearchBox placeholder="Search subjects…" />
+          <SearchBox placeholder="Search subjects..." />
         </>
       }
       isEmpty={tickets.length === 0}

@@ -22,10 +22,7 @@ export const createDepartmentSchema = z.object({
 
 export const updateDepartmentSchema = createDepartmentSchema
   .partial()
-  .refine(
-    (data) => Object.values(data).some((value) => value !== undefined),
-    "Nothing to update"
-  );
+  .refine((data) => Object.values(data).some((value) => value !== undefined), "Nothing to update");
 
 const subTitle = z
   .string()

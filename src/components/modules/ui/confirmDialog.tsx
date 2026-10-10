@@ -42,7 +42,7 @@ export default function ConfirmDialog({
             disabled={loading}
             className={`btn ${danger ? "btn-soft-danger" : "btn-primary"}`}
           >
-            {loading ? "Please wait…" : confirmLabel}
+            {loading ? "Please wait..." : confirmLabel}
           </button>
         </>
       }

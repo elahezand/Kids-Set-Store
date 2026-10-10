@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const { Schema, Types } = mongoose;
 
 const commentSchema = new Schema(
@@ -43,19 +43,13 @@ const commentSchema = new Schema(
     pros: {
       type: [String],
       default: [],
-      set: (arr) =>
-        Array.isArray(arr)
-          ? [...new Set(arr.map((v) => String(v).trim()).filter(Boolean))]
-          : [],
+      set: (arr) => (Array.isArray(arr) ? [...new Set(arr.map((v) => String(v).trim()).filter(Boolean))] : []),
     },
 
     cons: {
       type: [String],
       default: [],
-      set: (arr) =>
-        Array.isArray(arr)
-          ? [...new Set(arr.map((v) => String(v).trim()).filter(Boolean))]
-          : [],
+      set: (arr) => (Array.isArray(arr) ? [...new Set(arr.map((v) => String(v).trim()).filter(Boolean))] : []),
     },
 
     recommendation: {
@@ -178,4 +172,4 @@ commentSchema.post("updateOne", async function () {
 
 const Comment = mongoose.models.Comment || mongoose.model("Comment", commentSchema);
 Comment.syncProductScore = syncProductScore;
-module.exports = Comment;
+export default Comment;

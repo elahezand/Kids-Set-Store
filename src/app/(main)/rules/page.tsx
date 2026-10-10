@@ -113,7 +113,10 @@ export default async function RulesPage() {
             <h2 className="font-bold">Questions?</h2>
             <p className="mt-1 text-sm leading-7 text-gray-700 dark:text-gray-400">
               We answer during business hours. Write to us from the{" "}
-              <Link href={ROUTES.contact} className="font-medium text-sage-700 underline-offset-4 hover:underline dark:text-sage-300">
+              <Link
+                href={ROUTES.contact}
+                className="font-medium text-sage-700 underline-offset-4 hover:underline dark:text-sage-300"
+              >
                 contact page
               </Link>{" "}
               or reach us directly:

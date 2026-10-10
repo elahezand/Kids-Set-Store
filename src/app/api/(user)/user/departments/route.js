@@ -4,14 +4,14 @@ import { authUser } from "@/utils/auth/authGuard";
 import { fromService, handleRouteError, jsonError } from "@/utils/apiResponse";
 
 export async function GET() {
-    try {
-        await connectToDB();
+  try {
+    await connectToDB();
 
-        const user = await authUser();
-        if (!user || user.status === "expired") return jsonError("Unauthorized", 401);
+    const user = await authUser();
+    if (!user || user.status === "expired") return jsonError("Unauthorized", 401);
 
-        return fromService(await ticketService.getDepartments());
-    } catch (error) {
-        return handleRouteError(error);
-    }
+    return fromService(await ticketService.getDepartments());
+  } catch (error) {
+    return handleRouteError(error);
+  }
 }

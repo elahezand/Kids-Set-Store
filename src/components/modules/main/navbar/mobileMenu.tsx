@@ -81,7 +81,11 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
         }`}
       >
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-200 px-5 py-4 dark:border-white/10">
-          <Link href={ROUTES.home} className="flex items-center text-xl font-bold text-sage-600 dark:text-sage-300" aria-label="Home">
+          <Link
+            href={ROUTES.home}
+            className="flex items-center text-xl font-bold text-sage-600 dark:text-sage-300"
+            aria-label="Home"
+          >
             <SiteLogo src={logo} className="h-9 w-auto max-w-[140px]" />
           </Link>
 

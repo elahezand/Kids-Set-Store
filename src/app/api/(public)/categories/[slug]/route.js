@@ -3,22 +3,22 @@ import categoryService from "@/services/server/public/category";
 import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function GET(request, { params }) {
-    try {
-        await connectToDB();
+  try {
+    await connectToDB();
 
-        const { slug } = await params;
+    const { slug } = await params;
 
-        const data = await categoryService.getCategoryBySlug(slug);
+    const data = await categoryService.getCategoryBySlug(slug);
 
-        if (!data) {
-            return jsonError("Category not found", 404);
-        }
-
-        return respond({
-            success: true,
-            data,
-        });
-    } catch (error) {
-        return handleRouteError(error);
+    if (!data) {
+      return jsonError("Category not found", 404);
     }
+
+    return respond({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    return handleRouteError(error);
+  }
 }

@@ -10,44 +10,37 @@ import { handleRouteError, jsonError, validationError, respond } from "@/utils/a
 import { createNotificationSchema } from "@/validators/notification";
 
 export async function POST(request) {
-    try {
-        await connectToDB();
+  try {
+    await connectToDB();
 
-        const admin = await authAdmin();
+    const admin = await authAdmin();
 
-        if (!admin || admin.status === "expired") {
-            return jsonError("Unauthorized", 401);
-        }
-
-        const body = await request.json();
-
-        const result = validate(
-            createNotificationSchema,
-            body
-        );
-
-        if (!result.success) {
-            return validationError(result.errors);
-        }
-
-        const serviceResult =
-            await notificationService.create(result.data);
-
-        if (!serviceResult.success) {
-            return jsonError(
-                serviceResult.message,
-                serviceResult.status
-            );
-        }
-
-        return respond(
-            {
-                message: "Notification created successfully",
-                data: serviceResult.data,
-            },
-            { status: 201 }
-        );
-    } catch (error) {
-        return handleRouteError(error);
+    if (!admin || admin.status === "expired") {
+      return jsonError("Unauthorized", 401);
     }
+
+    const body = await request.json();
+
+    const result = validate(createNotificationSchema, body);
+
+    if (!result.success) {
+      return validationError(result.errors);
+    }
+
+    const serviceResult = await notificationService.create(result.data);
+
+    if (!serviceResult.success) {
+      return jsonError(serviceResult.message, serviceResult.status);
+    }
+
+    return respond(
+      {
+        message: "Notification created successfully",
+        data: serviceResult.data,
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    return handleRouteError(error);
+  }
 }

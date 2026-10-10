@@ -8,7 +8,6 @@ import { formatPrice } from "@/utils/format";
 const RANGES = [7, 30, 90] as const;
 type Range = (typeof RANGES)[number];
 
-// brand colors from @theme in globals.css (recharts needs real values, not classes)
 const SAGE = "#127068";
 const CORAL = "#ff7a68";
 const GRID = "rgba(140,140,140,0.18)";

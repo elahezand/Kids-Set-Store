@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const { Schema, Types } = mongoose;
-const { notifyUser, orderStatusMessage, NOTIFY_LINKS } = require("@/utils/notify");
+import { notifyUser, orderStatusMessage, NOTIFY_LINKS } from "@/utils/notify";
 const orderItemSchema = new Schema({
   productId: { type: Types.ObjectId, ref: "Product", required: true },
   variantId: { type: Types.ObjectId, default: null },
@@ -120,7 +120,6 @@ orderSchema.pre("save", function () {
 });
 
 orderSchema.post("save", async function (doc) {
-  // services that send their own, richer message (e.g. "shipped + tracking code") set $locals.skipStatusNotify
   if (doc._statusChanged && !doc.$locals?.skipStatusNotify) await notifyStatus(doc.user, doc._id, doc.status);
 });
 
@@ -150,4 +149,4 @@ orderSchema.post("updateOne", async function () {
 });
 
 const Order = mongoose.models.Order || mongoose.model("Order", orderSchema);
-module.exports = Order;
+export default Order;

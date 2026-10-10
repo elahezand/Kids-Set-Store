@@ -100,7 +100,7 @@ export default function AdminsList({ admins, currentUserId }: AdminsListProps) {
                 className="btn btn-primary"
                 disabled={!composer.canSend || composer.sending}
               >
-                {composer.sending ? "Sending…" : "Send"}
+                {composer.sending ? "Sending..." : "Send"}
               </button>
             </>
           }

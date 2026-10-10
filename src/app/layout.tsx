@@ -16,7 +16,6 @@ const BASE_METADATA: Metadata = {
   robots: "index, follow",
 };
 
-/** the logo from Admin › Site info is also the browser-tab icon */
 export async function generateMetadata(): Promise<Metadata> {
   const logo = ((await infoService.getSiteInfo()) as SiteInfo | null)?.logo?.trim();
   return logo ? { ...BASE_METADATA, icons: { icon: logo, apple: logo } } : BASE_METADATA;

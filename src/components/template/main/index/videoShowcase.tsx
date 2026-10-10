@@ -9,11 +9,9 @@ import { ROUTES } from "@/utils/constants";
 const VIDEO_SRC = "/setkids-ad-wide.mp4";
 const POSTER_SRC = "/setkids-ad-poster.jpg";
 
-// Same organic shape as the "Shop by category" section (index/categories), drawn in an 800x400 box
 const BLOB_PATH =
   "M120 60 C220 0 380 30 470 20 C590 8 720 40 770 130 C820 220 760 330 650 360 C540 390 430 350 320 370 C200 392 70 360 35 260 C0 160 40 100 120 60 Z";
 
-// Four-point sparkle, drawn in a 24x24 box
 const SPARKLE_PATH = "M12 0 C13 7 17 11 24 12 C17 13 13 17 12 24 C11 17 7 13 0 12 C7 11 11 7 12 0 Z";
 
 const SPARKLES = [
@@ -49,11 +47,9 @@ export default function VideoShowcase() {
         .play()
         .then(() => setBlocked(false))
         .catch((error: DOMException) => {
-          // AbortError = a pause()/new load interrupted play(): not a refusal, the next event retries
           if (error.name === "AbortError") return;
-          // NotSupportedError = the file can't be loaded (wrong path / missing file / codec)
           if (error.name === "NotSupportedError") {
-            console.warn(`[VideoShowcase] cannot play ${VIDEO_SRC} — is it in public/videos?`, error);
+            console.warn(`[VideoShowcase] cannot play ${VIDEO_SRC} - is it in public/videos?`, error);
           }
           setBlocked(true);
         });
@@ -104,7 +100,6 @@ export default function VideoShowcase() {
             </clipPath>
           </svg>
 
-          {/* tinted offset shape behind the video */}
           <svg
             aria-hidden="true"
             viewBox="0 0 800 400"
@@ -116,7 +111,11 @@ export default function VideoShowcase() {
               transform="rotate(-3 400 200) translate(-6 14)"
               className="fill-peach-50 dark:fill-peach-500/5"
             />
-            <path d={BLOB_PATH} transform="rotate(4 400 200) translate(14 10)" className="fill-sky-50 dark:fill-sky-500/5" />
+            <path
+              d={BLOB_PATH}
+              transform="rotate(4 400 200) translate(14 10)"
+              className="fill-sky-50 dark:fill-sky-500/5"
+            />
           </svg>
 
           <div className="relative">
@@ -138,7 +137,6 @@ export default function VideoShowcase() {
               />
             </div>
 
-            {/* stitched outline, slightly turned like on the categories shape */}
             <svg
               aria-hidden="true"
               viewBox="0 0 800 400"
@@ -191,7 +189,9 @@ export default function VideoShowcase() {
         </div>
 
         <div className="mt-2 flex items-center justify-between gap-3 sm:hidden">
-          <p className="text-lg leading-tight font-bold text-text-dark dark:text-white">Play-ready clothes for every age</p>
+          <p className="text-lg leading-tight font-bold text-text-dark dark:text-white">
+            Play-ready clothes for every age
+          </p>
           <Link href={ROUTES.products} className="btn btn-accent shrink-0">
             Shop now <LuArrowUpRight className="size-4" aria-hidden="true" />
           </Link>
