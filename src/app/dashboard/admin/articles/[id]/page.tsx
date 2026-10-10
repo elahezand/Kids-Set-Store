@@ -11,10 +11,12 @@ import { ROUTES } from "@/utils/constants";
 import { toPlain } from "@/utils/format";
 import type { Metadata } from "next";
 import type { AdminArticleDetail, CategoryNode, PageProps } from "@/types";
+import { requireAdmin } from "@/utils/auth/panelUser";
 
 export const metadata: Metadata = { title: "Edit article" };
 
 export default async function EditArticlePage({ params }: PageProps<{ id: string }>) {
+  await requireAdmin();
   const { id } = await params;
   if (!isValidObjectId(id)) notFound();
 

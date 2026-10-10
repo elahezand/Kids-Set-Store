@@ -1,8 +1,8 @@
-const mongoose = require("mongoose")
+import mongoose from "mongoose";
 import Session from "@/model/session";
-const redisClient = require("@/configs/redis");
-const logger = require("@/utils/logger");
-const {
+import redisClient from "@/configs/redis";
+import logger from "@/utils/logger";
+import {
   ACCESS_TOKEN_TTL_SECONDS,
   REFRESH_TOKEN_TTL_SECONDS,
   generateToken,
@@ -10,17 +10,14 @@ const {
   verifyRefreshToken,
   hashToken,
   compareTokenHash,
-} = require("@/utils/auth");
-
+} from "@/utils/auth";
 const ROTATION_GRACE_MS = 30 * 1000;
 const revokedKey = (sid) => `session:revoked:${sid}`;
 
 async function markRevokedInCache(sessionIds) {
   try {
     await Promise.all(
-      sessionIds.map((sid) =>
-        redisClient.set(revokedKey(String(sid)), "1", { EX: ACCESS_TOKEN_TTL_SECONDS })
-      )
+      sessionIds.map((sid) => redisClient.set(revokedKey(String(sid)), "1", { EX: ACCESS_TOKEN_TTL_SECONDS }))
     );
   } catch (err) {
     logger.error("[session] could not cache revoked session ids:", err);
@@ -28,9 +25,10 @@ async function markRevokedInCache(sessionIds) {
 }
 
 function clientInfo(req) {
+  const header = (name) => req?.headers?.get?.(name) || "";
   return {
-    userAgent: String(req.get?.("user-agent") || "").slice(0, 500),
-    ip: req.ip || req.socket?.remoteAddress || "",
+    userAgent: header("user-agent").slice(0, 500),
+    ip: header("x-forwarded-for").split(",")[0].trim() || header("x-real-ip"),
   };
 }
 
@@ -67,7 +65,6 @@ async function rotateSession(refreshToken, req) {
 
   const user = { _id: session.user };
 
-  // 1) Current token → rotate
   if (compareTokenHash(refreshToken, session.tokenHash)) {
     const tokens = await issueTokens(user, session._id);
     session.previousTokenHash = session.tokenHash;
@@ -81,15 +78,12 @@ async function rotateSession(refreshToken, req) {
     return { ok: true, ...tokens };
   }
 
-  // 2) Previous token, only moments after rotation → parallel request from another tab
-  const inGrace =
-    session.rotatedAt && Date.now() - session.rotatedAt.getTime() < ROTATION_GRACE_MS;
+  const inGrace = session.rotatedAt && Date.now() - session.rotatedAt.getTime() < ROTATION_GRACE_MS;
   if (inGrace && compareTokenHash(refreshToken, session.previousTokenHash)) {
     const accessToken = await generateToken({ id: session.user, sid: session._id });
     return { ok: true, accessToken, refreshToken: null };
   }
 
-  // 3) Anything else is an old / stolen refresh token → kill the session
   logger.warn(`[session] refresh token reuse detected, revoking session ${session._id}`);
   await revokeSession(session._id, "reuse_detected");
   return { ok: false, reason: "reuse_detected" };
@@ -113,24 +107,16 @@ async function revokeAllUserSessions(userId, reason = "logout_all", { exceptSess
   if (!sessions.length) return 0;
 
   const ids = sessions.map((s) => s._id);
-  await Session.updateMany(
-    { _id: { $in: ids } },
-    { $set: { revokedAt: new Date(), revokedReason: reason } }
-  );
+  await Session.updateMany({ _id: { $in: ids } }, { $set: { revokedAt: new Date(), revokedReason: reason } });
   await markRevokedInCache(ids);
   return ids.length;
 }
 
-export {
+export { createSession, rotateSession, revokeSession, revokeAllUserSessions };
+
+export default {
   createSession,
   rotateSession,
   revokeSession,
   revokeAllUserSessions,
-};
-
-export default {
-    createSession,
-    rotateSession,
-    revokeSession,
-    revokeAllUserSessions,
 };

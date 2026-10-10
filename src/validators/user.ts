@@ -21,7 +21,6 @@ export const userValidationSchema = z.object({
     .trim()
     .min(3, "Name must be at least 3 characters")
     .max(40, "Name cannot exceed 40 characters")
-    // Simple regex for English & Persian letters to avoid backtracking issues
     .refine((val) => /^[a-zA-Z\u0600-\u06FF\s]+$/.test(val), "Name must only contain letters"),
 
   email: z.preprocess(
@@ -36,7 +35,10 @@ export const userValidationSchema = z.object({
 
 export const resetPasswordSchema = z.object({
   phone: phoneSchema,
-  resetCode: z.string().trim().regex(/^\d{4,6}$/, "Code must be 4 to 6 digits"),
+  resetCode: z
+    .string()
+    .trim()
+    .regex(/^\d{4,6}$/, "Code must be 4 to 6 digits"),
   password: strongPasswordSchema,
 });
 
@@ -54,25 +56,26 @@ export const adminUsersQuerySchema = z.object({
 });
 
 export const userUpdateSchema = z.object({
-  username: z.string().min(2, "Username is too short"),
-  email: z.string().email("Invalid email"),
-  phone: z.string().min(10, "Invalid phone number"),
+  username: z.string().trim().min(2, "Username is too short").max(40, "Username cannot exceed 40 characters"),
+  email: z.preprocess(
+    (val) => (typeof val === "string" && val.trim() === "" ? undefined : val),
+    z.string().trim().toLowerCase().email("Invalid email").optional()
+  ),
+  phone: phoneSchema,
+  phoneCode: z.string().trim().optional(),
 });
 
 export const profileValidationSchema = userUpdateSchema
   .extend({
     password: z.string().optional(),
-    newPassword: z
-      .string()
-      .optional()
-      .refine((val) => !val || val.length >= 8, "Password must be at least 8 characters"),
+    newPassword: z.preprocess((val) => (val === "" ? undefined : val), strongPasswordSchema.optional()),
     confirmPassword: z.string().optional(),
   })
   .refine((data) => !data.newPassword || data.newPassword === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
-  })
-  .refine((data) => !data.newPassword || !!data.password, {
-    message: "Enter your current password",
-    path: ["password"],
   });
+
+export const phoneCodeRequestSchema = z.object({
+  phone: phoneSchema,
+});

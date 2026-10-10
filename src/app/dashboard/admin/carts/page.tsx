@@ -21,10 +21,7 @@ export default async function AdminCartsPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <PageHeader
-        title="Carts"
-        description="What customers have in their carts right now, newest activity first."
-      />
+      <PageHeader title="Carts" description="What customers have in their carts right now, newest activity first." />
       <CartsTable
         key={filtersKey(filters)}
         filters={filters}

@@ -1,51 +1,22 @@
-import { respond } from "@/utils/apiResponse";
 import { revokeSession } from "@/services/server/shared/session";
 import { verifyRefreshToken } from "@/utils/auth";
+import authCookies from "@/utils/auth/cookies";
+import { handleRouteError, respond } from "@/utils/apiResponse";
+
 export async function POST(req) {
-    try {
-        let sid = req.sessionId || null;
+  try {
+    const refreshToken = req.cookies.get("refreshToken")?.value;
 
-        const refreshToken = req.cookies.get("refreshToken")?.value;
-        if (!sid && refreshToken) {
-            const payload = await verifyRefreshToken(refreshToken);
-            sid = payload?.sid || null;
-        }
-
-        if (sid) {
-            await revokeSession(sid, "logout");
-        }
-
-        const response = respond(
-            {
-                success: true,
-                message: "Logged out",
-            },
-            { status: 200 }
-        );
-
-        response.cookies.set("accessToken", "", {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: process.env.NODE_ENV === "production",
-            path: "/",
-            maxAge: 0,
-        });
-
-        response.cookies.set("refreshToken", "", {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: process.env.NODE_ENV === "production",
-            path: "/",
-            maxAge: 0,
-        });
-
-        return response;
-    } catch (err) {
-        console.error("Logout error:", err);
-
-        return respond(
-            { success: false, message: "Server Error" },
-            { status: 500 }
-        );
+    if (refreshToken) {
+      const payload = await verifyRefreshToken(refreshToken);
+      if (payload?.sid) await revokeSession(payload.sid, "logout");
     }
+
+    const response = respond({ success: true, message: "Logged out" }, { status: 200 });
+    authCookies.clearAuthCookies(response);
+
+    return response;
+  } catch (error) {
+    return handleRouteError(error, "POST /api/auth/logout");
+  }
 }

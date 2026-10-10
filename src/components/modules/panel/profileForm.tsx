@@ -4,7 +4,10 @@ import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { type FieldPath, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { http } from "@/services/client/http";
+import { showErrorToast } from "@/services/client/errors";
 import { useUpdateProfile } from "@/services/client/panel";
+import { toast } from "sonner";
 import { DEFAULT_AVATAR } from "@/utils/constants";
 import { roleLabel } from "@/utils/role";
 import { profileValidationSchema } from "@/validators/user";
@@ -24,11 +27,14 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [avatarError, setAvatarError] = useState("");
+  const [sendingCode, setSendingCode] = useState(false);
 
   const {
     register,
     handleSubmit,
     reset,
+    watch,
+    getValues,
     formState: { errors, isDirty },
   } = useForm<ProfileInput, unknown, ProfileOutput>({
     resolver: zodResolver(profileValidationSchema),
@@ -36,6 +42,7 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
       username: userData?.username ?? "",
       email: userData?.email ?? "",
       phone: userData?.phone ?? "",
+      phoneCode: "",
       password: "",
       newPassword: "",
       confirmPassword: "",
@@ -44,7 +51,7 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
 
   const { mutate, isPending } = useUpdateProfile({
     onSaved: () => {
-      reset((values) => ({ ...values, password: "", newPassword: "", confirmPassword: "" }));
+      reset((values) => ({ ...values, phoneCode: "", password: "", newPassword: "", confirmPassword: "" }));
       if (fileInputRef.current) fileInputRef.current.value = "";
       setPreview(null);
     },
@@ -55,6 +62,20 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
       if (preview) URL.revokeObjectURL(preview);
     };
   }, [preview]);
+
+  const phoneChanged = watch("phone")?.trim() !== (userData?.phone ?? "");
+
+  const sendPhoneCode = async () => {
+    setSendingCode(true);
+    try {
+      await http.post("/user/profile/phone-code", { phone: getValues("phone").trim() });
+      toast.success("Verification code sent to your new phone number");
+    } catch (error) {
+      showErrorToast(error, "Could not send the code");
+    } finally {
+      setSendingCode(false);
+    }
+  };
 
   const onAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -147,6 +168,35 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
           {field("username", "Username", "text", "name")}
           {field("email", "Email (optional)", "email", "email")}
           {field("phone", "Phone", "tel", "tel")}
+          {phoneChanged && (
+            <div className="sm:col-span-2 lg:col-span-3">
+              <label htmlFor="phoneCode" className="label">
+                Verification code
+              </label>
+              <div className="flex gap-3">
+                <input
+                  id="phoneCode"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  {...register("phoneCode")}
+                  className={`input ${errors.phoneCode ? "input-error" : ""}`}
+                />
+                <button
+                  type="button"
+                  onClick={sendPhoneCode}
+                  disabled={sendingCode}
+                  className="btn btn-secondary shrink-0"
+                >
+                  {sendingCode ? "Sending..." : "Send code"}
+                </button>
+              </div>
+              {errors.phoneCode ? (
+                <span className="field-error">{String(errors.phoneCode.message)}</span>
+              ) : (
+                <span className="field-hint">We send a code to the new number to confirm it is yours.</span>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
@@ -173,7 +223,7 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
           disabled={isPending || (!isDirty && !preview)}
           className="btn btn-primary btn-lg w-full sm:w-auto"
         >
-          {isPending ? "Saving…" : "Save changes"}
+          {isPending ? "Saving..." : "Save changes"}
         </button>
       </div>
     </form>

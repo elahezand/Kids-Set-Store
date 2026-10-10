@@ -7,10 +7,12 @@ import { flattenCategories } from "@/utils/categoryOptions";
 import { ROUTES } from "@/utils/constants";
 import type { Metadata } from "next";
 import type { CategoryNode } from "@/types";
+import { requireAdmin } from "@/utils/auth/panelUser";
 
 export const metadata: Metadata = { title: "New article" };
 
 export default async function NewArticlePage() {
+  await requireAdmin();
   const categories = (await categoryService.getAllCategories()) as CategoryNode[];
 
   return (

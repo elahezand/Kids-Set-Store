@@ -1,153 +1,62 @@
-import { respond } from "@/utils/apiResponse";
 import User from "@/model/user";
-import { compare } from "bcryptjs";
-import redisClient from "@/configs/redis";
 import connectToDB from "@/configs/db";
+import { isBanned } from "@/utils/auth/ban";
+import { verifyOtp } from "@/services/server/shared/otp";
 import sessionService from "@/services/server/shared/session";
 import authCookies from "@/utils/auth/cookies";
-
-const OTP_TTL_SECONDS = 60;
-const MAX_OTP_ATTEMPTS = 5;
-
-const getOtpKey = (phone) => `otp:${phone}`;
-const getOtpAttemptsKey = (phone) =>
-    `otp:attempts:${phone}`;
+import { otpCodeSchema, phoneSchema } from "@/validators/authForm";
+import { getClientIp, rateLimit } from "@/utils/rateLimit";
+import { handleRouteError, jsonError, respond } from "@/utils/apiResponse";
 
 export async function POST(req) {
-    try {
-        await connectToDB();
+  try {
+    await connectToDB();
 
-        const { phone, code } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const phone = phoneSchema.safeParse(body.phone);
+    const code = otpCodeSchema.safeParse(String(body.code ?? ""));
 
-        if (!phone || !code) {
-            return respond(
-                {
-                    success: false,
-                    message: "Phone and code are required",
-                },
-                { status: 400 }
-            );
-        }
-
-        const savedOtp = await redisClient.get(
-            getOtpKey(phone)
-        );
-
-        if (!savedOtp) {
-            return respond(
-                {
-                    success: false,
-                    message: "OTP expired",
-                },
-                { status: 410 }
-            );
-        }
-
-        const attempts = await redisClient.incr(
-            getOtpAttemptsKey(phone)
-        );
-
-        if (attempts === 1) {
-            await redisClient.expire(
-                getOtpAttemptsKey(phone),
-                OTP_TTL_SECONDS
-            );
-        }
-
-        if (attempts > MAX_OTP_ATTEMPTS) {
-            await redisClient.del(getOtpKey(phone));
-
-            return respond(
-                {
-                    success: false,
-                    message:
-                        "Too many wrong codes. Request a new code.",
-                },
-                { status: 429 }
-            );
-        }
-
-        const isValid = await compare(
-            String(code),
-            savedOtp
-        );
-
-        if (!isValid) {
-            return respond(
-                {
-                    success: false,
-                    message: "Invalid OTP",
-                },
-                { status: 400 }
-            );
-        }
-
-        const deleted = await redisClient.del(
-            getOtpKey(phone)
-        );
-
-        await redisClient.del(
-            getOtpAttemptsKey(phone)
-        );
-
-        if (!deleted) {
-            return respond(
-                {
-                    success: false,
-                    message: "OTP expired",
-                },
-                { status: 410 }
-            );
-        }
-
-        let user = await User.findOne({ phone });
-
-        if (!user) {
-            user = await User.create({
-                phone,
-                username: "SETKID-USER",
-                role: ["USER"],
-            });
-        }
-
-        const {
-            accessToken,
-            refreshToken,
-        } = await sessionService.createSession(
-            user,
-            req
-        );
-
-        const response = respond(
-            {
-                success: true,
-                message: "Login successful",
-                data: {
-                    user: user.toObject(),
-                },
-            },
-            { status: 200 }
-        );
-
-        authCookies.setAuthCookies(response, {
-            accessToken,
-            refreshToken,
-        });
-
-        return response;
-
-    } catch (err) {
-        console.error(
-            "OTP verification error:",
-            err
-        );
-
-        return respond(
-            {
-                success: false,
-                message: "Server Error",
-            },
-            { status: 500 }
-        );
+    if (!phone.success || !code.success) {
+      return jsonError("Phone and code are required", 422);
     }
+
+    const limited = await rateLimit([{ key: `otp-verify:ip:${getClientIp(req)}`, limit: 30, window: 15 * 60 }]);
+    if (limited) return limited;
+
+    if (await isBanned(phone.data)) {
+      return jsonError("This phone number is banned", 403);
+    }
+
+    const result = await verifyOtp(phone.data, code.data);
+    if (!result.success) {
+      return jsonError(result.message, result.status);
+    }
+
+    let user = await User.findOne({ phone: phone.data });
+
+    if (!user) {
+      user = await User.create({
+        phone: phone.data,
+        username: `User${phone.data.slice(-4)}`,
+        role: ["USER"],
+      });
+    }
+
+    const tokens = await sessionService.createSession(user, req);
+
+    const response = respond(
+      {
+        success: true,
+        message: "Login successful",
+        data: { user: user.toObject() },
+      },
+      { status: 200 }
+    );
+
+    authCookies.setAuthCookies(response, tokens);
+
+    return response;
+  } catch (error) {
+    return handleRouteError(error, "POST /api/auth/sms/verify");
+  }
 }

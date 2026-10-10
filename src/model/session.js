@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const { Schema } = mongoose;
 const sessionSchema = new Schema(
   {
@@ -17,14 +17,23 @@ const sessionSchema = new Schema(
     revokedAt: { type: Date, default: null },
     revokedReason: {
       type: String,
-      enum: [null, "logout", "logout_all", "revoked_by_user", "reuse_detected", "banned", "user_deleted"],
+      enum: [
+        null,
+        "logout",
+        "logout_all",
+        "revoked_by_user",
+        "reuse_detected",
+        "banned",
+        "user_deleted",
+        "password_changed",
+        "phone_changed",
+      ],
       default: null,
     },
   },
   { timestamps: true, versionKey: false }
 );
 
-// MongoDB deletes the document once expiresAt has passed
 sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 sessionSchema.index({ user: 1, revokedAt: 1 });
 
@@ -32,4 +41,4 @@ sessionSchema.methods.isActive = function () {
   return !this.revokedAt && this.expiresAt > new Date();
 };
 
-module.exports = mongoose.models.Session || mongoose.model("Session", sessionSchema);
+export default mongoose.models.Session || mongoose.model("Session", sessionSchema);

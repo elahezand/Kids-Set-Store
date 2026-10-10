@@ -2,79 +2,70 @@ import connectToDB from "@/configs/db";
 import { cookies } from "next/headers";
 import UserModel from "@/model/user";
 import Session from "@/model/session";
-import {
-    verifyToken,
-    verifyRefreshToken,
-} from "@/utils/auth";
+import { verifyToken, verifyRefreshToken } from "@/utils/auth";
+import { isBanned } from "@/utils/auth/ban";
 
 const getAuthUser = async (tokenName, verify) => {
-    await connectToDB();
+  await connectToDB();
 
-    const cookiesStore = await cookies();
-    const token = cookiesStore.get(tokenName);
+  const cookiesStore = await cookies();
+  const token = cookiesStore.get(tokenName);
 
-    if (!token) return null;
+  if (!token) {
+    const canRefresh = tokenName === "accessToken" && cookiesStore.has("refreshToken");
+    return canRefresh ? { status: "expired" } : null;
+  }
 
-    const payload = await verify(token.value);
+  const payload = await verify(token.value);
 
-    if (!payload?.id || !payload?.sid) {
-        return { status: "expired" };
-    }
+  if (!payload?.id || !payload?.sid) {
+    return { status: "expired" };
+  }
 
-    const session = await Session.findById(payload.sid);
+  const session = await Session.findById(payload.sid);
 
-    if (!session || !session.isActive()) {
-        return { status: "expired" };
-    }
+  if (!session || !session.isActive()) {
+    return { status: "expired" };
+  }
 
-    if (String(session.user) !== String(payload.id)) {
-        return null;
-    }
+  if (String(session.user) !== String(payload.id)) {
+    return null;
+  }
 
-    const user = await UserModel.findById(payload.id);
+  const user = await UserModel.findById(payload.id);
 
-    if (!user) return null;
+  if (!user || (await isBanned(user.phone))) return null;
 
-    return user;
+  return user;
 };
 
 const authUser = async () => {
-    return getAuthUser("accessToken", verifyToken);
+  return getAuthUser("accessToken", verifyToken);
 };
 
 const authAdmin = async () => {
-    const user = await getAuthUser(
-        "accessToken",
-        verifyToken
-    );
+  const user = await getAuthUser("accessToken", verifyToken);
 
-    if (!user || user.status === "expired") {
-        return user;
-    }
-
-    const roles = Array.isArray(user.role) ? user.role : [user.role];
-    if (!roles.includes("ADMIN")) {
-        return null;
-    }
-
+  if (!user || user.status === "expired") {
     return user;
+  }
+
+  const roles = Array.isArray(user.role) ? user.role : [user.role];
+  if (!roles.includes("ADMIN")) {
+    return null;
+  }
+
+  return user;
 };
 
 const getMe = async () => {
-    const user = await getAuthUser(
-        "refreshToken",
-        verifyRefreshToken
-    );
+  const user = await getAuthUser("refreshToken", verifyRefreshToken);
 
-    if (!user || user.status === "expired") {
-        return null;
-    }
+  if (!user || user.status === "expired") {
+    return null;
+  }
 
-    return user;
+  return user;
 };
 
-export {
-    authUser,
-    authAdmin,
-    getMe,
-};
+export { authUser, authAdmin, getMe };

@@ -10,9 +10,7 @@ export const metadata: Metadata = { title: "Ticket departments" };
 
 export default async function AdminDepartmentsPage() {
   await requireAdmin();
-  const departments = toPlain(
-    (await departmentService.getDepartmentsOverview()) as AdminDepartmentOverview[]
-  );
+  const departments = toPlain((await departmentService.getDepartmentsOverview()) as AdminDepartmentOverview[]);
 
   return (
     <>

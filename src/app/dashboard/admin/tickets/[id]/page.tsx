@@ -9,13 +9,14 @@ import { ROUTES } from "@/utils/constants";
 import { toPlain } from "@/utils/format";
 import type { Metadata } from "next";
 import type { PageProps, TicketDetail } from "@/types";
+import { requireAdmin } from "@/utils/auth/panelUser";
 
 export const metadata: Metadata = { title: "Ticket details" };
 
 export default async function AdminTicketPage({ params }: PageProps<{ id: string }>) {
+  await requireAdmin();
   const { id } = await params;
 
-  // no ownerId: an admin can open any ticket
   const result = (await ticketService.getTicketThread(id)) as { success: boolean; data?: TicketDetail };
   if (!result.success || !result.data) notFound();
 
