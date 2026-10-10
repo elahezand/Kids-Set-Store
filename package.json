@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write \"src/**/*.{js,ts,tsx,css}\"",
+    "typecheck": "tsc --noEmit",
+    "seed:admin": "node scripts/createAdmin.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -21,15 +24,16 @@
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.2",
     "dompurify": "^3.3.1",
+    "install": "^0.13.0",
     "jsdom": "^28.0.0",
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "mongoose": "^9.0.0",
     "nanoid": "^3.3.11",
-    "next": "15.5.4",
+    "next": "^15.5.9",
     "nodemailer": "^7.0.13",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "^19.1.4",
+    "react-dom": "^19.1.4",
     "react-hook-form": "^7.69.0",
     "react-icons": "^5.5.0",
     "recharts": "^2.15.4",
@@ -51,7 +55,8 @@
     "@types/react-dom": "^19.3.0",
     "@types/three": "^0.172.0",
     "eslint": "^9",
-    "eslint-config-next": "15.5.4",
+    "eslint-config-next": "^15.5.9",
+    "prettier": "^3.6.2",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3"
   }
