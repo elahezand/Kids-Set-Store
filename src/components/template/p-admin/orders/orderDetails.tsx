@@ -144,7 +144,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
           {order.shippedAt && (
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl border border-gray-200 p-4 text-sm dark:border-white/10">
               <span className="flex items-center gap-2 font-medium text-gray-900 dark:text-gray-100">
-                <LuTruck className="size-4 text-sage-600" /> Shipped
+                <LuTruck className="size-4 text-brand-600" /> Shipped
                 {` on ${formatDate(order.shippedAt)}`}
               </span>
               {order.trackingCode && (
@@ -196,7 +196,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
           )}
 
           {autoCompletes && (
-            <p className="flex items-center gap-2 rounded-xl bg-sage-50 p-3 text-sm text-sage-800 dark:bg-sage-500/10 dark:text-sage-300">
+            <p className="flex items-center gap-2 rounded-xl bg-brand-50 p-3 text-sm text-brand-800 dark:bg-brand-500/10 dark:text-brand-300">
               <LuClock className="size-4 shrink-0" />
               Paid online - completes when the customer confirms delivery
               {autoCompleteAt ? `, or by itself on ${formatDate(autoCompleteAt)}` : ""} (
@@ -212,7 +212,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
               className={`flex items-center gap-2 rounded-xl p-3 text-sm ${
                 order.isCashOverdue
                   ? "bg-danger-50 text-danger-600 dark:bg-danger-500/10 dark:text-danger-300"
-                  : "bg-peach-50 text-peach-700 dark:bg-peach-500/10 dark:text-peach-300"
+                  : "bg-warning-50 text-warning-700 dark:bg-warning-500/10 dark:text-warning-300"
               }`}
             >
               <LuBanknote className="size-4 shrink-0" />

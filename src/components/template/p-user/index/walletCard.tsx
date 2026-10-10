@@ -21,7 +21,7 @@ export default function WalletCard({ wallet, transactions }: WalletCardProps) {
       </div>
 
       <div className="grid gap-6 p-5 md:grid-cols-[minmax(0,16rem)_1fr]">
-        <div className="rounded-2xl bg-gradient-to-br from-sage-500 to-sage-700 p-5 text-white shadow-card">
+        <div className="rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 p-5 text-white shadow-card">
           <div className="flex items-center gap-2 text-sm text-white/85">
             <LuWallet className="size-4" /> Balance
           </div>
@@ -52,7 +52,7 @@ export default function WalletCard({ wallet, transactions }: WalletCardProps) {
                     <span
                       className={`flex size-8 shrink-0 items-center justify-center rounded-full ${
                         refund
-                          ? "bg-sage-50 text-sage-600 dark:bg-sage-500/10 dark:text-sage-300"
+                          ? "bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-300"
                           : "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-gray-400"
                       }`}
                     >
@@ -71,7 +71,7 @@ export default function WalletCard({ wallet, transactions }: WalletCardProps) {
                     </div>
                     <span
                       className={`shrink-0 text-sm font-semibold tabular-nums ${
-                        refund ? "text-sage-700 dark:text-sage-300" : "text-gray-900 dark:text-gray-100"
+                        refund ? "text-brand-700 dark:text-brand-300" : "text-gray-900 dark:text-gray-100"
                       }`}
                     >
                       {refund ? "+" : "−"}

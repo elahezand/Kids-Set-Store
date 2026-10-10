@@ -16,7 +16,7 @@ const buildStats = (stats: PublicStats | null) => [
   {
     value: stats ? compact(stats.activeProducts) : "-",
     label: "Styles in store",
-    tone: "text-sage-600 dark:text-sage-300",
+    tone: "text-brand-600 dark:text-brand-300",
   },
   {
     value: stats?.averageRating ? String(stats.averageRating) : "-",
@@ -26,7 +26,7 @@ const buildStats = (stats: PublicStats | null) => [
   {
     value: stats ? compact(stats.successfulDeals) : "-",
     label: "Completed orders",
-    tone: "text-mint-600 dark:text-mint-300",
+    tone: "text-success-600 dark:text-success-300",
   },
 ];
 
@@ -78,7 +78,7 @@ const Promote = ({ stats = null }: { stats?: PublicStats | null }) => {
         </div>
 
         <div
-          className="relative flex flex-col rounded-[2rem] bg-sage-50 px-6 pb-8 dark:bg-sage-500/10 sm:px-8"
+          className="relative flex flex-col rounded-[2rem] bg-brand-50 px-6 pb-8 dark:bg-brand-500/10 sm:px-8"
           data-aos="fade-up"
           data-aos-delay="100"
         >

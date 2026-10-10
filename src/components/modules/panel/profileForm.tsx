@@ -132,7 +132,7 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
             src={preview || userData?.profilePicture || DEFAULT_AVATAR}
             alt=""
             unoptimized={Boolean(preview)}
-            className="size-24 shrink-0 rounded-full object-cover ring-4 ring-sage-100 sm:size-28 dark:ring-white/10"
+            className="size-24 shrink-0 rounded-full object-cover ring-4 ring-brand-100 sm:size-28 dark:ring-white/10"
           />
           <div className="min-w-0 flex-1">
             <p className="truncate font-semibold text-gray-900 dark:text-gray-100">{userData?.username}</p>

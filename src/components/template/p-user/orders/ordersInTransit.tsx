@@ -22,11 +22,11 @@ function Steps({ order }: { order: OrderListItem }) {
         const current = index === CURRENT_STEP;
         return (
           <li key={label} className="min-w-0" aria-current={current ? "step" : undefined}>
-            <div className={`h-1.5 rounded-full ${done ? "bg-sage-500" : "bg-gray-200 dark:bg-white/10"}`} />
+            <div className={`h-1.5 rounded-full ${done ? "bg-brand-500" : "bg-gray-200 dark:bg-white/10"}`} />
             <p
               className={`mt-1.5 truncate text-xs ${
                 current
-                  ? "font-semibold text-sage-700 dark:text-sage-300"
+                  ? "font-semibold text-brand-700 dark:text-brand-300"
                   : done
                     ? "text-gray-800 dark:text-gray-300"
                     : "text-gray-600 dark:text-gray-500"
@@ -58,7 +58,7 @@ export default function OrdersInTransit({ orders }: { orders: OrderListItem[] })
       <div className="card-header">
         <div>
           <h2 id="in-transit-title" className="card-title flex items-center gap-2">
-            <LuTruck className="size-5 text-sage-600 dark:text-sage-300" />
+            <LuTruck className="size-5 text-brand-600 dark:text-brand-300" />
             On the way to you
           </h2>
           <p className="mt-0.5 text-xs text-gray-700 dark:text-gray-500">
@@ -111,7 +111,7 @@ export default function OrdersInTransit({ orders }: { orders: OrderListItem[] })
               <div className="flex flex-col gap-1.5 lg:items-end lg:text-right">
                 {waitingForCash ? (
                   <p className="flex items-center gap-1.5 text-sm text-gray-700 lg:justify-end dark:text-gray-400">
-                    <LuCheck className="size-4 text-sage-600" /> You confirmed it arrived. Waiting for the store to
+                    <LuCheck className="size-4 text-brand-600" /> You confirmed it arrived. Waiting for the store to
                     confirm your cash payment.
                   </p>
                 ) : (

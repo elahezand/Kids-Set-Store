@@ -24,7 +24,7 @@ export default function ClubCard3D({ bare = false }: { bare?: boolean }) {
       className={
         bare
           ? "h-full min-h-[280px] w-full"
-          : "h-full min-h-[320px] w-full overflow-hidden bg-sage-100 dark:bg-sage-900/40"
+          : "h-full min-h-[320px] w-full overflow-hidden bg-brand-100 dark:bg-brand-900/40"
       }
     >
       <div
@@ -41,7 +41,7 @@ export default function ClubCard3D({ bare = false }: { bare?: boolean }) {
           onClick={() => setFlipped((value) => !value)}
           aria-pressed={flipped}
           aria-label={flipped ? "Show the front of the member card" : "Flip the member card to see the perks"}
-          className="relative h-[170px] w-[260px] cursor-pointer rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sage-500 sm:h-[190px] sm:w-[300px] [transform-style:preserve-3d]"
+          className="relative h-[170px] w-[260px] cursor-pointer rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500 sm:h-[190px] sm:w-[300px] [transform-style:preserve-3d]"
           style={{ transform: "translateZ(30px) rotateZ(6deg)" }}
         >
           <span
@@ -75,7 +75,7 @@ export default function ClubCard3D({ bare = false }: { bare?: boolean }) {
             </span>
 
             <span
-              className={`${face} bg-sage-600`}
+              className={`${face} bg-brand-600`}
               style={{ transform: `rotateY(180deg) translateZ(${CARD_THICKNESS / 2}px)` }}
             >
               <span className="block text-xs font-semibold opacity-85">Member perks</span>
@@ -96,7 +96,7 @@ export default function ClubCard3D({ bare = false }: { bare?: boolean }) {
           <span
             key={label}
             aria-hidden="true"
-            className={`absolute rounded-full bg-white px-3 py-1.5 text-xs font-bold text-sage-700 shadow-card dark:bg-ink-800 dark:text-sage-300 ${className}`}
+            className={`absolute rounded-full bg-white px-3 py-1.5 text-xs font-bold text-brand-700 shadow-card dark:bg-ink-800 dark:text-brand-300 ${className}`}
             style={{ transform: `translateZ(${depth}px)` }}
           >
             {label}

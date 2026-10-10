@@ -62,7 +62,7 @@ export default function Sidebar({ variant = "user", open = false, onClose, logo 
             {logo ? (
               <SiteLogo src={logo} className="size-9 shrink-0 rounded-xl" />
             ) : (
-              <span className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-sage-400 to-sage-600 text-sm font-bold text-white shadow-card">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 text-sm font-bold text-white shadow-card">
                 SK
               </span>
             )}
@@ -96,13 +96,13 @@ export default function Sidebar({ variant = "user", open = false, onClose, logo 
                         aria-current={active ? "page" : undefined}
                         className={`group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                           active
-                            ? "bg-sage-50 text-sage-700 dark:bg-sage-500/10 dark:text-sage-300"
+                            ? "bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300"
                             : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-100"
                         }`}
                       >
-                        {active && <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-sage-500" />}
+                        {active && <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-brand-500" />}
                         <Icon
-                          className={`size-[18px] shrink-0 ${active ? "text-sage-600 dark:text-sage-300" : "text-gray-600 group-hover:text-gray-800 dark:group-hover:text-gray-300"}`}
+                          className={`size-[18px] shrink-0 ${active ? "text-brand-600 dark:text-brand-300" : "text-gray-600 group-hover:text-gray-800 dark:group-hover:text-gray-300"}`}
                         />
                         {link.label}
                       </Link>

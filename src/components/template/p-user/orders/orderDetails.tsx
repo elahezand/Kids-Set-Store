@@ -73,7 +73,7 @@ export default function OrderDetails({ order, actions, onClose }: OrderDetailsPr
         {order.shippedAt && (
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl border border-gray-200 p-4 text-sm dark:border-white/10">
             <span className="flex items-center gap-2 font-medium text-gray-900 dark:text-gray-100">
-              <LuTruck className="size-4 text-sage-600" /> Shipped on {formatDate(order.shippedAt)}
+              <LuTruck className="size-4 text-brand-600" /> Shipped on {formatDate(order.shippedAt)}
             </span>
             {order.trackingCode && (
               <span className="text-gray-700 dark:text-gray-400">

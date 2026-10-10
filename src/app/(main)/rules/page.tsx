@@ -90,7 +90,7 @@ export default async function RulesPage() {
             {RULES.map((rule, index) => (
               <li key={rule.title}>
                 <h2 className="flex items-center gap-3 text-lg font-bold sm:text-xl">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-sage-50 text-sm text-sage-700 dark:bg-sage-500/15 dark:text-sage-300">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">
                     {index + 1}
                   </span>
                   {rule.title}
@@ -109,13 +109,13 @@ export default async function RulesPage() {
             ))}
           </ol>
 
-          <section className="mt-10 rounded-2xl bg-sage-50 p-6 dark:bg-ink-950">
+          <section className="mt-10 rounded-2xl bg-brand-50 p-6 dark:bg-ink-950">
             <h2 className="font-bold">Questions?</h2>
             <p className="mt-1 text-sm leading-7 text-gray-700 dark:text-gray-400">
               We answer during business hours. Write to us from the{" "}
               <Link
                 href={ROUTES.contact}
-                className="font-medium text-sage-700 underline-offset-4 hover:underline dark:text-sage-300"
+                className="font-medium text-brand-700 underline-offset-4 hover:underline dark:text-brand-300"
               >
                 contact page
               </Link>{" "}
@@ -125,7 +125,7 @@ export default async function RulesPage() {
               <ul className="mt-4 flex flex-col gap-2 text-sm sm:flex-row sm:gap-6">
                 {info?.phone && (
                   <li className="flex items-center gap-2">
-                    <LuPhone className="size-4 text-sage-600 dark:text-sage-400" />
+                    <LuPhone className="size-4 text-brand-600 dark:text-brand-400" />
                     <a href={`tel:${info.phone.replace(/[^\d+]/g, "")}`} className="hover:text-coral-500">
                       {info.phone}
                     </a>
@@ -133,7 +133,7 @@ export default async function RulesPage() {
                 )}
                 {info?.email && (
                   <li className="flex items-center gap-2">
-                    <LuMail className="size-4 text-sage-600 dark:text-sage-400" />
+                    <LuMail className="size-4 text-brand-600 dark:text-brand-400" />
                     <a href={`mailto:${info.email}`} className="hover:text-coral-500">
                       {info.email}
                     </a>

@@ -17,7 +17,7 @@ export default function PromoText() {
   return (
     <section
       aria-labelledby="promo-heading"
-      className="full-bleed section-y overflow-hidden pb-0 bg-sage-700 dark:bg-ink-800"
+      className="full-bleed section-y overflow-hidden pb-0 bg-brand-700 dark:bg-ink-800"
     >
       <div
         aria-hidden="true"
@@ -51,7 +51,7 @@ export default function PromoText() {
             </Link>
             <Link
               href={ROUTES.contact}
-              className="btn btn-lg rounded-full border-2 border-white/70 bg-transparent px-7 text-white transition-colors hover:bg-white hover:text-sage-700 focus-visible:ring-white/40"
+              className="btn btn-lg rounded-full border-2 border-white/70 bg-transparent px-7 text-white transition-colors hover:bg-white hover:text-brand-700 focus-visible:ring-white/40"
             >
               Contact us
             </Link>
@@ -67,7 +67,7 @@ export default function PromoText() {
                   href={`/products?q=${encodeURIComponent(q)}`}
                   className="group flex flex-col items-center gap-3 rounded-2xl bg-white px-4 py-5 text-center shadow-card ring-1 ring-white/10 transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-float dark:ring-white/10 dark:bg-ink-800/90 dark:hover:bg-ink-800"
                 >
-                  <span className="flex size-14 items-center justify-center rounded-full bg-sage-50 text-sage-600 transition-colors group-hover:bg-coral-500 group-hover:text-white dark:bg-sage-500/15 dark:text-sage-300">
+                  <span className="flex size-14 items-center justify-center rounded-full bg-brand-50 text-brand-600 transition-colors group-hover:bg-coral-500 group-hover:text-white dark:bg-brand-500/15 dark:text-brand-300">
                     <Icon className="size-7" aria-hidden="true" />
                   </span>
                   <span className="text-sm font-bold text-text-dark dark:text-gray-100 sm:text-base">{label}</span>

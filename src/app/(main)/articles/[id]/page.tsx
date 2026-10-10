@@ -26,13 +26,13 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 const CONTENT_CLASSES = [
   "text-base leading-7",
   "[&_h2]:mb-3 [&_h2]:mt-8 [&_h2]:text-xl [&_h2]:font-bold",
-  "[&_h3]:mb-3 [&_h3]:mt-6 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-sage-400",
+  "[&_h3]:mb-3 [&_h3]:mt-6 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-brand-400",
   "[&_p]:mb-4",
-  "[&_a]:text-coral-300 [&_a]:underline [&_a]:underline-offset-2",
+  "[&_a]:text-brand-600 [&_a]:underline [&_a]:underline-offset-2",
   "[&_ul]:mb-5 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:mb-5 [&_ol]:list-decimal [&_ol]:pl-6",
   "[&_li]:mb-2",
   "[&_img]:my-4 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-xl",
-  "[&_blockquote]:my-5 [&_blockquote]:border-l-4 [&_blockquote]:border-coral-300 [&_blockquote]:pl-4 [&_blockquote]:italic",
+  "[&_blockquote]:my-5 [&_blockquote]:border-l-4 [&_blockquote]:border-brand-300 [&_blockquote]:pl-4 [&_blockquote]:italic",
   "[&_pre]:my-5 [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:bg-gray-100 [&_pre]:p-4 dark:[&_pre]:bg-ink-700",
   "[&_table]:my-5 [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto",
 ].join(" ");
@@ -149,7 +149,7 @@ export default async function Page({ params }: ArticlePageProps) {
         <div className="w-full lg:w-[65%]">
           <article className="card card-body sm:p-8">
             <header className="mb-6">
-              <h1 className="mb-3 text-2xl font-bold leading-snug text-coral-300 sm:text-3xl">{article.title}</h1>
+              <h1 className="mb-3 text-2xl font-bold leading-snug text-text-dark dark:text-white sm:text-3xl">{article.title}</h1>
 
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center gap-2">
@@ -161,7 +161,7 @@ export default async function Page({ params }: ArticlePageProps) {
                     className="h-8 w-8 rounded-full object-cover"
                   />
 
-                  <strong className="font-semibold text-coral-300">{authorName}</strong>
+                  <strong className="font-semibold text-brand-600">{authorName}</strong>
                 </div>
 
                 {publishedDate && (
@@ -187,7 +187,7 @@ export default async function Page({ params }: ArticlePageProps) {
             )}
 
             {article.excerpt && (
-              <p className="mb-6 border-l-4 border-sage-400 pl-4 text-lg leading-8 text-gray-600 dark:text-gray-300">
+              <p className="mb-6 border-l-4 border-brand-400 pl-4 text-lg leading-8 text-gray-600 dark:text-gray-300">
                 {article.excerpt}
               </p>
             )}
@@ -197,7 +197,7 @@ export default async function Page({ params }: ArticlePageProps) {
             <footer className="mt-8 border-t border-gray-200 pt-4 dark:border-white/10">
               <Link
                 href={ROUTES.articles}
-                className="text-sm font-medium text-sage-400 transition-colors hover:text-coral-300"
+                className="text-sm font-medium text-brand-600 transition-colors hover:text-brand-700"
               >
                 ← Back to all articles
               </Link>
@@ -206,9 +206,9 @@ export default async function Page({ params }: ArticlePageProps) {
         </div>
 
         {otherArticles.length > 0 && (
-          <aside className="w-full rounded-2xl bg-coral-300 p-6 shadow-card sm:p-8 lg:sticky lg:top-24 lg:w-[35%]">
+          <aside className="w-full rounded-2xl bg-brand-50 p-6 dark:bg-brand-500/10 shadow-card sm:p-8 lg:sticky lg:top-24 lg:w-[35%]">
             <div className="rounded-2xl bg-white p-6 shadow-float dark:bg-ink-800 sm:p-8">
-              <h2 className="relative pl-2 text-lg text-sage-400 before:absolute before:-left-4 before:-top-[5px] before:h-[39px] before:w-[22px] before:skew-x-[10deg] before:rounded-bl-[12px] before:rounded-tl-[8px] before:bg-sage-400">
+              <h2 className="relative pl-2 text-lg text-brand-600 before:absolute before:-left-4 before:-top-[5px] before:h-[39px] before:w-[22px] before:skew-x-[10deg] before:rounded-bl-[12px] before:rounded-tl-[8px] before:bg-brand-400">
                 New articles
               </h2>
 
@@ -220,7 +220,7 @@ export default async function Page({ params }: ArticlePageProps) {
                   >
                     <Link
                       href={articleHref(item)}
-                      className="text-base text-text transition-colors duration-300 hover:text-sage-400 dark:text-gray-100"
+                      className="text-base text-text transition-colors duration-300 hover:text-brand-400 dark:text-gray-100"
                     >
                       {item.title}
                     </Link>

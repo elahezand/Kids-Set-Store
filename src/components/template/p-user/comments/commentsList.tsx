@@ -35,7 +35,7 @@ export default function CommentsList({ initialPage, limit, status }: CommentsLis
     comment.product ? (
       <Link
         href={ROUTES.product(String(comment.product._id))}
-        className="font-medium text-gray-900 hover:text-sage-700 dark:text-gray-100 dark:hover:text-sage-300"
+        className="font-medium text-gray-900 hover:text-brand-700 dark:text-gray-100 dark:hover:text-brand-300"
       >
         {comment.product.title}
       </Link>

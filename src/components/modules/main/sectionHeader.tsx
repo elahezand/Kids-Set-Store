@@ -20,7 +20,7 @@ export default function SectionHeader({
     <div className="mb-6 flex items-end justify-between gap-6 sm:mb-8">
       <div className="min-w-0">
         {eyebrow && (
-          <p className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-[0.18em] text-coral-600 uppercase dark:text-coral-300">
+          <p className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-[0.18em] text-brand-600 uppercase dark:text-brand-300">
             <span aria-hidden="true" className="h-px w-6 bg-current" />
             {eyebrow}
           </p>
@@ -37,7 +37,7 @@ export default function SectionHeader({
       {href && (
         <Link
           href={href}
-          className="group inline-flex shrink-0 items-center gap-1.5 pb-1 text-sm font-semibold text-sage-700 transition-colors hover:text-sage-900 dark:text-sage-300 dark:hover:text-white"
+          className="group inline-flex shrink-0 items-center gap-1.5 pb-1 text-sm font-semibold text-brand-700 transition-colors hover:text-brand-900 dark:text-brand-300 dark:hover:text-white"
         >
           <span className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1.5px] bg-left-bottom bg-no-repeat pb-0.5 transition-[background-size] duration-300 group-hover:bg-[length:100%_1.5px]">
             {linkLabel}

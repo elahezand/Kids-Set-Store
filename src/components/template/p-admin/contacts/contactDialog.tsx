@@ -57,7 +57,7 @@ export default function ContactDialog({ message, onDelete, onClose }: ContactDia
         <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
           <a
             href={`mailto:${message.email}`}
-            className="inline-flex items-center gap-1.5 text-sage-700 hover:underline dark:text-sage-300"
+            className="inline-flex items-center gap-1.5 text-brand-700 hover:underline dark:text-brand-300"
           >
             <LuMail className="size-4" /> {message.email}
           </a>
@@ -74,7 +74,7 @@ export default function ContactDialog({ message, onDelete, onClose }: ContactDia
         </p>
 
         {answered ? (
-          <div className="border-l-2 border-sage-400 pl-4">
+          <div className="border-l-2 border-brand-400 pl-4">
             <p className="text-xs text-gray-700 dark:text-gray-500">
               Answered by {personName(typeof message.answeredBy === "object" ? message.answeredBy : null, "an admin")}
               {message.answeredAt ? ` on ${formatDate(message.answeredAt)}` : ""}

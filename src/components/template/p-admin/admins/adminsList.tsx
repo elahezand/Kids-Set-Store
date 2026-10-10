@@ -42,7 +42,7 @@ export default function AdminsList({ admins, currentUserId }: AdminsListProps) {
                   alt=""
                   width={48}
                   height={48}
-                  className="size-12 shrink-0 rounded-full object-cover ring-2 ring-sage-100 dark:ring-white/10"
+                  className="size-12 shrink-0 rounded-full object-cover ring-2 ring-brand-100 dark:ring-white/10"
                 />
                 <div className="min-w-0 leading-tight">
                   <p className="truncate font-semibold text-gray-900 dark:text-gray-100">

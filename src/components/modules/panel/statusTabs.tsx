@@ -31,7 +31,7 @@ export default function StatusTabs<T extends string>({ tabs, value, param = "sta
               onClick={() => update({ [param]: tab.value === "all" ? null : tab.value })}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors sm:text-sm ${
                 active
-                  ? "bg-white text-sage-700 shadow-card dark:bg-ink-800 dark:text-sage-300"
+                  ? "bg-white text-brand-700 shadow-card dark:bg-ink-800 dark:text-brand-300"
                   : "text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
               }`}
             >

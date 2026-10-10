@@ -33,7 +33,7 @@ const VALUES: Value[] = [
     Icon: LuShieldCheck,
     title: "Made to last",
     text: "Strong stitching and colors that survive the washing machine, ready to be handed down.",
-    tone: "bg-sage-50 text-sage-600 dark:bg-sage-500/10 dark:text-sage-300",
+    tone: "bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-300",
   },
   {
     Icon: LuRuler,
@@ -116,7 +116,7 @@ export default function AboutPage() {
         </ul>
       </section>
 
-      <section className="mt-14 flex flex-col items-start justify-between gap-4 rounded-2xl bg-sage-50 p-6 sm:mt-16 sm:flex-row sm:items-center sm:p-8 dark:bg-ink-950">
+      <section className="mt-14 flex flex-col items-start justify-between gap-4 rounded-2xl bg-brand-50 p-6 sm:mt-16 sm:flex-row sm:items-center sm:p-8 dark:bg-ink-950">
         <div>
           <h2 className="text-lg font-bold sm:text-xl">Have a question about a size or an order?</h2>
           <p className="mt-1 text-sm text-gray-700 dark:text-gray-400">

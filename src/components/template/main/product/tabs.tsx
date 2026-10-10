@@ -32,7 +32,7 @@ const Tabs = ({ longDescription, specs }: TabsProps) => {
                 aria-controls={`panel-${id}`}
                 onClick={() => setActiveTab(id)}
                 className={`relative block w-full cursor-pointer pt-5 text-sm transition-colors duration-200 sm:text-base
-                                    after:absolute after:right-0 after:top-0 after:h-[3px] after:bg-sage-400 after:transition-all
+                                    after:absolute after:right-0 after:top-0 after:h-[3px] after:bg-brand-400 after:transition-all
                                     ${
                                       isActive
                                         ? "text-black after:w-full dark:text-white"
@@ -50,7 +50,7 @@ const Tabs = ({ longDescription, specs }: TabsProps) => {
         role="tabpanel"
         id={`panel-${activeTab}`}
         aria-labelledby={`tab-${activeTab}`}
-        className="mt-8 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:text-sage-400 [&_p]:mt-5"
+        className="mt-8 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:text-brand-400 [&_p]:mt-5"
       >
         {activeTab === "description" ? <Description description={longDescription} /> : <Specifications specs={specs} />}
       </section>

@@ -19,7 +19,7 @@ export default function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className={`flex flex-col items-center justify-center gap-3 px-6 py-12 text-center sm:py-14 ${className}`}>
-      <span className="flex size-14 items-center justify-center rounded-2xl bg-sage-50 text-sage-600 dark:bg-sage-500/10 dark:text-sage-300">
+      <span className="flex size-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-300">
         <Icon className="size-7" />
       </span>
       <div>

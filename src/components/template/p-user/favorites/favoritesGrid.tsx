@@ -61,7 +61,7 @@ export default function FavoritesGrid({ initialPage, limit }: FavoritesGridProps
             <div className="flex flex-1 flex-col gap-1.5 p-3 sm:gap-2 sm:p-4">
               <Link
                 href={ROUTES.product(product._id)}
-                className="line-clamp-2 text-sm font-medium text-gray-900 hover:text-sage-700 dark:text-gray-100"
+                className="line-clamp-2 text-sm font-medium text-gray-900 hover:text-brand-700 dark:text-gray-100"
               >
                 {product.name}
               </Link>

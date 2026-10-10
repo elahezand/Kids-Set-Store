@@ -175,7 +175,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
             <Thumb key={src} src={src} isNew onRemove={() => setFiles((list) => list.filter((_, i) => i !== index))} />
           ))}
           {kept.length + files.length < MAX_IMAGES && (
-            <label className="flex size-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-gray-300 text-xs text-gray-600 transition-colors hover:border-sage-400 hover:text-sage-700 dark:border-white/15">
+            <label className="flex size-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-gray-300 text-xs text-gray-600 transition-colors hover:border-brand-400 hover:text-brand-700 dark:border-white/15">
               <LuImagePlus className="size-5" />
               Add images
               <input

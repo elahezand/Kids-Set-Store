@@ -83,7 +83,7 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-200 px-5 py-4 dark:border-white/10">
           <Link
             href={ROUTES.home}
-            className="flex items-center text-xl font-bold text-sage-600 dark:text-sage-300"
+            className="flex items-center text-xl font-bold text-brand-600 dark:text-brand-300"
             aria-label="Home"
           >
             <SiteLogo src={logo} className="h-9 w-auto max-w-[140px]" />
@@ -150,7 +150,7 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
                       }`}
                     >
                       <div className="overflow-hidden">
-                        <ul className="mb-2 ml-2 flex flex-col gap-0.5 border-l-2 border-sage-200 pl-3 dark:border-sage-700">
+                        <ul className="mb-2 ml-2 flex flex-col gap-0.5 border-l-2 border-brand-200 pl-3 dark:border-brand-700">
                           {category.children.map((sub) => {
                             const hasGrandChildren = sub.children?.length > 0;
                             const isSubOpen = openSub === sub.id;
@@ -160,7 +160,7 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
                                 <div className="flex items-center">
                                   <Link
                                     href={ROUTES.category(sub.slug)}
-                                    className="flex-1 rounded-lg px-2 py-2.5 text-sm capitalize text-gray-700 transition-colors hover:bg-gray-50 hover:text-sage-600 dark:text-gray-300 dark:hover:bg-white/5"
+                                    className="flex-1 rounded-lg px-2 py-2.5 text-sm capitalize text-gray-700 transition-colors hover:bg-gray-50 hover:text-brand-600 dark:text-gray-300 dark:hover:bg-white/5"
                                   >
                                     {sub.name}
                                   </Link>
@@ -192,7 +192,7 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
                                           <li key={item.id}>
                                             <Link
                                               href={ROUTES.category(item.slug)}
-                                              className="block rounded-lg px-2 py-2 text-sm capitalize text-gray-600 transition-colors hover:text-sage-600 dark:text-gray-500"
+                                              className="block rounded-lg px-2 py-2 text-sm capitalize text-gray-600 transition-colors hover:text-brand-600 dark:text-gray-500"
                                             >
                                               {item.name}
                                             </Link>
@@ -209,7 +209,7 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
                           <li>
                             <Link
                               href={ROUTES.category(category.slug)}
-                              className="block rounded-lg px-2 py-2.5 text-sm font-semibold text-coral-400 transition-colors hover:text-coral-500"
+                              className="block rounded-lg px-2 py-2.5 text-sm font-semibold text-brand-600 transition-colors hover:text-brand-700"
                             >
                               View all {category.name}
                             </Link>
@@ -234,7 +234,7 @@ export default function MobileMenu({ tree = [], username = null, favoriteCount =
                   aria-current={pathname === item.href ? "page" : undefined}
                   className={`block rounded-lg px-2 py-2.5 text-[15px] transition-colors hover:bg-gray-50 dark:hover:bg-white/5 ${
                     pathname === item.href
-                      ? "font-semibold text-sage-600 dark:text-sage-300"
+                      ? "font-semibold text-brand-600 dark:text-brand-300"
                       : "text-gray-700 dark:text-gray-300"
                   }`}
                 >

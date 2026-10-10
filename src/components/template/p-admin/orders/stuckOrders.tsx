@@ -76,7 +76,7 @@ export default function StuckOrders({ orders, status }: StuckOrdersProps) {
               {status.overdueCash > 0 && (
                 <Link
                   href={`${ROUTES.admin.orders}?status=overdue`}
-                  className="text-sage-700 hover:underline dark:text-sage-300"
+                  className="text-brand-700 hover:underline dark:text-brand-300"
                 >
                   Review them
                 </Link>
@@ -90,7 +90,7 @@ export default function StuckOrders({ orders, status }: StuckOrdersProps) {
             </p>
           </div>
           {lastRun && (
-            <p className="flex items-center gap-2 text-sm text-mint-700 sm:col-span-3 dark:text-mint-300">
+            <p className="flex items-center gap-2 text-sm text-success-700 sm:col-span-3 dark:text-success-300">
               <LuCircleCheck className="size-4 shrink-0" /> Last run: {resultText(lastRun)}.
             </p>
           )}

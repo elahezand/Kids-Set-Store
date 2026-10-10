@@ -231,7 +231,7 @@ export default function ArticleForm({ article, categories }: ArticleFormProps) {
                 </button>
               </div>
             ) : (
-              <label className="flex aspect-[16/10] cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 text-sm text-gray-600 transition-colors hover:border-sage-400 hover:text-sage-700 dark:border-white/15">
+              <label className="flex aspect-[16/10] cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 text-sm text-gray-600 transition-colors hover:border-brand-400 hover:text-brand-700 dark:border-white/15">
                 <LuImagePlus className="size-6" />
                 Choose an image
                 <input

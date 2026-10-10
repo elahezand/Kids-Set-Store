@@ -164,7 +164,7 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
                         onClick={() => toggleSize(option.value)}
                         className={`inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                           on
-                            ? "border-sage-500 bg-sage-50 text-sage-700 dark:bg-sage-500/10 dark:text-sage-300"
+                            ? "border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300"
                             : "border-gray-300 text-gray-700 hover:border-gray-400 dark:border-white/15 dark:text-gray-400"
                         }`}
                       >
@@ -371,7 +371,7 @@ export default function VariantsEditor({ form, rules, categoryName }: VariantsEd
                           <span className="text-gray-500">-</span>
                         ) : (
                           <span
-                            className={`font-semibold tabular-nums ${discounted ? "text-sage-700 dark:text-sage-300" : "text-gray-900 dark:text-gray-100"}`}
+                            className={`font-semibold tabular-nums ${discounted ? "text-brand-700 dark:text-brand-300" : "text-gray-900 dark:text-gray-100"}`}
                           >
                             {formatPrice(final)}
                           </span>

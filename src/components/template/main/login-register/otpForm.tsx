@@ -71,7 +71,7 @@ const OtpForm = ({ phone, onCancel }: OtpFormProps) => {
           type="button"
           onClick={() => resend.mutate({ phone })}
           disabled={resendTimer > 0 || resend.isPending}
-          className="text-sm font-medium text-sage-500 transition-colors hover:text-sage-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="text-sm font-medium text-brand-500 transition-colors hover:text-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {resend.isPending ? "Sending..." : resendTimer > 0 ? `Send code again in ${resendTimer}s` : "Send code again"}
         </button>

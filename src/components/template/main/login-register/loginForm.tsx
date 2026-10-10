@@ -126,7 +126,7 @@ const LoginForm = ({ showRegisterForm }: { showRegisterForm: () => void }) => {
 
         <button type="button" onClick={showRegisterForm} className="mt-2 font-bold text-text dark:text-gray-100">
           Don&apos;t have an account? <br />
-          <strong className="text-sage-500">Sign Up</strong>
+          <strong className="text-brand-500">Sign Up</strong>
         </button>
       </div>
 

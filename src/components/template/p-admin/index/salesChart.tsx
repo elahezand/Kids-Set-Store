@@ -8,7 +8,7 @@ import { formatPrice } from "@/utils/format";
 const RANGES = [7, 30, 90] as const;
 type Range = (typeof RANGES)[number];
 
-const SAGE = "#127068";
+const BRAND = "#127068";
 const CORAL = "#ff7a68";
 const GRID = "rgba(140,140,140,0.18)";
 const AXIS = { fontSize: 12, fill: "#7e889a" };
@@ -55,7 +55,7 @@ export default function SalesChart() {
               onClick={() => setDays(range)}
               className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
                 range === days
-                  ? "bg-white text-sage-700 shadow-card dark:bg-ink-800 dark:text-sage-300"
+                  ? "bg-white text-brand-700 shadow-card dark:bg-ink-800 dark:text-brand-300"
                   : "text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
               }`}
             >
@@ -93,7 +93,7 @@ export default function SalesChart() {
                   yAxisId="orders"
                   dataKey="orders"
                   name="Orders"
-                  fill={SAGE}
+                  fill={BRAND}
                   radius={[6, 6, 0, 0]}
                   maxBarSize={22}
                 />
@@ -113,7 +113,7 @@ export default function SalesChart() {
         )}
         <div className="mt-3 flex items-center gap-4 text-xs text-gray-700 dark:text-gray-400">
           <span className="flex items-center gap-1.5">
-            <span className="size-2.5 rounded-sm" style={{ background: SAGE }} /> Orders
+            <span className="size-2.5 rounded-sm" style={{ background: BRAND }} /> Orders
           </span>
           <span className="flex items-center gap-1.5">
             <span className="h-0.5 w-3 rounded-full" style={{ background: CORAL }} /> Revenue

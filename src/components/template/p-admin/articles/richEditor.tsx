@@ -86,7 +86,7 @@ export default function RichEditor({ value, onChange, invalid = false }: RichEdi
       className={`overflow-hidden rounded-xl border bg-white shadow-card focus-within:ring-4 dark:bg-ink-900 ${
         invalid
           ? "border-danger-400 focus-within:ring-danger-400/20"
-          : "border-gray-300 focus-within:border-sage-500 focus-within:ring-sage-500/15 dark:border-white/10"
+          : "border-gray-300 focus-within:border-brand-500 focus-within:ring-brand-500/15 dark:border-white/10"
       }`}
     >
       <div className="flex flex-wrap gap-1 border-b border-gray-200 bg-gray-50 p-1.5 dark:border-white/10 dark:bg-white/[0.03]">
@@ -98,7 +98,7 @@ export default function RichEditor({ value, onChange, invalid = false }: RichEdi
             aria-label={label}
             aria-pressed={active}
             onClick={run}
-            className={`btn btn-sm btn-icon ${active ? "bg-white text-sage-700 shadow-card dark:bg-ink-700 dark:text-sage-300" : "btn-ghost"}`}
+            className={`btn btn-sm btn-icon ${active ? "bg-white text-brand-700 shadow-card dark:bg-ink-700 dark:text-brand-300" : "btn-ghost"}`}
           >
             <Icon className="size-4" />
           </button>

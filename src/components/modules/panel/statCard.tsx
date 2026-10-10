@@ -3,10 +3,10 @@ import { LuTrendingUp } from "react-icons/lu";
 import type { IconType } from "react-icons";
 
 const tones = {
-  sage: "bg-sage-50 text-sage-600 dark:bg-sage-500/10 dark:text-sage-300",
+  brand: "bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-300",
   coral: "bg-coral-50 text-coral-500 dark:bg-coral-500/10 dark:text-coral-300",
-  peach: "bg-peach-50 text-peach-600 dark:bg-peach-500/10 dark:text-peach-300",
-  mint: "bg-mint-50 text-mint-600 dark:bg-mint-500/10 dark:text-mint-300",
+  sun: "bg-sun-50 text-sun-700 dark:bg-sun-500/10 dark:text-sun-300",
+  sky: "bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-300",
 } as const;
 
 interface StatCardProps {
@@ -22,14 +22,14 @@ export default function StatCard({
   title,
   value,
   icon: Icon = LuTrendingUp,
-  tone = "sage",
+  tone = "brand",
   hint,
   href,
 }: StatCardProps) {
   const body = (
     <>
       <span
-        className={`flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-12 ${tones[tone] ?? tones.sage}`}
+        className={`flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-12 ${tones[tone] ?? tones.brand}`}
       >
         <Icon className="size-5 sm:size-6" />
       </span>

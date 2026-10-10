@@ -12,41 +12,40 @@ import {
 } from "@/components/template/main/index/hero/shapes";
 import { scrollStarStore } from "@/components/template/main/index/scrollStar/scrollStarStore";
 
+// same values as the tokens in globals.css
 const PALETTE = {
-  sage: "#38aba3",
-  sageDeep: "#127068",
-  coral: "#ff7a68",
-  mint: "#8ccf5f",
-  peach: "#ff8a3d",
-  sky: "#0f71c2",
-  sun: "#ffc425",
+  brand: "#38aba3", // brand-400
+  brandDeep: "#127068", // brand-600
+  coral: "#ff7a68", // coral-400
+  sky: "#1d86bf", // sky-600
+  sun: "#ffd23f", // sun-400
 };
 
 const BLOCK_SIZE = 0.88;
 
 const BLOCKS: Array<{ letter: string; color: string; position: [number, number, number]; tilt: number }> = [
-  { letter: "K", color: PALETTE.sage, position: [-1.38, -1.2, 0], tilt: 0.06 },
+  { letter: "K", color: PALETTE.brand, position: [-1.38, -1.2, 0], tilt: 0.06 },
   { letter: "I", color: PALETTE.coral, position: [-0.46, -1.2, 0.08], tilt: -0.08 },
-  { letter: "D", color: PALETTE.mint, position: [0.46, -1.2, -0.04], tilt: 0.04 },
-  { letter: "S", color: PALETTE.peach, position: [1.38, -1.2, 0.05], tilt: -0.05 },
-  { letter: "S", color: PALETTE.sky, position: [-0.92, -0.28, 0.02], tilt: -0.1 },
+  { letter: "D", color: PALETTE.sky, position: [0.46, -1.2, -0.04], tilt: 0.04 },
+  { letter: "S", color: PALETTE.sun, position: [1.38, -1.2, 0.05], tilt: -0.05 },
+  { letter: "S", color: PALETTE.coral, position: [-0.92, -0.28, 0.02], tilt: -0.1 },
   { letter: "E", color: PALETTE.sun, position: [0, -0.28, -0.06], tilt: 0.09 },
-  { letter: "T", color: PALETTE.sageDeep, position: [0.92, -0.28, 0.04], tilt: -0.04 },
+  { letter: "T", color: PALETTE.brandDeep, position: [0.92, -0.28, 0.04], tilt: -0.04 },
 ];
 
 const BALLOONS: Array<{ color: string; position: [number, number, number]; scale: number }> = [
   { color: PALETTE.coral, position: [-1.95, 1.55, -0.4], scale: 0.48 },
-  { color: PALETTE.sage, position: [1.85, 1.85, -0.9], scale: 0.42 },
+  { color: PALETTE.brand, position: [1.85, 1.85, -0.9], scale: 0.42 },
   { color: PALETTE.sun, position: [0.25, 2.25, -1.8], scale: 0.36 },
 ];
 
 const STARS: Array<{ color: string; position: [number, number, number]; scale: number }> = [
   { color: PALETTE.sky, position: [2.05, 0.3, 0.8], scale: 0.75 },
-  { color: PALETTE.sage, position: [-0.85, 2.35, 0.2], scale: 0.5 },
+  { color: PALETTE.brand, position: [-0.85, 2.35, 0.2], scale: 0.5 },
   { color: PALETTE.coral, position: [1.45, -2.25, 1], scale: 0.45 },
 ];
 
-const CONFETTI_COLORS = [PALETTE.coral, PALETTE.mint, PALETTE.sun, PALETTE.sky, PALETTE.sage];
+const CONFETTI_COLORS = [PALETTE.coral, PALETTE.sun, PALETTE.sky, PALETTE.brand];
 
 function ToyBlock({ letter, color, position, tilt }: (typeof BLOCKS)[number]) {
   const geometry = useMemo(() => new RoundedBoxGeometry(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, 4, 0.1), []);
@@ -144,7 +143,7 @@ function Shirt() {
   return (
     <group position={[-2.05, 0.15, 0.6]} rotation={[0.1, 0.45, -0.18]} scale={0.72}>
       <mesh geometry={shirt}>
-        <meshStandardMaterial color={PALETTE.sageDeep} roughness={0.7} />
+        <meshStandardMaterial color={PALETTE.brandDeep} roughness={0.7} />
       </mesh>
       <mesh geometry={badge} position={[0.2, 0.18, 0.13]}>
         <meshStandardMaterial color={PALETTE.sun} roughness={0.4} />

@@ -40,12 +40,12 @@ export default async function ContactPage() {
       <Breadcrumb route="contact-us" title="Contact Us" />
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12">
         <div className="flex flex-col items-center justify-center gap-6">
-          <div className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-b from-sage-50 to-peach-50 px-4 pt-8 sm:px-8">
+          <div className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-b from-brand-50 to-sun-50 px-4 pt-8 sm:px-8">
             <div
               aria-hidden="true"
               className="absolute -top-14 -right-8 size-44 rounded-full bg-sun-400/25 blur-2xl dark:bg-sun-400/10"
             />
-            <p className="relative text-center text-sm font-semibold text-coral-500 dark:text-coral-400">
+            <p className="relative text-center text-sm font-semibold text-brand-600 dark:text-brand-300">
               We&apos;d love to hear from you
             </p>
             <Image
@@ -60,12 +60,12 @@ export default async function ContactPage() {
           </div>
 
           {details.length > 0 && (
-            <ul className="flex w-full flex-col gap-3 rounded-2xl bg-mint-200/60 p-5 text-sm dark:bg-ink-800">
+            <ul className="flex w-full flex-col gap-3 rounded-2xl bg-brand-50 p-5 text-sm dark:bg-ink-800">
               {details.map(({ Icon, text, href }) => (
                 <li key={text} className="flex items-center gap-3">
-                  <Icon className="size-4 shrink-0 text-sage-600" />
+                  <Icon className="size-4 shrink-0 text-brand-600" />
                   {href ? (
-                    <a href={href} className="hover:text-coral-400">
+                    <a href={href} className="hover:text-brand-600">
                       {text}
                     </a>
                   ) : (

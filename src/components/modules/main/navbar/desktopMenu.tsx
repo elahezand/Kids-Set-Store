@@ -15,7 +15,7 @@ const openOnHover =
 const Arrow = () => (
   <IoIosArrowDown
     aria-hidden="true"
-    className="size-3.5 text-coral-400 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180"
+    className="size-3.5 text-gray-400 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180"
   />
 );
 
@@ -50,7 +50,7 @@ function SmallDropdown({
             <li key={link.href}>
               <Link
                 href={link.href}
-                className="block rounded-xl px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-coral-50 hover:text-coral-600 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-coral-300"
+                className="block rounded-xl px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-brand-50 hover:text-brand-700 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-brand-200"
               >
                 {link.label}
               </Link>
@@ -82,7 +82,7 @@ function CategoryItem({ category }: { category: CategoryNode }) {
               <p className="text-base font-bold text-gray-900 dark:text-gray-100">{category.name}</p>
               <Link
                 href={ROUTES.category(category.slug)}
-                className="text-sm font-medium text-sage-600 hover:text-coral-500 dark:text-sage-300"
+                className="text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-300"
               >
                 View all →
               </Link>
@@ -93,18 +93,18 @@ function CategoryItem({ category }: { category: CategoryNode }) {
                 <div key={sub.id} className="min-w-0">
                   <Link
                     href={ROUTES.category(sub.slug)}
-                    className="mb-2 block truncate text-[15px] font-semibold text-sage-600 transition-colors hover:text-coral-500 dark:text-sage-300"
+                    className="mb-2 block truncate text-[15px] font-semibold text-brand-600 transition-colors hover:text-brand-700 dark:text-brand-300"
                   >
                     {sub.name}
                   </Link>
 
                   {sub.children.length > 0 && (
-                    <ul className="space-y-0.5 border-l-2 border-coral-100 pl-3 dark:border-white/10">
+                    <ul className="space-y-0.5 border-l-2 border-gray-200 pl-3 dark:border-white/10">
                       {sub.children.map((item) => (
                         <li key={item.id}>
                           <Link
                             href={ROUTES.category(item.slug)}
-                            className="block truncate py-1 text-sm text-gray-600 transition-colors hover:text-coral-500 dark:text-gray-300 dark:hover:text-coral-300"
+                            className="block truncate py-1 text-sm text-gray-600 transition-colors hover:text-brand-700 dark:text-gray-300 dark:hover:text-brand-200"
                           >
                             {item.name}
                           </Link>
@@ -154,7 +154,7 @@ export default function DesktopMenu({ tree, username }: DesktopMenuProps) {
         <li className="ml-1">
           <Link
             href={ROUTES.login}
-            className="btn btn-sm whitespace-nowrap rounded-full border-2 border-coral-400 px-4 py-1.5 text-current transition-colors hover:border-coral-500 hover:bg-coral-500 hover:text-white"
+            className="btn btn-sm whitespace-nowrap rounded-full border-2 border-brand-500 px-4 py-1.5 text-current transition-colors hover:border-brand-600 hover:bg-brand-600 hover:text-white"
           >
             Sign up / Log in
           </Link>

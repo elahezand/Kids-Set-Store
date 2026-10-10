@@ -3,17 +3,19 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-sage: #38aba3;
-  --color-sage-50: #ecf8f7;
-  --color-sage-100: #d0efec;
-  --color-sage-200: #a3dfd9;
-  --color-sage-300: #6cc8c0;
-  --color-sage-400: #38aba3;
-  --color-sage-500: #15807a;
-  --color-sage-600: #127068;
-  --color-sage-700: #0f5c56;
-  --color-sage-800: #0c4a45;
-  --color-sage-900: #08332f;
+  /* brand: buttons, links. coral: sales and discounts. sun, sky: light backgrounds only.
+     success, warning, danger: status messages */
+  --color-brand: #38aba3;
+  --color-brand-50: #ecf8f7;
+  --color-brand-100: #d0efec;
+  --color-brand-200: #a3dfd9;
+  --color-brand-300: #6cc8c0;
+  --color-brand-400: #38aba3;
+  --color-brand-500: #15807a;
+  --color-brand-600: #127068;
+  --color-brand-700: #0f5c56;
+  --color-brand-800: #0c4a45;
+  --color-brand-900: #08332f;
 
   --color-coral: #ff9e8f;
   --color-coral-50: #fff3f1;
@@ -27,29 +29,28 @@
   --color-coral-800: #78271e;
   --color-coral-900: #4f1a14;
 
-  --color-mint: #a8ecd2;
-  --color-mint-50: #edfcf6;
-  --color-mint-100: #d2f7e8;
-  --color-mint-200: #a8ecd2;
-  --color-mint-300: #6fdcb5;
-  --color-mint-400: #34c79a;
-  --color-mint-500: #1fa97f;
-  --color-mint-600: #178a68;
-  --color-mint-700: #156e54;
-  --color-mint-800: #135744;
-  --color-mint-900: #0c372c;
+  --color-success-50: #edfcf6;
+  --color-success-100: #d2f7e8;
+  --color-success-200: #a8ecd2;
+  --color-success-300: #6fdcb5;
+  --color-success-400: #34c79a;
+  --color-success-500: #1fa97f;
+  --color-success-600: #178a68;
+  --color-success-700: #156e54;
+  --color-success-800: #135744;
+  --color-success-900: #0c372c;
 
-  --color-peach: #ffd9b3;
-  --color-peach-50: #fff7ee;
-  --color-peach-100: #ffecd7;
-  --color-peach-200: #ffd9b3;
-  --color-peach-300: #ffc28a;
-  --color-peach-400: #ffb36b;
-  --color-peach-500: #f7913d;
-  --color-peach-600: #d6731f;
-  --color-peach-700: #aa5816;
-  --color-peach-800: #804315;
-  --color-peach-900: #522b0f;
+  --color-warning: #f7913d;
+  --color-warning-50: #fff7ee;
+  --color-warning-100: #ffecd7;
+  --color-warning-200: #ffd9b3;
+  --color-warning-300: #ffc28a;
+  --color-warning-400: #ffb36b;
+  --color-warning-500: #f7913d;
+  --color-warning-600: #d6731f;
+  --color-warning-700: #aa5816;
+  --color-warning-800: #804315;
+  --color-warning-900: #522b0f;
 
   --color-sky-50: #eefaff;
   --color-sky-100: #d8f2fd;
@@ -87,7 +88,6 @@
   --color-danger-900: #4a1215;
 
   --color-success: #178a68;
-  --color-success-light: #edfcf6;
 
   --color-gray-50: #f7f8fa;
   --color-gray-100: #eff1f5;
@@ -117,7 +117,7 @@
 
   --shadow-card: 0 1px 2px rgb(20 25 37 / 0.04), 0 2px 6px rgb(20 25 37 / 0.06);
   --shadow-float: 0 16px 40px -12px rgb(20 25 37 / 0.2);
-  --shadow-pop: 0 6px 0 0 var(--color-sage-700);
+  --shadow-pop: 0 6px 0 0 var(--color-brand-700);
 
   --animate-fade-in: fade-in 0.2s ease-out;
   --animate-scale-in: scale-in 0.2s ease-out;
@@ -186,7 +186,7 @@
   }
 
   :where(a, button, [role="button"], input, select, textarea, summary):focus-visible {
-    outline: 2px solid var(--color-sage-500);
+    outline: 2px solid var(--color-brand-500);
     outline-offset: 2px;
     border-radius: 0.5rem;
   }
@@ -212,7 +212,7 @@
   }
 
   ::selection {
-    @apply bg-coral-200 text-sage-900;
+    @apply bg-brand-200 text-brand-900;
   }
 
   body::-webkit-scrollbar {
@@ -224,7 +224,7 @@
   }
 
   body::-webkit-scrollbar-thumb {
-    @apply rounded-full border-2 border-solid border-gray-50 bg-coral-300 dark:border-ink-950 dark:bg-sage-600;
+    @apply rounded-full border-2 border-solid border-gray-50 bg-gray-300 dark:border-ink-950 dark:bg-brand-600;
   }
 }
 
@@ -250,7 +250,7 @@
   }
 
   .skip-link {
-    @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[10000] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-sage-700 focus:shadow-float;
+    @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[10000] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-brand-700 focus:shadow-float;
   }
 
   .card-hover {
@@ -277,11 +277,11 @@
   }
 
   .section-link {
-    @apply flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold text-coral-600 transition-colors hover:bg-coral-50 hover:text-coral-700 dark:text-coral-300 dark:hover:bg-coral-500/10 sm:text-base;
+    @apply flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold text-brand-600 transition-colors hover:bg-brand-50 hover:text-brand-700 dark:text-brand-300 dark:hover:bg-brand-500/10 sm:text-base;
   }
 
   .auth-shell {
-    @apply relative z-1 mx-auto grid w-full max-w-[1100px] grid-cols-1 items-center gap-0 overflow-hidden rounded-[2rem] border border-mint-200 bg-white shadow-float dark:border-sage-800 dark:bg-ink-800 md:grid-cols-2;
+    @apply relative z-1 mx-auto grid w-full max-w-[1100px] grid-cols-1 items-center gap-0 overflow-hidden rounded-[2rem] border border-brand-100 bg-white shadow-float dark:border-brand-800 dark:bg-ink-800 md:grid-cols-2;
   }
 
   .auth-card {
@@ -306,7 +306,7 @@
   }
 
   .btn-primary {
-    @apply bg-sage-600 text-white shadow-card hover:bg-sage-700 focus-visible:ring-sage-500/25;
+    @apply bg-brand-600 text-white shadow-card hover:bg-brand-700 focus-visible:ring-brand-500/25;
   }
 
   .btn-accent {
@@ -332,22 +332,22 @@
   }
 
   .btn-soft-primary {
-    @apply bg-sage-50 text-sage-700 hover:bg-sage-100 focus-visible:ring-sage-500/25;
-    @apply dark:bg-sage-500/10 dark:text-sage-300 dark:hover:bg-sage-500/20;
+    @apply bg-brand-50 text-brand-700 hover:bg-brand-100 focus-visible:ring-brand-500/25;
+    @apply dark:bg-brand-500/10 dark:text-brand-300 dark:hover:bg-brand-500/20;
   }
 
   .btn-pop {
-    @apply bg-sage-500 text-white focus-visible:ring-sage-500/30;
-    box-shadow: 0 4px 0 0 var(--color-sage-700);
+    @apply bg-brand-500 text-white focus-visible:ring-brand-500/30;
+    box-shadow: 0 4px 0 0 var(--color-brand-700);
     transform: translateY(-2px);
   }
 
   .btn-pop:hover {
-    @apply bg-sage-600;
+    @apply bg-brand-600;
   }
 
   .btn-pop:active {
-    box-shadow: 0 1px 0 0 var(--color-sage-700);
+    box-shadow: 0 1px 0 0 var(--color-brand-700);
     transform: translateY(1px);
   }
 
@@ -357,7 +357,7 @@
 
   .input {
     @apply block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-card outline-none transition;
-    @apply placeholder:text-gray-600 hover:border-gray-400 focus:border-sage-500 focus:ring-4 focus:ring-sage-500/15;
+    @apply placeholder:text-gray-600 hover:border-gray-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15;
     @apply disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-70;
     @apply dark:border-white/10 dark:bg-ink-900 dark:text-gray-100 dark:placeholder:text-gray-500;
   }
@@ -374,8 +374,8 @@
   }
 
   input[type="file"].input {
-    @apply cursor-pointer p-1.5 file:mr-3 file:rounded-lg file:border-0 file:bg-sage-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-sage-700 hover:file:bg-sage-100;
-    @apply dark:file:bg-sage-500/10 dark:file:text-sage-300;
+    @apply cursor-pointer p-1.5 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-100;
+    @apply dark:file:bg-brand-500/10 dark:file:text-brand-300;
   }
 
   .input-error {
@@ -392,7 +392,7 @@
 
   .checkbox {
     @apply relative size-5 shrink-0 cursor-pointer appearance-none rounded-md border-2 border-gray-300 bg-white outline-none transition;
-    @apply hover:border-coral-300 focus-visible:ring-4 focus-visible:ring-coral-200 checked:border-coral-500 checked:bg-coral-500;
+    @apply hover:border-brand-300 focus-visible:ring-4 focus-visible:ring-brand-200 checked:border-brand-500 checked:bg-brand-500;
     @apply dark:border-white/20 dark:bg-ink-800;
   }
 
@@ -427,7 +427,7 @@
   }
 
   .product-card-media {
-    @apply relative aspect-square overflow-hidden rounded-2xl bg-coral-50 dark:bg-white/5;
+    @apply relative aspect-square overflow-hidden rounded-2xl bg-gray-50 dark:bg-white/5;
   }
 
   .product-card-media img {
@@ -461,26 +461,26 @@
   }
 
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800 transition-colors hover:border-sage-300 hover:bg-sage-50;
+    @apply inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800 transition-colors hover:border-brand-300 hover:bg-brand-50;
     @apply dark:border-white/10 dark:bg-ink-800 dark:text-gray-200 dark:hover:bg-white/5;
   }
 
   .chip-active,
   .chip[aria-pressed="true"] {
-    @apply border-sage-600 bg-sage-600 text-white hover:border-sage-700 hover:bg-sage-700;
+    @apply border-brand-600 bg-brand-600 text-white hover:border-brand-700 hover:bg-brand-700;
   }
 
   .size-option {
     @apply inline-flex min-w-12 cursor-pointer items-center justify-center rounded-xl border-2 border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 tabular-nums transition;
-    @apply hover:border-sage-400 has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-sage-500/20;
-    @apply has-[:checked]:border-sage-600 has-[:checked]:bg-sage-50 has-[:checked]:text-sage-800;
+    @apply hover:border-brand-400 has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-brand-500/20;
+    @apply has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50 has-[:checked]:text-brand-800;
     @apply has-[:disabled]:cursor-not-allowed has-[:disabled]:border-dashed has-[:disabled]:text-gray-500 has-[:disabled]:line-through;
-    @apply dark:border-white/10 dark:bg-ink-800 dark:text-gray-200 dark:has-[:checked]:bg-sage-500/15 dark:has-[:checked]:text-sage-200;
+    @apply dark:border-white/10 dark:bg-ink-800 dark:text-gray-200 dark:has-[:checked]:bg-brand-500/15 dark:has-[:checked]:text-brand-200;
   }
 
   .swatch {
     @apply relative inline-block size-8 cursor-pointer rounded-full ring-2 ring-white ring-offset-2 ring-offset-gray-200 transition;
-    @apply has-[:checked]:ring-offset-sage-600 has-[:focus-visible]:ring-offset-sage-500;
+    @apply has-[:checked]:ring-offset-brand-600 has-[:focus-visible]:ring-offset-brand-500;
     @apply dark:ring-ink-800 dark:ring-offset-white/20;
     background: var(--swatch, var(--color-gray-300));
   }
@@ -523,7 +523,7 @@
   }
 
   .badge-success {
-    @apply bg-sage-50 text-sage-700 ring-sage-600/20 dark:bg-sage-500/10 dark:text-sage-300 dark:ring-sage-400/20;
+    @apply bg-success-50 text-success-700 ring-success-600/20 dark:bg-success-500/10 dark:text-success-300 dark:ring-success-400/20;
   }
 
   .badge-danger {
@@ -531,7 +531,7 @@
   }
 
   .badge-warning {
-    @apply bg-sun-50 text-sun-800 ring-sun-500/25 dark:bg-sun-500/10 dark:text-sun-300 dark:ring-sun-400/20;
+    @apply bg-warning-50 text-warning-700 ring-warning-500/25 dark:bg-warning-500/10 dark:text-warning-300 dark:ring-warning-400/20;
   }
 
   .badge-accent {
@@ -547,7 +547,7 @@
   }
 
   .spinner {
-    @apply inline-block size-10 animate-spin rounded-full border-4 border-sage-300 border-r-coral-400;
+    @apply inline-block size-10 animate-spin rounded-full border-4 border-brand-200 border-r-brand-600;
   }
 
   .skeleton {
@@ -594,7 +594,7 @@
   .swiper-pagination-bullet-active {
     width: 22px !important;
     border-radius: 999px !important;
-    background: var(--color-coral-500) !important;
+    background: var(--color-brand-500) !important;
   }
 
   .gallery-slider-2 {
@@ -612,7 +612,7 @@
 
   .gallery-slider-2 .swiper-slide-thumb-active {
     opacity: 1;
-    box-shadow: 0 0 0 2px var(--color-sage-500);
+    box-shadow: 0 0 0 2px var(--color-brand-500);
   }
 }
 
@@ -652,12 +652,12 @@
 }
 
 .swal-button--confirm {
-  background-color: var(--color-sage-600) !important;
+  background-color: var(--color-brand-600) !important;
   color: #fff;
 }
 
 .swal-button--confirm:hover {
-  background-color: var(--color-sage-700) !important;
+  background-color: var(--color-brand-700) !important;
 }
 
 .swal-button--danger {
@@ -679,7 +679,7 @@
 .swal-content__input:focus,
 .swal-content__textarea:focus {
   outline: none;
-  border-color: var(--color-sage-500);
+  border-color: var(--color-brand-500);
   box-shadow: 0 0 0 4px rgb(21 128 122 / 0.18);
 }
 
@@ -793,10 +793,10 @@ html.dark .swal-text {
   flex-shrink: 0;
   border-radius: 50%;
   box-shadow:
-    0 0 0 10px var(--color-sage-400),
-    0 0 0 25px var(--color-sage-400),
+    0 0 0 10px var(--color-brand-400),
+    0 0 0 25px var(--color-brand-400),
     0 0 0 42px var(--color-coral-300),
-    0 0 0 65px var(--color-sage-400),
+    0 0 0 65px var(--color-brand-400),
     0 120px 0 -25px var(--color-coral-300),
     100px 70px 0 -25px var(--color-coral-300),
     80px 140px 0 -10px var(--color-coral-300),
@@ -811,7 +811,7 @@ html.dark .swal-text {
   margin: auto;
   width: 20px;
   height: 20px;
-  border: 3px solid var(--color-sage-400);
+  border: 3px solid var(--color-brand-400);
   border-radius: 50%;
   opacity: 0.2;
   animation: rings 3s ease-out infinite;

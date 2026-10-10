@@ -39,7 +39,7 @@ export default async function UserDashboardPage() {
           title="Orders"
           value={counts.orders}
           icon={LuShoppingBag}
-          tone="peach"
+          tone="sun"
           href={ROUTES.dashboard.orders}
         />
         <StatCard title="Tickets" value={counts.tickets} icon={LuTicket} tone="coral" href={ROUTES.dashboard.tickets} />
@@ -47,14 +47,14 @@ export default async function UserDashboardPage() {
           title="Comments"
           value={counts.comments}
           icon={LuMessageSquare}
-          tone="mint"
+          tone="sky"
           href={ROUTES.dashboard.comments}
         />
         <StatCard
           title="Favorites"
           value={counts.favorites}
           icon={LuHeart}
-          tone="sage"
+          tone="brand"
           href={ROUTES.dashboard.favorites}
         />
       </section>

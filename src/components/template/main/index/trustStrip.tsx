@@ -13,7 +13,7 @@ export default function TrustStrip() {
       <ul className="home-container grid grid-cols-2 gap-x-4 gap-y-6 py-6 lg:grid-cols-4 lg:py-8">
         {PROMISES.map(({ icon: Icon, title, text }) => (
           <li key={title} className="flex items-start gap-3">
-            <Icon className="mt-0.5 size-6 shrink-0 text-sage-600 dark:text-sage-400" aria-hidden="true" />
+            <Icon className="mt-0.5 size-6 shrink-0 text-brand-600 dark:text-brand-400" aria-hidden="true" />
             <div>
               <p className="text-sm font-bold text-text-dark dark:text-gray-100 sm:text-base">{title}</p>
               <p className="text-xs text-gray-700 dark:text-gray-500 sm:text-sm">{text}</p>

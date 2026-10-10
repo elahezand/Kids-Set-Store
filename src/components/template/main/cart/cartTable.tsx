@@ -144,7 +144,7 @@ const CartTable = ({ initialCart, addresses = [], defaultPhone = "", walletBalan
                     {["Product", "Price", "Quantity", "Total", ""].map((title, index) => (
                       <th
                         key={title || `actions-${index}`}
-                        className="bg-sage-400 p-4 text-center text-sm font-semibold uppercase tracking-wide text-white"
+                        className="bg-brand-400 p-4 text-center text-sm font-semibold uppercase tracking-wide text-white"
                       >
                         {title}
                       </th>
@@ -174,7 +174,7 @@ const CartTable = ({ initialCart, addresses = [], defaultPhone = "", walletBalan
                             <div className="flex flex-col gap-1">
                               <Link
                                 href={ROUTES.product(productId)}
-                                className="text-sm font-medium leading-6 text-text hover:text-coral-300 dark:text-gray-100"
+                                className="text-sm font-medium leading-6 text-text hover:text-brand-600 dark:text-gray-100"
                               >
                                 {title}
                               </Link>
@@ -188,13 +188,13 @@ const CartTable = ({ initialCart, addresses = [], defaultPhone = "", walletBalan
                         </td>
 
                         <td className="min-w-[160px] border-b border-gray-200 p-4 text-center align-middle dark:border-white/10">
-                          <div className="mx-auto flex w-[110px] items-center justify-between overflow-hidden rounded-lg border-2 border-coral-300">
+                          <div className="mx-auto flex w-[110px] items-center justify-between overflow-hidden rounded-lg border-2 border-gray-200">
                             <button
                               type="button"
                               aria-label="Decrease quantity"
                               onClick={() => changeQuantity(item, item.quantity - 1)}
                               disabled={item.quantity <= 1 || updateCart.isPending}
-                              className="flex-1 select-none bg-gray-50 py-1 transition-colors hover:bg-coral-300 hover:text-white disabled:opacity-40 dark:bg-ink-800"
+                              className="flex-1 select-none bg-gray-50 py-1 transition-colors hover:bg-brand-50 hover:text-brand-700 disabled:opacity-40 dark:bg-ink-800"
                             >
                               -
                             </button>
@@ -206,7 +206,7 @@ const CartTable = ({ initialCart, addresses = [], defaultPhone = "", walletBalan
                               aria-label="Increase quantity"
                               onClick={() => changeQuantity(item, item.quantity + 1)}
                               disabled={updateCart.isPending}
-                              className="flex-1 select-none bg-gray-50 py-1 transition-colors hover:bg-coral-300 hover:text-white disabled:opacity-40 dark:bg-ink-800"
+                              className="flex-1 select-none bg-gray-50 py-1 transition-colors hover:bg-brand-50 hover:text-brand-700 disabled:opacity-40 dark:bg-ink-800"
                             >
                               +
                             </button>
@@ -236,7 +236,7 @@ const CartTable = ({ initialCart, addresses = [], defaultPhone = "", walletBalan
 
             <section className="mt-6 flex flex-wrap items-center justify-end gap-4">
               {cart?.coupon ? (
-                <div className="flex items-center gap-3 rounded-lg border border-sage-400 px-4 py-2 text-sm">
+                <div className="flex items-center gap-3 rounded-lg border border-brand-400 px-4 py-2 text-sm">
                   <span>
                     Code <strong>{cart.coupon.code}</strong> applied
                   </span>
@@ -250,7 +250,7 @@ const CartTable = ({ initialCart, addresses = [], defaultPhone = "", walletBalan
                   </button>
                 </div>
               ) : (
-                <div className="flex h-11 items-center overflow-hidden rounded-lg border border-coral-300">
+                <div className="flex h-11 items-center overflow-hidden rounded-lg border border-gray-300">
                   <input
                     type="text"
                     value={discount}
@@ -266,7 +266,7 @@ const CartTable = ({ initialCart, addresses = [], defaultPhone = "", walletBalan
                     type="button"
                     onClick={applyDiscount}
                     disabled={updateCart.isPending}
-                    className="h-full whitespace-nowrap bg-coral-300 px-4 text-sm font-semibold text-white transition-colors hover:bg-coral-400 disabled:opacity-60 sm:px-5"
+                    className="h-full whitespace-nowrap bg-brand-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-60 sm:px-5"
                   >
                     {updateCart.isPending ? "Applying..." : "Apply"}
                   </button>
@@ -366,7 +366,7 @@ const CartTable = ({ initialCart, addresses = [], defaultPhone = "", walletBalan
               )}
               <div className="flex items-center justify-between">
                 <p>Total</p>
-                <p className="text-xl font-bold text-sage-500">{formatPrice(payable)}</p>
+                <p className="text-xl font-bold text-brand-500">{formatPrice(payable)}</p>
               </div>
             </div>
 

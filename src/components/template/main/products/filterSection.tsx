@@ -42,7 +42,7 @@ const parseSpecs = (raw: string | null): Record<string, string> => {
 };
 
 const controlClass =
-  "w-full rounded-xl border-2 border-coral-300 bg-white px-4 py-2.5 text-sm text-text outline-none transition-all focus:border-sage-400 dark:bg-ink-800 dark:text-gray-100 sm:text-base";
+  "w-full rounded-xl border-2 border-gray-200 bg-white px-4 py-2.5 text-sm text-text outline-none transition-all focus:border-brand-400 dark:bg-ink-800 dark:text-gray-100 sm:text-base";
 
 interface FilterSectionProps {
   categories?: CategoryNode[];
@@ -89,7 +89,7 @@ export default function FilterSection({ categories = [], categoryFilters = [] }:
 
   return (
     <div
-      className={`mb-8 rounded-2xl border border-sage-100 bg-sage-50 p-4 shadow-card transition-opacity dark:border-white/10 dark:bg-ink-800/60 ${isPending ? "opacity-70" : ""}`}
+      className={`mb-8 rounded-2xl border border-brand-100 bg-brand-50 p-4 shadow-card transition-opacity dark:border-white/10 dark:bg-ink-800/60 ${isPending ? "opacity-70" : ""}`}
       aria-busy={isPending}
     >
       <form
@@ -159,7 +159,7 @@ export default function FilterSection({ categories = [], categoryFilters = [] }:
             onChange={(e) => setMaxPrice(e.target.value)}
             onPointerUp={commitPrice}
             onKeyUp={commitPrice}
-            className="w-full accent-coral-300"
+            className="w-full accent-brand-500"
           />
         </label>
 
@@ -187,7 +187,7 @@ export default function FilterSection({ categories = [], categoryFilters = [] }:
       </div>
 
       {(choiceFilters.length > 0 || booleanFilters.length > 0) && (
-        <div className="mt-3 border-t border-sage-100 pt-3 dark:border-white/10">
+        <div className="mt-3 border-t border-brand-100 pt-3 dark:border-white/10">
           {choiceFilters.length > 0 && (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {choiceFilters.map((filter) => (
@@ -221,8 +221,8 @@ export default function FilterSection({ categories = [], categoryFilters = [] }:
                     onClick={() => setFilterValue(filter, active ? "" : "true")}
                     className={`rounded-full border-2 px-4 py-1.5 text-sm font-medium transition-colors ${
                       active
-                        ? "border-sage-600 bg-sage-600 text-white"
-                        : "border-coral-300 bg-white text-text hover:border-sage-400 dark:bg-ink-800 dark:text-gray-100"
+                        ? "border-brand-600 bg-brand-600 text-white"
+                        : "border-gray-200 bg-white text-text hover:border-brand-400 dark:bg-ink-800 dark:text-gray-100"
                     }`}
                   >
                     {filter.name}
@@ -241,7 +241,7 @@ export default function FilterSection({ categories = [], categoryFilters = [] }:
             setSearch("");
             clear();
           }}
-          className="mt-3 inline-flex items-center gap-1 text-sm text-gray-700 hover:text-coral-400 dark:text-gray-300"
+          className="mt-3 inline-flex items-center gap-1 text-sm text-gray-700 hover:text-brand-600 dark:text-gray-300"
         >
           <HiX className="size-4" />
           Clear filters

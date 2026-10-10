@@ -28,11 +28,11 @@ export default async function AdminDashboardPage() {
           value={formatPrice(revenue.total)}
           hint={`${formatPrice(revenue.last30Days)} in the last 30 days`}
           icon={LuBanknote}
-          tone="sage"
+          tone="brand"
         />
-        <StatCard title="Orders" value={counts.orders} icon={LuShoppingBag} tone="peach" href={ROUTES.admin.orders} />
-        <StatCard title="Products" value={counts.products} icon={LuPackage} tone="mint" href={ROUTES.admin.products} />
-        <StatCard title="Users" value={counts.users} icon={LuUsers} tone="sage" href={ROUTES.admin.users} />
+        <StatCard title="Orders" value={counts.orders} icon={LuShoppingBag} tone="sun" href={ROUTES.admin.orders} />
+        <StatCard title="Products" value={counts.products} icon={LuPackage} tone="sky" href={ROUTES.admin.products} />
+        <StatCard title="Users" value={counts.users} icon={LuUsers} tone="brand" href={ROUTES.admin.users} />
         <StatCard
           title="Tickets"
           value={counts.tickets}
@@ -45,7 +45,7 @@ export default async function AdminDashboardPage() {
           title="Comments to review"
           value={counts.pendingComments}
           icon={LuMessageSquare}
-          tone="peach"
+          tone="sun"
           href={`${ROUTES.admin.comments}?status=pending`}
         />
       </section>

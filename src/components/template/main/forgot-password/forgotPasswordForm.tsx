@@ -96,7 +96,7 @@ export default function ForgotPasswordForm() {
           >
             <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
               Code sent to <span className="font-semibold">{phoneNumber}</span>{" "}
-              <button type="button" onClick={changeNumber} className="font-semibold text-coral-400 underline">
+              <button type="button" onClick={changeNumber} className="font-semibold text-brand-600 underline">
                 Change
               </button>
             </p>
@@ -126,7 +126,7 @@ export default function ForgotPasswordForm() {
               {...resetForm.register("newPassword")}
             />
             {resetErrors.newPassword && <p className="field-error">{resetErrors.newPassword.message}</p>}
-            <small className="field-hint text-sage-500">Upper and lower case, a number and a symbol (@ # ! ...)</small>
+            <small className="field-hint text-brand-500">Upper and lower case, a number and a symbol (@ # ! ...)</small>
 
             <button type="submit" className="btn btn-primary mt-3 w-full" disabled={resetPassword.isPending}>
               {resetPassword.isPending ? "Processing..." : "Reset Password"}

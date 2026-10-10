@@ -67,7 +67,7 @@ export default function ContactsTable({ initialPage, params, filters, limit }: C
                 >
                   <span
                     aria-hidden="true"
-                    className={`mt-1.5 size-2 shrink-0 rounded-full ${unread ? "bg-sage-500" : "bg-transparent"}`}
+                    className={`mt-1.5 size-2 shrink-0 rounded-full ${unread ? "bg-brand-500" : "bg-transparent"}`}
                   />
                   <span className="min-w-0 flex-1">
                     <span className="flex items-baseline justify-between gap-3">

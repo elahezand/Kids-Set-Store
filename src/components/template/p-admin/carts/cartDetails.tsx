@@ -108,7 +108,7 @@ export default function CartDetails({ cart, onDelete, onClose }: CartDetailsProp
                 <dt className="text-gray-700 dark:text-gray-400">
                   Discount{detail.coupon ? ` (${detail.coupon.code})` : ""}
                 </dt>
-                <dd className="text-mint-700 tabular-nums dark:text-mint-300">
+                <dd className="text-success-700 tabular-nums dark:text-success-300">
                   −{formatPrice(detail.pricing.discount)}
                 </dd>
               </div>

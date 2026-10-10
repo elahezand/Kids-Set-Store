@@ -99,7 +99,7 @@ export default function SubscribersTable({ initialPage, params, filters, limit }
                 <td>
                   <a
                     href={`mailto:${subscriber.email}`}
-                    className="font-medium text-gray-900 hover:text-sage-700 hover:underline dark:text-gray-100 dark:hover:text-sage-300"
+                    className="font-medium text-gray-900 hover:text-brand-700 hover:underline dark:text-gray-100 dark:hover:text-brand-300"
                   >
                     {subscriber.email}
                   </a>

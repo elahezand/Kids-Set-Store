@@ -21,7 +21,7 @@ export default function ArticleCard({ _id, slug, author, title, cover, excerpt, 
         href={href}
         tabIndex={-1}
         aria-hidden="true"
-        className="relative block aspect-[4/3] overflow-hidden bg-sage-50 dark:bg-ink-900"
+        className="relative block aspect-[4/3] overflow-hidden bg-brand-50 dark:bg-ink-900"
       >
         {cover && (
           <Image
@@ -47,7 +47,7 @@ export default function ArticleCard({ _id, slug, author, title, cover, excerpt, 
         <h3 className="min-h-[3.1rem] font-shabnam-bold text-lg leading-snug text-text-dark dark:text-gray-100">
           <Link
             href={href}
-            className="line-clamp-2 transition-colors group-hover:text-sage-600 dark:group-hover:text-sage-300"
+            className="line-clamp-2 transition-colors group-hover:text-brand-600 dark:group-hover:text-brand-300"
           >
             {title}
           </Link>
@@ -69,7 +69,7 @@ export default function ArticleCard({ _id, slug, author, title, cover, excerpt, 
             <span className="truncate">{getAuthorName(author)}</span>
           </span>
 
-          <span className="shrink-0 text-gray-500 transition-colors hover:text-sage-600 dark:text-gray-400">
+          <span className="shrink-0 text-gray-500 transition-colors hover:text-brand-600 dark:text-gray-400">
             <ArticleShareButton share={share} />
           </span>
         </div>

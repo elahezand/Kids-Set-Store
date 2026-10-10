@@ -58,7 +58,7 @@ export default function CommentItem({
             <div className="flex flex-wrap items-center gap-2">
               <strong>{user?.username || "User"}</strong>
               {verifiedPurchase && <span className="text-xs font-medium text-green-600">✓ Verified Purchase</span>}
-              <span className="text-sm text-sage-400">{formatDate(createdAt)}</span>
+              <span className="text-sm text-brand-600">{formatDate(createdAt)}</span>
               {editedAt && <span className="text-xs text-gray-500">(edited {formatDate(editedAt)})</span>}
             </div>
             <Stars score={rating ?? 0} className="gap-1" />

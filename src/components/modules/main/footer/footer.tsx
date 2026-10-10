@@ -67,7 +67,7 @@ const Footer = ({ info = null }: { info?: SiteInfo | null }) => {
         <div>
           <Link
             href={ROUTES.home}
-            className="inline-flex items-center text-2xl font-bold tracking-tight text-sage-600 dark:text-sage-300"
+            className="inline-flex items-center text-2xl font-bold tracking-tight text-brand-600 dark:text-brand-300"
             aria-label="Home"
           >
             <SiteLogo src={info?.logo} className="h-12 w-auto max-w-[180px]" />
@@ -80,9 +80,9 @@ const Footer = ({ info = null }: { info?: SiteInfo | null }) => {
           <ul className="mt-6 flex flex-col gap-3 text-sm">
             {contactInfo.map(({ icon: Icon, text, href }) => (
               <li key={text} className="flex items-center gap-3">
-                <Icon className="size-4 shrink-0 text-sage-600 dark:text-sage-400" />
+                <Icon className="size-4 shrink-0 text-brand-600 dark:text-brand-400" />
                 {href ? (
-                  <a href={href} className="transition-colors hover:text-sage-600 dark:hover:text-sage-300">
+                  <a href={href} className="transition-colors hover:text-brand-600 dark:hover:text-brand-300">
                     {text}
                   </a>
                 ) : (
@@ -106,7 +106,7 @@ const Footer = ({ info = null }: { info?: SiteInfo | null }) => {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-gray-700 transition-colors hover:text-sage-600 dark:text-gray-400 dark:hover:text-sage-300"
+                      className="text-gray-700 transition-colors hover:text-brand-600 dark:text-gray-400 dark:hover:text-brand-300"
                     >
                       {link.label}
                     </Link>
@@ -132,7 +132,7 @@ const Footer = ({ info = null }: { info?: SiteInfo | null }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex size-9 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-white hover:text-sage-600 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-sage-300"
+                  className="flex size-9 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-white hover:text-brand-600 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-brand-300"
                 >
                   <Icon className="size-4" />
                 </a>

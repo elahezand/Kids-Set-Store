@@ -85,7 +85,7 @@ export default function SaleCord() {
           style={{
             height: `calc(var(--rope) + ${pull}px)`,
             backgroundImage:
-              "repeating-linear-gradient(160deg, var(--color-coral-400) 0 5px, var(--color-sage-300) 5px 10px)",
+              "repeating-linear-gradient(160deg, var(--color-coral-400) 0 5px, var(--color-brand-300) 5px 10px)",
           }}
         />
 
@@ -97,9 +97,9 @@ export default function SaleCord() {
           onPointerCancel={onPointerUp}
           onKeyDown={onKeyDown}
           aria-label="Pull down to see products on sale"
-          className={`pointer-events-auto relative -mt-px flex touch-none flex-col items-center rounded-2xl px-3 pt-3 pb-2.5 text-white shadow-float transition-[transform,background-color] duration-200 select-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sage-500 sm:px-4 ${
+          className={`pointer-events-auto relative -mt-px flex touch-none flex-col items-center rounded-2xl px-3 pt-3 pb-2.5 text-white shadow-float transition-[transform,background-color] duration-200 select-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500 sm:px-4 ${
             dragging ? "scale-105 cursor-grabbing" : "cursor-grab hover:-rotate-3"
-          } ${ready ? "bg-sage-600" : "bg-coral-500"}`}
+          } ${ready ? "bg-brand-600" : "bg-coral-500"}`}
         >
           <span
             aria-hidden="true"

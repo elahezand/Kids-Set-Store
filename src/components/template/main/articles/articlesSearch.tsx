@@ -64,7 +64,7 @@ export default function ArticlesSearch({ categories = [] }: { categories?: Artic
             setValue("");
             update({ q: "", category: "" });
           }}
-          className="inline-flex items-center justify-center gap-1 text-sm text-gray-600 hover:text-coral-300 dark:text-gray-400"
+          className="inline-flex items-center justify-center gap-1 text-sm text-gray-600 hover:text-brand-600 dark:text-gray-400"
         >
           <HiX className="size-4" />
           Clear

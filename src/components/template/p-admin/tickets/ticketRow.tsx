@@ -15,7 +15,7 @@ export default function TicketRow({ ticket }: { ticket: AdminTicket }) {
       className="group flex items-center justify-between gap-3 px-4 py-4 transition-colors hover:bg-gray-50 sm:gap-4 sm:px-5 dark:hover:bg-white/[0.02]"
     >
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-gray-900 group-hover:text-sage-700 dark:text-gray-100 dark:group-hover:text-sage-300">
+        <p className="truncate text-sm font-medium text-gray-900 group-hover:text-brand-700 dark:text-gray-100 dark:group-hover:text-brand-300">
           {ticket.title}
         </p>
         <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-700 dark:text-gray-500">

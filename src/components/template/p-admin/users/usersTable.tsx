@@ -53,7 +53,7 @@ export default function UsersTable({ initialPage, params, filters, currentUserId
         height={36}
         src={user.profilePicture || DEFAULT_AVATAR}
         alt=""
-        className="size-9 shrink-0 rounded-full object-cover ring-2 ring-sage-100 dark:ring-white/10"
+        className="size-9 shrink-0 rounded-full object-cover ring-2 ring-brand-100 dark:ring-white/10"
       />
       <div className="min-w-0 leading-tight">
         <p className="truncate font-medium text-gray-900 dark:text-gray-100">

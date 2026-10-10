@@ -19,7 +19,7 @@ export default function FavoriteItems({ initialPage, limit = 20 }: FavoriteItems
   if (!products.length && !hasNextPage) {
     return (
       <div className="py-8 text-center leading-tight text-text dark:text-gray-100" data-aos="fade-up">
-        <FaRegHeart className="mx-auto text-[7rem] text-sage-300 sm:text-[9rem] md:text-[10rem]" />
+        <FaRegHeart className="mx-auto text-[7rem] text-brand-300 sm:text-[9rem] md:text-[10rem]" />
         <p className="mb-3 mt-6 text-2xl font-bold sm:text-3xl md:text-4xl">No Product Found</p>
         <span className="mb-1.5 block text-gray-600 dark:text-gray-400">
           You do not have any products in your favorites list yet.

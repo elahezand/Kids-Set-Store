@@ -30,12 +30,12 @@ export default function AddToBasket({ productId, variantId = null, maxQty, disab
   };
 
   const stepperBtn =
-    "flex h-full w-10 items-center justify-center text-coral-300 transition hover:bg-coral-300/10 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-300";
+    "flex h-full w-10 items-center justify-center text-brand-600 transition hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300";
 
   return (
     <div className="flex w-full items-stretch gap-3">
       <div
-        className={`flex h-12 items-center overflow-hidden rounded-xl border-2 border-coral-300 ${
+        className={`flex h-12 items-center overflow-hidden rounded-xl border-2 border-gray-200 ${
           disabled ? "opacity-50" : ""
         }`}
       >

@@ -18,7 +18,7 @@ export default function ScrollToTop() {
       type="button"
       aria-label="Scroll to top"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className={`fixed bottom-6 left-4 z-40 flex size-12 items-center justify-center rounded-full bg-coral-300 text-3xl text-white shadow-float transition-all duration-200 hover:bg-coral-400 ${visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"}`}
+      className={`fixed bottom-6 left-4 z-40 flex size-12 items-center justify-center rounded-full bg-brand-500 text-3xl text-white shadow-float transition-all duration-200 hover:bg-brand-600 ${visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"}`}
     >
       <MdKeyboardArrowUp />
     </button>

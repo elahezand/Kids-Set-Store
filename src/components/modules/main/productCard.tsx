@@ -11,15 +11,6 @@ import { PLACEHOLDER_IMAGE, ROUTES } from "@/utils/constants";
 import { formatPrice } from "@/utils/format";
 import type { ProductCardData } from "@/types";
 
-const PHOTO_TINTS = [
-  "bg-coral-50 dark:bg-coral-500/10",
-  "bg-sky-50 dark:bg-sky-500/10",
-  "bg-sun-50 dark:bg-sun-500/10",
-  "bg-sage-50 dark:bg-sage-500/10",
-] as const;
-
-const tintFor = (id: string) => PHOTO_TINTS[id.charCodeAt(id.length - 1) % PHOTO_TINTS.length];
-
 const IMAGE_SIZES = "(min-width: 1280px) 20vw, (min-width: 768px) 25vw, 50vw";
 
 const buttonBase =
@@ -62,15 +53,15 @@ export default function ProductCard({
   const buttonColor = !inStock
     ? "bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-gray-400"
     : justAdded
-      ? "bg-mint-500 text-white"
-      : "bg-sage-600 text-white hover:bg-sage-700";
+      ? "bg-success-500 text-white"
+      : "bg-brand-600 text-white hover:bg-brand-700";
 
   return (
     <article className="group relative flex h-full flex-col rounded-3xl bg-white p-2.5 ring-1 ring-gray-200/70 transition-shadow duration-300 hover:shadow-float sm:p-3 dark:bg-ink-800 dark:ring-white/5">
       <Link
         href={href}
         aria-label={name}
-        className={`relative block aspect-square overflow-hidden rounded-2xl focus-visible:ring-2 focus-visible:ring-sage-500 focus-visible:outline-none ${tintFor(_id)}`}
+        className={`relative block aspect-square overflow-hidden rounded-2xl focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none bg-gray-50 dark:bg-white/5`}
       >
         <Image
           fill
@@ -133,7 +124,7 @@ export default function ProductCard({
         {needsChoice ? (
           <Link
             href={href}
-            className={`${buttonBase} ${inStock ? "bg-sage-600 text-white hover:bg-sage-700" : buttonColor}`}
+            className={`${buttonBase} ${inStock ? "bg-brand-600 text-white hover:bg-brand-700" : buttonColor}`}
             aria-label={`Choose options for ${name}`}
           >
             <LuSlidersHorizontal className="size-4" />

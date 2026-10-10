@@ -8,8 +8,7 @@ const TINTS = [
   { bg: "bg-coral-50 dark:bg-coral-500/10", motif: "text-coral-200 dark:text-coral-500/30", letter: "text-coral-500" },
   { bg: "bg-sky-50 dark:bg-sky-500/10", motif: "text-sky-200 dark:text-sky-500/30", letter: "text-sky-500" },
   { bg: "bg-sun-50 dark:bg-sun-500/10", motif: "text-sun-200 dark:text-sun-500/30", letter: "text-sun-500" },
-  { bg: "bg-mint-50 dark:bg-mint-500/10", motif: "text-mint-200 dark:text-mint-500/30", letter: "text-mint-500" },
-  { bg: "bg-sage-50 dark:bg-sage-500/10", motif: "text-sage-200 dark:text-sage-500/30", letter: "text-sage-500" },
+  { bg: "bg-brand-50 dark:bg-brand-500/10", motif: "text-brand-200 dark:text-brand-500/30", letter: "text-brand-500" },
 ];
 
 const MOTIFS: ReactNode[] = [
@@ -78,8 +77,8 @@ export default function Categories({ categories = [] }: { categories?: CategoryN
         >
           <defs>
             <linearGradient id="categories-blob-fill" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="currentColor" className="text-sage-100 dark:text-sage-500/15" />
-              <stop offset="100%" stopColor="currentColor" className="text-mint-50 dark:text-mint-500/5" />
+              <stop offset="0%" stopColor="currentColor" className="text-brand-100 dark:text-brand-500/15" />
+              <stop offset="100%" stopColor="currentColor" className="text-sky-50 dark:text-sky-500/5" />
             </linearGradient>
           </defs>
 
@@ -97,7 +96,7 @@ export default function Categories({ categories = [] }: { categories?: CategoryN
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
             transform="rotate(-3 400 200)"
-            className="stroke-sage-400 dark:stroke-sage-500/40"
+            className="stroke-brand-400 dark:stroke-brand-500/40"
           />
         </svg>
 
@@ -122,10 +121,10 @@ export default function Categories({ categories = [] }: { categories?: CategoryN
               <li key={category.id}>
                 <Link
                   href={ROUTES.category(category.slug)}
-                  className="group flex flex-col items-center gap-3 rounded-2xl p-1 text-center focus-visible:ring-2 focus-visible:ring-sage-500 focus-visible:outline-none"
+                  className="group flex flex-col items-center gap-3 rounded-2xl p-1 text-center focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
                 >
                   <span
-                    className={`relative flex size-24 items-center justify-center overflow-hidden rounded-full shadow-card ring-4 ring-white transition duration-300 after:pointer-events-none after:absolute after:inset-1.5 after:rounded-full after:border after:border-white/80 group-hover:-translate-y-1.5 group-hover:shadow-float group-hover:ring-sage-500 motion-reduce:transition-none sm:size-28 lg:size-44 lg:after:inset-2.5 dark:ring-ink-900 dark:after:border-white/10 ${tint.bg}`}
+                    className={`relative flex size-24 items-center justify-center overflow-hidden rounded-full shadow-card ring-4 ring-white transition duration-300 after:pointer-events-none after:absolute after:inset-1.5 after:rounded-full after:border after:border-white/80 group-hover:-translate-y-1.5 group-hover:shadow-float group-hover:ring-brand-500 motion-reduce:transition-none sm:size-28 lg:size-44 lg:after:inset-2.5 dark:ring-ink-900 dark:after:border-white/10 ${tint.bg}`}
                   >
                     <svg
                       viewBox="0 0 64 64"

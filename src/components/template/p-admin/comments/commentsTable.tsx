@@ -52,7 +52,7 @@ export default function CommentsTable({ initialPage, params, filters, limit }: C
       <Link
         href={ROUTES.product(String(comment.product._id))}
         target="_blank"
-        className="font-medium text-gray-900 hover:text-sage-700 dark:text-gray-100 dark:hover:text-sage-300"
+        className="font-medium text-gray-900 hover:text-brand-700 dark:text-gray-100 dark:hover:text-brand-300"
       >
         {comment.product.title}
       </Link>
@@ -271,8 +271,8 @@ function ReplyItem({
   onDelete?: () => void;
 }) {
   return (
-    <div className="mt-2 flex items-start gap-2 rounded-xl border-l-4 border-sage-300 bg-sage-50/60 py-2 pr-2 pl-3 dark:border-sage-500/40 dark:bg-sage-500/5">
-      <LuCornerDownRight className="mt-0.5 size-3.5 shrink-0 text-sage-600" />
+    <div className="mt-2 flex items-start gap-2 rounded-xl border-l-4 border-brand-300 bg-brand-50/60 py-2 pr-2 pl-3 dark:border-brand-500/40 dark:bg-brand-500/5">
+      <LuCornerDownRight className="mt-0.5 size-3.5 shrink-0 text-brand-600" />
       <div className="min-w-0 flex-1">
         <p className="text-xs text-gray-700 dark:text-gray-400">
           <span className="font-medium text-gray-900 dark:text-gray-100">Store reply</span>

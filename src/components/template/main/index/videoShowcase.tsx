@@ -109,7 +109,7 @@ export default function VideoShowcase() {
             <path
               d={BLOB_PATH}
               transform="rotate(-3 400 200) translate(-6 14)"
-              className="fill-peach-50 dark:fill-peach-500/5"
+              className="fill-sun-50 dark:fill-sun-500/5"
             />
             <path
               d={BLOB_PATH}
@@ -120,7 +120,7 @@ export default function VideoShowcase() {
 
           <div className="relative">
             <div
-              className="relative overflow-hidden bg-sage-100 dark:bg-ink-800"
+              className="relative overflow-hidden bg-brand-100 dark:bg-ink-800"
               style={{ clipPath: `url(#${clipId})` }}
             >
               <video
@@ -151,7 +151,7 @@ export default function VideoShowcase() {
                 strokeLinecap="round"
                 vectorEffect="non-scaling-stroke"
                 transform="rotate(-2 400 200)"
-                className="stroke-sage-500 dark:stroke-sage-400/50"
+                className="stroke-brand-500 dark:stroke-brand-400/50"
               />
             </svg>
 
@@ -160,7 +160,7 @@ export default function VideoShowcase() {
                 type="button"
                 onClick={playNow}
                 aria-label="Play the video"
-                className="absolute inset-0 m-auto flex size-16 items-center justify-center rounded-full bg-white/90 text-sage-700 shadow-float ring-4 ring-white/60 transition hover:scale-105 sm:size-20"
+                className="absolute inset-0 m-auto flex size-16 items-center justify-center rounded-full bg-white/90 text-brand-700 shadow-float ring-4 ring-white/60 transition hover:scale-105 sm:size-20"
               >
                 <LuPlay className="size-7 translate-x-0.5 sm:size-8" aria-hidden="true" />
               </button>

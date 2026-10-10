@@ -7,14 +7,14 @@ import { Toaster } from "sonner";
 
 const TOAST_CLASSES = {
   toast:
-    "rounded-2xl! border! border-sage-100! bg-white! px-4! py-3.5! text-gray-800! shadow-float! font-sans! dark:border-y-white/10! dark:border-r-white/10! dark:bg-ink-800! dark:text-gray-100!",
+    "rounded-2xl! border! border-brand-100! bg-white! px-4! py-3.5! text-gray-800! shadow-float! font-sans! dark:border-y-white/10! dark:border-r-white/10! dark:bg-ink-800! dark:text-gray-100!",
   title: "text-sm! font-semibold!",
   description: "text-xs! text-gray-600! dark:text-gray-400!",
-  success: "border-l-4! border-l-mint-400! [&_[data-icon]]:text-mint-500!",
+  success: "border-l-4! border-l-success-400! [&_[data-icon]]:text-success-500!",
   error: "border-l-4! border-l-coral-400! [&_[data-icon]]:text-coral-500!",
-  info: "border-l-4! border-l-sage-400! [&_[data-icon]]:text-sage-500!",
-  warning: "border-l-4! border-l-peach-400! [&_[data-icon]]:text-peach-500!",
-  closeButton: "border-sage-100! bg-white! text-gray-500! hover:text-coral-500! dark:border-white/10! dark:bg-ink-800!",
+  info: "border-l-4! border-l-brand-400! [&_[data-icon]]:text-brand-500!",
+  warning: "border-l-4! border-l-warning-400! [&_[data-icon]]:text-warning-500!",
+  closeButton: "border-brand-100! bg-white! text-gray-500! hover:text-coral-500! dark:border-white/10! dark:bg-ink-800!",
 };
 
 const createQueryClient = () =>

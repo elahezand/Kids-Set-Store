@@ -20,7 +20,7 @@ export default function CategoryFilter({ categories, value, param = "category" }
         onChange={(event) => update({ [param]: event.target.value || null })}
         disabled={isPending}
         aria-label="Filter by category"
-        className={`input w-auto max-w-[14rem] py-1.5 pl-8 text-xs ${value ? "border-sage-500 text-sage-700 dark:text-sage-300" : ""}`}
+        className={`input w-auto max-w-[14rem] py-1.5 pl-8 text-xs ${value ? "border-brand-500 text-brand-700 dark:text-brand-300" : ""}`}
       >
         <option value="">All categories</option>
         {categories.map((category) => (

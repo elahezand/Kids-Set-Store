@@ -28,7 +28,7 @@ const Rating = ({ score, commentsCount }: { score: number; commentsCount: number
 
     <a
       href="#comments"
-      className="text-sm text-gray-500 underline-offset-2 hover:text-sage-400 hover:underline dark:text-gray-400"
+      className="text-sm text-gray-500 underline-offset-2 hover:text-brand-400 hover:underline dark:text-gray-400"
     >
       {commentsCount} reviews
     </a>
@@ -40,7 +40,7 @@ const Price = ({ price, originalPrice }: { price: number; originalPrice: number 
 
   return (
     <div className="flex flex-wrap items-baseline gap-3">
-      <span className="font-shabnam-bold text-4xl leading-none text-sage-400">{formatPrice(price)}</span>
+      <span className="font-shabnam-bold text-4xl leading-none text-brand-600">{formatPrice(price)}</span>
       {originalPrice !== null && (
         <>
           <span className="text-lg text-gray-400 line-through">{formatPrice(originalPrice)}</span>
@@ -97,10 +97,10 @@ const VariantSelector = ({ options, variants, selectedAttributes, onSelect }: Va
                     type="button"
                     aria-pressed={isActive}
                     onClick={() => onSelect(attribute, value)}
-                    className={`flex min-h-[44px] min-w-[52px] items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-400 focus-visible:ring-offset-2 ${
+                    className={`flex min-h-[44px] min-w-[52px] items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 ${
                       isActive
-                        ? "border-sage-400 bg-sage-400/10 text-sage-400 ring-1 ring-sage-400"
-                        : "border-gray-300 hover:border-sage-400 dark:border-white/20"
+                        ? "border-brand-500 bg-brand-50 text-brand-700 ring-1 ring-brand-500"
+                        : "border-gray-300 hover:border-brand-400 dark:border-white/20"
                     } ${available ? "" : "opacity-50 line-through"}`}
                   >
                     {isColor && (
@@ -148,7 +148,7 @@ const Details = ({ product, commentsCount, selection, isFavorited }: DetailsProp
         <Rating score={product.score} commentsCount={commentsCount} />
       </header>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-sage-400/20 bg-sage-400/5 p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-400/20 bg-brand-400/5 p-5">
         <Price price={price} originalPrice={originalPrice} />
         <StockBadge inStock={inStock} />
       </div>
@@ -187,7 +187,7 @@ const Details = ({ product, commentsCount, selection, isFavorited }: DetailsProp
             <Link
               key={category._id ?? category.slug}
               href={ROUTES.category(category.slug)}
-              className="text-sage-500 hover:text-coral-300 hover:underline"
+              className="text-brand-500 hover:text-coral-300 hover:underline"
             >
               {category.title}
             </Link>
@@ -218,7 +218,7 @@ const Details = ({ product, commentsCount, selection, isFavorited }: DetailsProp
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Share on ${name}`}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-sage-400 transition hover:-translate-y-0.5 hover:bg-sage-400 hover:text-white dark:border-white/20"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-brand-600 transition hover:-translate-y-0.5 hover:bg-brand-400 hover:text-white dark:border-white/20"
             >
               <Icon className="text-base" />
             </a>

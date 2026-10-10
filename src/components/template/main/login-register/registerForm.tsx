@@ -86,7 +86,7 @@ const RegisterForm = ({ showLoginForm }: { showLoginForm: () => void }) => {
               {...register("password")}
             />
             {errors.password && <span className="field-error">{errors.password.message}</span>}
-            <small className="field-hint text-sage-500">Upper and lower case, a number and a symbol (@ # ! ...)</small>
+            <small className="field-hint text-brand-500">Upper and lower case, a number and a symbol (@ # ! ...)</small>
           </div>
         )}
 
@@ -111,7 +111,7 @@ const RegisterForm = ({ showLoginForm }: { showLoginForm: () => void }) => {
 
         <button type="button" onClick={showLoginForm} className="mt-2 font-bold text-text dark:text-gray-100">
           Already have an account? <br />
-          <strong className="text-sage-500">Log In</strong>
+          <strong className="text-brand-500">Log In</strong>
         </button>
       </div>
 

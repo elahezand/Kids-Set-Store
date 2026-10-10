@@ -85,7 +85,7 @@ export default function NotificationComposer({
               setRecipients(next);
               report({ ready: next.size > 0 && msg.trim().length >= 3 && !linkInvalid });
             }}
-            className="text-xs font-medium text-sage-700 hover:underline dark:text-sage-300"
+            className="text-xs font-medium text-brand-700 hover:underline dark:text-brand-300"
           >
             {allSelected ? "Clear" : "All admins"}
           </button>
@@ -96,9 +96,9 @@ export default function NotificationComposer({
             return (
               <label
                 key={admin._id}
-                className={`flex cursor-pointer items-center gap-2 rounded-full border py-1 pr-3 pl-1 text-sm transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sage-500 ${
+                className={`flex cursor-pointer items-center gap-2 rounded-full border py-1 pr-3 pl-1 text-sm transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-500 ${
                   checked
-                    ? "border-sage-400 bg-sage-50 text-sage-800 dark:border-sage-500/50 dark:bg-sage-500/10 dark:text-sage-200"
+                    ? "border-brand-400 bg-brand-50 text-brand-800 dark:border-brand-500/50 dark:bg-brand-500/10 dark:text-brand-200"
                     : "border-gray-200 text-gray-800 hover:border-gray-300 dark:border-white/10 dark:text-gray-300"
                 }`}
               >

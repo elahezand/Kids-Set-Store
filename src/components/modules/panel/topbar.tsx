@@ -126,7 +126,7 @@ export default function Topbar({ user, onMenuClick }: TopbarProps) {
             height={36}
             alt={user?.username || "avatar"}
             src={user?.profilePicture || DEFAULT_AVATAR}
-            className="size-9 rounded-full object-cover ring-2 ring-sage-100 dark:ring-white/10"
+            className="size-9 rounded-full object-cover ring-2 ring-brand-100 dark:ring-white/10"
           />
           <div className="hidden max-w-40 leading-tight sm:block">
             <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">{user?.username}</p>

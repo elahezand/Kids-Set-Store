@@ -87,7 +87,7 @@ export default function OrdersTable({ initialPage, params, filters, limit }: Ord
     awaitsCash(order)
       ? order.isCashOverdue
         ? "bg-danger-50/60 dark:bg-danger-500/5"
-        : "bg-peach-50/60 dark:bg-peach-500/5"
+        : "bg-warning-50/60 dark:bg-warning-500/5"
       : "";
 
   const actions = (order: AdminOrder) => (

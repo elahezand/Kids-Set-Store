@@ -46,7 +46,7 @@ export default function TicketThread({ ticket }: TicketThreadProps) {
                 aria-hidden="true"
                 className={`flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold sm:size-9 ${
                   fromSupport
-                    ? "bg-sage-600 text-white"
+                    ? "bg-brand-600 text-white"
                     : "bg-coral-100 text-coral-600 dark:bg-coral-500/15 dark:text-coral-300"
                 }`}
               >
@@ -67,7 +67,7 @@ export default function TicketThread({ ticket }: TicketThreadProps) {
                 <p
                   className={`rounded-2xl px-4 py-3 text-left text-sm leading-6 break-words whitespace-pre-line shadow-card ${
                     fromSupport
-                      ? "rounded-br-sm bg-sage-600 text-white"
+                      ? "rounded-br-sm bg-brand-600 text-white"
                       : "rounded-bl-sm border border-gray-200 bg-white text-gray-800 dark:border-white/10 dark:bg-ink-900 dark:text-gray-200"
                   }`}
                 >

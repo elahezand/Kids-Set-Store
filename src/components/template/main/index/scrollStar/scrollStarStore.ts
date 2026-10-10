@@ -22,4 +22,4 @@ export const scrollStarStore = {
 
 export const CANVAS_STAR_PX = 37;
 
-export const SCROLL_STAR_COLOR = "#0f71c2";
+export const SCROLL_STAR_COLOR = "#1d86bf";

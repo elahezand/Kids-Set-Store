@@ -142,7 +142,7 @@ export default function CategoriesManager({ categories }: { categories: AdminCat
                   <Link
                     href={ROUTES.category(row.slug)}
                     target="_blank"
-                    className="inline-flex items-center gap-1 hover:text-sage-700 dark:hover:text-sage-300"
+                    className="inline-flex items-center gap-1 hover:text-brand-700 dark:hover:text-brand-300"
                     title="Open in the store"
                   >
                     {row.productsCount} products

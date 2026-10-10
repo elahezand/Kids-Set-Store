@@ -74,7 +74,7 @@ export default function OrdersList({ initialPage, limit, status }: OrdersListPro
     if (order.status === "cancelled" && order.refundAmount) {
       return (
         <span
-          className={`flex items-center gap-1 text-xs text-sage-700 dark:text-sage-300 ${compact ? "justify-end" : ""}`}
+          className={`flex items-center gap-1 text-xs text-brand-700 dark:text-brand-300 ${compact ? "justify-end" : ""}`}
         >
           <LuWallet className="size-3.5" /> {formatPrice(order.refundAmount)} refunded to your wallet
         </span>
